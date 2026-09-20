@@ -120,7 +120,7 @@
     background:radial-gradient(ellipse 62% 54% at 50% 50%, rgba(5,6,12,.8) 0%, rgba(5,6,12,.5) 52%, rgba(5,6,12,0) 100%);
   }
   .hero-core{
-    width:min(100%,780px); display:flex; flex-direction:column; align-items:center;
+    width:min(100%,900px); display:flex; flex-direction:column; align-items:center;
     gap:24px; text-align:center;
   }
   .hero h1{
@@ -128,6 +128,7 @@
     line-height:.98; letter-spacing:-.042em; text-wrap:balance;
     text-shadow:0 2px 40px rgba(5,6,12,.9);
   }
+  .hero .search-shell{max-width:720px;}
   .hero-sub{
     color:var(--ink-2); font-size:clamp(1rem,1.6vw,1.15rem); line-height:1.6;
     max-width:48ch; text-wrap:pretty; text-shadow:0 1px 24px rgba(5,6,12,.95);
@@ -135,7 +136,7 @@
 
   /* search (shared by hero and map) */
   .search-shell{
-    position:relative; width:100%; height:66px; padding:0 9px 0 22px;
+    position:relative; z-index:20; width:100%; height:66px; padding:0 9px 0 22px;
     display:flex; align-items:center; gap:12px; text-align:left;
     border-radius:22px; background:var(--glass);
     -webkit-backdrop-filter:blur(22px) saturate(1.35); backdrop-filter:blur(22px) saturate(1.35);
@@ -146,7 +147,8 @@
     content:''; position:absolute; inset:0; border-radius:inherit; padding:1.5px; pointer-events:none;
     background:var(--spectrum); opacity:.55; transition:opacity .2s;
     -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite:xor; mask:linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;
+    mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     mask-composite:exclude;
   }
   .search-shell:focus-within{box-shadow:0 0 0 5px rgba(165,172,255,.14), 0 30px 80px -24px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.07);}
@@ -202,7 +204,7 @@
     font-size:.8125rem; color:var(--ink-2); white-space:nowrap;
   }
   .pill b{color:var(--ink); font-weight:600;}
-  .pill .sep{width:1px; height:14px; background:var(--line-strong);}
+  .pill .sep{display:block; width:1px; height:14px; background:var(--line-strong);}
   .live-dot{width:7px; height:7px; border-radius:50%; background:var(--known); box-shadow:0 0 8px var(--known); flex-shrink:0;}
   .pill .rel{display:flex; align-items:center; gap:8px;}
   .scroll-link{
@@ -295,7 +297,7 @@
   .strip{display:flex; gap:2px; height:8px;}
   .strip i{display:block; width:18px; border-radius:2px;}
   .legend{display:flex; align-items:center; gap:10px; white-space:nowrap;}
-  .map-bar .sep{width:1px; height:16px; background:var(--line-strong);}
+  .map-bar .sep{display:block; width:1px; height:16px; background:var(--line-strong);}
   #mapReadout{white-space:nowrap; min-width:200px;}
   @media(hover:none){ .map-bar .sep, #mapReadout{display:none;} }
   @media(max-width:560px){ #mapReadout, .map-bar .sep{display:none;} }
@@ -357,7 +359,7 @@
   }
   .viewer-tag.epoch{left:auto; right:12px; color:var(--ink);}
   .viewer-controls{padding:16px 18px; border-top:1px solid var(--line); background:var(--space-2); display:flex; flex-direction:column; gap:16px;}
-  .transport{display:flex; align-items:center; gap:12px;}
+  .transport{display:flex; align-items:center; flex-wrap:wrap; gap:12px;}
   .play{
     width:44px; height:44px; border-radius:50%; border:0; background:var(--ink); color:var(--space);
     display:grid; place-items:center; flex-shrink:0; transition:background .15s, transform .1s;
@@ -365,7 +367,7 @@
   .play:hover{background:#fff;}
   .play:active{transform:scale(.95);}
   .play .icon{width:20px; height:20px;}
-  .speed{flex:1; display:flex; align-items:center; gap:12px; min-width:0; font-size:.8125rem; color:var(--ink-2);}
+  .speed{flex:1 1 220px; display:flex; align-items:center; gap:12px; min-width:0; font-size:.8125rem; color:var(--ink-2);}
   .speed input[type=range]{flex:1; min-width:60px; accent-color:#7c83fd;}
   .speed output{width:56px; text-align:right; color:var(--ink);}
   .diff-row{display:flex; align-items:center; justify-content:space-between; gap:16px; font-size:.8125rem; color:var(--ink-2);}
@@ -869,11 +871,11 @@
     about:'About – SpectraHunt',
     field:'Field – SpectraHunt'
   };
-  let view = 'home', prevView = 'home', currentField = null, firstRoute = true, candFilter = 'all';
+  let view = 'home', currentField = null, firstRoute = true, candFilter = 'all';
 
   function routeName(){
     const n = (location.hash.replace(/^#\/?/, '') || 'home').split(/[?/]/)[0];
-    return VIEWS.includes(n) ? n : (n==='how' ? 'home' : 'home');
+    return VIEWS.includes(n) ? n : 'home';
   }
   function navigate(name){
     const target = name==='home' ? '#/' : '#/'+name;
@@ -881,13 +883,17 @@
     else location.hash = target;
   }
   function route(){
-    if(location.hash === '#how'){ return; }            /* in-page anchor on home */
+    if(location.hash === '#how'){                        /* deep link to the how-it-works section */
+      show('home'); requestAnimationFrame(() => $('#how').scrollIntoView({block:'start'})); return;
+    }
     let name = routeName();
-    if(name==='field' && !currentField){ name = 'home'; history.replaceState(null,'','#/'); }
+    if(name==='field' && !currentField){
+      name = 'home';
+      try{ history.replaceState(null,'','#/'); }catch(err){ location.hash = '#/'; }
+    }
     show(name);
   }
   function show(name){
-    if(name !== view){ prevView = view; }
     if(name !== 'field' && playing) setPlaying(false);
     if(name !== 'candidates') stopThumbs();
     view = name;
@@ -899,7 +905,7 @@
       if(on) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current');
     });
     document.title = TITLES[name];
-    if(!firstRoute){ window.scrollTo(0,0); $('#main').focus({preventScroll:true}); }
+    if(!firstRoute){ window.scrollTo({top:0, left:0, behavior:'instant'}); $('#main').focus({preventScroll:true}); }
     firstRoute = false;
     if(name==='candidates') buildCandidates();
     if(name!=='map') closeInspector();
@@ -914,7 +920,7 @@
   });
 
   /* ================= canvas plumbing ================= */
-  const hero = {host:$('#hero'), canvas:$('#heroCanvas'), w:0, h:0, stars:[], blobs:[]};
+  const hero = {host:$('#hero'), core:$('.hero-core'), canvas:$('#heroCanvas'), w:0, h:0, stars:[], blobs:[], mover:null};
   const map  = {host:$('#view-map'), canvas:$('#mapCanvas'), w:0, h:0, stars:[], blobs:[], hover:null, selected:null, coverage:true};
   hero.ctx = hero.canvas.getContext('2d');
   map.ctx  = map.canvas.getContext('2d');
@@ -932,11 +938,21 @@
     const rng = mulberry32(seed), hues = [235,205,20,265,300];
     return hues.map(hue => ({x:rng(), y:rng(), r:.14 + rng()*.2, hue}));
   }
+  /* Park the moving-object demo in free space beside or above the text stack, never behind it. */
+  function layoutMover(){
+    const core = hero.core, w = hero.w, navH = $('.nav').offsetHeight;
+    const top = core.offsetTop, right = core.offsetLeft + core.offsetWidth;
+    const step = Math.max(26, Math.min(hero.w, hero.h) * .05);
+    if(w - right >= 170 + step){ hero.mover = {cx: right + (w-right)/2, cy: top + core.offsetHeight*.16, step}; }
+    else if(top - navH >= step*2.6 + 24){ hero.mover = {cx: w*.76, cy: navH + (top-navH)/2, step}; }
+    else hero.mover = null;
+  }
   function resizeHero(){
     if(view!=='home') return;
     if(!sizeCanvas(hero)) return;
     hero.stars = genStars(1337, 1, 1, Math.min(1400, Math.floor(hero.w*hero.h/2500)));
     hero.blobs = makeBlobs(99);
+    layoutMover();
     kick();
   }
   function resizeMap(){
@@ -947,7 +963,7 @@
     kick();
   }
   if('ResizeObserver' in window){
-    new ResizeObserver(resizeHero).observe(hero.host);
+    const ro = new ResizeObserver(resizeHero); ro.observe(hero.host); ro.observe(hero.core);
     new ResizeObserver(resizeMap).observe(map.host);
   } else {
     window.addEventListener('resize', () => { resizeHero(); resizeMap(); });
@@ -974,17 +990,11 @@
   }
 
   /* ---------- hero sky ---------- */
-  function moverPath(w, h){
-    const narrow = w < 640;
-    const cx = w * (narrow ? .78 : (w < 1000 ? .8 : .83));
-    const cy = Math.max(h * (narrow ? .15 : .26), narrow ? 128 : 150);
-    const step = Math.max(26, Math.min(w,h) * .055);
-    return [0,1,2].map(i => ({x: cx + (i-1)*step, y: cy - (i-1)*step*.62}));
-  }
   function drawMover(ctx, w, h, t){
-    const pts = moverPath(w, h);
+    const m = hero.mover; if(!m) return;
+    const pts = [0,1,2].map(i => ({x: m.cx + (i-1)*m.step, y: m.cy - (i-1)*m.step*.62}));
     const idx = reduceMotion.matches ? 1 : Math.floor(t/1500) % 3;
-    const narrow = w < 640;
+    const narrow = pts[2].x + 21 + 92 > w - 8;                 /* not enough room on the right: put the label on the left */
     ctx.save();
     ctx.lineWidth = 1;
     ctx.setLineDash([3,5]); ctx.strokeStyle = 'rgba(238,240,248,.3)';
@@ -1100,7 +1110,8 @@
   }
   function kick(){ if(!raf) raf = requestAnimationFrame(tick); }
   document.addEventListener('visibilitychange', kick);
-  reduceMotion.addEventListener && reduceMotion.addEventListener('change', kick);
+  if(reduceMotion.addEventListener) reduceMotion.addEventListener('change', kick);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(() => { resizeHero(); });
 
   /* ================= search (hero + map) ================= */
   const NAME_POOL = [];
@@ -1519,8 +1530,6 @@
 
   /* ================= boot ================= */
   route();
-  if(location.hash === '' || location.hash === '#') view = 'home';
-  resizeHero(); kick();
 })();
 </script>
 </body>
