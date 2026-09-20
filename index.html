@@ -3,479 +3,780 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Trace — a SPHEREx sky-change explorer</title>
+<title>SpectraHunt: hunt what moves in the infrared sky</title>
+<meta name="description" content="SpectraHunt compares repeated SPHEREx passes of the same patch of sky and flags what moved or changed: comets, asteroids and variable stars.">
+<meta name="theme-color" content="#05060c">
+<meta property="og:title" content="SpectraHunt: hunt what moves in the infrared sky">
+<meta property="og:description" content="Search any object or sky position, then blink between SPHEREx epochs to see what changed.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%2305060c'/%3E%3Cdefs%3E%3ClinearGradient id='g' gradientUnits='userSpaceOnUse' x1='3' y1='0' x2='21' y2='0'%3E%3Cstop offset='0' stop-color='%237c83fd'/%3E%3Cstop offset='.2' stop-color='%235aa9e6'/%3E%3Cstop offset='.4' stop-color='%234fc9a8'/%3E%3Cstop offset='.6' stop-color='%23e8c34a'/%3E%3Cstop offset='.8' stop-color='%23f08a4b'/%3E%3Cstop offset='1' stop-color='%23e85d4a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='12' cy='12' r='6.5' fill='none' stroke='url(%23g)' stroke-width='2'/%3E%3Ccircle cx='12' cy='12' r='2' fill='%23eef0f8'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --void:#080a14;
-    --panel:#10142450;
-    --panel-solid:#12162a;
-    --line:#252b45;
-    --text:#e7e9f5;
-    --text-dim:#9198b8;
-    --text-faint:#5c637f;
+    color-scheme:dark;
+    --space:#05060c;
+    --space-2:#0a0c16;
+    --glass:rgba(11,13,24,.72);
+    --glass-strong:rgba(11,13,24,.93);
+    --raised:#151929;
+    --line:rgba(255,255,255,.09);
+    --line-strong:rgba(255,255,255,.2);
+    --ink:#eef0f8;
+    --ink-2:#aab0c8;
+    --ink-3:#8a90ab;
+    --focus:#a5acff;
     --b1:#7c83fd; --b2:#5aa9e6; --b3:#4fc9a8; --b4:#e8c34a; --b5:#f08a4b; --b6:#e85d4a;
-    --known:#57b88c;
-    --unknown:#e8b34a;
-    --focus:#a7b4ff;
-    --radius-s:6px;
-    --radius-m:10px;
+    --known:#5fcf9a;
+    --unknown:#f0bb52;
+    --spectrum:linear-gradient(90deg,var(--b1),var(--b2),var(--b3),var(--b4),var(--b5),var(--b6));
+    --font-display:'Bricolage Grotesque','Avenir Next','Segoe UI',system-ui,sans-serif;
+    --font-ui:'Geist',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    --font-mono:'Geist Mono',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+    --nav-h:60px;
+    --nav-total:calc(var(--nav-h) + env(safe-area-inset-top,0px));
     font-size:16px;
   }
   *{box-sizing:border-box;}
-  html,body{height:100%;}
+  html{scroll-behavior:smooth; scroll-padding-top:var(--nav-total); -webkit-text-size-adjust:100%;}
   body{
-    margin:0;
-    background:var(--void);
-    color:var(--text);
-    font-family:'Inter',system-ui,sans-serif;
-    -webkit-font-smoothing:antialiased;
-    padding-top:env(safe-area-inset-top,0px);
-    padding-bottom:env(safe-area-inset-bottom,0px);
-    overflow-x:hidden;
+    margin:0; background:var(--space); color:var(--ink);
+    font-family:var(--font-ui); font-size:.9375rem; line-height:1.5;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    overflow-x:hidden; font-variant-numeric:tabular-nums;
   }
-  html{scroll-padding-top:env(safe-area-inset-top,0px);}
-  h1,h2,h3{font-family:'Fraunces',serif; font-weight:500; margin:0; letter-spacing:-0.01em;}
-  p{margin:0;}
+  body[data-view="map"]{overflow:hidden;}
+  h1,h2,h3,h4,p,ol,ul,dl,dd,figure{margin:0;}
+  ol,ul{padding:0; list-style:none;}
   a{color:inherit;}
-  button{font-family:inherit;}
-  .mono{font-family:'IBM Plex Mono',monospace; letter-spacing:0.01em;}
-  ::selection{background:#3a4270; color:#fff;}
-  :focus-visible{outline:2px solid var(--focus); outline-offset:2px; border-radius:4px;}
+  button{font:inherit; color:inherit; cursor:pointer;}
+  input{font:inherit; color:inherit;}
+  svg{display:block;}
+  .mono{font-family:var(--font-mono); font-size:.92em; letter-spacing:0;}
+  ::selection{background:#3a4180; color:#fff;}
+  :focus-visible{outline:2px solid var(--focus); outline-offset:2px; border-radius:6px;}
+  main:focus{outline:none;}
+  .sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap;}
+  .skip{position:fixed; left:12px; top:-60px; z-index:100; background:var(--ink); color:var(--space); padding:10px 14px; border-radius:10px; font-weight:600; text-decoration:none; transition:top .15s;}
+  .skip:focus{top:12px;}
+  .icon{width:1em; height:1em; flex-shrink:0;}
 
-  /* ---------- layout shell ---------- */
-  #app{min-height:100dvh; display:flex; flex-direction:column;}
+  .glass{
+    background:var(--glass);
+    -webkit-backdrop-filter:blur(18px) saturate(1.3); backdrop-filter:blur(18px) saturate(1.3);
+    border:1px solid var(--line);
+    box-shadow:0 20px 50px -20px rgba(0,0,0,.75), inset 0 1px 0 rgba(255,255,255,.05);
+  }
 
-  header.topnav{
-    position:sticky; top:0; z-index:40;
+  /* ---------- nav ---------- */
+  .nav{
+    position:fixed; inset:0 0 auto 0; z-index:60;
     padding-top:env(safe-area-inset-top,0px);
-    background:rgba(8,10,20,0.82);
-    backdrop-filter:blur(10px);
+    background:rgba(5,6,12,.6);
+    -webkit-backdrop-filter:blur(16px) saturate(1.3); backdrop-filter:blur(16px) saturate(1.3);
     border-bottom:1px solid var(--line);
   }
-  .topnav-inner{
-    max-width:1400px; margin:0 auto;
-    display:flex; align-items:center; justify-content:space-between;
-    padding:14px 24px;
-    gap:24px;
+  .nav-inner{
+    max-width:1320px; margin:0 auto; height:var(--nav-h);
+    padding:0 max(20px,env(safe-area-inset-right,0px)) 0 max(20px,env(safe-area-inset-left,0px));
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
   }
-  .brand{display:flex; align-items:center; gap:11px; text-decoration:none; cursor:pointer; background:none; border:none; color:inherit; padding:0;}
-  .brand-mark{display:flex; height:16px; width:34px; border-radius:3px; overflow:hidden; box-shadow:0 0 0 1px var(--line);}
-  .brand-mark span{flex:1;}
-  .brand-name{font-family:'Fraunces',serif; font-size:1.2rem; font-weight:500;}
-  .brand-sub{font-size:.72rem; color:var(--text-faint); display:none;}
-  @media(min-width:640px){ .brand-sub{display:block;} }
-
-  nav.tabs{display:flex; gap:4px; background:#0d1122; border:1px solid var(--line); padding:3px; border-radius:999px;}
-  nav.tabs button{
-    background:none; border:none; color:var(--text-dim); font-size:.85rem;
-    padding:7px 16px; border-radius:999px; cursor:pointer; transition:color .15s, background .15s;
+  .brand{display:flex; align-items:center; gap:10px; text-decoration:none; border-radius:10px;}
+  .brand .logo{width:26px; height:26px;}
+  .brand-name{font-family:var(--font-display); font-size:1.2rem; font-weight:650; letter-spacing:-.02em;}
+  .tabs{display:flex; gap:2px;}
+  .tabs a{
+    text-decoration:none; color:var(--ink-2); font-size:.875rem; font-weight:500;
+    padding:8px 14px; border-radius:999px; transition:color .15s, background .15s;
   }
-  nav.tabs button:hover{color:var(--text);}
-  nav.tabs button.active{background:#252c4d; color:var(--text);}
-
-  .status-pill{
-    display:flex; align-items:center; gap:7px; font-size:.72rem; color:var(--text-dim);
-    border:1px solid var(--line); padding:6px 12px; border-radius:999px; white-space:nowrap;
-  }
-  .status-pill .dot{width:6px; height:6px; border-radius:50%; background:#57b88c; box-shadow:0 0 6px #57b88c;}
-  @media(max-width:760px){ .status-pill{display:none;} }
-
-  main{flex:1; position:relative;}
-  section.view{display:none;}
-  section.view.active{display:block;}
-
-  /* ---------- EXPLORER ---------- */
-  #view-explorer{position:relative;}
-  .explorer-stage{
-    position:relative;
-    height:calc(100dvh - 64px);
-    min-height:520px;
-    overflow:hidden;
-  }
-  #skyCanvas{position:absolute; inset:0; width:100%; height:100%; cursor:crosshair;}
-
-  .explorer-overlay{
-    position:absolute; inset:0; pointer-events:none;
-    display:flex; flex-direction:column; justify-content:space-between;
-    padding:28px 24px 20px;
-  }
-  .hero-copy{max-width:640px; pointer-events:auto;}
-  .hero-copy h1{font-size:clamp(1.9rem,4.4vw,3rem); line-height:1.05; margin-bottom:14px;}
-  .hero-copy p{color:var(--text-dim); font-size:1rem; line-height:1.55; max-width:520px;}
-
-  .search-row{
-    margin-top:20px; display:flex; gap:8px; pointer-events:auto; max-width:460px;
-    background:rgba(15,18,34,0.9); border:1px solid var(--line); border-radius:var(--radius-m);
-    padding:6px; backdrop-filter:blur(6px);
-  }
-  .search-row input{
-    flex:1; background:none; border:none; color:var(--text); padding:9px 10px; font-size:.9rem;
-  }
-  .search-row input::placeholder{color:var(--text-faint);}
-  .search-row input:focus{outline:none;}
-  .search-row button{
-    background:var(--text); color:var(--void); border:none; border-radius:var(--radius-s);
-    padding:9px 16px; font-size:.85rem; font-weight:600; cursor:pointer;
-  }
-  .search-row button:hover{background:#c7ccec;}
-  .search-hint{margin-top:8px; font-size:.74rem; color:var(--text-faint); pointer-events:auto;}
-  .search-hint button{background:none;border:none;color:var(--focus);cursor:pointer;font-size:.74rem;padding:0;text-decoration:underline;text-underline-offset:2px;}
-
-  .bottom-bar{
-    display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap;
-    pointer-events:auto;
-  }
-  .legend{
-    background:rgba(15,18,34,0.9); border:1px solid var(--line); border-radius:var(--radius-m);
-    padding:12px 16px; font-size:.75rem; color:var(--text-dim); backdrop-filter:blur(6px);
-    display:flex; align-items:center; gap:12px;
-  }
-  .legend-strip{display:flex; height:8px; width:96px; border-radius:4px; overflow:hidden;}
-  .legend-strip span{flex:1;}
-  .coverage-toggle{
-    display:flex; align-items:center; gap:9px;
-    background:rgba(15,18,34,0.9); border:1px solid var(--line); border-radius:var(--radius-m);
-    padding:10px 14px; font-size:.78rem; color:var(--text-dim); backdrop-filter:blur(6px);
-  }
-  .switch{position:relative; width:34px; height:19px; background:#252c4d; border-radius:999px; cursor:pointer; border:none; flex-shrink:0;}
-  .switch::after{content:'';position:absolute; top:2px; left:2px; width:15px; height:15px; border-radius:50%; background:#8892c4; transition:transform .15s, background .15s;}
-  .switch.on{background:#3a4a8a;}
-  .switch.on::after{transform:translateX(15px); background:#e7e9f5;}
-
-  .reticle-label{
-    position:absolute; pointer-events:none; transform:translate(-50%,-140%);
-    background:#12162a; border:1px solid var(--line); border-radius:6px; padding:4px 8px;
-    font-size:.7rem; white-space:nowrap; opacity:0; transition:opacity .12s;
+  .tabs a:hover{color:var(--ink); background:rgba(255,255,255,.06);}
+  .tabs a.active{color:var(--ink); background:rgba(255,255,255,.1);}
+  @media(max-width:480px){
+    .nav-inner{padding-left:14px; padding-right:10px; gap:6px;}
+    .brand-name{font-size:1.08rem;}
+    .brand .logo{width:24px; height:24px;}
+    .tabs a{padding:7px 9px; font-size:.8125rem;}
   }
 
-  .inspect-panel{
-    position:absolute; top:0; right:0; bottom:0; width:330px; max-width:88vw;
-    background:#0d1122; border-left:1px solid var(--line);
-    padding:20px; overflow-y:auto;
-    transform:translateX(100%); transition:transform .22s ease;
-    display:flex; flex-direction:column; gap:16px;
-  }
-  .inspect-panel.open{transform:translateX(0);}
-  .inspect-panel h3{font-size:1.05rem;}
-  .inspect-close{
-    align-self:flex-end; background:none; border:none; color:var(--text-faint); cursor:pointer;
-    font-size:1.1rem; line-height:1; padding:4px;
-  }
-  .inspect-close:hover{color:var(--text);}
-  .kv{display:grid; grid-template-columns:auto 1fr; gap:5px 12px; font-size:.8rem;}
-  .kv dt{color:var(--text-faint);}
-  .kv dd{margin:0; text-align:right;}
-  .epoch-chip-row{display:flex; flex-wrap:wrap; gap:6px;}
-  .epoch-chip{
-    font-size:.7rem; padding:4px 8px; border-radius:5px; background:#191f38; border:1px solid var(--line); color:var(--text-dim);
-  }
-  .cta-primary{
-    background:var(--text); color:var(--void); border:none; border-radius:var(--radius-s);
-    padding:11px 16px; font-size:.85rem; font-weight:600; cursor:pointer; width:100%;
-  }
-  .cta-primary:hover{background:#c7ccec;}
-  .inspect-empty{color:var(--text-faint); font-size:.83rem; line-height:1.5; margin-top:40px;}
+  /* ---------- views ---------- */
+  .view{display:none;}
+  .view.active{display:block;}
+  .page{max-width:1200px; margin:0 auto; padding:calc(var(--nav-total) + 36px) 20px 80px;}
 
-  /* ---------- FIELD / BLINK VIEW ---------- */
-  .field-wrap{max-width:1200px; margin:0 auto; padding:28px 24px 64px;}
-  .field-head{display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:22px;}
-  .back-link{background:none;border:none;color:var(--text-dim); font-size:.82rem; cursor:pointer; display:flex; align-items:center; gap:6px; padding:0; margin-bottom:10px;}
-  .back-link:hover{color:var(--text);}
-  .field-title{font-size:1.55rem;}
-  .field-sub{color:var(--text-dim); font-size:.85rem; margin-top:6px;}
-  .badge{display:inline-flex; align-items:center; gap:6px; font-size:.72rem; padding:5px 10px; border-radius:999px; font-weight:500;}
-  .badge.known{background:#14301f; color:var(--known); border:1px solid #21492e;}
-  .badge.unknown{background:#33270f; color:var(--unknown); border:1px solid #55420f;}
-  .badge .dot{width:5px;height:5px;border-radius:50%;background:currentColor;}
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative; isolation:isolate; overflow:hidden;
+    min-height:100vh; min-height:100dvh;
+    display:grid; place-items:center;
+    padding:calc(var(--nav-total) + 28px) 20px calc(104px + env(safe-area-inset-bottom,0px));
+  }
+  #heroCanvas{position:absolute; inset:0; width:100%; height:100%; z-index:-2; animation:sky-in 1.6s ease-out both;}
+  @keyframes sky-in{from{opacity:0;} to{opacity:1;}}
+  .hero-scrim{
+    position:absolute; inset:0; z-index:-1; pointer-events:none;
+    background:radial-gradient(ellipse 62% 54% at 50% 50%, rgba(5,6,12,.8) 0%, rgba(5,6,12,.5) 52%, rgba(5,6,12,0) 100%);
+  }
+  .hero-core{
+    width:min(100%,780px); display:flex; flex-direction:column; align-items:center;
+    gap:24px; text-align:center;
+  }
+  .hero h1{
+    font-family:var(--font-display); font-weight:650; font-size:clamp(2.7rem,7.2vw,5.4rem);
+    line-height:.98; letter-spacing:-.042em; text-wrap:balance;
+    text-shadow:0 2px 40px rgba(5,6,12,.9);
+  }
+  .hero-sub{
+    color:var(--ink-2); font-size:clamp(1rem,1.6vw,1.15rem); line-height:1.6;
+    max-width:48ch; text-wrap:pretty; text-shadow:0 1px 24px rgba(5,6,12,.95);
+  }
 
-  .field-grid{display:grid; grid-template-columns:1fr 300px; gap:24px;}
-  @media(max-width:900px){ .field-grid{grid-template-columns:1fr;} }
+  /* search (shared by hero and map) */
+  .search-shell{
+    position:relative; width:100%; height:66px; padding:0 9px 0 22px;
+    display:flex; align-items:center; gap:12px; text-align:left;
+    border-radius:22px; background:var(--glass);
+    -webkit-backdrop-filter:blur(22px) saturate(1.35); backdrop-filter:blur(22px) saturate(1.35);
+    box-shadow:0 30px 80px -24px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.07);
+    transition:box-shadow .2s;
+  }
+  .search-shell::before{
+    content:''; position:absolute; inset:0; border-radius:inherit; padding:1.5px; pointer-events:none;
+    background:var(--spectrum); opacity:.55; transition:opacity .2s;
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask:linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    mask-composite:exclude;
+  }
+  .search-shell:focus-within{box-shadow:0 0 0 5px rgba(165,172,255,.14), 0 30px 80px -24px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.07);}
+  .search-shell:focus-within::before{opacity:1;}
+  .s-icon{width:22px; height:22px; color:var(--ink-3); flex-shrink:0;}
+  .search-shell input{
+    flex:1; min-width:0; height:100%; background:transparent; border:0; outline:0;
+    font-size:1.0625rem; color:var(--ink); text-overflow:ellipsis;
+  }
+  .search-shell input::placeholder{color:var(--ink-3);}
+  .s-kbd{
+    font-family:var(--font-mono); font-size:.75rem; color:var(--ink-3);
+    border:1px solid var(--line-strong); border-radius:7px; padding:2px 8px; line-height:1.4;
+  }
+  @media(hover:none){ .s-kbd{display:none;} }
+  .s-go{
+    height:48px; padding:0 24px; border:0; border-radius:15px; background:var(--ink); color:var(--space);
+    font-weight:600; font-size:.9375rem; transition:background .15s, transform .1s;
+  }
+  .s-go:hover{background:#fff;}
+  .s-go:active{transform:scale(.97);}
+  .s-list{
+    position:absolute; top:calc(100% + 10px); left:0; right:0; z-index:30; display:none;
+    max-height:min(380px,52dvh); overflow-y:auto; padding:8px; border-radius:18px;
+    background:var(--glass-strong); border:1px solid var(--line-strong);
+    -webkit-backdrop-filter:blur(24px); backdrop-filter:blur(24px);
+    box-shadow:0 30px 70px -10px rgba(0,0,0,.85);
+  }
+  .s-list.open{display:block;}
+  .s-group{font-size:.75rem; color:var(--ink-3); padding:9px 12px 5px; font-weight:500;}
+  .opt{display:flex; align-items:center; justify-content:space-between; gap:14px; padding:11px 12px; border-radius:11px; cursor:pointer; font-size:.9375rem;}
+  .opt:hover,.opt.hl{background:rgba(255,255,255,.08);}
+  .o-meta{font-family:var(--font-mono); font-size:.75rem; color:var(--ink-3); white-space:nowrap;}
+  .s-empty{padding:16px 12px; color:var(--ink-2); font-size:.875rem; line-height:1.55;}
 
-  .viewer-card{background:var(--panel-solid); border:1px solid var(--line); border-radius:var(--radius-m); overflow:hidden;}
-  .viewer-canvas-wrap{position:relative; aspect-ratio:1/1; background:#050611;}
+  .quick{display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:8px;}
+  .quick-label{font-size:.8125rem; color:var(--ink-3); margin-right:2px;}
+  .chip{
+    background:rgba(11,13,24,.66); border:1px solid var(--line); border-radius:999px;
+    -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px);
+    padding:7px 14px; font-size:.8125rem; color:var(--ink-2); transition:color .15s, border-color .15s, background .15s;
+  }
+  .chip:hover{color:var(--ink); border-color:var(--line-strong); background:rgba(20,23,40,.8);}
+
+  .hero-foot{
+    position:absolute; left:0; right:0; bottom:calc(22px + env(safe-area-inset-bottom,0px));
+    padding:0 max(20px,env(safe-area-inset-right,0px)) 0 max(20px,env(safe-area-inset-left,0px));
+    display:flex; align-items:center; justify-content:space-between; gap:12px; pointer-events:none;
+  }
+  .hero-foot > *{pointer-events:auto;}
+  .pill{
+    display:flex; align-items:center; gap:16px; padding:10px 18px; border-radius:999px;
+    font-size:.8125rem; color:var(--ink-2); white-space:nowrap;
+  }
+  .pill b{color:var(--ink); font-weight:600;}
+  .pill .sep{width:1px; height:14px; background:var(--line-strong);}
+  .live-dot{width:7px; height:7px; border-radius:50%; background:var(--known); box-shadow:0 0 8px var(--known); flex-shrink:0;}
+  .pill .rel{display:flex; align-items:center; gap:8px;}
+  .scroll-link{
+    display:flex; align-items:center; gap:8px; padding:10px 16px 10px 18px; border-radius:999px;
+    font-size:.8125rem; color:var(--ink); text-decoration:none; font-weight:500; transition:background .15s;
+  }
+  .scroll-link:hover{background:rgba(20,23,40,.85);}
+  @media(max-width:820px){ .pill .rel{display:none;} }
+  @media(max-width:560px){
+    .hero-foot{justify-content:center;}
+    .hero-foot .pill{display:none;}
+    .search-shell{height:60px; padding-left:16px; border-radius:20px;}
+    .s-go{height:44px; padding:0 18px;}
+  }
+
+  /* ---------- how it works ---------- */
+  .how{background:var(--space); border-top:1px solid var(--line); padding:clamp(64px,9vw,120px) 20px;}
+  .how-inner{max-width:1120px; margin:0 auto;}
+  .how h2{font-family:var(--font-display); font-weight:650; font-size:clamp(1.8rem,3.6vw,2.7rem); letter-spacing:-.035em; line-height:1.05; max-width:20ch; text-wrap:balance;}
+  .how-lead{color:var(--ink-2); font-size:1.0625rem; line-height:1.6; max-width:52ch; margin-top:16px;}
+  .steps{display:grid; grid-template-columns:repeat(3,1fr); margin-top:clamp(36px,5vw,64px); border-top:1px solid var(--line);}
+  .steps li{padding:32px 32px 8px 0; display:flex; flex-direction:column; gap:14px;}
+  .steps li + li{padding-left:32px; border-left:1px solid var(--line);}
+  .step-fig{border-radius:14px; overflow:hidden; background:#04050a; border:1px solid var(--line); aspect-ratio:8/5;}
+  .step-fig svg{width:100%; height:100%;}
+  .step-head{display:flex; align-items:center; gap:12px; margin-top:8px;}
+  .step-n{
+    width:26px; height:26px; border-radius:50%; border:1px solid var(--line-strong);
+    display:grid; place-items:center; font-size:.75rem; font-weight:600; color:var(--ink-2); flex-shrink:0;
+  }
+  .steps h3{font-family:var(--font-display); font-size:1.25rem; font-weight:600; letter-spacing:-.02em;}
+  .steps p{color:var(--ink-2); font-size:.9375rem; line-height:1.6; max-width:38ch; padding-bottom:24px;}
+  .how-cta{display:flex; flex-wrap:wrap; gap:12px; margin-top:32px;}
+  @media(max-width:860px){
+    .steps{grid-template-columns:1fr;}
+    .steps li, .steps li + li{padding:28px 0 4px; border-left:0;}
+    .steps li + li{border-top:1px solid var(--line);}
+    .step-fig{max-width:420px;}
+  }
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px; text-decoration:none;
+    height:46px; padding:0 22px; border-radius:14px; font-weight:600; font-size:.9375rem;
+    border:1px solid var(--line-strong); background:transparent; color:var(--ink); transition:background .15s, border-color .15s;
+  }
+  .btn:hover{background:rgba(255,255,255,.07);}
+  .btn.primary{background:var(--ink); color:var(--space); border-color:transparent;}
+  .btn.primary:hover{background:#fff;}
+  .btn:disabled{opacity:.45; cursor:not-allowed;}
+  .btn.block{width:100%;}
+
+  /* ---------- footer ---------- */
+  .site-foot{border-top:1px solid var(--line); background:var(--space); padding:32px 20px calc(36px + env(safe-area-inset-bottom,0px)); }
+  body[data-view="map"] .site-foot{display:none;}
+  .foot-inner{max-width:1120px; margin:0 auto; display:flex; flex-wrap:wrap; justify-content:space-between; gap:20px 48px; align-items:flex-start;}
+  .foot-brand{display:flex; flex-direction:column; gap:10px; max-width:46ch;}
+  .foot-brand .brand-name{font-size:1.05rem;}
+  .foot-brand .brand{cursor:default;}
+  .foot-note,.foot-cite{color:var(--ink-3); font-size:.8125rem; line-height:1.6;}
+  .foot-cite{max-width:40ch;}
+
+  /* ---------- sky map ---------- */
+  #view-map{position:relative; height:100vh; height:100dvh; overflow:hidden;}
+  #mapCanvas{position:absolute; inset:0; width:100%; height:100%; display:block; cursor:crosshair; touch-action:manipulation;}
+  .map-tools{
+    position:absolute; z-index:5; top:calc(var(--nav-total) + 14px); left:max(16px,env(safe-area-inset-left,0px));
+    width:min(440px,calc(100% - 32px)); padding:12px; border-radius:20px;
+    display:flex; flex-direction:column; gap:12px;
+  }
+  .map-tools .search-shell{height:46px; padding:0 6px 0 14px; border-radius:14px; box-shadow:none; background:rgba(255,255,255,.05);}
+  .map-tools .search-shell::before{opacity:.0;}
+  .map-tools .search-shell:focus-within::before{opacity:1;}
+  .map-tools .s-icon{width:18px; height:18px;}
+  .map-tools .search-shell input{font-size:.9375rem;}
+  .map-tools .s-go{height:34px; padding:0 14px; border-radius:10px; font-size:.8125rem;}
+  .map-tools .s-kbd{display:none;}
+  .map-tools .s-list{top:calc(100% + 8px);}
+  .tool-row{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:0 4px;}
+  .tool-row span{font-size:.8125rem; color:var(--ink-2);}
+  .switch{position:relative; width:38px; height:22px; border-radius:999px; border:0; background:#262b44; flex-shrink:0; transition:background .15s;}
+  .switch::after{content:''; position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:#9097b3; transition:transform .15s, background .15s;}
+  .switch[aria-checked="true"]{background:#4451a6;}
+  .switch[aria-checked="true"]::after{transform:translateX(16px); background:#fff;}
+  .map-help{font-size:.8125rem; color:var(--ink-3); padding:0 4px 2px; line-height:1.5;}
+
+  .map-bar{
+    position:absolute; z-index:5; left:max(16px,env(safe-area-inset-left,0px)); bottom:calc(16px + env(safe-area-inset-bottom,0px));
+    display:flex; align-items:center; gap:16px; padding:10px 16px; border-radius:14px; font-size:.75rem; color:var(--ink-2);
+  }
+  .strip{display:flex; gap:2px; height:8px;}
+  .strip i{display:block; width:18px; border-radius:2px;}
+  .legend{display:flex; align-items:center; gap:10px; white-space:nowrap;}
+  .map-bar .sep{width:1px; height:16px; background:var(--line-strong);}
+  #mapReadout{white-space:nowrap; min-width:200px;}
+  @media(hover:none){ .map-bar .sep, #mapReadout{display:none;} }
+  @media(max-width:560px){ #mapReadout, .map-bar .sep{display:none;} }
+
+  .inspector{
+    position:absolute; z-index:6; top:calc(var(--nav-total) + 14px); right:max(16px,env(safe-area-inset-right,0px));
+    width:330px; max-height:calc(100% - var(--nav-total) - 30px); overflow-y:auto; padding:20px; border-radius:20px;
+    background:var(--glass-strong);
+    transform:translateX(calc(100% + 32px)); opacity:0; visibility:hidden;
+    transition:transform .24s cubic-bezier(.2,.8,.2,1), opacity .2s, visibility 0s .24s;
+  }
+  .inspector.open{transform:none; opacity:1; visibility:visible; transition:transform .24s cubic-bezier(.2,.8,.2,1), opacity .2s;}
+  .inspector-top{display:flex; align-items:flex-start; justify-content:space-between; gap:12px;}
+  .inspector h2{font-family:var(--font-display); font-size:1.25rem; font-weight:600; letter-spacing:-.02em; line-height:1.2;}
+  .icon-btn{
+    width:34px; height:34px; border-radius:10px; border:1px solid var(--line); background:transparent; color:var(--ink-2);
+    display:grid; place-items:center; flex-shrink:0; transition:background .15s, color .15s;
+  }
+  .icon-btn:hover{background:rgba(255,255,255,.08); color:var(--ink);}
+  .icon-btn .icon{width:18px; height:18px;}
+  .insp-id{color:var(--ink-3); font-size:.8125rem; margin-top:6px;}
+  .kv{display:grid; grid-template-columns:auto 1fr; gap:8px 16px; font-size:.8125rem;}
+  .kv dt{color:var(--ink-3);}
+  .kv dd{text-align:right; color:var(--ink);}
+  .insp-body{display:flex; flex-direction:column; gap:18px; margin-top:18px;}
+  .insp-note{color:var(--ink-2); font-size:.8125rem; line-height:1.55;}
+  @media(max-width:720px){
+    .inspector{
+      top:auto; left:12px; right:12px; width:auto; bottom:calc(70px + env(safe-area-inset-bottom,0px));
+      max-height:min(58dvh,460px); transform:translateY(calc(100% + 120px));
+    }
+    .map-tools{left:12px; width:calc(100% - 24px);}
+    .map-bar{left:12px;}
+  }
+
+  /* ---------- badges ---------- */
+  .badge{display:inline-flex; align-items:center; gap:7px; font-size:.75rem; font-weight:500; padding:5px 11px; border-radius:999px; border:1px solid var(--line); color:var(--ink-2); background:rgba(255,255,255,.04); white-space:nowrap; align-self:flex-start;}
+  .badge .dot{width:6px; height:6px; border-radius:50%; background:currentColor;}
+  .badge.known{color:var(--known); background:rgba(95,207,154,.1); border-color:rgba(95,207,154,.3);}
+  .badge.unknown{color:var(--unknown); background:rgba(240,187,82,.1); border-color:rgba(240,187,82,.32);}
+
+  /* ---------- field / blink ---------- */
+  .back{display:inline-flex; align-items:center; gap:6px; background:none; border:0; color:var(--ink-2); font-size:.875rem; padding:6px 8px 6px 0; margin-bottom:14px; border-radius:8px;}
+  .back:hover{color:var(--ink);}
+  .back .icon{width:18px; height:18px;}
+  .field-head{display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:24px;}
+  .field-title{font-family:var(--font-display); font-size:clamp(1.6rem,3.2vw,2.3rem); font-weight:650; letter-spacing:-.035em; line-height:1.1;}
+  .field-sub{color:var(--ink-2); font-size:.9375rem; margin-top:8px;}
+  .field-grid{display:grid; grid-template-columns:minmax(0,1fr) 330px; gap:24px; align-items:start;}
+  @media(max-width:960px){ .field-grid{grid-template-columns:1fr;} }
+
+  .viewer{border-radius:20px; overflow:hidden; background:#04050a; border:1px solid var(--line);}
+  .viewer-stage{position:relative; width:min(100%,74vh); margin:0 auto; aspect-ratio:1/1;}
+  @supports (height:1dvh){ .viewer-stage{width:min(100%,74dvh);} }
   #blinkCanvas{width:100%; height:100%; display:block;}
-  .viewer-tag{position:absolute; top:12px; left:12px; font-size:.68rem; background:rgba(8,10,20,.75); border:1px solid var(--line); padding:4px 9px; border-radius:5px; color:var(--text-dim);}
-  .viewer-tag.epoch{left:auto; right:12px;}
-
-  .viewer-controls{padding:14px 16px; border-top:1px solid var(--line); display:flex; flex-direction:column; gap:12px;}
+  .viewer-tag{
+    position:absolute; top:12px; left:12px; font-size:.75rem; padding:5px 10px; border-radius:8px;
+    background:rgba(5,6,12,.78); border:1px solid var(--line); color:var(--ink-2);
+  }
+  .viewer-tag.epoch{left:auto; right:12px; color:var(--ink);}
+  .viewer-controls{padding:16px 18px; border-top:1px solid var(--line); background:var(--space-2); display:flex; flex-direction:column; gap:16px;}
   .transport{display:flex; align-items:center; gap:12px;}
-  .play-btn{
-    width:38px; height:38px; border-radius:50%; background:var(--text); color:var(--void); border:none;
-    display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; font-size:.9rem;
+  .play{
+    width:44px; height:44px; border-radius:50%; border:0; background:var(--ink); color:var(--space);
+    display:grid; place-items:center; flex-shrink:0; transition:background .15s, transform .1s;
   }
-  .play-btn:hover{background:#c7ccec;}
-  .speed-row{flex:1; display:flex; align-items:center; gap:10px;}
-  .speed-row input[type=range]{flex:1; accent-color:#7c83fd;}
-  .speed-row span{font-size:.72rem; color:var(--text-faint); width:52px; text-align:right;}
-  .diff-toggle{display:flex; align-items:center; justify-content:space-between; font-size:.8rem; color:var(--text-dim);}
-
-  .band-tabs{display:flex; gap:5px; padding:14px 16px 4px; flex-wrap:wrap; border-top:1px solid var(--line);}
-  .band-tab{
-    border:1px solid var(--line); background:#0d1122; color:var(--text-dim); border-radius:999px;
-    font-size:.68rem; padding:6px 10px; cursor:pointer; display:flex; align-items:center; gap:6px;
+  .play:hover{background:#fff;}
+  .play:active{transform:scale(.95);}
+  .play .icon{width:20px; height:20px;}
+  .speed{flex:1; display:flex; align-items:center; gap:12px; min-width:0; font-size:.8125rem; color:var(--ink-2);}
+  .speed input[type=range]{flex:1; min-width:60px; accent-color:#7c83fd;}
+  .speed output{width:56px; text-align:right; color:var(--ink);}
+  .diff-row{display:flex; align-items:center; justify-content:space-between; gap:16px; font-size:.8125rem; color:var(--ink-2);}
+  .keys{font-size:.75rem; color:var(--ink-3);}
+  kbd{font-family:var(--font-mono); font-size:.6875rem; border:1px solid var(--line-strong); border-radius:5px; padding:1px 6px; color:var(--ink-2);}
+  .band-row{display:flex; flex-wrap:wrap; gap:6px; padding:0 18px 18px; background:var(--space-2);}
+  .band{
+    display:flex; align-items:center; gap:8px; padding:7px 12px; border-radius:999px; border:1px solid var(--line);
+    background:transparent; color:var(--ink-2); font-size:.8125rem; transition:background .15s, border-color .15s, color .15s;
   }
-  .band-tab .sw{width:7px; height:7px; border-radius:50%;}
-  .band-tab.active{border-color:currentColor; color:var(--text); background:#171c34;}
+  .band:hover{background:rgba(255,255,255,.06);}
+  .band .sw{width:8px; height:8px; border-radius:50%;}
+  .band[aria-pressed="true"]{color:var(--ink); border-color:var(--band-color); background:rgba(255,255,255,.07);}
 
-  .side-stack{display:flex; flex-direction:column; gap:16px;}
-  .info-card{background:var(--panel-solid); border:1px solid var(--line); border-radius:var(--radius-m); padding:16px;}
-  .info-card h4{font-size:.82rem; color:var(--text-dim); font-weight:500; margin-bottom:12px; font-family:'Inter';}
-  .cite-box{background:#0d1122; border:1px solid var(--line); border-radius:6px; padding:11px; font-size:.72rem; color:var(--text-faint); line-height:1.5; margin-top:10px;}
-  .link-row{display:flex; flex-direction:column; gap:7px; margin-top:10px;}
-  .link-row a{font-size:.78rem; color:var(--focus); text-decoration:none; display:flex; align-items:center; gap:5px;}
-  .link-row a:hover{text-decoration:underline;}
+  .aside{border-radius:20px; background:var(--space-2); border:1px solid var(--line);}
+  .aside section{padding:20px;}
+  .aside section + section{border-top:1px solid var(--line);}
+  .aside h2{font-size:.875rem; font-weight:600; color:var(--ink); margin-bottom:14px;}
+  .aside p{font-size:.8125rem; color:var(--ink-2); line-height:1.6;}
+  .epoch-row{display:flex; flex-wrap:wrap; gap:6px;}
+  .epoch-chip{padding:5px 10px; border-radius:8px; border:1px solid var(--line); background:transparent; color:var(--ink-2); font-family:var(--font-mono); font-size:.75rem; transition:background .15s, color .15s, border-color .15s;}
+  .epoch-chip:hover{background:rgba(255,255,255,.06);}
+  .epoch-chip[aria-pressed="true"]{color:var(--ink); border-color:var(--line-strong); background:rgba(255,255,255,.09);}
+  .ext-links{display:flex; flex-direction:column; gap:10px; margin-top:14px;}
+  .ext-links a{display:flex; align-items:center; gap:6px; color:var(--focus); font-size:.8125rem; text-decoration:none;}
+  .ext-links a:hover{text-decoration:underline;}
+  .ext-links .icon{width:14px; height:14px;}
+  .cite-box{margin-top:14px; padding:12px; border-radius:10px; border:1px solid var(--line); font-size:.75rem; color:var(--ink-3); line-height:1.55;}
 
-  /* ---------- CANDIDATES ---------- */
-  .cand-wrap{max-width:1200px; margin:0 auto; padding:32px 24px 64px;}
-  .cand-head{display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:22px;}
-  .cand-head h2{font-size:1.7rem;}
-  .cand-head p{color:var(--text-dim); font-size:.88rem; margin-top:6px; max-width:480px;}
-  .filters{display:flex; gap:8px; flex-wrap:wrap;}
-  .filter-chip{
-    border:1px solid var(--line); background:#0d1122; color:var(--text-dim); border-radius:999px;
-    font-size:.76rem; padding:7px 13px; cursor:pointer;
+  /* ---------- candidates ---------- */
+  .page-head{display:flex; align-items:flex-end; justify-content:space-between; gap:20px; flex-wrap:wrap;}
+  .page-head h1{font-family:var(--font-display); font-size:clamp(1.9rem,4vw,2.9rem); font-weight:650; letter-spacing:-.038em; line-height:1.05;}
+  .page-head p{color:var(--ink-2); margin-top:12px; max-width:56ch; line-height:1.6;}
+  .segment{display:inline-flex; padding:4px; gap:2px; border-radius:999px; border:1px solid var(--line); background:var(--space-2);}
+  .segment button{border:0; background:transparent; color:var(--ink-2); font-size:.8125rem; font-weight:500; padding:8px 16px; border-radius:999px; transition:background .15s, color .15s;}
+  .segment button:hover{color:var(--ink);}
+  .segment button[aria-pressed="true"]{background:rgba(255,255,255,.12); color:var(--ink);}
+  .cand-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:16px; margin-top:32px;}
+  .cand{
+    display:flex; flex-direction:column; text-align:left; padding:0; border-radius:16px; overflow:hidden;
+    background:var(--space-2); border:1px solid var(--line); transition:border-color .15s, transform .15s;
   }
-  .filter-chip.active{background:#252c4d; color:var(--text); border-color:#3a4270;}
-
-  .cand-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px; margin-top:22px;}
-  .cand-card{
-    background:var(--panel-solid); border:1px solid var(--line); border-radius:var(--radius-m); overflow:hidden;
-    cursor:pointer; transition:border-color .15s; display:flex; flex-direction:column;
-  }
-  .cand-card:hover{border-color:#3a4270;}
-  .cand-thumb{position:relative; aspect-ratio:1/1; background:#050611;}
+  .cand:hover{border-color:var(--line-strong);}
+  .cand-thumb{position:relative; aspect-ratio:1/1; background:#04050a;}
   .cand-thumb canvas{width:100%; height:100%; display:block;}
-  .cand-badge-float{position:absolute; top:8px; left:8px;}
-  .cand-score{position:absolute; top:8px; right:8px; font-size:.66rem; background:rgba(8,10,20,.75); padding:3px 7px; border-radius:5px; color:var(--text-dim);}
-  .cand-body{padding:12px 13px 14px;}
-  .cand-name{font-size:.92rem; font-weight:500; margin-bottom:4px;}
-  .cand-meta{font-size:.72rem; color:var(--text-faint); display:flex; justify-content:space-between;}
+  .cand-thumb .badge{position:absolute; top:12px; left:12px; background:rgba(5,6,12,.82);}
+  .cand-score{position:absolute; top:12px; right:12px; font-size:.75rem; padding:4px 9px; border-radius:8px; background:rgba(5,6,12,.82); color:var(--ink-2);}
+  .cand-body{padding:14px 16px 16px; display:flex; flex-direction:column; gap:6px;}
+  .cand-name{font-weight:600; font-size:1rem; letter-spacing:-.01em;}
+  .cand-meta{display:flex; justify-content:space-between; font-size:.75rem; color:var(--ink-3);}
+  .empty{color:var(--ink-2); padding:48px 0;}
 
-  /* ---------- ABOUT ---------- */
-  .about-wrap{max-width:720px; margin:0 auto; padding:48px 24px 80px;}
-  .about-wrap h2{font-size:1.9rem; margin-bottom:8px;}
-  .about-wrap .kicker{color:var(--text-faint); font-size:.82rem; margin-bottom:22px;}
-  .about-wrap section{margin-top:34px;}
-  .about-wrap h3{font-size:1.05rem; margin-bottom:10px; font-family:'Inter'; font-weight:600;}
-  .about-wrap p{color:var(--text-dim); font-size:.92rem; line-height:1.7; margin-bottom:12px;}
-  .band-table{width:100%; border-collapse:collapse; font-size:.82rem; margin-top:6px;}
-  .band-table th,.band-table td{text-align:left; padding:8px 10px; border-bottom:1px solid var(--line);}
-  .band-table th{color:var(--text-faint); font-weight:500; font-size:.72rem;}
-  .band-table .sw{width:9px;height:9px;border-radius:50%; display:inline-block; margin-right:7px;}
-  .cite-block{background:var(--panel-solid); border:1px solid var(--line); border-radius:var(--radius-m); padding:16px; font-size:.82rem; color:var(--text-dim); line-height:1.6; font-style:italic;}
-  .source-list{list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px;}
-  .source-list a{color:var(--focus); text-decoration:none; font-size:.85rem;}
+  /* ---------- about ---------- */
+  .prose{max-width:700px; margin:0 auto; padding:calc(var(--nav-total) + 48px) 20px 96px;}
+  .prose h1{font-family:var(--font-display); font-size:clamp(2rem,4.4vw,3.1rem); font-weight:650; letter-spacing:-.04em; line-height:1.05;}
+  .prose .lede{color:var(--ink-2); font-size:1.0625rem; margin-top:14px; line-height:1.6;}
+  .notice{margin-top:32px; padding:16px 18px; border-radius:14px; border:1px solid rgba(240,187,82,.3); background:rgba(240,187,82,.07); color:#e9c98a; font-size:.875rem; line-height:1.6;}
+  .prose section{margin-top:44px;}
+  .prose h2{font-family:var(--font-display); font-size:1.4rem; font-weight:600; letter-spacing:-.02em; margin-bottom:12px;}
+  .prose p{color:var(--ink-2); line-height:1.75; margin-bottom:14px;}
+  .band-table{width:100%; border-collapse:collapse; font-size:.875rem; margin-top:16px;}
+  .band-table th,.band-table td{text-align:left; padding:11px 10px; border-bottom:1px solid var(--line);}
+  .band-table th{color:var(--ink-3); font-weight:500; font-size:.8125rem;}
+  .band-table .sw{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:10px;}
+  .cite-block{padding:18px; border-radius:14px; border:1px solid var(--line); background:var(--space-2); color:var(--ink-2); font-size:.875rem; line-height:1.7;}
+  .source-list{display:flex; flex-direction:column; gap:12px;}
+  .source-list a{color:var(--focus); text-decoration:none;}
   .source-list a:hover{text-decoration:underline;}
-  .mockup-note{
-    background:#241a0d; border:1px solid #4a340f; color:#e8b96a; border-radius:var(--radius-m);
-    padding:14px 16px; font-size:.82rem; line-height:1.55; margin-bottom:30px;
-  }
+
+  noscript div{position:fixed; inset:0; display:grid; place-items:center; background:var(--space); color:var(--ink); z-index:200; padding:24px; text-align:center;}
 
   @media (prefers-reduced-motion: reduce){
-    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+    html{scroll-behavior:auto;}
+    *,*::before,*::after{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important;}
   }
 </style>
 </head>
-<body>
-<div id="app">
+<body data-view="home">
 
-  <header class="topnav">
-    <div class="topnav-inner">
-      <div style="display:flex; align-items:center; gap:28px;">
-        <button class="brand" data-goto="explorer" aria-label="Trace home">
-          <span class="brand-mark"><span style="background:#7c83fd"></span><span style="background:#5aa9e6"></span><span style="background:#4fc9a8"></span><span style="background:#e8c34a"></span><span style="background:#f08a4b"></span><span style="background:#e85d4a"></span></span>
-          <span class="brand-name">Trace<span class="brand-sub" style="display:inline;font-family:'Inter';font-weight:400;color:var(--text-faint);font-size:.75rem;margin-left:2px;"> / SPHEREx</span></span>
-        </button>
-      </div>
-      <nav class="tabs" role="tablist" aria-label="Primary">
-        <button data-goto="explorer" class="active">Explorer</button>
-        <button data-goto="candidates">Candidates</button>
-        <button data-goto="about">About</button>
-      </nav>
-      <div class="status-pill"><span class="dot"></span> QR2 · updated weekly</div>
-    </div>
-  </header>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="spec" gradientUnits="userSpaceOnUse" x1="1" y1="0" x2="23" y2="0">
+      <stop offset="0" stop-color="#7c83fd"/><stop offset=".2" stop-color="#5aa9e6"/><stop offset=".4" stop-color="#4fc9a8"/>
+      <stop offset=".6" stop-color="#e8c34a"/><stop offset=".8" stop-color="#f08a4b"/><stop offset="1" stop-color="#e85d4a"/>
+    </linearGradient>
+    <symbol id="i-logo" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="7.5" fill="none" stroke="url(#spec)" stroke-width="2.2"/>
+      <path d="M12 1.5v4.2M12 18.3v4.2M1.5 12h4.2M18.3 12h4.2" stroke="url(#spec)" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <circle cx="12" cy="12" r="2.3" fill="#eef0f8"/>
+    </symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M20 20l-4.9-4.9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-fwd" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.4-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z" fill="currentColor"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6.5" y="5" width="4" height="14" rx="1.2" fill="currentColor"/><rect x="13.5" y="5" width="4" height="14" rx="1.2" fill="currentColor"/></symbol>
+    <symbol id="i-ext" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
 
-  <main>
+<noscript><div>SpectraHunt needs JavaScript to draw the sky and run searches. Please enable it and reload.</div></noscript>
 
-    <!-- ===================== EXPLORER ===================== -->
-    <section id="view-explorer" class="view active">
-      <div class="explorer-stage">
-        <canvas id="skyCanvas"></canvas>
-        <div class="explorer-overlay">
-          <div class="hero-copy">
-            <h1>Watch the infrared sky move.</h1>
-            <p>SPHEREx maps the whole sky every six months in 102 colors of infrared light. Trace lines up every pass over the same patch of sky so you can see, frame by frame, what shifted, brightened, or wandered through.</p>
-            <div class="search-row">
-              <input type="text" id="searchInput" placeholder="Search coordinates, e.g. 156.09, -41.64, or an object name" aria-label="Search sky position">
-              <button id="searchBtn">Go</button>
-            </div>
-            <p class="search-hint">Not sure where to look? <button id="jumpEcliptic">Jump to the ecliptic plane</button> — most solar-system motion happens there.</p>
-          </div>
-          <div class="bottom-bar">
-            <div class="legend">
-              <span>Coverage · epochs observed</span>
-              <span class="legend-strip"><span style="background:#1c2140"></span><span style="background:#232a52"></span><span style="background:#2e3a72"></span><span style="background:#4552a0"></span><span style="background:#6c7ce0"></span></span>
-              <span>1 → 5+</span>
-            </div>
-            <div class="coverage-toggle">
-              <span>Coverage overlay</span>
-              <button class="switch on" id="coverageSwitch" aria-pressed="true" aria-label="Toggle coverage overlay"></button>
-            </div>
-          </div>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#/" aria-label="SpectraHunt home">
+      <svg class="logo icon" aria-hidden="true"><use href="#i-logo"/></svg>
+      <span class="brand-name">SpectraHunt</span>
+    </a>
+    <nav class="tabs" aria-label="Primary">
+      <a href="#/map" data-route="map">Sky map</a>
+      <a href="#/candidates" data-route="candidates">Candidates</a>
+      <a href="#/about" data-route="about">About</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" tabindex="-1">
+
+  <!-- ===================== HOME ===================== -->
+  <section id="view-home" class="view active" aria-label="Home">
+    <div class="hero" id="hero">
+      <canvas id="heroCanvas" aria-hidden="true"></canvas>
+      <div class="hero-scrim"></div>
+
+      <div class="hero-core">
+        <h1>Hunt what moves in the infrared sky</h1>
+        <p class="hero-sub">SPHEREx scans the whole sky every six months. SpectraHunt lines up each pass and flags what changed: comets, asteroids, variable stars.</p>
+
+        <form class="search-shell" id="heroSearch" role="search" data-sid="hs" novalidate>
+          <svg class="s-icon icon" aria-hidden="true"><use href="#i-search"/></svg>
+          <input type="text" id="heroInput" role="combobox" aria-expanded="false" aria-controls="heroList" aria-autocomplete="list"
+                 placeholder="Search an object or coordinates" aria-label="Search an object name or sky coordinates (RA, Dec in degrees)"
+                 autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="search">
+          <kbd class="s-kbd" aria-hidden="true">/</kbd>
+          <button type="submit" class="s-go">Search</button>
+          <div class="s-list" id="heroList" role="listbox" aria-label="Suggestions"></div>
+        </form>
+
+        <div class="quick" id="quick">
+          <span class="quick-label">Try</span>
+          <button type="button" class="chip" data-q="3I/ATLAS">3I/ATLAS</button>
+          <button type="button" class="chip" data-q="433 Eros">433 Eros</button>
+          <button type="button" class="chip" data-q="Orion Complex">Orion Complex</button>
+          <button type="button" class="chip mono" data-q="156.09, -41.64">156.09, −41.64</button>
         </div>
-        <div class="reticle-label" id="reticleLabel"></div>
+      </div>
 
-        <aside class="inspect-panel" id="inspectPanel" aria-label="Field inspector">
-          <button class="inspect-close" id="inspectClose" aria-label="Close">✕</button>
-          <div id="inspectContent">
-            <p class="inspect-empty">Click anywhere on the sky map to inspect that field — its coverage history, epoch count, and whether Trace has flagged anything moving there.</p>
+      <div class="hero-foot">
+        <div class="pill glass">
+          <span class="rel"><span class="live-dot"></span>QR2 release, updated weekly</span>
+          <span class="sep rel" aria-hidden="true"></span>
+          <span><b id="statFields">—</b> fields indexed</span>
+          <span class="sep" aria-hidden="true"></span>
+          <span><b id="statFlags">—</b> flagged this week</span>
+        </div>
+        <a class="scroll-link glass" href="#how" id="howLink">How it works <svg class="icon" aria-hidden="true"><use href="#i-down"/></svg></a>
+      </div>
+    </div>
+
+    <section class="how" id="how" aria-labelledby="how-h">
+      <div class="how-inner">
+        <h2 id="how-h">How SpectraHunt spots something that moves</h2>
+        <p class="how-lead">Every field is compared with itself across visits. Stars stay put. Anything else shows up in the difference.</p>
+
+        <ol class="steps">
+          <li>
+            <figure class="step-fig">
+              <svg viewBox="0 0 240 150" role="img" aria-label="Two sets of stars, offset slightly, being lined up">
+                <g fill="#dfe3f2"><circle cx="40" cy="40" r="3"/><circle cx="90" cy="98" r="2.2"/><circle cx="150" cy="52" r="3.2"/><circle cx="196" cy="112" r="2.4"/><circle cx="122" cy="26" r="1.8"/><circle cx="62" cy="118" r="2.6"/></g>
+                <g fill="none" stroke="#5aa9e6" stroke-width="1.4"><circle cx="49" cy="46" r="4.6"/><circle cx="99" cy="104" r="4"/><circle cx="159" cy="58" r="4.8"/><circle cx="205" cy="118" r="4.2"/><circle cx="131" cy="32" r="3.6"/><circle cx="71" cy="124" r="4.4"/></g>
+                <g stroke="rgba(238,240,248,.3)" stroke-width="1" stroke-dasharray="2 3"><path d="M43 42l3 2M92 100l4 3M153 54l4 3M198 113l4 3M124 28l4 3M65 120l4 3"/></g>
+              </svg>
+            </figure>
+            <div class="step-head"><span class="step-n">1</span><h3>Align the passes</h3></div>
+            <p>Each visit to a field is registered to a common pixel grid and background-subtracted.</p>
+          </li>
+          <li>
+            <figure class="step-fig">
+              <svg viewBox="0 0 240 150" role="img" aria-label="Faded stars with one bright spot paired with a dark spot">
+                <g fill="#dfe3f2" opacity=".16"><circle cx="40" cy="40" r="3"/><circle cx="90" cy="98" r="2.2"/><circle cx="150" cy="52" r="3.2"/><circle cx="196" cy="112" r="2.4"/><circle cx="62" cy="118" r="2.6"/></g>
+                <circle cx="146" cy="70" r="16" fill="#f08a4b" opacity=".22"/>
+                <circle cx="146" cy="70" r="5.5" fill="#fff"/>
+                <circle cx="102" cy="88" r="5.5" fill="#04050a" stroke="rgba(238,240,248,.6)" stroke-width="1.4" stroke-dasharray="3 3"/>
+                <path d="M110 85l28-12" stroke="rgba(238,240,248,.4)" stroke-width="1.2" stroke-dasharray="2 4"/>
+              </svg>
+            </figure>
+            <div class="step-head"><span class="step-n">2</span><h3>Subtract one from the other</h3></div>
+            <p>Stationary stars cancel out. A mover leaves a paired bright and dark spot: where it is, and where it was.</p>
+          </li>
+          <li>
+            <figure class="step-fig">
+              <svg viewBox="0 0 240 150" role="img" aria-label="A bright dot inside a dashed circle marking a catalog match radius">
+                <g fill="#dfe3f2" opacity=".16"><circle cx="40" cy="40" r="3"/><circle cx="190" cy="34" r="2.2"/><circle cx="200" cy="112" r="3"/><circle cx="52" cy="112" r="2.4"/></g>
+                <circle cx="120" cy="75" r="15" fill="#f08a4b" opacity=".22"/>
+                <circle cx="120" cy="75" r="5" fill="#fff"/>
+                <circle cx="120" cy="75" r="26" fill="none" stroke="#5fcf9a" stroke-width="1.4" stroke-dasharray="4 4"/>
+                <path d="M120 40v9M120 101v9M85 75h9M146 75h9" stroke="rgba(238,240,248,.55)" stroke-width="1.3" stroke-linecap="round"/>
+              </svg>
+            </figure>
+            <div class="step-head"><span class="step-n">3</span><h3>Check the catalogs</h3></div>
+            <p>Every candidate is cross-matched against SkyBoT's known solar-system objects. Anything without a match goes to a person for review.</p>
+          </li>
+        </ol>
+
+        <div class="how-cta">
+          <a class="btn primary" href="#/map">Open the sky map</a>
+          <a class="btn" href="#/candidates">See this week's candidates</a>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ===================== SKY MAP ===================== -->
+  <section id="view-map" class="view" aria-label="Sky map">
+    <h1 class="sr-only">Sky map</h1>
+    <canvas id="mapCanvas" role="img" aria-label="All-sky coverage map. Use the search box to jump to a field, or click the map to inspect one."></canvas>
+
+    <div class="map-tools glass">
+      <form class="search-shell" id="mapSearch" role="search" data-sid="ms" novalidate>
+        <svg class="s-icon icon" aria-hidden="true"><use href="#i-search"/></svg>
+        <input type="text" id="mapInput" role="combobox" aria-expanded="false" aria-controls="mapList" aria-autocomplete="list"
+               placeholder="Object or RA, Dec" aria-label="Search an object name or sky coordinates (RA, Dec in degrees)"
+               autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="search">
+        <button type="submit" class="s-go">Go</button>
+        <div class="s-list" id="mapList" role="listbox" aria-label="Suggestions"></div>
+      </form>
+      <div class="tool-row">
+        <span id="covLabel">Coverage overlay</span>
+        <button type="button" class="switch" id="coverageSwitch" role="switch" aria-checked="true" aria-labelledby="covLabel"></button>
+      </div>
+      <p class="map-help">Click any field to see how many times SPHEREx has visited it and whether anything moved.</p>
+    </div>
+
+    <div class="map-bar glass">
+      <div class="legend">
+        <span>Epochs observed</span>
+        <span class="strip" id="legendStrip" aria-hidden="true"></span>
+        <span>1 to 5+</span>
+      </div>
+      <span class="sep" aria-hidden="true"></span>
+      <span class="mono" id="mapReadout" aria-hidden="true">RA —, Dec —</span>
+    </div>
+
+    <aside class="inspector" id="inspector" aria-label="Field inspector">
+      <div class="inspector-top">
+        <div id="inspTitle"></div>
+        <button type="button" class="icon-btn" id="inspectClose" aria-label="Close inspector"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg></button>
+      </div>
+      <div class="insp-body" id="inspBody"></div>
+    </aside>
+  </section>
+
+  <!-- ===================== FIELD / BLINK ===================== -->
+  <section id="view-field" class="view" aria-label="Field">
+    <div class="page">
+      <button type="button" class="back" id="fieldBack"><svg class="icon" aria-hidden="true"><use href="#i-back"/></svg><span id="backLabel">Back</span></button>
+      <div class="field-head">
+        <div>
+          <h1 class="field-title" id="fieldTitle">Field</h1>
+          <p class="field-sub" id="fieldSub"></p>
+        </div>
+        <span class="badge unknown" id="fieldBadge"><span class="dot"></span> Unidentified, needs review</span>
+      </div>
+
+      <div class="field-grid">
+        <div class="viewer">
+          <div class="viewer-stage">
+            <canvas id="blinkCanvas" width="960" height="960" aria-label="Blink comparison of this field across epochs" role="img"></canvas>
+            <span class="viewer-tag mono" id="viewerModeTag">Raw frames</span>
+            <span class="viewer-tag epoch mono" id="viewerEpochTag">—</span>
           </div>
+          <div class="viewer-controls">
+            <div class="transport">
+              <button type="button" class="icon-btn" id="prevEpoch" aria-label="Previous epoch"><svg class="icon" aria-hidden="true"><use href="#i-back"/></svg></button>
+              <button type="button" class="play" id="playBtn" aria-label="Play blink"><svg class="icon" aria-hidden="true"><use href="#i-play"/></svg></button>
+              <button type="button" class="icon-btn" id="nextEpoch" aria-label="Next epoch"><svg class="icon" aria-hidden="true"><use href="#i-fwd"/></svg></button>
+              <label class="speed"><span>Blink rate</span><input type="range" id="speedRange" min="150" max="1200" value="550" step="10"><output id="speedLabel" for="speedRange">550 ms</output></label>
+            </div>
+            <div class="diff-row">
+              <span id="diffLabel">Difference mode cancels stationary stars and keeps the mover</span>
+              <button type="button" class="switch" id="diffSwitch" role="switch" aria-checked="false" aria-labelledby="diffLabel"></button>
+            </div>
+            <p class="keys"><kbd>Space</kbd> play or pause &nbsp; <kbd>←</kbd> <kbd>→</kbd> step through epochs</p>
+          </div>
+          <div class="band-row" id="bandRow"></div>
+        </div>
+
+        <aside class="aside" aria-label="Field details">
+          <section>
+            <h2>Field metadata</h2>
+            <dl class="kv mono" id="metaKv"></dl>
+          </section>
+          <section>
+            <h2>Epochs in this blink</h2>
+            <div class="epoch-row" id="epochChips"></div>
+          </section>
+          <section>
+            <h2>Solar-system cross-match</h2>
+            <p id="skybotNote"></p>
+          </section>
+          <section>
+            <h2>Data provenance</h2>
+            <p>Level-2 spectral image MEF, QR2 pipeline, IRSA/IPAC.</p>
+            <div class="ext-links">
+              <a href="https://irsa.ipac.caltech.edu/Missions/spherex.html" target="_blank" rel="noopener">SPHEREx archive at IRSA <svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></a>
+              <a href="https://aws.amazon.com/marketplace/pp/prodview-mobipde7g65fu" target="_blank" rel="noopener">SPHEREx on AWS Open Data <svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></a>
+            </div>
+            <p class="cite-box">Data: NASA/JPL–Caltech SPHEREx, processed by IRSA (IPAC). This field is a generated preview for the prototype, not a real detection.</p>
+          </section>
         </aside>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- ===================== FIELD / BLINK ===================== -->
-    <section id="view-field" class="view">
-      <div class="field-wrap">
-        <button class="back-link" id="fieldBack">← Back</button>
-        <div class="field-head">
-          <div>
-            <div class="field-title" id="fieldTitle">Field 2026W38_2B · RA 156.09, Dec −41.64</div>
-            <div class="field-sub mono" id="fieldSub">6 epochs available · Band 3 (1.63–2.41 µm) selected</div>
-          </div>
-          <span class="badge unknown" id="fieldBadge"><span class="dot"></span> Unidentified — needs review</span>
+  <!-- ===================== CANDIDATES ===================== -->
+  <section id="view-candidates" class="view" aria-label="Candidates">
+    <div class="page">
+      <div class="page-head">
+        <div>
+          <h1>This week's candidates</h1>
+          <p>Every field where two or more epochs disagree is differenced and searched automatically. These are the results waiting on a human look.</p>
         </div>
-
-        <div class="field-grid">
-          <div class="viewer-card">
-            <div class="viewer-canvas-wrap">
-              <canvas id="blinkCanvas" width="640" height="640"></canvas>
-              <span class="viewer-tag mono" id="viewerModeTag">Raw frames</span>
-              <span class="viewer-tag epoch mono" id="viewerEpochTag">2026W12_2B</span>
-            </div>
-            <div class="viewer-controls">
-              <div class="transport">
-                <button class="play-btn" id="playBtn" aria-label="Play">▶</button>
-                <div class="speed-row">
-                  <span style="font-size:.72rem;color:var(--text-faint);">Blink rate</span>
-                  <input type="range" id="speedRange" min="150" max="1200" value="550" step="10">
-                  <span id="speedLabel">550 ms</span>
-                </div>
-              </div>
-              <div class="diff-toggle">
-                <span>Difference mode — cancel out stationary stars, keep the mover</span>
-                <button class="switch" id="diffSwitch" aria-pressed="false" aria-label="Toggle difference mode"></button>
-              </div>
-            </div>
-            <div class="band-tabs" id="bandTabs"></div>
-          </div>
-
-          <div class="side-stack">
-            <div class="info-card">
-              <h4>Field metadata</h4>
-              <dl class="kv mono" id="metaKv"></dl>
-            </div>
-            <div class="info-card">
-              <h4>Epochs in this blink</h4>
-              <div class="epoch-chip-row mono" id="epochChips"></div>
-            </div>
-            <div class="info-card">
-              <h4>Solar-system cross-match</h4>
-              <p style="font-size:.8rem; color:var(--text-dim); line-height:1.5;" id="skybotNote">Checked against SkyBoT (IMCCE) at each epoch — no cataloged object found within 8″ of this position. Could be an artifact, or something not yet in the catalogs.</p>
-            </div>
-            <div class="info-card">
-              <h4>Data provenance</h4>
-              <p style="font-size:.78rem; color:var(--text-faint); line-height:1.5;">Level-2 Spectral Image MEF, QR2 pipeline, IRSA/IPAC.</p>
-              <div class="link-row">
-                <a href="#" onclick="return false;">↗ Open raw FITS cutout on IRSA</a>
-                <a href="#" onclick="return false;">↗ View on AWS Open Data (S3)</a>
-              </div>
-              <div class="cite-box">Data: NASA/JPL–Caltech SPHEREx, processed by IRSA (IPAC). Mock preview only — this field is illustrative, not a real detection.</div>
-            </div>
-          </div>
+        <div class="segment" id="filters" role="group" aria-label="Filter candidates">
+          <button type="button" data-filter="all" aria-pressed="true">All</button>
+          <button type="button" data-filter="unknown" aria-pressed="false">Unidentified</button>
+          <button type="button" data-filter="known" aria-pressed="false">Known objects</button>
         </div>
       </div>
-    </section>
+      <div class="cand-grid" id="candGrid"></div>
+    </div>
+  </section>
 
-    <!-- ===================== CANDIDATES ===================== -->
-    <section id="view-candidates" class="view">
-      <div class="cand-wrap">
-        <div class="cand-head">
-          <div>
-            <h2>This week's candidates</h2>
-            <p>Every field where two or more epochs disagree gets differenced and searched automatically. These are the results waiting on a human look.</p>
-          </div>
-          <div class="filters" id="filters">
-            <button class="filter-chip active" data-filter="all">All</button>
-            <button class="filter-chip" data-filter="unknown">Unidentified only</button>
-            <button class="filter-chip" data-filter="known">Known objects</button>
-          </div>
-        </div>
-        <div class="cand-grid" id="candGrid"></div>
-      </div>
-    </section>
+  <!-- ===================== ABOUT ===================== -->
+  <section id="view-about" class="view" aria-label="About">
+    <div class="prose">
+      <h1>About SpectraHunt</h1>
+      <p class="lede">A design prototype for the 2026 NASA Space Apps Challenge.</p>
+      <p class="notice">This build uses generated placeholder data. No live SPHEREx imagery is being fetched. It shows what we're proposing to build: an interface anyone can use to watch the SPHEREx sky change over time.</p>
 
-    <!-- ===================== ABOUT ===================== -->
-    <section id="view-about" class="view">
-      <div class="about-wrap">
-        <p class="kicker mono">2026 NASA SPACE APPS CHALLENGE · PROTOTYPE</p>
-        <h2>About Trace</h2>
-        <div class="mockup-note">This is a design mockup with generated placeholder data — no live SPHEREx imagery is being fetched. It exists to show what we're proposing to build: an interface anyone can use to watch the SPHEREx sky change over time.</div>
+      <section>
+        <h2>What SPHEREx is watching for</h2>
+        <p>SPHEREx (Spectro-Photometer for the History of the Universe, Epoch of Reionization, and Ices Explorer) is a NASA all-sky survey observatory, imaging the entire sky roughly every six months across 102 near-infrared bands from 0.75 to 5 microns. Because it revisits the same sky repeatedly, anything that moves, brightens, or fades between visits stands out once you compare epochs directly: comets, asteroids, variable stars, and more.</p>
+        <table class="band-table">
+          <thead><tr><th scope="col"><span class="sr-only">Color</span></th><th scope="col">Band</th><th scope="col">Wavelength</th></tr></thead>
+          <tbody>
+            <tr><td><span class="sw" style="background:#7c83fd"></span></td><td>Band 1</td><td>0.75 – 1.09 µm</td></tr>
+            <tr><td><span class="sw" style="background:#5aa9e6"></span></td><td>Band 2</td><td>1.10 – 1.62 µm</td></tr>
+            <tr><td><span class="sw" style="background:#4fc9a8"></span></td><td>Band 3</td><td>1.63 – 2.41 µm</td></tr>
+            <tr><td><span class="sw" style="background:#e8c34a"></span></td><td>Band 4</td><td>2.42 – 3.82 µm</td></tr>
+            <tr><td><span class="sw" style="background:#f08a4b"></span></td><td>Band 5</td><td>3.83 – 4.41 µm</td></tr>
+            <tr><td><span class="sw" style="background:#e85d4a"></span></td><td>Band 6</td><td>4.42 – 5.00 µm</td></tr>
+          </tbody>
+        </table>
+      </section>
 
-        <section>
-          <h3>What SPHEREx is watching for</h3>
-          <p>SPHEREx (Spectro-Photometer for the History of the Universe, Epoch of Reionization, and Ices Explorer) is a NASA all-sky survey observatory, imaging the entire sky roughly every six months across 102 near-infrared bands from 0.75 to 5 microns. Because it revisits the same sky repeatedly, anything that moves, brightens, or fades between visits stands out once you compare epochs directly — comets, asteroids, variable stars, and more.</p>
-          <table class="band-table">
-            <thead><tr><th></th><th>Band</th><th>Wavelength</th></tr></thead>
-            <tbody>
-              <tr><td><span class="sw" style="background:#7c83fd"></span></td><td>Band 1</td><td>0.75 – 1.09 µm</td></tr>
-              <tr><td><span class="sw" style="background:#5aa9e6"></span></td><td>Band 2</td><td>1.10 – 1.62 µm</td></tr>
-              <tr><td><span class="sw" style="background:#4fc9a8"></span></td><td>Band 3</td><td>1.63 – 2.41 µm</td></tr>
-              <tr><td><span class="sw" style="background:#e8c34a"></span></td><td>Band 4</td><td>2.42 – 3.82 µm</td></tr>
-              <tr><td><span class="sw" style="background:#f08a4b"></span></td><td>Band 5</td><td>3.83 – 4.41 µm</td></tr>
-              <tr><td><span class="sw" style="background:#e85d4a"></span></td><td>Band 6</td><td>4.42 – 5.00 µm</td></tr>
-            </tbody>
-          </table>
-        </section>
+      <section>
+        <h2>How detection will work</h2>
+        <p>Each sky cell with two or more epochs gets aligned to a common grid, background-subtracted, and differenced. Whatever's left over after masking bad pixels gets run through source extraction. Real movers show up as a paired bright and dark dipole; noise and cosmic rays don't pair up the same way. Every candidate is cross-checked against SkyBoT's catalog of known solar-system objects before it reaches the feed.</p>
+      </section>
 
-        <section>
-          <h3>How detection will work</h3>
-          <p>Each sky cell with two or more epochs gets aligned to a common grid, background-subtracted, and differenced. Whatever's left over — after masking bad pixels — gets run through source extraction. Real movers show up as a paired bright/dark "dipole"; noise and cosmic rays don't pair up the same way. Every candidate is cross-checked against SkyBoT's catalog of known solar-system objects before it reaches the feed.</p>
-        </section>
+      <section>
+        <h2>Required data citation</h2>
+        <div class="cite-block">This publication makes use of data products from the Spectro-Photometer for the History of the Universe, Epoch of Reionization and Ices Explorer (SPHEREx), which is a joint project of the Jet Propulsion Laboratory and the California Institute of Technology, and is funded by the National Aeronautics and Space Administration.</div>
+      </section>
 
-        <section>
-          <h3>Required data citation</h3>
-          <div class="cite-block">"This publication makes use of data products from the Spectro-Photometer for the History of the Universe, Epoch of Reionization and Ices Explorer (SPHEREx), which is a joint project of the Jet Propulsion Laboratory and the California Institute of Technology, and is funded by the National Aeronautics and Space Administration."</div>
-        </section>
+      <section>
+        <h2>Sources</h2>
+        <ul class="source-list">
+          <li><a href="https://irsa.ipac.caltech.edu/Missions/spherex.html" target="_blank" rel="noopener">SPHEREx archive at IRSA</a></li>
+          <li><a href="https://irsa.ipac.caltech.edu/data/SPHEREx/docs/overview_qr.html" target="_blank" rel="noopener">SPHEREx Quick Release overview, IRSA</a></li>
+          <li><a href="https://aws.amazon.com/marketplace/pp/prodview-mobipde7g65fu" target="_blank" rel="noopener">SPHEREx Quick Release on AWS Open Data</a></li>
+          <li><a href="https://vo.imcce.fr/webservices/skybot/" target="_blank" rel="noopener">IMCCE SkyBoT, solar-system cone search</a></li>
+        </ul>
+      </section>
+    </div>
+  </section>
 
-        <section>
-          <h3>Sources</h3>
-          <ul class="source-list">
-            <li><a href="#" onclick="return false;">SPHEREx Archive at IRSA — User Guide</a></li>
-            <li><a href="#" onclick="return false;">AWS Open Data Registry — SPHEREx Quick Release</a></li>
-            <li><a href="#" onclick="return false;">IMCCE SkyBoT — solar-system cone search</a></li>
-          </ul>
-        </section>
-      </div>
-    </section>
+</main>
 
-  </main>
-</div>
+<footer class="site-foot">
+  <div class="foot-inner">
+    <div class="foot-brand">
+      <span class="brand"><svg class="logo icon" aria-hidden="true"><use href="#i-logo"/></svg><span class="brand-name">SpectraHunt</span></span>
+      <p class="foot-note">A prototype for the 2026 NASA Space Apps Challenge. The fields and candidates shown use generated placeholder data.</p>
+    </div>
+    <p class="foot-cite">Data: NASA/JPL–Caltech SPHEREx, processed by IRSA (IPAC).</p>
+  </div>
+</footer>
 
 <script>
 (function(){
   "use strict";
+
+  /* ================= helpers ================= */
+  const $  = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const TAU = Math.PI * 2;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const MONO = '"Geist Mono", ui-monospace, Menlo, Consolas, monospace';
+
   const BANDS = [
-    {id:1, label:"Band 1", range:"0.75–1.09 µm", color:"#7c83fd"},
-    {id:2, label:"Band 2", range:"1.10–1.62 µm", color:"#5aa9e6"},
-    {id:3, label:"Band 3", range:"1.63–2.41 µm", color:"#4fc9a8"},
-    {id:4, label:"Band 4", range:"2.42–3.82 µm", color:"#e8c34a"},
-    {id:5, label:"Band 5", range:"3.83–4.41 µm", color:"#f08a4b"},
-    {id:6, label:"Band 6", range:"4.42–5.00 µm", color:"#e85d4a"},
+    {id:1, label:'Band 1', range:'0.75–1.09 µm', color:'#7c83fd'},
+    {id:2, label:'Band 2', range:'1.10–1.62 µm', color:'#5aa9e6'},
+    {id:3, label:'Band 3', range:'1.63–2.41 µm', color:'#4fc9a8'},
+    {id:4, label:'Band 4', range:'2.42–3.82 µm', color:'#e8c34a'},
+    {id:5, label:'Band 5', range:'3.83–4.41 µm', color:'#f08a4b'},
+    {id:6, label:'Band 6', range:'4.42–5.00 µm', color:'#e85d4a'},
   ];
 
   function mulberry32(seed){
@@ -486,433 +787,740 @@
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
   }
-
   function genStars(seed, w, h, count){
-    const rng = mulberry32(seed);
-    const stars = [];
+    const rng = mulberry32(seed), out = [];
     for(let i=0;i<count;i++){
-      stars.push({
-        x: rng()*w, y: rng()*h,
-        r: 0.5 + Math.pow(rng(),3.2)*2.6,
-        b: 0.25 + rng()*0.75
-      });
+      const c = rng();
+      out.push({ x:rng()*w, y:rng()*h, r:0.5 + Math.pow(rng(),3.2)*2.6, b:0.25 + rng()*0.75, ci: c<0.12 ? 1 : (c<0.24 ? 2 : 0) });
     }
-    return stars;
+    return out;
   }
-
-  /* ---------------- Explorer starfield ---------------- */
-  const skyCanvas = document.getElementById('skyCanvas');
-  const sctx = skyCanvas.getContext('2d');
-  let skyStars = [], skyBlobs = [], coverageCells = [];
-  let coverageOn = true;
-  let DPR = Math.min(window.devicePixelRatio||1, 2);
-
-  function resizeSky(){
-    const stage = skyCanvas.parentElement;
-    const w = stage.clientWidth, h = stage.clientHeight;
-    skyCanvas.width = w*DPR; skyCanvas.height = h*DPR;
-    skyCanvas.style.width = w+'px'; skyCanvas.style.height = h+'px';
-    sctx.setTransform(DPR,0,0,DPR,0,0);
-    buildSky(w,h);
+  function hexToRgba(hex, a){
+    const v = hex.replace('#','');
+    return `rgba(${parseInt(v.substring(0,2),16)},${parseInt(v.substring(2,4),16)},${parseInt(v.substring(4,6),16)},${a})`;
   }
+  function hashStr(s){ let h=0; for(let i=0;i<s.length;i++){ h=(h<<5)-h+s.charCodeAt(i); h|=0; } return h; }
+  const STAR_FILL = ['#e6e8f2', '#ffe6c4', '#c9dcff'];
+  const fmtRa  = v => `${Number(v).toFixed(2)}°`;
+  const fmtDec = v => `${v<0?'−':''}${Math.abs(Number(v)).toFixed(2)}°`;
 
-  function buildSky(w,h){
-    skyStars = genStars(1337, w, h, Math.floor((w*h)/2600));
-    const rng = mulberry32(99);
-    skyBlobs = [];
-    for(let i=0;i<5;i++){
-      skyBlobs.push({x:rng()*w, y:rng()*h, r: 120+rng()*260, hue: [235,205,175,20,340][i]});
+  /* ================= mock sky data ================= */
+  const CANDIDATES = [
+    {name:'2026 XJ14',     ra:132.41, dec:-3.22,  band:5, known:false,           score:7.8, date:'2026-09-18'},
+    {name:'3I/ATLAS',      ra:131.98, dec:-2.87,  band:4, known:'3I/ATLAS',      score:9.6, date:'2026-09-16'},
+    {name:'Field 0091-D2', ra:88.10,  dec:14.55,  band:2, known:false,           score:5.4, date:'2026-09-15'},
+    {name:'433 Eros',      ra:210.32, dec:9.11,   band:1, known:'433 Eros',      score:8.9, date:'2026-09-14'},
+    {name:'Field 2204-D6', ra:301.77, dec:-22.03, band:6, known:false,           score:6.1, date:'2026-09-13'},
+    {name:'65803 Didymos', ra:19.44,  dec:5.02,   band:3, known:'65803 Didymos', score:8.2, date:'2026-09-12'},
+    {name:'Field 0730-D1', ra:44.90,  dec:-61.18, band:5, known:false,           score:6.9, date:'2026-09-11'},
+    {name:'Field 1550-D4', ra:250.02, dec:31.44,  band:2, known:false,           score:5.0, date:'2026-09-10'},
+  ];
+
+  const SUGGESTIONS = [
+    {group:'Notable fields', items:[
+      {name:'3I/ATLAS field',       meta:'132.40, −3.20',   ra:132.40, dec:-3.20,  known:true},
+      {name:'Ecliptic plane',       meta:'0.00, 0.00',      ra:0,      dec:0,      known:false},
+      {name:'Vela Molecular Ridge', meta:'127.69, −39.18',  ra:127.69, dec:-39.18, known:false},
+      {name:'Orion Complex',        meta:'83.82, −5.39',    ra:83.82,  dec:-5.39,  known:false},
+    ]},
+    {group:'Known objects', items:[
+      {name:'433 Eros',      meta:'asteroid',     ra:210.32, dec:9.11,  known:true},
+      {name:'65803 Didymos', meta:'asteroid',     ra:19.44,  dec:5.02,  known:true},
+      {name:'Ceres',         meta:'dwarf planet', ra:58.14,  dec:12.66, known:true},
+    ]},
+    {group:'Try coordinates', items:[
+      {name:'156.09, −41.64', meta:'RA, Dec', ra:156.09, dec:-41.64, known:false},
+      {name:'301.77, −22.03', meta:'RA, Dec', ra:301.77, dec:-22.03, known:false},
+    ]},
+  ];
+
+  /* Coverage grid: 72 x 36 fields (5° each). Epoch counts are generated, then
+     curated fields are forced to have several epochs so the demo is consistent. */
+  const GRID_W = 72, GRID_H = 36;
+  const GRID = [];
+  for(let j=0;j<GRID_H;j++){
+    const row = [];
+    for(let i=0;i<GRID_W;i++){
+      const l = mulberry32(i*131 + j*977 + 13)();
+      row.push(l<.12 ? 0 : l<.3 ? 1 : l<.5 ? 2 : l<.7 ? 3 : l<.87 ? 4 : 5);
     }
-    coverageCells = [];
-    const cell = 46;
-    for(let y=0;y<h;y+=cell){
-      for(let x=0;x<w;x+=cell){
-        const v = mulberry32(x*131+y*977)();
-        coverageCells.push({x,y, level: v});
-      }
-    }
+    GRID.push(row);
   }
+  function cellOf(ra, dec){
+    return {
+      i: Math.min(GRID_W-1, Math.max(0, Math.floor(ra/360*GRID_W))),
+      j: Math.min(GRID_H-1, Math.max(0, Math.floor((90-dec)/180*GRID_H)))
+    };
+  }
+  SUGGESTIONS.forEach(g => g.items.forEach(it => { const c = cellOf(it.ra, it.dec); GRID[c.j][c.i] = Math.max(GRID[c.j][c.i], 4); }));
+  CANDIDATES.forEach(it => { const c = cellOf(it.ra, it.dec); GRID[c.j][c.i] = Math.max(GRID[c.j][c.i], 3); });
+  function epochCount(ra, dec, seed){
+    const c = cellOf(ra, dec), e = GRID[c.j][c.i];
+    return e >= 5 ? 5 + (mulberry32(seed+5)() > .5 ? 1 : 0) : e;
+  }
+  const LEVEL_COLORS = [null, '#141a38', '#1c2554', '#27357a', '#3848a8', '#5a6ce0'];
 
-  let twinklePhase = 0;
-  function drawSky(t){
-    const w = skyCanvas.width/DPR, h = skyCanvas.height/DPR;
-    sctx.clearRect(0,0,w,h);
-    const grad = sctx.createLinearGradient(0,0,0,h);
-    grad.addColorStop(0,'#0b0e1c'); grad.addColorStop(1,'#060812');
-    sctx.fillStyle = grad; sctx.fillRect(0,0,w,h);
+  /* ================= routing ================= */
+  const VIEWS = ['home','map','candidates','about','field'];
+  const TITLES = {
+    home:'SpectraHunt: hunt what moves in the infrared sky',
+    map:'Sky map – SpectraHunt',
+    candidates:'Candidates – SpectraHunt',
+    about:'About – SpectraHunt',
+    field:'Field – SpectraHunt'
+  };
+  let view = 'home', prevView = 'home', currentField = null, firstRoute = true, candFilter = 'all';
 
-    sctx.globalCompositeOperation = 'lighter';
-    skyBlobs.forEach(b=>{
-      const g = sctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);
-      g.addColorStop(0, `hsla(${b.hue},70%,45%,0.05)`);
-      g.addColorStop(1, `hsla(${b.hue},70%,45%,0)`);
-      sctx.fillStyle = g;
-      sctx.beginPath(); sctx.arc(b.x,b.y,b.r,0,7); sctx.fill();
+  function routeName(){
+    const n = (location.hash.replace(/^#\/?/, '') || 'home').split(/[?/]/)[0];
+    return VIEWS.includes(n) ? n : (n==='how' ? 'home' : 'home');
+  }
+  function navigate(name){
+    const target = name==='home' ? '#/' : '#/'+name;
+    if(location.hash === target || (name==='home' && (location.hash==='' || location.hash==='#'))) route();
+    else location.hash = target;
+  }
+  function route(){
+    if(location.hash === '#how'){ return; }            /* in-page anchor on home */
+    let name = routeName();
+    if(name==='field' && !currentField){ name = 'home'; history.replaceState(null,'','#/'); }
+    show(name);
+  }
+  function show(name){
+    if(name !== view){ prevView = view; }
+    if(name !== 'field' && playing) setPlaying(false);
+    if(name !== 'candidates') stopThumbs();
+    view = name;
+    $$('.view').forEach(v => v.classList.toggle('active', v.id === 'view-'+name));
+    document.body.dataset.view = name;
+    $$('.tabs a').forEach(a => {
+      const on = a.dataset.route === name;
+      a.classList.toggle('active', on);
+      if(on) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current');
     });
-    sctx.globalCompositeOperation = 'source-over';
-
-    if(coverageOn){
-      coverageCells.forEach(c=>{
-        const l = c.level;
-        let color;
-        if(l<0.5) color = 'rgba(255,255,255,0)';
-        else if(l<0.65) color = 'rgba(70,85,150,0.10)';
-        else if(l<0.8) color = 'rgba(90,110,190,0.16)';
-        else if(l<0.92) color = 'rgba(120,140,230,0.22)';
-        else color = 'rgba(150,165,255,0.30)';
-        sctx.fillStyle = color;
-        sctx.fillRect(c.x,c.y,44,44);
-      });
-    }
-
-    skyStars.forEach((s,i)=>{
-      const tw = 0.85 + 0.15*Math.sin(twinklePhase*0.001 + i*12.9898);
-      sctx.beginPath();
-      sctx.fillStyle = `rgba(231,233,245,${s.b*tw})`;
-      sctx.arc(s.x, s.y, s.r, 0, 7);
-      sctx.fill();
-    });
+    document.title = TITLES[name];
+    if(!firstRoute){ window.scrollTo(0,0); $('#main').focus({preventScroll:true}); }
+    firstRoute = false;
+    if(name==='candidates') buildCandidates();
+    if(name!=='map') closeInspector();
+    resizeHero(); resizeMap(); kick();
   }
+  window.addEventListener('hashchange', route);
 
-  let reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function skyLoop(t){
-    twinklePhase = t;
-    drawSky(t);
-    if(!reduceMotion) requestAnimationFrame(skyLoop);
-  }
-
-  window.addEventListener('resize', resizeSky);
-  resizeSky();
-  requestAnimationFrame(skyLoop);
-  if(reduceMotion) drawSky(0);
-
-  /* ------------- explorer interactions ------------- */
-  const inspectPanel = document.getElementById('inspectPanel');
-  const inspectContent = document.getElementById('inspectContent');
-  const inspectClose = document.getElementById('inspectClose');
-  const reticleLabel = document.getElementById('reticleLabel');
-  const coverageSwitch = document.getElementById('coverageSwitch');
-
-  coverageSwitch.addEventListener('click', ()=>{
-    coverageOn = !coverageOn;
-    coverageSwitch.classList.toggle('on', coverageOn);
-    coverageSwitch.setAttribute('aria-pressed', String(coverageOn));
+  /* smooth in-page anchor for "How it works" without touching the route */
+  $('#howLink').addEventListener('click', e => {
+    e.preventDefault();
+    $('#how').scrollIntoView({behavior: reduceMotion.matches ? 'auto' : 'smooth', block:'start'});
   });
 
-  function pixelToSky(px, py, w, h){
-    const ra = (px/w)*360;
-    const dec = 90 - (py/h)*180;
-    return {ra: ra.toFixed(2), dec: dec.toFixed(2)};
+  /* ================= canvas plumbing ================= */
+  const hero = {host:$('#hero'), canvas:$('#heroCanvas'), w:0, h:0, stars:[], blobs:[]};
+  const map  = {host:$('#view-map'), canvas:$('#mapCanvas'), w:0, h:0, stars:[], blobs:[], hover:null, selected:null, coverage:true};
+  hero.ctx = hero.canvas.getContext('2d');
+  map.ctx  = map.canvas.getContext('2d');
+
+  function sizeCanvas(o){
+    const w = o.host.clientWidth, h = o.host.clientHeight;
+    if(!w || !h) return false;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    o.canvas.width = Math.round(w*dpr); o.canvas.height = Math.round(h*dpr);
+    o.ctx.setTransform(dpr,0,0,dpr,0,0);
+    o.w = w; o.h = h;
+    return true;
+  }
+  function makeBlobs(seed){
+    const rng = mulberry32(seed), hues = [235,205,20,265,300];
+    return hues.map(hue => ({x:rng(), y:rng(), r:.14 + rng()*.2, hue}));
+  }
+  function resizeHero(){
+    if(view!=='home') return;
+    if(!sizeCanvas(hero)) return;
+    hero.stars = genStars(1337, 1, 1, Math.min(1400, Math.floor(hero.w*hero.h/2500)));
+    hero.blobs = makeBlobs(99);
+    kick();
+  }
+  function resizeMap(){
+    if(view!=='map') return;
+    if(!sizeCanvas(map)) return;
+    map.stars = genStars(2024, 1, 1, Math.min(1500, Math.floor(map.w*map.h/3200)));
+    map.blobs = makeBlobs(7);
+    kick();
+  }
+  if('ResizeObserver' in window){
+    new ResizeObserver(resizeHero).observe(hero.host);
+    new ResizeObserver(resizeMap).observe(map.host);
+  } else {
+    window.addEventListener('resize', () => { resizeHero(); resizeMap(); });
   }
 
-  function fakeEpochCount(seedSeed){
-    const rng = mulberry32(seedSeed);
-    return 1 + Math.floor(rng()*6);
+  function drawBlobs(o, ctx, alpha){
+    ctx.globalCompositeOperation = 'lighter';
+    const m = Math.max(o.w, o.h);
+    o.blobs.forEach(b => {
+      const x = b.x*o.w, y = b.y*o.h, r = b.r*m;
+      const g = ctx.createRadialGradient(x,y,0,x,y,r);
+      g.addColorStop(0, `hsla(${b.hue},62%,46%,${alpha})`);
+      g.addColorStop(1, `hsla(${b.hue},62%,46%,0)`);
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x,y,r,0,TAU); ctx.fill();
+    });
+    ctx.globalCompositeOperation = 'source-over';
+  }
+  function drawBracket(ctx, x, y, b, l){
+    ctx.beginPath();
+    [[-1,-1],[1,-1],[1,1],[-1,1]].forEach(([sx,sy]) => {
+      ctx.moveTo(x+sx*b, y+sy*(b-l)); ctx.lineTo(x+sx*b, y+sy*b); ctx.lineTo(x+sx*(b-l), y+sy*b);
+    });
+    ctx.stroke();
   }
 
-  skyCanvas.addEventListener('click', (e)=>{
-    const rect = skyCanvas.getBoundingClientRect();
-    const x = e.clientX - rect.left, y = e.clientY - rect.top;
-    const sky = pixelToSky(x,y,rect.width,rect.height);
-    const seedSeed = Math.floor(x*1000+y);
-    const epochs = fakeEpochCount(seedSeed);
-    const hasCandidate = mulberry32(seedSeed+7)() > 0.6;
+  /* ---------- hero sky ---------- */
+  function moverPath(w, h){
+    const narrow = w < 640;
+    const cx = w * (narrow ? .78 : (w < 1000 ? .8 : .83));
+    const cy = Math.max(h * (narrow ? .15 : .26), narrow ? 128 : 150);
+    const step = Math.max(26, Math.min(w,h) * .055);
+    return [0,1,2].map(i => ({x: cx + (i-1)*step, y: cy - (i-1)*step*.62}));
+  }
+  function drawMover(ctx, w, h, t){
+    const pts = moverPath(w, h);
+    const idx = reduceMotion.matches ? 1 : Math.floor(t/1500) % 3;
+    const narrow = w < 640;
+    ctx.save();
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3,5]); ctx.strokeStyle = 'rgba(238,240,248,.3)';
+    ctx.beginPath(); pts.forEach((p,i) => i ? ctx.lineTo(p.x,p.y) : ctx.moveTo(p.x,p.y)); ctx.stroke();
+    ctx.setLineDash([]);
+    pts.forEach((p,i) => { if(i===idx) return; ctx.beginPath(); ctx.arc(p.x,p.y,3.5,0,TAU); ctx.strokeStyle='rgba(238,240,248,.42)'; ctx.stroke(); });
+    const a = pts[idx];
+    const g = ctx.createRadialGradient(a.x,a.y,0,a.x,a.y,24);
+    g.addColorStop(0,'rgba(240,138,75,.6)'); g.addColorStop(1,'rgba(240,138,75,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(a.x,a.y,24,0,TAU); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(a.x,a.y,3.3,0,TAU); ctx.fill();
+    ctx.strokeStyle = 'rgba(238,240,248,.92)'; ctx.lineWidth = 1.25;
+    drawBracket(ctx, a.x, a.y, 13, 5);
+    ctx.font = `500 11px ${MONO}`; ctx.textBaseline = 'middle';
+    ctx.fillStyle = 'rgba(238,240,248,.8)';
+    ctx.textAlign = narrow ? 'right' : 'left';
+    ctx.fillText(`2026W${10+idx*3}_2B`, a.x + (narrow ? -21 : 21), a.y);
+    ctx.restore();
+  }
+  function drawHero(t){
+    const {ctx, w, h} = hero;
+    if(!w || !h) return;
+    ctx.globalCompositeOperation = 'source-over';
+    const bg = ctx.createLinearGradient(0,0,0,h);
+    bg.addColorStop(0,'#070915'); bg.addColorStop(1,'#04050a');
+    ctx.fillStyle = bg; ctx.fillRect(0,0,w,h);
+    drawBlobs(hero, ctx, .06);
 
-    inspectContent.innerHTML = `
-      <h3 style="margin-bottom:4px;">Field at RA ${sky.ra}°, Dec ${sky.dec}°</h3>
-      <p class="mono" style="font-size:.75rem;color:var(--text-faint);margin-bottom:16px;">2026W${(10+Math.floor(epochs*3))}_2B · Detector ${1+(seedSeed%6)}</p>
-      <dl class="kv mono" style="margin-bottom:16px;">
-        <dt>Epochs</dt><dd>${epochs}</dd>
-        <dt>Bands present</dt><dd>${3+Math.floor(mulberry32(seedSeed+3)()*4)} of 6</dd>
-        <dt>Survey</dt><dd>${mulberry32(seedSeed+9)()>0.8?'Deep':'Wide'}</dd>
+    const tw = t * 0.0011;
+    for(let i=0;i<hero.stars.length;i++){
+      const s = hero.stars[i];
+      const dx = (s.x-.5)/.40, dy = (s.y-.5)/.30;
+      const d = Math.min(1, Math.hypot(dx,dy));
+      const att = .14 + .86*(d*d*(3-2*d));                 /* stars dim behind the text stack */
+      ctx.globalAlpha = Math.min(1, s.b*att*(0.86 + 0.14*Math.sin(tw + i*12.9898)));
+      ctx.fillStyle = STAR_FILL[s.ci];
+      ctx.beginPath(); ctx.arc(s.x*w, s.y*h, s.r, 0, TAU); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    drawMover(ctx, w, h, t);
+  }
+
+  /* ---------- sky map ---------- */
+  function drawMap(t){
+    const {ctx, w, h} = map;
+    if(!w || !h) return;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = '#05060c'; ctx.fillRect(0,0,w,h);
+    drawBlobs(map, ctx, .05);
+    const cw = w/GRID_W, ch = h/GRID_H;
+
+    if(map.coverage){
+      for(let j=0;j<GRID_H;j++) for(let i=0;i<GRID_W;i++){
+        const e = GRID[j][i]; if(!e) continue;
+        ctx.fillStyle = LEVEL_COLORS[e];
+        ctx.fillRect(i*cw+.5, j*ch+.5, cw-1, ch-1);
+      }
+    }
+
+    /* graticule */
+    ctx.lineWidth = 1;
+    for(let ra=30; ra<360; ra+=30){
+      const x = Math.round(ra/360*w)+.5;
+      ctx.strokeStyle = 'rgba(255,255,255,.07)'; ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke();
+    }
+    for(let dec=-60; dec<=60; dec+=30){
+      const y = Math.round((90-dec)/180*h)+.5;
+      ctx.strokeStyle = dec===0 ? 'rgba(255,255,255,.16)' : 'rgba(255,255,255,.07)';
+      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
+    }
+    ctx.font = `500 11px ${MONO}`; ctx.textBaseline = 'alphabetic'; ctx.lineJoin = 'round';
+    const label = (txt, x, y, align) => {
+      ctx.textAlign = align; ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(5,6,12,.85)'; ctx.strokeText(txt,x,y);
+      ctx.fillStyle = 'rgba(196,202,226,.78)'; ctx.fillText(txt,x,y);
+    };
+    const eqY = (90/180)*h;
+    for(let ra=30; ra<360; ra+=30) label(`${ra}°`, ra/360*w + 5, eqY - 6, 'left');
+    for(let dec=-60; dec<=60; dec+=30){
+      if(dec===0) continue;
+      label(`${dec>0?'+':'−'}${Math.abs(dec)}°`, w-10, (90-dec)/180*h - 6, 'right');
+    }
+    label('0°', w-10, eqY - 6, 'right');
+    ctx.lineWidth = 1;
+
+    /* stars */
+    const tw = t*0.0011;
+    for(let i=0;i<map.stars.length;i++){
+      const s = map.stars[i];
+      ctx.globalAlpha = Math.min(1, s.b*(0.88 + 0.12*Math.sin(tw + i*12.9898)));
+      ctx.fillStyle = STAR_FILL[s.ci];
+      ctx.beginPath(); ctx.arc(s.x*w, s.y*h, s.r*.85, 0, TAU); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    if(map.hover){
+      ctx.strokeStyle = 'rgba(238,240,248,.7)'; ctx.lineWidth = 1.25;
+      ctx.strokeRect(map.hover.i*cw+.5, map.hover.j*ch+.5, cw-1, ch-1);
+    }
+    if(map.selected){
+      const x = map.selected.nx*w, y = map.selected.ny*h;
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5;
+      drawBracket(ctx, x, y, 14, 6);
+      ctx.beginPath(); ctx.arc(x,y,2.2,0,TAU); ctx.fillStyle = '#fff'; ctx.fill();
+    }
+  }
+
+  /* ---------- render loop ---------- */
+  let raf = 0;
+  function tick(t){
+    raf = 0;
+    if(view==='home') drawHero(t); else if(view==='map') drawMap(t);
+    if((view==='home' || view==='map') && !reduceMotion.matches && !document.hidden) raf = requestAnimationFrame(tick);
+  }
+  function kick(){ if(!raf) raf = requestAnimationFrame(tick); }
+  document.addEventListener('visibilitychange', kick);
+  reduceMotion.addEventListener && reduceMotion.addEventListener('change', kick);
+
+  /* ================= search (hero + map) ================= */
+  const NAME_POOL = [];
+  SUGGESTIONS.forEach(g => g.items.forEach(it => { if(g.group !== 'Try coordinates') NAME_POOL.push(it); }));
+  CANDIDATES.forEach(c => NAME_POOL.push({name:c.name, ra:c.ra, dec:c.dec, known:c.known ? c.known : false, knownName: c.known || null}));
+  const norm = s => s.toLowerCase().replace(/\s+/g,'');
+
+  function parseCoords(q){
+    const s = q.replace(/[−–—]/g,'-').replace(/[°,;]/g,' ').replace(/\b(ra|dec)\b\s*[:=]?/gi,' ').trim();
+    const m = s.match(/^(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)$/);
+    if(!m) return null;
+    const ra = parseFloat(m[1]), dec = parseFloat(m[2]);
+    if(ra<0 || ra>360 || dec<-90 || dec>90) return {error:'RA runs from 0° to 360° and Dec from −90° to +90°.'};
+    return {ra, dec};
+  }
+  function findByName(q){
+    const n = norm(q); if(!n) return null;
+    return NAME_POOL.find(it => norm(it.name) === n)
+        || NAME_POOL.find(it => norm(it.name).startsWith(n))
+        || NAME_POOL.find(it => norm(it.name).includes(n)) || null;
+  }
+  const KNOWN_GUESS = ['433 Eros','65803 Didymos','3I/ATLAS','an atmospheric artifact'];
+  function targetFromItem(it){
+    const seed = Math.abs(hashStr(it.name)) % 100000;
+    return {label:it.name, ra:it.ra, dec:it.dec, epochs:epochCount(it.ra,it.dec,seed), hasCandidate:!it.known, seed, knownName: it.knownName || (it.known ? it.name : null)};
+  }
+  function targetFromSky(ra, dec, label){
+    const seed = Math.abs(hashStr(ra.toFixed(2)+','+dec.toFixed(2))) % 100000;
+    const epochs = epochCount(ra,dec,seed);
+    return {label:label||null, ra, dec, epochs, hasCandidate: epochs>=2 && mulberry32(seed+7)()>.72, seed, knownName:null};
+  }
+  function epochsProblem(ra, dec, epochs){
+    if(epochs>=2) return null;
+    return epochs===0
+      ? `SPHEREx hasn't covered RA ${fmtRa(ra)}, Dec ${fmtDec(dec)} yet.`
+      : `Only one epoch covers RA ${fmtRa(ra)}, Dec ${fmtDec(dec)} so far. A blink needs at least two.`;
+  }
+  function resolve(q){
+    q = (q||'').trim();
+    if(!q) return {error:'Type an object name or coordinates to search.'};
+    const c = parseCoords(q);
+    if(c){
+      if(c.error) return c;
+      const t = targetFromSky(c.ra, c.dec);
+      const p = epochsProblem(c.ra, c.dec, t.epochs);
+      return p ? {error:p} : {target:t};
+    }
+    const it = findByName(q);
+    if(it){
+      const t = targetFromItem(it);
+      const p = epochsProblem(t.ra, t.dec, t.epochs);
+      return p ? {error:p} : {target:t};
+    }
+    return {error:`No match for “${q}”. Try an object name such as 3I/ATLAS, or coordinates like 132.40, −3.20.`};
+  }
+
+  function createSearch(form){
+    const input = $('input', form), list = $('.s-list', form), uid = form.dataset.sid;
+    let flat = [], hl = -1;
+    const setOpen = o => {
+      list.classList.toggle('open', o);
+      input.setAttribute('aria-expanded', String(o));
+      if(!o){ hl = -1; input.removeAttribute('aria-activedescendant'); }
+    };
+    const paint = () => {
+      $$('.opt', list).forEach(el => {
+        const on = Number(el.dataset.idx) === hl;
+        el.classList.toggle('hl', on); el.setAttribute('aria-selected', String(on));
+        if(on){ input.setAttribute('aria-activedescendant', el.id); el.scrollIntoView({block:'nearest'}); }
+      });
+      if(hl < 0) input.removeAttribute('aria-activedescendant');
+    };
+    function render(error){
+      flat = []; hl = -1;
+      if(error){ list.innerHTML = `<div class="s-empty" role="alert">${esc(error)}</div>`; setOpen(true); return; }
+      const q = input.value.trim().toLowerCase();
+      let html = '';
+      const c = q ? parseCoords(input.value) : null;
+      if(c && !c.error){
+        const idx = flat.length; flat.push({kind:'coord'});
+        html += `<div class="s-group">Coordinates</div><div class="opt" role="option" id="${uid}-o${idx}" data-idx="${idx}" aria-selected="false"><span>Go to RA ${fmtRa(c.ra)}, Dec ${fmtDec(c.dec)}</span><span class="o-meta">position</span></div>`;
+      }
+      SUGGESTIONS.forEach(g => {
+        const matched = g.items.filter(it => !q || it.name.toLowerCase().includes(q));
+        if(!matched.length) return;
+        html += `<div class="s-group">${esc(g.group)}</div>`;
+        matched.forEach(it => {
+          const idx = flat.length; flat.push({kind:'item', it});
+          html += `<div class="opt" role="option" id="${uid}-o${idx}" data-idx="${idx}" aria-selected="false"><span>${esc(it.name)}</span><span class="o-meta">${esc(it.meta)}</span></div>`;
+        });
+      });
+      if(!flat.length) html = `<div class="s-empty">No suggestions. Press Enter to search for “${esc(input.value.trim())}” anyway.</div>`;
+      list.innerHTML = html; setOpen(true);
+    }
+    function showError(msg){ input.setAttribute('aria-invalid','true'); render(msg); }
+    function submit(text){
+      const r = resolve(text);
+      if(r.error){ showError(r.error); return; }
+      input.removeAttribute('aria-invalid'); setOpen(false); input.blur();
+      openField(r.target);
+    }
+    function choose(idx){
+      const f = flat[idx]; if(!f) return;
+      if(f.kind==='coord'){ submit(input.value); return; }
+      input.value = f.it.name; input.removeAttribute('aria-invalid'); setOpen(false); input.blur();
+      const t = targetFromItem(f.it);
+      const p = epochsProblem(t.ra, t.dec, t.epochs);
+      if(p){ showError(p); input.focus(); return; }
+      openField(t);
+    }
+    list.addEventListener('mousedown', e => {
+      const el = e.target.closest('.opt'); if(!el) return;
+      e.preventDefault(); choose(Number(el.dataset.idx));
+    });
+    input.addEventListener('focus', () => render());
+    input.addEventListener('input', () => { input.removeAttribute('aria-invalid'); render(); });
+    input.addEventListener('keydown', e => {
+      if(e.key==='ArrowDown'){ e.preventDefault(); if(!list.classList.contains('open')) render(); hl = Math.min(hl+1, flat.length-1); paint(); }
+      else if(e.key==='ArrowUp'){ e.preventDefault(); hl = Math.max(hl-1, -1); paint(); }
+      else if(e.key==='Enter'){ e.preventDefault(); if(hl>=0) choose(hl); else submit(input.value); }
+      else if(e.key==='Escape'){ if(list.classList.contains('open')){ e.preventDefault(); setOpen(false); } else input.blur(); }
+    });
+    form.addEventListener('submit', e => { e.preventDefault(); if(hl>=0) choose(hl); else submit(input.value); });
+    document.addEventListener('pointerdown', e => { if(!form.contains(e.target)) setOpen(false); });
+    return {input, submit};
+  }
+  const heroSearch = createSearch($('#heroSearch'));
+  const mapSearch  = createSearch($('#mapSearch'));
+
+  $('#quick').addEventListener('click', e => {
+    const b = e.target.closest('.chip'); if(!b) return;
+    heroSearch.input.value = b.dataset.q.replace('-', '−');
+    heroSearch.submit(b.dataset.q);
+  });
+  document.addEventListener('keydown', e => {
+    if(e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
+    const tag = (e.target.tagName||'').toUpperCase();
+    if(tag==='INPUT' || tag==='TEXTAREA' || e.target.isContentEditable) return;
+    if(view==='home'){ e.preventDefault(); heroSearch.input.focus(); }
+    else if(view==='map'){ e.preventDefault(); mapSearch.input.focus(); }
+  });
+
+  $('#statFields').textContent = (GRID_W*GRID_H).toLocaleString('en-US');
+  $('#statFlags').textContent = CANDIDATES.length;
+
+  /* ================= map interaction ================= */
+  const inspector = $('#inspector'), inspTitle = $('#inspTitle'), inspBody = $('#inspBody');
+  const covSwitch = $('#coverageSwitch'), readout = $('#mapReadout');
+  $('#legendStrip').innerHTML = LEVEL_COLORS.slice(1).map(c => `<i style="background:${c}"></i>`).join('');
+
+  covSwitch.addEventListener('click', () => {
+    map.coverage = !map.coverage;
+    covSwitch.setAttribute('aria-checked', String(map.coverage));
+    kick();
+  });
+
+  function skyAt(clientX, clientY){
+    const r = map.canvas.getBoundingClientRect();
+    const nx = Math.min(1, Math.max(0, (clientX - r.left)/r.width));
+    const ny = Math.min(1, Math.max(0, (clientY - r.top)/r.height));
+    return {nx, ny, ra:nx*360, dec:90-ny*180};
+  }
+  map.canvas.addEventListener('pointermove', e => {
+    if(e.pointerType==='touch') return;
+    const s = skyAt(e.clientX, e.clientY), c = cellOf(s.ra, s.dec), n = GRID[c.j][c.i];
+    map.hover = c;
+    readout.textContent = `RA ${fmtRa(s.ra)}  Dec ${fmtDec(s.dec)}  ${n} ${n===1?'epoch':'epochs'}`;
+    kick();
+  });
+  map.canvas.addEventListener('pointerleave', () => { map.hover = null; readout.textContent = 'RA —, Dec —'; kick(); });
+
+  function closeInspector(){ inspector.classList.remove('open'); map.selected = null; kick(); }
+  $('#inspectClose').addEventListener('click', closeInspector);
+  document.addEventListener('keydown', e => { if(e.key==='Escape' && view==='map' && inspector.classList.contains('open')) closeInspector(); });
+
+  map.canvas.addEventListener('click', e => {
+    const s = skyAt(e.clientX, e.clientY), c = cellOf(s.ra, s.dec);
+    const seed = 500 + c.i*100 + c.j;
+    const t = targetFromSky(s.ra, s.dec);
+    t.seed = seed; t.epochs = epochCount(s.ra, s.dec, seed); t.hasCandidate = t.epochs>=2 && mulberry32(seed+7)()>.72;
+    map.selected = {nx:s.nx, ny:s.ny}; kick();
+
+    const n = t.epochs;
+    const planning = `2026W${10+Math.max(1,n)*3}_2B`;
+    inspTitle.innerHTML = `<h2>Field at RA ${fmtRa(s.ra)}, Dec ${fmtDec(s.dec)}</h2><p class="insp-id mono">${planning}, detector ${1+(seed%6)}</p>`;
+    let status;
+    if(n===0) status = `<span class="badge">Not observed yet</span><p class="insp-note">SPHEREx hasn't visited this field, so there is nothing to compare.</p>`;
+    else if(n===1) status = `<span class="badge">One epoch so far</span><p class="insp-note">A blink needs at least two epochs of the same field.</p>`;
+    else status = t.hasCandidate
+      ? `<span class="badge unknown"><span class="dot"></span> Flagged candidate here</span>`
+      : `<span class="badge">No motion flagged</span>`;
+    inspBody.innerHTML = `
+      <dl class="kv mono">
+        <dt>Epochs</dt><dd>${n===5 ? '5+' : n}</dd>
+        <dt>Bands present</dt><dd>${n===0 ? 0 : 3+Math.floor(mulberry32(seed+3)()*4)} of 6</dd>
+        <dt>Survey</dt><dd>${mulberry32(seed+9)()>.8 ? 'Deep' : 'Wide'}</dd>
       </dl>
-      ${hasCandidate
-        ? `<span class="badge unknown" style="margin-bottom:14px;"><span class="dot"></span> Flagged candidate here</span>`
-        : `<span class="badge known" style="background:#171c34;color:var(--text-dim);border-color:var(--line);margin-bottom:14px;">No motion flagged</span>`
-      }
-      <button class="cta-primary" id="openBlinkFromInspect">Open blink view</button>
-    `;
-    inspectPanel.classList.add('open');
-
-    reticleLabel.style.left = x+'px';
-    reticleLabel.style.top = y+'px';
-    reticleLabel.textContent = `${sky.ra}°, ${sky.dec}°`;
-    reticleLabel.style.opacity = '1';
-    clearTimeout(reticleLabel._t);
-    reticleLabel._t = setTimeout(()=>{ reticleLabel.style.opacity='0'; }, 1800);
-
-    document.getElementById('openBlinkFromInspect').addEventListener('click', ()=>{
-      openField(sky, epochs, hasCandidate, seedSeed);
-    });
+      ${status}
+      <button type="button" class="btn primary block" id="openBlink" ${n<2?'disabled':''}>Open blink view</button>`;
+    inspector.classList.add('open');
+    const ob = $('#openBlink');
+    if(n>=2) ob.addEventListener('click', () => openField(t));
   });
 
-  inspectClose.addEventListener('click', ()=> inspectPanel.classList.remove('open'));
+  /* ================= field / blink view ================= */
+  const blinkCanvas = $('#blinkCanvas'), bctx = blinkCanvas.getContext('2d');
+  const BLINK = 640, BLINK_SCALE = blinkCanvas.width / BLINK;
+  let currentBand = 3, diffMode = false, playing = false, frameIdx = 0, epochList = [], blinkStars = [], moverIndex = 0, blinkTimer = null, blinkSpeed = 550;
+  const playBtn = $('#playBtn');
 
-  document.getElementById('searchBtn').addEventListener('click', doSearch);
-  document.getElementById('searchInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') doSearch(); });
-  function doSearch(){
-    const val = document.getElementById('searchInput').value.trim();
-    const seedSeed = Math.abs(hashStr(val || 'default')) % 100000;
-    const epochs = fakeEpochCount(seedSeed);
-    openField({ra:(seedSeed%360).toFixed(2), dec:((seedSeed%180)-90).toFixed(2)}, epochs, mulberry32(seedSeed+7)()>0.5, seedSeed, val);
-  }
-  function hashStr(s){ let h=0; for(let i=0;i<s.length;i++){ h = (h<<5)-h + s.charCodeAt(i); h|=0; } return h; }
-
-  document.getElementById('jumpEcliptic').addEventListener('click', ()=>{
-    openField({ra:'132.40', dec:'-3.20'}, 6, true, 4242, '3I/ATLAS field');
-  });
-
-  /* ---------------- Field / blink view ---------------- */
-  const blinkCanvas = document.getElementById('blinkCanvas');
-  const bctx = blinkCanvas.getContext('2d');
-  let currentBand = 3;
-  let diffMode = false;
-  let playing = false;
-  let frameIdx = 0;
-  let epochList = [];
-  let blinkStars = [];
-  let moverIndex = 0;
-  let blinkTimer = null;
-  let blinkSpeed = 550;
-
-  function buildBandTabs(){
-    const wrap = document.getElementById('bandTabs');
-    wrap.innerHTML = '';
-    BANDS.forEach(b=>{
+  function buildBandRow(){
+    const row = $('#bandRow'); row.innerHTML = '';
+    BANDS.forEach(b => {
       const btn = document.createElement('button');
-      btn.className = 'band-tab' + (b.id===currentBand?' active':'');
-      btn.style.color = b.id===currentBand ? b.color : '';
+      btn.type = 'button'; btn.className = 'band';
+      btn.style.setProperty('--band-color', b.color);
+      btn.setAttribute('aria-pressed', String(b.id===currentBand));
       btn.innerHTML = `<span class="sw" style="background:${b.color}"></span>${b.label}`;
-      btn.addEventListener('click', ()=>{
-        currentBand = b.id;
-        buildBandTabs();
-        renderBlinkFrame();
-        document.getElementById('fieldSub').textContent = `${epochList.length} epochs available · ${b.label} (${b.range}) selected`;
-      });
-      wrap.appendChild(btn);
+      btn.addEventListener('click', () => { currentBand = b.id; buildBandRow(); updateSub(); renderBlinkFrame(); });
+      row.appendChild(btn);
     });
   }
+  function updateSub(){
+    const b = BANDS[currentBand-1], f = currentField;
+    $('#fieldSub').textContent = `${epochList.length} epochs in ${b.label} (${b.range}) at RA ${fmtRa(f.ra)}, Dec ${fmtDec(f.dec)}`;
+  }
+  function buildEpochChips(){
+    $('#epochChips').innerHTML = epochList.map((e,i) => `<button type="button" class="epoch-chip" data-i="${i}" aria-pressed="${i===frameIdx}">${e}</button>`).join('');
+  }
 
-  function openField(sky, epochs, hasCandidate, seed, label){
-    inspectPanel.classList.remove('open');
+  function openField(t){
+    currentField = t;
+    fieldFrom = view;
     epochList = [];
-    for(let i=0;i<epochs;i++){
-      const week = 10 + i*3;
-      epochList.push(`2026W${week}_2B`);
-    }
-    blinkStars = genStars(seed, 640, 640, 90);
-    moverIndex = Math.floor(mulberry32(seed+11)()*blinkStars.length);
-    frameIdx = 0;
+    for(let i=0;i<t.epochs;i++) epochList.push(`2026W${10+i*3}_2B`);
+    blinkStars = genStars(t.seed, BLINK, BLINK, 90);
+    moverIndex = Math.floor(mulberry32(t.seed+11)()*blinkStars.length);
+    frameIdx = 0; diffMode = false;
+    $('#diffSwitch').setAttribute('aria-checked','false');
+    setPlaying(false);
 
-    document.getElementById('fieldTitle').textContent = label
-      ? `${label}`
-      : `Field ${epochList[0]} · RA ${sky.ra}, Dec ${sky.dec}`;
-    document.getElementById('fieldSub').textContent = `${epochs} epochs available · Band ${currentBand} (${BANDS[currentBand-1].range}) selected`;
-
-    const badge = document.getElementById('fieldBadge');
-    const skybotNote = document.getElementById('skybotNote');
-    if(hasCandidate){
-      badge.className = 'badge unknown';
-      badge.innerHTML = '<span class="dot"></span> Unidentified — needs review';
-      skybotNote.textContent = 'Checked against SkyBoT (IMCCE) at each epoch — no cataloged object found within 8″ of this position. Could be an artifact, or something not yet in the catalogs.';
+    $('#fieldTitle').textContent = t.label || `Field ${epochList[0]}`;
+    const badge = $('#fieldBadge'), note = $('#skybotNote');
+    if(t.hasCandidate){
+      badge.className = 'badge unknown'; badge.innerHTML = '<span class="dot"></span> Unidentified, needs review';
+      note.textContent = 'Checked against SkyBoT at each epoch. No cataloged object found within 8 arcsec of this position. It could be an artifact, or something not yet in the catalogs.';
     } else {
-      const known = ['433 Eros','65803 Didymos','3I/ATLAS','(atmospheric artifact)'][Math.floor(mulberry32(seed+3)()*4)];
-      badge.className = 'badge known';
-      badge.innerHTML = `<span class="dot"></span> Matches known object`;
-      skybotNote.textContent = `SkyBoT cross-match at the detection epoch returned a match: ${known}, within predicted position uncertainty.`;
+      const k = t.knownName || KNOWN_GUESS[Math.floor(mulberry32(t.seed+3)()*KNOWN_GUESS.length)];
+      badge.className = 'badge known'; badge.innerHTML = '<span class="dot"></span> Matches known object';
+      note.textContent = `SkyBoT cross-match at the detection epoch returned a match: ${k}, within the predicted position uncertainty.`;
     }
-
-    document.getElementById('metaKv').innerHTML = `
-      <dt>RA / Dec</dt><dd>${sky.ra}° / ${sky.dec}°</dd>
-      <dt>Detector</dt><dd>${1+(seed%6)}</dd>
+    $('#metaKv').innerHTML = `
+      <dt>RA / Dec</dt><dd>${fmtRa(t.ra)} / ${fmtDec(t.dec)}</dd>
+      <dt>Detector</dt><dd>${1+(t.seed%6)}</dd>
       <dt>Planning period</dt><dd>${epochList[0]}</dd>
       <dt>Pixel scale</dt><dd>6.2″/px</dd>
-      <dt>Survey</dt><dd>${mulberry32(seed+9)()>0.8?'Deep':'Wide'}</dd>
-    `;
-    document.getElementById('epochChips').innerHTML = epochList.map(e=>`<span class="epoch-chip">${e}</span>`).join('');
-
-    buildBandTabs();
-    goto('field');
+      <dt>Survey</dt><dd>${mulberry32(t.seed+9)()>.8 ? 'Deep' : 'Wide'}</dd>`;
+    $('#backLabel').textContent = fieldFrom==='map' ? 'Back to sky map' : fieldFrom==='candidates' ? 'Back to candidates' : 'Back to search';
+    buildEpochChips(); buildBandRow(); updateSub();
+    navigate('field');
     renderBlinkFrame();
   }
+  let fieldFrom = 'home';
 
   function renderBlinkFrame(){
-    const w = blinkCanvas.width, h = blinkCanvas.height;
-    const bandColor = BANDS[currentBand-1].color;
-    document.getElementById('viewerEpochTag').textContent = epochList[frameIdx] || '—';
-    document.getElementById('viewerModeTag').textContent = diffMode ? 'Difference mode' : 'Raw frames';
+    const w = BLINK, h = BLINK, bandColor = BANDS[currentBand-1].color;
+    $('#viewerEpochTag').textContent = epochList[frameIdx] || '—';
+    $('#viewerModeTag').textContent = diffMode ? 'Difference mode' : 'Raw frames';
+    $$('.epoch-chip').forEach((c,i) => c.setAttribute('aria-pressed', String(i===frameIdx)));
 
+    bctx.setTransform(BLINK_SCALE,0,0,BLINK_SCALE,0,0);
+    bctx.globalCompositeOperation = 'source-over';
     bctx.clearRect(0,0,w,h);
-    const g = bctx.createRadialGradient(w/2,h/2,0,w/2,h/2,w*0.7);
-    g.addColorStop(0, hexToRgba(bandColor,0.05));
-    g.addColorStop(1, 'rgba(0,0,0,0)');
-    bctx.fillStyle = '#050611'; bctx.fillRect(0,0,w,h);
+    bctx.fillStyle = '#040509'; bctx.fillRect(0,0,w,h);
+    const g = bctx.createRadialGradient(w/2,h/2,0,w/2,h/2,w*.7);
+    g.addColorStop(0, hexToRgba(bandColor,.05)); g.addColorStop(1,'rgba(0,0,0,0)');
     bctx.fillStyle = g; bctx.fillRect(0,0,w,h);
 
-    function starsForFrame(idx){
-      return blinkStars.map((s,i)=>{
-        if(i!==moverIndex) return s;
-        const rng = mulberry32(9000+idx*17+moverIndex);
-        const dx = (idx - Math.floor(epochList.length/2)) * 14;
-        const dy = (idx - Math.floor(epochList.length/2)) * -9;
-        return {x:s.x+dx, y:s.y+dy, r:s.r*1.15, b:Math.min(1,s.b+0.15)};
-      });
-    }
-
+    const mid = Math.floor(epochList.length/2);
+    const starsForFrame = idx => blinkStars.map((s,i) => {
+      if(i!==moverIndex) return s;
+      return {x:s.x+(idx-mid)*14, y:s.y+(idx-mid)*-9, r:s.r*1.15, b:Math.min(1,s.b+.15), ci:s.ci};
+    });
     function draw(stars, comp, alpha){
       bctx.globalCompositeOperation = comp;
-      stars.forEach((s,i)=>{
-        bctx.beginPath();
+      stars.forEach((s,i) => {
         const isMover = i===moverIndex;
-        bctx.fillStyle = isMover ? hexToRgba('#ffffff', s.b*alpha) : `rgba(231,233,245,${s.b*alpha})`;
-        bctx.arc(s.x, s.y, s.r, 0, 7);
-        bctx.fill();
+        bctx.beginPath();
+        bctx.fillStyle = isMover ? hexToRgba('#ffffff', s.b*alpha) : `rgba(230,231,239,${s.b*alpha})`;
+        bctx.arc(s.x, s.y, s.r, 0, TAU); bctx.fill();
         if(isMover){
-          bctx.beginPath();
-          bctx.fillStyle = hexToRgba(bandColor, 0.35*alpha);
-          bctx.arc(s.x, s.y, s.r*3.2, 0, 7);
-          bctx.fill();
+          bctx.beginPath(); bctx.fillStyle = hexToRgba(bandColor, .32*alpha);
+          bctx.arc(s.x, s.y, s.r*3.2, 0, TAU); bctx.fill();
         }
       });
       bctx.globalCompositeOperation = 'source-over';
     }
-
     if(diffMode){
-      const prevIdx = (frameIdx-1+epochList.length)%epochList.length;
-      draw(starsForFrame(prevIdx), 'lighter', 0.55);
+      const prev = (frameIdx-1+epochList.length) % epochList.length;
+      draw(starsForFrame(prev), 'lighter', .55);
       draw(starsForFrame(frameIdx), 'difference', 1);
     } else {
       draw(starsForFrame(frameIdx), 'lighter', 1);
     }
+
+    /* scale bar: 10 arcmin at 6.2 arcsec per pixel */
+    const len = 600/6.2, x0 = 22, y0 = h-26;
+    bctx.strokeStyle = 'rgba(238,240,248,.85)'; bctx.lineWidth = 1.5; bctx.beginPath();
+    bctx.moveTo(x0,y0); bctx.lineTo(x0+len,y0); bctx.moveTo(x0,y0-4); bctx.lineTo(x0,y0+4); bctx.moveTo(x0+len,y0-4); bctx.lineTo(x0+len,y0+4); bctx.stroke();
+    bctx.font = `500 11px ${MONO}`; bctx.fillStyle = 'rgba(238,240,248,.85)'; bctx.textAlign = 'left'; bctx.textBaseline = 'alphabetic';
+    bctx.fillText('10′', x0, y0-9);
   }
 
-  function hexToRgba(hex, a){
-    const v = hex.replace('#','');
-    const r = parseInt(v.substring(0,2),16), gg = parseInt(v.substring(2,4),16), b = parseInt(v.substring(4,6),16);
-    return `rgba(${r},${gg},${b},${a})`;
+  function setPlaying(on){
+    playing = on && epochList.length > 1;
+    playBtn.innerHTML = `<svg class="icon" aria-hidden="true"><use href="#${playing ? 'i-pause' : 'i-play'}"/></svg>`;
+    playBtn.setAttribute('aria-label', playing ? 'Pause blink' : 'Play blink');
+    clearInterval(blinkTimer);
+    if(playing) blinkTimer = setInterval(() => { frameIdx = (frameIdx+1) % epochList.length; renderBlinkFrame(); }, blinkSpeed);
   }
-
-  document.getElementById('diffSwitch').addEventListener('click', function(){
-    diffMode = !diffMode;
-    this.classList.toggle('on', diffMode);
-    this.setAttribute('aria-pressed', String(diffMode));
+  function step(d){
+    if(!epochList.length) return;
+    setPlaying(false);
+    frameIdx = (frameIdx + d + epochList.length) % epochList.length;
     renderBlinkFrame();
-  });
-
-  const playBtn = document.getElementById('playBtn');
-  playBtn.addEventListener('click', ()=>{
-    playing = !playing;
-    playBtn.textContent = playing ? '❚❚' : '▶';
-    if(playing) startBlink(); else stopBlink();
-  });
-  function startBlink(){
-    stopBlink();
-    blinkTimer = setInterval(()=>{
-      frameIdx = (frameIdx+1) % epochList.length;
-      renderBlinkFrame();
-    }, blinkSpeed);
   }
-  function stopBlink(){ clearInterval(blinkTimer); }
-
-  const speedRange = document.getElementById('speedRange');
-  speedRange.addEventListener('input', function(){
-    blinkSpeed = 1350 - Number(this.value); // invert: right = faster
-    blinkSpeed = Number(this.value);
-    document.getElementById('speedLabel').textContent = this.value + ' ms';
-    if(playing) startBlink();
+  playBtn.addEventListener('click', () => setPlaying(!playing));
+  $('#prevEpoch').addEventListener('click', () => step(-1));
+  $('#nextEpoch').addEventListener('click', () => step(1));
+  $('#epochChips').addEventListener('click', e => {
+    const b = e.target.closest('.epoch-chip'); if(!b) return;
+    setPlaying(false); frameIdx = Number(b.dataset.i); renderBlinkFrame();
+  });
+  $('#diffSwitch').addEventListener('click', function(){
+    diffMode = !diffMode; this.setAttribute('aria-checked', String(diffMode)); renderBlinkFrame();
+  });
+  $('#speedRange').addEventListener('input', function(){
+    blinkSpeed = Number(this.value); $('#speedLabel').textContent = `${this.value} ms`;
+    if(playing) setPlaying(true);
+  });
+  $('#fieldBack').addEventListener('click', () => {
+    if(history.length > 1 && fieldFrom) history.back(); else navigate('map');
+  });
+  document.addEventListener('keydown', e => {
+    if(view!=='field' || e.metaKey || e.ctrlKey || e.altKey) return;
+    const tag = (e.target.tagName||'').toUpperCase();
+    if(['INPUT','BUTTON','A','SELECT','TEXTAREA'].includes(tag)) return;
+    if(e.key===' '){ e.preventDefault(); setPlaying(!playing); }
+    else if(e.key==='ArrowRight'){ e.preventDefault(); step(1); }
+    else if(e.key==='ArrowLeft'){ e.preventDefault(); step(-1); }
   });
 
-  document.getElementById('fieldBack').addEventListener('click', ()=>{
-    stopBlink(); playing=false; playBtn.textContent='▶';
-    goto('explorer');
-  });
+  /* ================= candidates ================= */
+  const candGrid = $('#candGrid');
+  let thumbTimers = [];
+  function stopThumbs(){ thumbTimers.forEach(clearInterval); thumbTimers = []; }
 
-  /* ---------------- Candidates feed ---------------- */
-  const CANDIDATES = [
-    {name:'2026 XJ14', ra:132.41, dec:-3.22, band:5, known:false, score:7.8, date:'2026-09-18'},
-    {name:'3I/ATLAS', ra:131.98, dec:-2.87, band:4, known:'3I/ATLAS', score:9.6, date:'2026-09-16'},
-    {name:'Field 0091-D2', ra:88.10, dec:14.55, band:2, known:false, score:5.4, date:'2026-09-15'},
-    {name:'433 Eros', ra:210.32, dec:9.11, band:1, known:'433 Eros', score:8.9, date:'2026-09-14'},
-    {name:'Field 2204-D6', ra:301.77, dec:-22.03, band:6, known:false, score:6.1, date:'2026-09-13'},
-    {name:'65803 Didymos', ra:19.44, dec:5.02, band:3, known:'65803 Didymos', score:8.2, date:'2026-09-12'},
-    {name:'Field 0730-D1', ra:44.90, dec:-61.18, band:5, known:false, score:6.9, date:'2026-09-11'},
-    {name:'Field 1550-D4', ra:250.02, dec:31.44, band:2, known:false, score:5.0, date:'2026-09-10'},
-  ];
+  function buildCandidates(){
+    stopThumbs(); candGrid.innerHTML = '';
+    const list = CANDIDATES.filter(c => candFilter==='all' ? true : candFilter==='known' ? !!c.known : !c.known);
+    $$('#filters button').forEach(b => {
+      const f = b.dataset.filter;
+      const n = CANDIDATES.filter(c => f==='all' ? true : f==='known' ? !!c.known : !c.known).length;
+      b.textContent = `${f==='all' ? 'All' : f==='known' ? 'Known objects' : 'Unidentified'} (${n})`;
+      b.setAttribute('aria-pressed', String(f===candFilter));
+    });
+    if(!list.length){ candGrid.innerHTML = '<p class="empty">No candidates match this filter.</p>'; return; }
 
-  const candGrid = document.getElementById('candGrid');
-  const cardAnimators = [];
-  function buildCandidates(filter){
-    candGrid.innerHTML = '';
-    cardAnimators.length = 0;
-    const list = CANDIDATES.filter(c => filter==='all' ? true : (filter==='known' ? !!c.known : !c.known));
-    list.forEach((c, ci)=>{
-      const card = document.createElement('div');
-      card.className = 'cand-card';
-      const band = BANDS[c.band-1];
+    list.forEach(c => {
+      const gi = CANDIDATES.indexOf(c), band = BANDS[c.band-1], seed = 5000+gi;
+      const card = document.createElement('button');
+      card.type = 'button'; card.className = 'cand';
+      card.setAttribute('aria-label', `${c.name}, ${c.known ? 'known object' : 'unidentified'}, ${c.score.toFixed(1)} sigma, ${band.label}`);
       card.innerHTML = `
         <div class="cand-thumb">
-          <canvas width="220" height="220"></canvas>
-          <span class="cand-badge-float badge ${c.known?'known':'unknown'}"><span class="dot"></span>${c.known? 'Known' : 'Unidentified'}</span>
+          <canvas width="260" height="260" aria-hidden="true"></canvas>
+          <span class="badge ${c.known?'known':'unknown'}"><span class="dot"></span>${c.known ? 'Known' : 'Unidentified'}</span>
           <span class="cand-score mono">${c.score.toFixed(1)}σ</span>
         </div>
         <div class="cand-body">
-          <div class="cand-name">${c.name}</div>
+          <div class="cand-name">${esc(c.name)}</div>
           <div class="cand-meta mono"><span>${band.label}</span><span>${c.date}</span></div>
-        </div>
-      `;
-      card.addEventListener('click', ()=>{
-        openField({ra:c.ra.toFixed(2), dec:c.dec.toFixed(2)}, 5+ (ci%3), !c.known, 5000+ci, c.name);
+        </div>`;
+      card.addEventListener('click', () => {
+        const t = {label:c.name, ra:c.ra, dec:c.dec, epochs:Math.max(3, epochCount(c.ra,c.dec,seed)), hasCandidate:!c.known, seed, knownName:c.known || null};
+        openField(t);
       });
       candGrid.appendChild(card);
 
-      const cvs = card.querySelector('canvas');
-      const cctx = cvs.getContext('2d');
-      const seed = 5000+ci;
-      const stars = genStars(seed, 220, 220, 26);
-      const moverI = Math.floor(mulberry32(seed+2)()*stars.length);
-      let toggle = 0;
-      function drawThumb(){
-        cctx.clearRect(0,0,220,220);
-        cctx.fillStyle = '#050611'; cctx.fillRect(0,0,220,220);
-        cctx.globalCompositeOperation = 'lighter';
-        stars.forEach((s,i)=>{
-          let x=s.x, y=s.y;
-          if(i===moverI && toggle===1){ x+=10; y-=7; }
-          cctx.beginPath();
-          cctx.fillStyle = i===moverI ? hexToRgba(band.color, 0.9) : `rgba(231,233,245,${s.b})`;
-          cctx.arc(x,y,i===moverI?s.r*1.4:s.r,0,7);
-          cctx.fill();
+      const ctx = card.querySelector('canvas').getContext('2d');
+      const stars = genStars(seed, 260, 260, 30);
+      const mi = Math.floor(mulberry32(seed+2)()*stars.length);
+      let flip = 0;
+      const drawThumb = () => {
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.fillStyle = '#040509'; ctx.fillRect(0,0,260,260);
+        ctx.globalCompositeOperation = 'lighter';
+        stars.forEach((s,i) => {
+          let x = s.x, y = s.y;
+          if(i===mi && flip===1){ x += 12; y -= 8; }
+          ctx.beginPath();
+          ctx.fillStyle = i===mi ? hexToRgba(band.color,.95) : `rgba(230,231,239,${s.b})`;
+          ctx.arc(x, y, i===mi ? s.r*1.5 : s.r, 0, TAU); ctx.fill();
         });
-        cctx.globalCompositeOperation = 'source-over';
-        toggle = 1-toggle;
-      }
+        ctx.globalCompositeOperation = 'source-over';
+        flip = 1-flip;
+      };
       drawThumb();
-      const iv = setInterval(drawThumb, 750 + (ci%3)*60);
-      cardAnimators.push(iv);
+      if(!reduceMotion.matches) thumbTimers.push(setInterval(drawThumb, 760 + (gi%3)*70));
     });
   }
-  document.getElementById('filters').addEventListener('click', (e)=>{
-    const btn = e.target.closest('.filter-chip');
-    if(!btn) return;
-    [...document.querySelectorAll('.filter-chip')].forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    buildCandidates(btn.dataset.filter);
+  $('#filters').addEventListener('click', e => {
+    const b = e.target.closest('button'); if(!b) return;
+    candFilter = b.dataset.filter; buildCandidates();
   });
 
-  /* ---------------- Nav / routing ---------------- */
-  function goto(name){
-    document.querySelectorAll('section.view').forEach(s=>s.classList.remove('active'));
-    document.getElementById('view-'+name).classList.add('active');
-    document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('active', b.dataset.goto===name));
-    window.scrollTo({top:0, behavior:'instant' in window ? 'instant':'auto'});
-    if(name==='explorer') setTimeout(resizeSky, 30);
-    if(name==='candidates' && candGrid.children.length===0) buildCandidates('all');
-  }
-  document.querySelectorAll('[data-goto]').forEach(el=>{
-    el.addEventListener('click', ()=> goto(el.dataset.goto));
-  });
-
-  buildCandidates('all');
+  /* ================= boot ================= */
+  route();
+  if(location.hash === '' || location.hash === '#') view = 'home';
+  resizeHero(); kick();
 })();
 </script>
 </body>
