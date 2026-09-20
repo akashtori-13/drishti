@@ -1,0 +1,919 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trace — a SPHEREx sky-change explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#080a14;
+    --panel:#10142450;
+    --panel-solid:#12162a;
+    --line:#252b45;
+    --text:#e7e9f5;
+    --text-dim:#9198b8;
+    --text-faint:#5c637f;
+    --b1:#7c83fd; --b2:#5aa9e6; --b3:#4fc9a8; --b4:#e8c34a; --b5:#f08a4b; --b6:#e85d4a;
+    --known:#57b88c;
+    --unknown:#e8b34a;
+    --focus:#a7b4ff;
+    --radius-s:6px;
+    --radius-m:10px;
+    font-size:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--void);
+    color:var(--text);
+    font-family:'Inter',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    overflow-x:hidden;
+  }
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  h1,h2,h3{font-family:'Fraunces',serif; font-weight:500; margin:0; letter-spacing:-0.01em;}
+  p{margin:0;}
+  a{color:inherit;}
+  button{font-family:inherit;}
+  .mono{font-family:'IBM Plex Mono',monospace; letter-spacing:0.01em;}
+  ::selection{background:#3a4270; color:#fff;}
+  :focus-visible{outline:2px solid var(--focus); outline-offset:2px; border-radius:4px;}
+
+  /* ---------- layout shell ---------- */
+  #app{min-height:100dvh; display:flex; flex-direction:column;}
+
+  header.topnav{
+    position:sticky; top:0; z-index:40;
+    padding-top:env(safe-area-inset-top,0px);
+    background:rgba(8,10,20,0.82);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .topnav-inner{
+    max-width:1400px; margin:0 auto;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 24px;
+    gap:24px;
+  }
+  .brand{display:flex; align-items:center; gap:11px; text-decoration:none; cursor:pointer; background:none; border:none; color:inherit; padding:0;}
+  .brand-mark{display:flex; height:16px; width:34px; border-radius:3px; overflow:hidden; box-shadow:0 0 0 1px var(--line);}
+  .brand-mark span{flex:1;}
+  .brand-name{font-family:'Fraunces',serif; font-size:1.2rem; font-weight:500;}
+  .brand-sub{font-size:.72rem; color:var(--text-faint); display:none;}
+  @media(min-width:640px){ .brand-sub{display:block;} }
+
+  nav.tabs{display:flex; gap:4px; background:#0d1122; border:1px solid var(--line); padding:3px; border-radius:999px;}
+  nav.tabs button{
+    background:none; border:none; color:var(--text-dim); font-size:.85rem;
+    padding:7px 16px; border-radius:999px; cursor:pointer; transition:color .15s, background .15s;
+  }
+  nav.tabs button:hover{color:var(--text);}
+  nav.tabs button.active{background:#252c4d; color:var(--text);}
+
+  .status-pill{
+    display:flex; align-items:center; gap:7px; font-size:.72rem; color:var(--text-dim);
+    border:1px solid var(--line); padding:6px 12px; border-radius:999px; white-space:nowrap;
+  }
+  .status-pill .dot{width:6px; height:6px; border-radius:50%; background:#57b88c; box-shadow:0 0 6px #57b88c;}
+  @media(max-width:760px){ .status-pill{display:none;} }
+
+  main{flex:1; position:relative;}
+  section.view{display:none;}
+  section.view.active{display:block;}
+
+  /* ---------- EXPLORER ---------- */
+  #view-explorer{position:relative;}
+  .explorer-stage{
+    position:relative;
+    height:calc(100dvh - 64px);
+    min-height:520px;
+    overflow:hidden;
+  }
+  #skyCanvas{position:absolute; inset:0; width:100%; height:100%; cursor:crosshair;}
+
+  .explorer-overlay{
+    position:absolute; inset:0; pointer-events:none;
+    display:flex; flex-direction:column; justify-content:space-between;
+    padding:28px 24px 20px;
+  }
+  .hero-copy{max-width:640px; pointer-events:auto;}
+  .hero-copy h1{font-size:clamp(1.9rem,4.4vw,3rem); line-height:1.05; margin-bottom:14px;}
+  .hero-copy p{color:var(--text-dim); font-size:1rem; line-height:1.55; max-width:520px;}
+
+  .search-row{
+    margin-top:20px; display:flex; gap:8px; pointer-events:auto; max-width:460px;
+    background:rgba(15,18,34,0.9); border:1px solid var(--line); border-radius:var(--radius-m);
+    padding:6px; backdrop-filter:blur(6px);
+  }
+  .search-row input{
+    flex:1; background:none; border:none; color:var(--text); padding:9px 10px; font-size:.9rem;
+  }
+  .search-row input::placeholder{color:var(--text-faint);}
+  .search-row input:focus{outline:none;}
+  .search-row button{
+    background:var(--text); color:var(--void); border:none; border-radius:var(--radius-s);
+    padding:9px 16px; font-size:.85rem; font-weight:600; cursor:pointer;
+  }
+  .search-row button:hover{background:#c7ccec;}
+  .search-hint{margin-top:8px; font-size:.74rem; color:var(--text-faint); pointer-events:auto;}
+  .search-hint button{background:none;border:none;color:var(--focus);cursor:pointer;font-size:.74rem;padding:0;text-decoration:underline;text-underline-offset:2px;}
+
+  .bottom-bar{
+    display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap;
+    pointer-events:auto;
+  }
+  .legend{
+    background:rgba(15,18,34,0.9); border:1px solid var(--line); border-radius:var(--radius-m);
+    padding:12px 16px; font-size:.75rem; color:var(--text-dim); backdrop-filter:blur(6px);
+    display:flex; align-items:center; gap:12px;
+  }
+  .legend-strip{display:flex; height:8px; width:96px; border-radius:4px; overflow:hidden;}
+  .legend-strip span{flex:1;}
+  .coverage-toggle{
+    display:flex; align-items:center; gap:9px;
+    background:rgba(15,18,34,0.9); border:1px solid var(--line); border-radius:var(--radius-m);
+    padding:10px 14px; font-size:.78rem; color:var(--text-dim); backdrop-filter:blur(6px);
+  }
+  .switch{position:relative; width:34px; height:19px; background:#252c4d; border-radius:999px; cursor:pointer; border:none; flex-shrink:0;}
+  .switch::after{content:'';position:absolute; top:2px; left:2px; width:15px; height:15px; border-radius:50%; background:#8892c4; transition:transform .15s, background .15s;}
+  .switch.on{background:#3a4a8a;}
+  .switch.on::after{transform:translateX(15px); background:#e7e9f5;}
+
+  .reticle-label{
+    position:absolute; pointer-events:none; transform:translate(-50%,-140%);
+    background:#12162a; border:1px solid var(--line); border-radius:6px; padding:4px 8px;
+    font-size:.7rem; white-space:nowrap; opacity:0; transition:opacity .12s;
+  }
+
+  .inspect-panel{
+    position:absolute; top:0; right:0; bottom:0; width:330px; max-width:88vw;
+    background:#0d1122; border-left:1px solid var(--line);
+    padding:20px; overflow-y:auto;
+    transform:translateX(100%); transition:transform .22s ease;
+    display:flex; flex-direction:column; gap:16px;
+  }
+  .inspect-panel.open{transform:translateX(0);}
+  .inspect-panel h3{font-size:1.05rem;}
+  .inspect-close{
+    align-self:flex-end; background:none; border:none; color:var(--text-faint); cursor:pointer;
+    font-size:1.1rem; line-height:1; padding:4px;
+  }
+  .inspect-close:hover{color:var(--text);}
+  .kv{display:grid; grid-template-columns:auto 1fr; gap:5px 12px; font-size:.8rem;}
+  .kv dt{color:var(--text-faint);}
+  .kv dd{margin:0; text-align:right;}
+  .epoch-chip-row{display:flex; flex-wrap:wrap; gap:6px;}
+  .epoch-chip{
+    font-size:.7rem; padding:4px 8px; border-radius:5px; background:#191f38; border:1px solid var(--line); color:var(--text-dim);
+  }
+  .cta-primary{
+    background:var(--text); color:var(--void); border:none; border-radius:var(--radius-s);
+    padding:11px 16px; font-size:.85rem; font-weight:600; cursor:pointer; width:100%;
+  }
+  .cta-primary:hover{background:#c7ccec;}
+  .inspect-empty{color:var(--text-faint); font-size:.83rem; line-height:1.5; margin-top:40px;}
+
+  /* ---------- FIELD / BLINK VIEW ---------- */
+  .field-wrap{max-width:1200px; margin:0 auto; padding:28px 24px 64px;}
+  .field-head{display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:22px;}
+  .back-link{background:none;border:none;color:var(--text-dim); font-size:.82rem; cursor:pointer; display:flex; align-items:center; gap:6px; padding:0; margin-bottom:10px;}
+  .back-link:hover{color:var(--text);}
+  .field-title{font-size:1.55rem;}
+  .field-sub{color:var(--text-dim); font-size:.85rem; margin-top:6px;}
+  .badge{display:inline-flex; align-items:center; gap:6px; font-size:.72rem; padding:5px 10px; border-radius:999px; font-weight:500;}
+  .badge.known{background:#14301f; color:var(--known); border:1px solid #21492e;}
+  .badge.unknown{background:#33270f; color:var(--unknown); border:1px solid #55420f;}
+  .badge .dot{width:5px;height:5px;border-radius:50%;background:currentColor;}
+
+  .field-grid{display:grid; grid-template-columns:1fr 300px; gap:24px;}
+  @media(max-width:900px){ .field-grid{grid-template-columns:1fr;} }
+
+  .viewer-card{background:var(--panel-solid); border:1px solid var(--line); border-radius:var(--radius-m); overflow:hidden;}
+  .viewer-canvas-wrap{position:relative; aspect-ratio:1/1; background:#050611;}
+  #blinkCanvas{width:100%; height:100%; display:block;}
+  .viewer-tag{position:absolute; top:12px; left:12px; font-size:.68rem; background:rgba(8,10,20,.75); border:1px solid var(--line); padding:4px 9px; border-radius:5px; color:var(--text-dim);}
+  .viewer-tag.epoch{left:auto; right:12px;}
+
+  .viewer-controls{padding:14px 16px; border-top:1px solid var(--line); display:flex; flex-direction:column; gap:12px;}
+  .transport{display:flex; align-items:center; gap:12px;}
+  .play-btn{
+    width:38px; height:38px; border-radius:50%; background:var(--text); color:var(--void); border:none;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; font-size:.9rem;
+  }
+  .play-btn:hover{background:#c7ccec;}
+  .speed-row{flex:1; display:flex; align-items:center; gap:10px;}
+  .speed-row input[type=range]{flex:1; accent-color:#7c83fd;}
+  .speed-row span{font-size:.72rem; color:var(--text-faint); width:52px; text-align:right;}
+  .diff-toggle{display:flex; align-items:center; justify-content:space-between; font-size:.8rem; color:var(--text-dim);}
+
+  .band-tabs{display:flex; gap:5px; padding:14px 16px 4px; flex-wrap:wrap; border-top:1px solid var(--line);}
+  .band-tab{
+    border:1px solid var(--line); background:#0d1122; color:var(--text-dim); border-radius:999px;
+    font-size:.68rem; padding:6px 10px; cursor:pointer; display:flex; align-items:center; gap:6px;
+  }
+  .band-tab .sw{width:7px; height:7px; border-radius:50%;}
+  .band-tab.active{border-color:currentColor; color:var(--text); background:#171c34;}
+
+  .side-stack{display:flex; flex-direction:column; gap:16px;}
+  .info-card{background:var(--panel-solid); border:1px solid var(--line); border-radius:var(--radius-m); padding:16px;}
+  .info-card h4{font-size:.82rem; color:var(--text-dim); font-weight:500; margin-bottom:12px; font-family:'Inter';}
+  .cite-box{background:#0d1122; border:1px solid var(--line); border-radius:6px; padding:11px; font-size:.72rem; color:var(--text-faint); line-height:1.5; margin-top:10px;}
+  .link-row{display:flex; flex-direction:column; gap:7px; margin-top:10px;}
+  .link-row a{font-size:.78rem; color:var(--focus); text-decoration:none; display:flex; align-items:center; gap:5px;}
+  .link-row a:hover{text-decoration:underline;}
+
+  /* ---------- CANDIDATES ---------- */
+  .cand-wrap{max-width:1200px; margin:0 auto; padding:32px 24px 64px;}
+  .cand-head{display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:22px;}
+  .cand-head h2{font-size:1.7rem;}
+  .cand-head p{color:var(--text-dim); font-size:.88rem; margin-top:6px; max-width:480px;}
+  .filters{display:flex; gap:8px; flex-wrap:wrap;}
+  .filter-chip{
+    border:1px solid var(--line); background:#0d1122; color:var(--text-dim); border-radius:999px;
+    font-size:.76rem; padding:7px 13px; cursor:pointer;
+  }
+  .filter-chip.active{background:#252c4d; color:var(--text); border-color:#3a4270;}
+
+  .cand-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px; margin-top:22px;}
+  .cand-card{
+    background:var(--panel-solid); border:1px solid var(--line); border-radius:var(--radius-m); overflow:hidden;
+    cursor:pointer; transition:border-color .15s; display:flex; flex-direction:column;
+  }
+  .cand-card:hover{border-color:#3a4270;}
+  .cand-thumb{position:relative; aspect-ratio:1/1; background:#050611;}
+  .cand-thumb canvas{width:100%; height:100%; display:block;}
+  .cand-badge-float{position:absolute; top:8px; left:8px;}
+  .cand-score{position:absolute; top:8px; right:8px; font-size:.66rem; background:rgba(8,10,20,.75); padding:3px 7px; border-radius:5px; color:var(--text-dim);}
+  .cand-body{padding:12px 13px 14px;}
+  .cand-name{font-size:.92rem; font-weight:500; margin-bottom:4px;}
+  .cand-meta{font-size:.72rem; color:var(--text-faint); display:flex; justify-content:space-between;}
+
+  /* ---------- ABOUT ---------- */
+  .about-wrap{max-width:720px; margin:0 auto; padding:48px 24px 80px;}
+  .about-wrap h2{font-size:1.9rem; margin-bottom:8px;}
+  .about-wrap .kicker{color:var(--text-faint); font-size:.82rem; margin-bottom:22px;}
+  .about-wrap section{margin-top:34px;}
+  .about-wrap h3{font-size:1.05rem; margin-bottom:10px; font-family:'Inter'; font-weight:600;}
+  .about-wrap p{color:var(--text-dim); font-size:.92rem; line-height:1.7; margin-bottom:12px;}
+  .band-table{width:100%; border-collapse:collapse; font-size:.82rem; margin-top:6px;}
+  .band-table th,.band-table td{text-align:left; padding:8px 10px; border-bottom:1px solid var(--line);}
+  .band-table th{color:var(--text-faint); font-weight:500; font-size:.72rem;}
+  .band-table .sw{width:9px;height:9px;border-radius:50%; display:inline-block; margin-right:7px;}
+  .cite-block{background:var(--panel-solid); border:1px solid var(--line); border-radius:var(--radius-m); padding:16px; font-size:.82rem; color:var(--text-dim); line-height:1.6; font-style:italic;}
+  .source-list{list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px;}
+  .source-list a{color:var(--focus); text-decoration:none; font-size:.85rem;}
+  .source-list a:hover{text-decoration:underline;}
+  .mockup-note{
+    background:#241a0d; border:1px solid #4a340f; color:#e8b96a; border-radius:var(--radius-m);
+    padding:14px 16px; font-size:.82rem; line-height:1.55; margin-bottom:30px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header class="topnav">
+    <div class="topnav-inner">
+      <div style="display:flex; align-items:center; gap:28px;">
+        <button class="brand" data-goto="explorer" aria-label="Trace home">
+          <span class="brand-mark"><span style="background:#7c83fd"></span><span style="background:#5aa9e6"></span><span style="background:#4fc9a8"></span><span style="background:#e8c34a"></span><span style="background:#f08a4b"></span><span style="background:#e85d4a"></span></span>
+          <span class="brand-name">Trace<span class="brand-sub" style="display:inline;font-family:'Inter';font-weight:400;color:var(--text-faint);font-size:.75rem;margin-left:2px;"> / SPHEREx</span></span>
+        </button>
+      </div>
+      <nav class="tabs" role="tablist" aria-label="Primary">
+        <button data-goto="explorer" class="active">Explorer</button>
+        <button data-goto="candidates">Candidates</button>
+        <button data-goto="about">About</button>
+      </nav>
+      <div class="status-pill"><span class="dot"></span> QR2 · updated weekly</div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ===================== EXPLORER ===================== -->
+    <section id="view-explorer" class="view active">
+      <div class="explorer-stage">
+        <canvas id="skyCanvas"></canvas>
+        <div class="explorer-overlay">
+          <div class="hero-copy">
+            <h1>Watch the infrared sky move.</h1>
+            <p>SPHEREx maps the whole sky every six months in 102 colors of infrared light. Trace lines up every pass over the same patch of sky so you can see, frame by frame, what shifted, brightened, or wandered through.</p>
+            <div class="search-row">
+              <input type="text" id="searchInput" placeholder="Search coordinates, e.g. 156.09, -41.64, or an object name" aria-label="Search sky position">
+              <button id="searchBtn">Go</button>
+            </div>
+            <p class="search-hint">Not sure where to look? <button id="jumpEcliptic">Jump to the ecliptic plane</button> — most solar-system motion happens there.</p>
+          </div>
+          <div class="bottom-bar">
+            <div class="legend">
+              <span>Coverage · epochs observed</span>
+              <span class="legend-strip"><span style="background:#1c2140"></span><span style="background:#232a52"></span><span style="background:#2e3a72"></span><span style="background:#4552a0"></span><span style="background:#6c7ce0"></span></span>
+              <span>1 → 5+</span>
+            </div>
+            <div class="coverage-toggle">
+              <span>Coverage overlay</span>
+              <button class="switch on" id="coverageSwitch" aria-pressed="true" aria-label="Toggle coverage overlay"></button>
+            </div>
+          </div>
+        </div>
+        <div class="reticle-label" id="reticleLabel"></div>
+
+        <aside class="inspect-panel" id="inspectPanel" aria-label="Field inspector">
+          <button class="inspect-close" id="inspectClose" aria-label="Close">✕</button>
+          <div id="inspectContent">
+            <p class="inspect-empty">Click anywhere on the sky map to inspect that field — its coverage history, epoch count, and whether Trace has flagged anything moving there.</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ===================== FIELD / BLINK ===================== -->
+    <section id="view-field" class="view">
+      <div class="field-wrap">
+        <button class="back-link" id="fieldBack">← Back</button>
+        <div class="field-head">
+          <div>
+            <div class="field-title" id="fieldTitle">Field 2026W38_2B · RA 156.09, Dec −41.64</div>
+            <div class="field-sub mono" id="fieldSub">6 epochs available · Band 3 (1.63–2.41 µm) selected</div>
+          </div>
+          <span class="badge unknown" id="fieldBadge"><span class="dot"></span> Unidentified — needs review</span>
+        </div>
+
+        <div class="field-grid">
+          <div class="viewer-card">
+            <div class="viewer-canvas-wrap">
+              <canvas id="blinkCanvas" width="640" height="640"></canvas>
+              <span class="viewer-tag mono" id="viewerModeTag">Raw frames</span>
+              <span class="viewer-tag epoch mono" id="viewerEpochTag">2026W12_2B</span>
+            </div>
+            <div class="viewer-controls">
+              <div class="transport">
+                <button class="play-btn" id="playBtn" aria-label="Play">▶</button>
+                <div class="speed-row">
+                  <span style="font-size:.72rem;color:var(--text-faint);">Blink rate</span>
+                  <input type="range" id="speedRange" min="150" max="1200" value="550" step="10">
+                  <span id="speedLabel">550 ms</span>
+                </div>
+              </div>
+              <div class="diff-toggle">
+                <span>Difference mode — cancel out stationary stars, keep the mover</span>
+                <button class="switch" id="diffSwitch" aria-pressed="false" aria-label="Toggle difference mode"></button>
+              </div>
+            </div>
+            <div class="band-tabs" id="bandTabs"></div>
+          </div>
+
+          <div class="side-stack">
+            <div class="info-card">
+              <h4>Field metadata</h4>
+              <dl class="kv mono" id="metaKv"></dl>
+            </div>
+            <div class="info-card">
+              <h4>Epochs in this blink</h4>
+              <div class="epoch-chip-row mono" id="epochChips"></div>
+            </div>
+            <div class="info-card">
+              <h4>Solar-system cross-match</h4>
+              <p style="font-size:.8rem; color:var(--text-dim); line-height:1.5;" id="skybotNote">Checked against SkyBoT (IMCCE) at each epoch — no cataloged object found within 8″ of this position. Could be an artifact, or something not yet in the catalogs.</p>
+            </div>
+            <div class="info-card">
+              <h4>Data provenance</h4>
+              <p style="font-size:.78rem; color:var(--text-faint); line-height:1.5;">Level-2 Spectral Image MEF, QR2 pipeline, IRSA/IPAC.</p>
+              <div class="link-row">
+                <a href="#" onclick="return false;">↗ Open raw FITS cutout on IRSA</a>
+                <a href="#" onclick="return false;">↗ View on AWS Open Data (S3)</a>
+              </div>
+              <div class="cite-box">Data: NASA/JPL–Caltech SPHEREx, processed by IRSA (IPAC). Mock preview only — this field is illustrative, not a real detection.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== CANDIDATES ===================== -->
+    <section id="view-candidates" class="view">
+      <div class="cand-wrap">
+        <div class="cand-head">
+          <div>
+            <h2>This week's candidates</h2>
+            <p>Every field where two or more epochs disagree gets differenced and searched automatically. These are the results waiting on a human look.</p>
+          </div>
+          <div class="filters" id="filters">
+            <button class="filter-chip active" data-filter="all">All</button>
+            <button class="filter-chip" data-filter="unknown">Unidentified only</button>
+            <button class="filter-chip" data-filter="known">Known objects</button>
+          </div>
+        </div>
+        <div class="cand-grid" id="candGrid"></div>
+      </div>
+    </section>
+
+    <!-- ===================== ABOUT ===================== -->
+    <section id="view-about" class="view">
+      <div class="about-wrap">
+        <p class="kicker mono">2026 NASA SPACE APPS CHALLENGE · PROTOTYPE</p>
+        <h2>About Trace</h2>
+        <div class="mockup-note">This is a design mockup with generated placeholder data — no live SPHEREx imagery is being fetched. It exists to show what we're proposing to build: an interface anyone can use to watch the SPHEREx sky change over time.</div>
+
+        <section>
+          <h3>What SPHEREx is watching for</h3>
+          <p>SPHEREx (Spectro-Photometer for the History of the Universe, Epoch of Reionization, and Ices Explorer) is a NASA all-sky survey observatory, imaging the entire sky roughly every six months across 102 near-infrared bands from 0.75 to 5 microns. Because it revisits the same sky repeatedly, anything that moves, brightens, or fades between visits stands out once you compare epochs directly — comets, asteroids, variable stars, and more.</p>
+          <table class="band-table">
+            <thead><tr><th></th><th>Band</th><th>Wavelength</th></tr></thead>
+            <tbody>
+              <tr><td><span class="sw" style="background:#7c83fd"></span></td><td>Band 1</td><td>0.75 – 1.09 µm</td></tr>
+              <tr><td><span class="sw" style="background:#5aa9e6"></span></td><td>Band 2</td><td>1.10 – 1.62 µm</td></tr>
+              <tr><td><span class="sw" style="background:#4fc9a8"></span></td><td>Band 3</td><td>1.63 – 2.41 µm</td></tr>
+              <tr><td><span class="sw" style="background:#e8c34a"></span></td><td>Band 4</td><td>2.42 – 3.82 µm</td></tr>
+              <tr><td><span class="sw" style="background:#f08a4b"></span></td><td>Band 5</td><td>3.83 – 4.41 µm</td></tr>
+              <tr><td><span class="sw" style="background:#e85d4a"></span></td><td>Band 6</td><td>4.42 – 5.00 µm</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section>
+          <h3>How detection will work</h3>
+          <p>Each sky cell with two or more epochs gets aligned to a common grid, background-subtracted, and differenced. Whatever's left over — after masking bad pixels — gets run through source extraction. Real movers show up as a paired bright/dark "dipole"; noise and cosmic rays don't pair up the same way. Every candidate is cross-checked against SkyBoT's catalog of known solar-system objects before it reaches the feed.</p>
+        </section>
+
+        <section>
+          <h3>Required data citation</h3>
+          <div class="cite-block">"This publication makes use of data products from the Spectro-Photometer for the History of the Universe, Epoch of Reionization and Ices Explorer (SPHEREx), which is a joint project of the Jet Propulsion Laboratory and the California Institute of Technology, and is funded by the National Aeronautics and Space Administration."</div>
+        </section>
+
+        <section>
+          <h3>Sources</h3>
+          <ul class="source-list">
+            <li><a href="#" onclick="return false;">SPHEREx Archive at IRSA — User Guide</a></li>
+            <li><a href="#" onclick="return false;">AWS Open Data Registry — SPHEREx Quick Release</a></li>
+            <li><a href="#" onclick="return false;">IMCCE SkyBoT — solar-system cone search</a></li>
+          </ul>
+        </section>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const BANDS = [
+    {id:1, label:"Band 1", range:"0.75–1.09 µm", color:"#7c83fd"},
+    {id:2, label:"Band 2", range:"1.10–1.62 µm", color:"#5aa9e6"},
+    {id:3, label:"Band 3", range:"1.63–2.41 µm", color:"#4fc9a8"},
+    {id:4, label:"Band 4", range:"2.42–3.82 µm", color:"#e8c34a"},
+    {id:5, label:"Band 5", range:"3.83–4.41 µm", color:"#f08a4b"},
+    {id:6, label:"Band 6", range:"4.42–5.00 µm", color:"#e85d4a"},
+  ];
+
+  function mulberry32(seed){
+    return function(){
+      seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function genStars(seed, w, h, count){
+    const rng = mulberry32(seed);
+    const stars = [];
+    for(let i=0;i<count;i++){
+      stars.push({
+        x: rng()*w, y: rng()*h,
+        r: 0.5 + Math.pow(rng(),3.2)*2.6,
+        b: 0.25 + rng()*0.75
+      });
+    }
+    return stars;
+  }
+
+  /* ---------------- Explorer starfield ---------------- */
+  const skyCanvas = document.getElementById('skyCanvas');
+  const sctx = skyCanvas.getContext('2d');
+  let skyStars = [], skyBlobs = [], coverageCells = [];
+  let coverageOn = true;
+  let DPR = Math.min(window.devicePixelRatio||1, 2);
+
+  function resizeSky(){
+    const stage = skyCanvas.parentElement;
+    const w = stage.clientWidth, h = stage.clientHeight;
+    skyCanvas.width = w*DPR; skyCanvas.height = h*DPR;
+    skyCanvas.style.width = w+'px'; skyCanvas.style.height = h+'px';
+    sctx.setTransform(DPR,0,0,DPR,0,0);
+    buildSky(w,h);
+  }
+
+  function buildSky(w,h){
+    skyStars = genStars(1337, w, h, Math.floor((w*h)/2600));
+    const rng = mulberry32(99);
+    skyBlobs = [];
+    for(let i=0;i<5;i++){
+      skyBlobs.push({x:rng()*w, y:rng()*h, r: 120+rng()*260, hue: [235,205,175,20,340][i]});
+    }
+    coverageCells = [];
+    const cell = 46;
+    for(let y=0;y<h;y+=cell){
+      for(let x=0;x<w;x+=cell){
+        const v = mulberry32(x*131+y*977)();
+        coverageCells.push({x,y, level: v});
+      }
+    }
+  }
+
+  let twinklePhase = 0;
+  function drawSky(t){
+    const w = skyCanvas.width/DPR, h = skyCanvas.height/DPR;
+    sctx.clearRect(0,0,w,h);
+    const grad = sctx.createLinearGradient(0,0,0,h);
+    grad.addColorStop(0,'#0b0e1c'); grad.addColorStop(1,'#060812');
+    sctx.fillStyle = grad; sctx.fillRect(0,0,w,h);
+
+    sctx.globalCompositeOperation = 'lighter';
+    skyBlobs.forEach(b=>{
+      const g = sctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);
+      g.addColorStop(0, `hsla(${b.hue},70%,45%,0.05)`);
+      g.addColorStop(1, `hsla(${b.hue},70%,45%,0)`);
+      sctx.fillStyle = g;
+      sctx.beginPath(); sctx.arc(b.x,b.y,b.r,0,7); sctx.fill();
+    });
+    sctx.globalCompositeOperation = 'source-over';
+
+    if(coverageOn){
+      coverageCells.forEach(c=>{
+        const l = c.level;
+        let color;
+        if(l<0.5) color = 'rgba(255,255,255,0)';
+        else if(l<0.65) color = 'rgba(70,85,150,0.10)';
+        else if(l<0.8) color = 'rgba(90,110,190,0.16)';
+        else if(l<0.92) color = 'rgba(120,140,230,0.22)';
+        else color = 'rgba(150,165,255,0.30)';
+        sctx.fillStyle = color;
+        sctx.fillRect(c.x,c.y,44,44);
+      });
+    }
+
+    skyStars.forEach((s,i)=>{
+      const tw = 0.85 + 0.15*Math.sin(twinklePhase*0.001 + i*12.9898);
+      sctx.beginPath();
+      sctx.fillStyle = `rgba(231,233,245,${s.b*tw})`;
+      sctx.arc(s.x, s.y, s.r, 0, 7);
+      sctx.fill();
+    });
+  }
+
+  let reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function skyLoop(t){
+    twinklePhase = t;
+    drawSky(t);
+    if(!reduceMotion) requestAnimationFrame(skyLoop);
+  }
+
+  window.addEventListener('resize', resizeSky);
+  resizeSky();
+  requestAnimationFrame(skyLoop);
+  if(reduceMotion) drawSky(0);
+
+  /* ------------- explorer interactions ------------- */
+  const inspectPanel = document.getElementById('inspectPanel');
+  const inspectContent = document.getElementById('inspectContent');
+  const inspectClose = document.getElementById('inspectClose');
+  const reticleLabel = document.getElementById('reticleLabel');
+  const coverageSwitch = document.getElementById('coverageSwitch');
+
+  coverageSwitch.addEventListener('click', ()=>{
+    coverageOn = !coverageOn;
+    coverageSwitch.classList.toggle('on', coverageOn);
+    coverageSwitch.setAttribute('aria-pressed', String(coverageOn));
+  });
+
+  function pixelToSky(px, py, w, h){
+    const ra = (px/w)*360;
+    const dec = 90 - (py/h)*180;
+    return {ra: ra.toFixed(2), dec: dec.toFixed(2)};
+  }
+
+  function fakeEpochCount(seedSeed){
+    const rng = mulberry32(seedSeed);
+    return 1 + Math.floor(rng()*6);
+  }
+
+  skyCanvas.addEventListener('click', (e)=>{
+    const rect = skyCanvas.getBoundingClientRect();
+    const x = e.clientX - rect.left, y = e.clientY - rect.top;
+    const sky = pixelToSky(x,y,rect.width,rect.height);
+    const seedSeed = Math.floor(x*1000+y);
+    const epochs = fakeEpochCount(seedSeed);
+    const hasCandidate = mulberry32(seedSeed+7)() > 0.6;
+
+    inspectContent.innerHTML = `
+      <h3 style="margin-bottom:4px;">Field at RA ${sky.ra}°, Dec ${sky.dec}°</h3>
+      <p class="mono" style="font-size:.75rem;color:var(--text-faint);margin-bottom:16px;">2026W${(10+Math.floor(epochs*3))}_2B · Detector ${1+(seedSeed%6)}</p>
+      <dl class="kv mono" style="margin-bottom:16px;">
+        <dt>Epochs</dt><dd>${epochs}</dd>
+        <dt>Bands present</dt><dd>${3+Math.floor(mulberry32(seedSeed+3)()*4)} of 6</dd>
+        <dt>Survey</dt><dd>${mulberry32(seedSeed+9)()>0.8?'Deep':'Wide'}</dd>
+      </dl>
+      ${hasCandidate
+        ? `<span class="badge unknown" style="margin-bottom:14px;"><span class="dot"></span> Flagged candidate here</span>`
+        : `<span class="badge known" style="background:#171c34;color:var(--text-dim);border-color:var(--line);margin-bottom:14px;">No motion flagged</span>`
+      }
+      <button class="cta-primary" id="openBlinkFromInspect">Open blink view</button>
+    `;
+    inspectPanel.classList.add('open');
+
+    reticleLabel.style.left = x+'px';
+    reticleLabel.style.top = y+'px';
+    reticleLabel.textContent = `${sky.ra}°, ${sky.dec}°`;
+    reticleLabel.style.opacity = '1';
+    clearTimeout(reticleLabel._t);
+    reticleLabel._t = setTimeout(()=>{ reticleLabel.style.opacity='0'; }, 1800);
+
+    document.getElementById('openBlinkFromInspect').addEventListener('click', ()=>{
+      openField(sky, epochs, hasCandidate, seedSeed);
+    });
+  });
+
+  inspectClose.addEventListener('click', ()=> inspectPanel.classList.remove('open'));
+
+  document.getElementById('searchBtn').addEventListener('click', doSearch);
+  document.getElementById('searchInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') doSearch(); });
+  function doSearch(){
+    const val = document.getElementById('searchInput').value.trim();
+    const seedSeed = Math.abs(hashStr(val || 'default')) % 100000;
+    const epochs = fakeEpochCount(seedSeed);
+    openField({ra:(seedSeed%360).toFixed(2), dec:((seedSeed%180)-90).toFixed(2)}, epochs, mulberry32(seedSeed+7)()>0.5, seedSeed, val);
+  }
+  function hashStr(s){ let h=0; for(let i=0;i<s.length;i++){ h = (h<<5)-h + s.charCodeAt(i); h|=0; } return h; }
+
+  document.getElementById('jumpEcliptic').addEventListener('click', ()=>{
+    openField({ra:'132.40', dec:'-3.20'}, 6, true, 4242, '3I/ATLAS field');
+  });
+
+  /* ---------------- Field / blink view ---------------- */
+  const blinkCanvas = document.getElementById('blinkCanvas');
+  const bctx = blinkCanvas.getContext('2d');
+  let currentBand = 3;
+  let diffMode = false;
+  let playing = false;
+  let frameIdx = 0;
+  let epochList = [];
+  let blinkStars = [];
+  let moverIndex = 0;
+  let blinkTimer = null;
+  let blinkSpeed = 550;
+
+  function buildBandTabs(){
+    const wrap = document.getElementById('bandTabs');
+    wrap.innerHTML = '';
+    BANDS.forEach(b=>{
+      const btn = document.createElement('button');
+      btn.className = 'band-tab' + (b.id===currentBand?' active':'');
+      btn.style.color = b.id===currentBand ? b.color : '';
+      btn.innerHTML = `<span class="sw" style="background:${b.color}"></span>${b.label}`;
+      btn.addEventListener('click', ()=>{
+        currentBand = b.id;
+        buildBandTabs();
+        renderBlinkFrame();
+        document.getElementById('fieldSub').textContent = `${epochList.length} epochs available · ${b.label} (${b.range}) selected`;
+      });
+      wrap.appendChild(btn);
+    });
+  }
+
+  function openField(sky, epochs, hasCandidate, seed, label){
+    inspectPanel.classList.remove('open');
+    epochList = [];
+    for(let i=0;i<epochs;i++){
+      const week = 10 + i*3;
+      epochList.push(`2026W${week}_2B`);
+    }
+    blinkStars = genStars(seed, 640, 640, 90);
+    moverIndex = Math.floor(mulberry32(seed+11)()*blinkStars.length);
+    frameIdx = 0;
+
+    document.getElementById('fieldTitle').textContent = label
+      ? `${label}`
+      : `Field ${epochList[0]} · RA ${sky.ra}, Dec ${sky.dec}`;
+    document.getElementById('fieldSub').textContent = `${epochs} epochs available · Band ${currentBand} (${BANDS[currentBand-1].range}) selected`;
+
+    const badge = document.getElementById('fieldBadge');
+    const skybotNote = document.getElementById('skybotNote');
+    if(hasCandidate){
+      badge.className = 'badge unknown';
+      badge.innerHTML = '<span class="dot"></span> Unidentified — needs review';
+      skybotNote.textContent = 'Checked against SkyBoT (IMCCE) at each epoch — no cataloged object found within 8″ of this position. Could be an artifact, or something not yet in the catalogs.';
+    } else {
+      const known = ['433 Eros','65803 Didymos','3I/ATLAS','(atmospheric artifact)'][Math.floor(mulberry32(seed+3)()*4)];
+      badge.className = 'badge known';
+      badge.innerHTML = `<span class="dot"></span> Matches known object`;
+      skybotNote.textContent = `SkyBoT cross-match at the detection epoch returned a match: ${known}, within predicted position uncertainty.`;
+    }
+
+    document.getElementById('metaKv').innerHTML = `
+      <dt>RA / Dec</dt><dd>${sky.ra}° / ${sky.dec}°</dd>
+      <dt>Detector</dt><dd>${1+(seed%6)}</dd>
+      <dt>Planning period</dt><dd>${epochList[0]}</dd>
+      <dt>Pixel scale</dt><dd>6.2″/px</dd>
+      <dt>Survey</dt><dd>${mulberry32(seed+9)()>0.8?'Deep':'Wide'}</dd>
+    `;
+    document.getElementById('epochChips').innerHTML = epochList.map(e=>`<span class="epoch-chip">${e}</span>`).join('');
+
+    buildBandTabs();
+    goto('field');
+    renderBlinkFrame();
+  }
+
+  function renderBlinkFrame(){
+    const w = blinkCanvas.width, h = blinkCanvas.height;
+    const bandColor = BANDS[currentBand-1].color;
+    document.getElementById('viewerEpochTag').textContent = epochList[frameIdx] || '—';
+    document.getElementById('viewerModeTag').textContent = diffMode ? 'Difference mode' : 'Raw frames';
+
+    bctx.clearRect(0,0,w,h);
+    const g = bctx.createRadialGradient(w/2,h/2,0,w/2,h/2,w*0.7);
+    g.addColorStop(0, hexToRgba(bandColor,0.05));
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    bctx.fillStyle = '#050611'; bctx.fillRect(0,0,w,h);
+    bctx.fillStyle = g; bctx.fillRect(0,0,w,h);
+
+    function starsForFrame(idx){
+      return blinkStars.map((s,i)=>{
+        if(i!==moverIndex) return s;
+        const rng = mulberry32(9000+idx*17+moverIndex);
+        const dx = (idx - Math.floor(epochList.length/2)) * 14;
+        const dy = (idx - Math.floor(epochList.length/2)) * -9;
+        return {x:s.x+dx, y:s.y+dy, r:s.r*1.15, b:Math.min(1,s.b+0.15)};
+      });
+    }
+
+    function draw(stars, comp, alpha){
+      bctx.globalCompositeOperation = comp;
+      stars.forEach((s,i)=>{
+        bctx.beginPath();
+        const isMover = i===moverIndex;
+        bctx.fillStyle = isMover ? hexToRgba('#ffffff', s.b*alpha) : `rgba(231,233,245,${s.b*alpha})`;
+        bctx.arc(s.x, s.y, s.r, 0, 7);
+        bctx.fill();
+        if(isMover){
+          bctx.beginPath();
+          bctx.fillStyle = hexToRgba(bandColor, 0.35*alpha);
+          bctx.arc(s.x, s.y, s.r*3.2, 0, 7);
+          bctx.fill();
+        }
+      });
+      bctx.globalCompositeOperation = 'source-over';
+    }
+
+    if(diffMode){
+      const prevIdx = (frameIdx-1+epochList.length)%epochList.length;
+      draw(starsForFrame(prevIdx), 'lighter', 0.55);
+      draw(starsForFrame(frameIdx), 'difference', 1);
+    } else {
+      draw(starsForFrame(frameIdx), 'lighter', 1);
+    }
+  }
+
+  function hexToRgba(hex, a){
+    const v = hex.replace('#','');
+    const r = parseInt(v.substring(0,2),16), gg = parseInt(v.substring(2,4),16), b = parseInt(v.substring(4,6),16);
+    return `rgba(${r},${gg},${b},${a})`;
+  }
+
+  document.getElementById('diffSwitch').addEventListener('click', function(){
+    diffMode = !diffMode;
+    this.classList.toggle('on', diffMode);
+    this.setAttribute('aria-pressed', String(diffMode));
+    renderBlinkFrame();
+  });
+
+  const playBtn = document.getElementById('playBtn');
+  playBtn.addEventListener('click', ()=>{
+    playing = !playing;
+    playBtn.textContent = playing ? '❚❚' : '▶';
+    if(playing) startBlink(); else stopBlink();
+  });
+  function startBlink(){
+    stopBlink();
+    blinkTimer = setInterval(()=>{
+      frameIdx = (frameIdx+1) % epochList.length;
+      renderBlinkFrame();
+    }, blinkSpeed);
+  }
+  function stopBlink(){ clearInterval(blinkTimer); }
+
+  const speedRange = document.getElementById('speedRange');
+  speedRange.addEventListener('input', function(){
+    blinkSpeed = 1350 - Number(this.value); // invert: right = faster
+    blinkSpeed = Number(this.value);
+    document.getElementById('speedLabel').textContent = this.value + ' ms';
+    if(playing) startBlink();
+  });
+
+  document.getElementById('fieldBack').addEventListener('click', ()=>{
+    stopBlink(); playing=false; playBtn.textContent='▶';
+    goto('explorer');
+  });
+
+  /* ---------------- Candidates feed ---------------- */
+  const CANDIDATES = [
+    {name:'2026 XJ14', ra:132.41, dec:-3.22, band:5, known:false, score:7.8, date:'2026-09-18'},
+    {name:'3I/ATLAS', ra:131.98, dec:-2.87, band:4, known:'3I/ATLAS', score:9.6, date:'2026-09-16'},
+    {name:'Field 0091-D2', ra:88.10, dec:14.55, band:2, known:false, score:5.4, date:'2026-09-15'},
+    {name:'433 Eros', ra:210.32, dec:9.11, band:1, known:'433 Eros', score:8.9, date:'2026-09-14'},
+    {name:'Field 2204-D6', ra:301.77, dec:-22.03, band:6, known:false, score:6.1, date:'2026-09-13'},
+    {name:'65803 Didymos', ra:19.44, dec:5.02, band:3, known:'65803 Didymos', score:8.2, date:'2026-09-12'},
+    {name:'Field 0730-D1', ra:44.90, dec:-61.18, band:5, known:false, score:6.9, date:'2026-09-11'},
+    {name:'Field 1550-D4', ra:250.02, dec:31.44, band:2, known:false, score:5.0, date:'2026-09-10'},
+  ];
+
+  const candGrid = document.getElementById('candGrid');
+  const cardAnimators = [];
+  function buildCandidates(filter){
+    candGrid.innerHTML = '';
+    cardAnimators.length = 0;
+    const list = CANDIDATES.filter(c => filter==='all' ? true : (filter==='known' ? !!c.known : !c.known));
+    list.forEach((c, ci)=>{
+      const card = document.createElement('div');
+      card.className = 'cand-card';
+      const band = BANDS[c.band-1];
+      card.innerHTML = `
+        <div class="cand-thumb">
+          <canvas width="220" height="220"></canvas>
+          <span class="cand-badge-float badge ${c.known?'known':'unknown'}"><span class="dot"></span>${c.known? 'Known' : 'Unidentified'}</span>
+          <span class="cand-score mono">${c.score.toFixed(1)}σ</span>
+        </div>
+        <div class="cand-body">
+          <div class="cand-name">${c.name}</div>
+          <div class="cand-meta mono"><span>${band.label}</span><span>${c.date}</span></div>
+        </div>
+      `;
+      card.addEventListener('click', ()=>{
+        openField({ra:c.ra.toFixed(2), dec:c.dec.toFixed(2)}, 5+ (ci%3), !c.known, 5000+ci, c.name);
+      });
+      candGrid.appendChild(card);
+
+      const cvs = card.querySelector('canvas');
+      const cctx = cvs.getContext('2d');
+      const seed = 5000+ci;
+      const stars = genStars(seed, 220, 220, 26);
+      const moverI = Math.floor(mulberry32(seed+2)()*stars.length);
+      let toggle = 0;
+      function drawThumb(){
+        cctx.clearRect(0,0,220,220);
+        cctx.fillStyle = '#050611'; cctx.fillRect(0,0,220,220);
+        cctx.globalCompositeOperation = 'lighter';
+        stars.forEach((s,i)=>{
+          let x=s.x, y=s.y;
+          if(i===moverI && toggle===1){ x+=10; y-=7; }
+          cctx.beginPath();
+          cctx.fillStyle = i===moverI ? hexToRgba(band.color, 0.9) : `rgba(231,233,245,${s.b})`;
+          cctx.arc(x,y,i===moverI?s.r*1.4:s.r,0,7);
+          cctx.fill();
+        });
+        cctx.globalCompositeOperation = 'source-over';
+        toggle = 1-toggle;
+      }
+      drawThumb();
+      const iv = setInterval(drawThumb, 750 + (ci%3)*60);
+      cardAnimators.push(iv);
+    });
+  }
+  document.getElementById('filters').addEventListener('click', (e)=>{
+    const btn = e.target.closest('.filter-chip');
+    if(!btn) return;
+    [...document.querySelectorAll('.filter-chip')].forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    buildCandidates(btn.dataset.filter);
+  });
+
+  /* ---------------- Nav / routing ---------------- */
+  function goto(name){
+    document.querySelectorAll('section.view').forEach(s=>s.classList.remove('active'));
+    document.getElementById('view-'+name).classList.add('active');
+    document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('active', b.dataset.goto===name));
+    window.scrollTo({top:0, behavior:'instant' in window ? 'instant':'auto'});
+    if(name==='explorer') setTimeout(resizeSky, 30);
+    if(name==='candidates' && candGrid.children.length===0) buildCandidates('all');
+  }
+  document.querySelectorAll('[data-goto]').forEach(el=>{
+    el.addEventListener('click', ()=> goto(el.dataset.goto));
+  });
+
+  buildCandidates('all');
+})();
+</script>
+</body>
+</html>
