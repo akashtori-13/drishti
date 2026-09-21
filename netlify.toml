@@ -1,0 +1,45 @@
+# Netlify Configuration for SpectraHunt
+# This file tells Netlify how to build and deploy the site
+
+[build]
+  # Use Python 3.11 (Netlify's default is often older, so we specify)
+  # We use a build plugin or a simple build command to install deps and run the builder
+  command = "pip install -r requirements.txt && python scripts/build_static_bundle.py --region '180,0,2' --max-frames 50"
+  publish = "data"
+
+# Environment variables
+[build.environment]
+  PYTHON_VERSION = "3.11"
+
+# Redirects for SPA-like behavior if needed (though our app uses hash routing #/ which works by default)
+# But we ensure any unknown routes go to index.html just in case
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Security Headers (Optional but recommended)
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Specific headers for JSON data (ensure CORS works if needed, though same-origin here)
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Content-Type = "application/json"
+
+# Serve all files with proper MIME types
+[[headers]]
+  for = "/*.json"
+  [headers.values]
+    Content-Type = "application/json; charset=utf-8"
+
+[[headers]]
+  for = "/*.db"
+  [headers.values]
+    Content-Type = "application/octet-stream"

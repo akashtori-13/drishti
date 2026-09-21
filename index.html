@@ -871,7 +871,98 @@
   const fmtRa  = v => `${Number(v).toFixed(2)}°`;
   const fmtDec = v => `${v<0?'−':''}${Math.abs(Number(v)).toFixed(2)}°`;
 
-  /* ================= mock sky data ================= */
+  /* ================= DATA LAYER =================
+   * Fetches real SPHEREx data from either:
+   * - Live API (/api/*) when CONFIG.dataMode === 'live'
+   * - Static JSON files (data/*.json) when CONFIG.dataMode === 'static'
+   * The RNG helpers (mulberry32, genStars) remain ONLY for the decorative
+   * hero background animation - they are NOT used for any scientific data.
+   */
+  const CONFIG = {
+    dataMode: 'static', // 'static' or 'live'
+    apiBase: '',        // empty = same origin; set to 'http://localhost:8000' for live dev
+    cache: new Map()    // in-memory request cache
+  };
+
+  async function fetchData(endpoint, staticFile){
+    const cacheKey = endpoint || staticFile;
+    if(CONFIG.cache.has(cacheKey)){
+      return CONFIG.cache.get(cacheKey);
+    }
+    let url;
+    if(CONFIG.dataMode === 'live' && endpoint){
+      url = `${CONFIG.apiBase}${endpoint}`;
+    } else if(staticFile){
+      url = `data/${staticFile}`;
+    } else {
+      throw new Error('No endpoint or static file specified');
+    }
+    try{
+      const res = await fetch(url, {headers: {'Accept': 'application/json'}});
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      CONFIG.cache.set(cacheKey, data);
+      return data;
+    } catch(err){
+      console.error(`fetchData(${url}) failed:`, err);
+      throw err;
+    }
+  }
+
+  async function getStatus(){
+    if(CONFIG.dataMode === 'live'){
+      return fetchData('/api/status', null);
+    }
+    return fetchData(null, 'status.json');
+  }
+
+  async function getCoverage(){
+    if(CONFIG.dataMode === 'live'){
+      return fetchData('/api/coverage', null);
+    }
+    return fetchData(null, 'coverage.json');
+  }
+
+  async function getCandidates(limit=500){
+    if(CONFIG.dataMode === 'live'){
+      return fetchData(`/api/candidates?limit=${limit}`, null);
+    }
+    return fetchData(null, 'candidates.json');
+  }
+
+  async function getDemoFields(){
+    if(CONFIG.dataMode === 'live'){
+      return fetchData('/api/demo_fields', null);
+    }
+    return fetchData(null, 'demo_fields.json');
+  }
+
+  async function getField(ra, dec){
+    if(CONFIG.dataMode === 'live'){
+      return fetchData(`/api/field?ra=${ra}&dec=${dec}`, null);
+    }
+    // For static mode, we don't have per-field JSON; return null
+    return null;
+  }
+
+  async function getBlink(ra, dec, band=3, size=0.15){
+    if(CONFIG.dataMode === 'live'){
+      return fetchData(`/api/blink?ra=${ra}&dec=${dec}&band=${band}&size_arcmin=${size*60}`, null);
+    }
+    return null;
+  }
+
+  async function resolveQuery(q){
+    if(CONFIG.dataMode === 'live'){
+      return fetchData(`/api/resolve?q=${encodeURIComponent(q)}`, null);
+    }
+    return [];
+  }
+
+  /* ================= mock sky data (FALLBACK ONLY) =================
+   * These are used ONLY if the data files fail to load.
+   * They should NEVER be shown when real data is available.
+   */
   const CANDIDATES = [
     {name:'2026 XJ14',     ra:132.41, dec:-3.22,  band:5, known:false,           score:7.8, date:'2026-09-18'},
     {name:'3I/ATLAS',      ra:131.98, dec:-2.87,  band:4, known:'3I/ATLAS',      score:9.6, date:'2026-09-16'},
@@ -901,29 +992,41 @@
     ]},
   ];
 
-  /* Coverage grid: 72 x 36 fields (5° each). Epoch counts are generated, then
-     curated fields are forced to have several epochs so the demo is consistent. */
+  /* ================= COVERAGE GRID (72x36, 5° cells) =================
+   * This is populated from real data (coverage.json) on init.
+   * The RNG-based grid below is ONLY a fallback if the file fails to load.
+   */
   const GRID_W = 72, GRID_H = 36;
-  const GRID = [];
-  for(let j=0;j<GRID_H;j++){
-    const row = [];
-    for(let i=0;i<GRID_W;i++){
-      const l = mulberry32(i*131 + j*977 + 13)();
-      row.push(l<.12 ? 0 : l<.3 ? 1 : l<.5 ? 2 : l<.7 ? 3 : l<.87 ? 4 : 5);
-    }
-    GRID.push(row);
-  }
+  let GRID = []; // Will be filled by initRealData()
+  let coverageLoaded = false;
+
   function cellOf(ra, dec){
     return {
       i: Math.min(GRID_W-1, Math.max(0, Math.floor(ra/360*GRID_W))),
       j: Math.min(GRID_H-1, Math.max(0, Math.floor((90-dec)/180*GRID_H)))
     };
   }
-  SUGGESTIONS.forEach(g => g.items.forEach(it => { const c = cellOf(it.ra, it.dec); GRID[c.j][c.i] = Math.max(GRID[c.j][c.i], 4); }));
-  CANDIDATES.forEach(it => { const c = cellOf(it.ra, it.dec); GRID[c.j][c.i] = Math.max(GRID[c.j][c.i], 3); });
-  function epochCount(ra, dec, seed){
-    const c = cellOf(ra, dec), e = GRID[c.j][c.i];
-    return e >= 5 ? 5 + (mulberry32(seed+5)() > .5 ? 1 : 0) : e;
+
+  async function initRealData(){
+    try{
+      const cov = await getCoverage();
+      if(cov && cov.counts && cov.indexed){
+        GRID = cov.counts;
+        coverageLoaded = true;
+        console.log('Coverage data loaded:', cov.generated_at);
+      }
+    } catch(err){
+      console.warn('Failed to load coverage.json, using RNG fallback');
+      // Fallback: generate random grid (decorative only)
+      for(let j=0;j<GRID_H;j++){
+        const row = [];
+        for(let i=0;i<GRID_W;i++){
+          const l = mulberry32(i*131 + j*977 + 13)();
+          row.push(l<.12 ? 0 : l<.3 ? 1 : l<.5 ? 2 : l<.7 ? 3 : l<.87 ? 4 : 5);
+        }
+        GRID.push(row);
+      }
+    }
   }
   const LEVEL_COLORS = [null, '#141a38', '#1c2554', '#27357a', '#3848a8', '#5a6ce0'];
 
@@ -1344,6 +1447,31 @@
     return {input, submit};
   }
   const heroSearch = createSearch($('#heroSearch'));
+  /* ================= HOME STATS (from real data) ================= */
+  async function initHomeStats(){
+    try{
+      const status = await getStatus();
+      if(status){
+        $('#statFields').textContent = (status.fields_indexed || 0).toLocaleString('en-US');
+        $('#statFlags').textContent = (status.candidates_this_week || 0).toLocaleString('en-US');
+        // Update the release pill with last ingest time
+        const releasePill = $('#releasePill');
+        if(releasePill && status.last_ingest_at){
+          const ingestDate = new Date(status.last_ingest_at);
+          const now = new Date();
+          const daysAgo = Math.floor((now - ingestDate) / (1000*60*60*24));
+          const timeStr = daysAgo <= 1 ? 'today' : `${daysAgo} days ago`;
+          releasePill.title = `Last ingest: ${ingestDate.toUTCString()}`;
+          releasePill.textContent = `${status.release || 'QR2'} • updated ${timeStr}`;
+        }
+      }
+    } catch(err){
+      console.warn('Failed to load status.json, using placeholder stats');
+      $('#statFields').textContent = `${GRID_W*GRID_H}`;
+      $('#statFlags').textContent = '—';
+    }
+  }
+
   const mapSearch  = createSearch($('#mapSearch'));
 
   $('#quick').addEventListener('click', e => {
@@ -1358,9 +1486,7 @@
     if(view==='home'){ e.preventDefault(); heroSearch.input.focus(); }
     else if(view==='map'){ e.preventDefault(); mapSearch.input.focus(); }
   });
-
-  $('#statFields').textContent = (GRID_W*GRID_H).toLocaleString('en-US');
-  $('#statFlags').textContent = CANDIDATES.length;
+  // Stats are now set by initHomeStats() during boot
 
   /* ================= map interaction ================= */
   const inspector = $('#inspector'), inspTitle = $('#inspTitle'), inspBody = $('#inspBody');
@@ -1583,39 +1709,77 @@
     else if(e.key==='ArrowLeft'){ e.preventDefault(); step(-1); }
   });
 
-  /* ================= candidates ================= */
+  /* ================= candidates (from real data) ================= */
   const candGrid = $('#candGrid');
   let thumbTimers = [];
+  let realCandidates = []; // Will hold candidates from data file
   function stopThumbs(){ thumbTimers.forEach(clearInterval); thumbTimers = []; }
+
+  async function buildCandidatesFromData(){
+    try{
+      const cands = await getCandidates(500);
+      if(cands && Array.isArray(cands)){
+        realCandidates = cands;
+      }
+    } catch(err){
+      console.warn('Failed to load candidates.json, using fallback');
+      realCandidates = CANDIDATES; // Use mock data as fallback
+    }
+  }
 
   function buildCandidates(){
     stopThumbs(); candGrid.innerHTML = '';
-    const list = CANDIDATES.filter(c => candFilter==='all' ? true : candFilter==='known' ? !!c.known : !c.known);
+    // Use real candidates if loaded, otherwise fall back to mock array
+    const list = realCandidates.length ? realCandidates : CANDIDATES;
+    const filtered = list.filter(c => {
+      if(candFilter === 'all') return true;
+      if(candFilter === 'known') return !!c.skybot_match || !!c.known;
+      return !c.skybot_match && !c.known;
+    });
+    
     $$('#filters button').forEach(b => {
       const f = b.dataset.filter;
-      const n = CANDIDATES.filter(c => f==='all' ? true : f==='known' ? !!c.known : !c.known).length;
+      const n = list.filter(c => {
+        if(f === 'all') return true;
+        if(f === 'known') return !!c.skybot_match || !!c.known;
+        return !c.skybot_match && !c.known;
+      }).length;
       b.textContent = `${f==='all' ? 'All' : f==='known' ? 'Known objects' : 'Unidentified'} (${n})`;
       b.setAttribute('aria-pressed', String(f===candFilter));
     });
-    if(!list.length){ candGrid.innerHTML = '<p class="empty">No candidates match this filter.</p>'; return; }
+    
+    if(!filtered.length){ 
+      candGrid.innerHTML = '<p class="empty">No candidates match this filter.</p>'; 
+      return; 
+    }
 
-    list.forEach(c => {
-      const gi = CANDIDATES.indexOf(c), band = BANDS[c.band-1], seed = 5000+gi;
+    filtered.forEach((c, idx) => {
+      // Handle both old mock format and new real-data format
+      const name = c.name || `SH-C${c.id || idx}`;
+      const ra = c.ra || 0;
+      const dec = c.dec || 0;
+      const bandId = c.band || 3;
+      const band = BANDS[bandId - 1] || BANDS[2];
+      const score = c.significance_sigma || c.score || 5.0;
+      const isKnown = !!c.skybot_match || !!c.known;
+      const dateStr = c.created_at ? new Date(c.created_at).toISOString().slice(0,10) : (c.date || 'Unknown');
+      
+      const seed = 5000 + idx;
       const card = document.createElement('button');
       card.type = 'button'; card.className = 'cand';
-      card.setAttribute('aria-label', `${c.name}, ${c.known ? 'known object' : 'unidentified'}, ${c.score.toFixed(1)} sigma, ${band.label}`);
+      card.setAttribute('aria-label', `${name}, ${isKnown ? 'known object' : 'unidentified'}, ${score.toFixed(1)} sigma, ${band.label}`);
       card.innerHTML = `
         <div class="cand-thumb">
           <canvas width="260" height="260" aria-hidden="true"></canvas>
-          <span class="badge ${c.known?'known':'unknown'}"><span class="dot"></span>${c.known ? 'Known' : 'Unidentified'}</span>
-          <span class="cand-score mono">${c.score.toFixed(1)}σ</span>
+          <span class="badge ${isKnown?'known':'unknown'}"><span class="dot"></span>${isKnown ? 'Known' : 'Unidentified'}</span>
+          <span class="cand-score mono">${score.toFixed(1)}σ</span>
         </div>
         <div class="cand-body">
-          <div class="cand-name">${esc(c.name)}</div>
-          <div class="cand-meta mono"><span>${band.label}</span><span>${c.date}</span></div>
+          <div class="cand-name">${esc(name)}</div>
+          <div class="cand-meta mono"><span>${band.label}</span><span>${dateStr}</span></div>
         </div>`;
       card.addEventListener('click', () => {
-        const t = {label:c.name, ra:c.ra, dec:c.dec, epochs:Math.max(3, epochCount(c.ra,c.dec,seed)), hasCandidate:!c.known, seed, knownName:c.known || null};
+        const t = {label:name, ra:ra, dec:dec, epochs:3, hasCandidate:!isKnown, seed};
         openField(t);
       });
       candGrid.appendChild(card);
@@ -1639,7 +1803,7 @@
         flip = 1-flip;
       };
       drawThumb();
-      if(!reduceMotion.matches) thumbTimers.push(setInterval(drawThumb, 760 + (gi%3)*70));
+      if(!reduceMotion.matches) thumbTimers.push(setInterval(drawThumb, 760 + (idx%3)*70));
     });
   }
   $('#filters').addEventListener('click', e => {
@@ -1648,7 +1812,13 @@
   });
 
   /* ================= boot ================= */
-  route();
+  (async function boot(){
+    // Load real data first (coverage, status, candidates)
+    await initRealData();
+    await initHomeStats();
+    await buildCandidatesFromData();
+    route();
+  })();
 })();
 </script>
 </body>
