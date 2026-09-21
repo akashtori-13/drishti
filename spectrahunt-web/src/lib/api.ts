@@ -1,7 +1,7 @@
 // API layer for SpectraHunt - works with both live backend and static JSON files
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
-interface Status {
+export interface Status {
   release: string;
   last_ingest_at: string | null;
   newest_planning_period: string | null;
@@ -11,14 +11,14 @@ interface Status {
   pipeline_version: string;
 }
 
-interface Coverage {
+export interface Coverage {
   grid: { w: number; h: number };
   counts: number[][];
   indexed: boolean[][];
   generated_at: string;
 }
 
-interface Candidate {
+export interface Candidate {
   id: string;
   name: string;
   ra: number;
@@ -35,6 +35,14 @@ interface Candidate {
   status: 'pending' | 'verified' | 'artifact';
   thumb_urls: string[];
   created_at: string;
+}
+
+export interface SearchSuggestion {
+  type: 'candidate' | 'object' | 'field' | 'coordinates';
+  label: string;
+  ra?: number;
+  dec?: number;
+  description?: string;
 }
 
 interface FieldEpoch {
@@ -82,14 +90,6 @@ interface BlinkData {
     png_url: string;
   }>;
   wcs_note: string;
-}
-
-interface SearchSuggestion {
-  type: 'candidate' | 'object' | 'field' | 'coordinates';
-  label: string;
-  ra?: number;
-  dec?: number;
-  description?: string;
 }
 
 interface ResolveResult {

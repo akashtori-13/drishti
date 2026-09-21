@@ -106,7 +106,7 @@ export default function CandidatesPage() {
 
                 {/* Thumbnail placeholders */}
                 <div className="mt-4 flex space-x-2">
-                  {candidate.thumb_urls.slice(0, 2).map((url, i) => (
+                  {candidate.thumb_urls.slice(0, 2).map((url: string, i: number) => (
                     <div
                       key={i}
                       className="w-16 h-16 bg-slate-700 rounded-lg flex items-center justify-center text-xs text-slate-500"
