@@ -168,7 +168,7 @@ async def api_detect(ra: float = Query(...), dec: float = Query(...),
     """Aligned difference detection: WCS reproject, significance dipoles, Gaia labels."""
     from backend.pipeline import detect_field
     try:
-        return detect_field(ra, dec, band=band, size_deg=size_deg, db_path=DATABASE_PATH)
+        return await detect_field(ra, dec, band=band, size_deg=size_deg, db_path=DATABASE_PATH)
     except Exception as e:
         print(f"detect failed: {e}")
         return {"candidates": [], "matched": 0, "detail": "error"}
