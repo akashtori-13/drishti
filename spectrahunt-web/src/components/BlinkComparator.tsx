@@ -92,6 +92,18 @@ export default function BlinkComparator({
   const [palQ, setPalQ] = useState('');
   type Pop = null | 'tune' | 'bands' | 'data' | 'export' | 'keys';
   const [dock, setDock] = useState<Pop>(null);
+  const [anchor, setAnchor] = useState<{ x: number; y: number } | null>(null);
+  const openPop = (d: Exclude<Pop, null>) => (e: React.MouseEvent<HTMLButtonElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    setAnchor({
+      x: Math.max(8, Math.min(r.left, window.innerWidth - 456)),
+      y: Math.min(r.bottom + 8, window.innerHeight - 120),
+    });
+    setDock((cur) => (cur === d ? null : d));
+  };
+  const popStyle: React.CSSProperties | undefined = anchor
+    ? { left: anchor.x, top: anchor.y }
+    : undefined;
   const [stretch, setStretch] = useState<Stretch>('asinh');
   const [cmap, setCmap] = useState<Colormap>('cividis');
   const [invert, setInvert] = useState(false);
@@ -641,12 +653,12 @@ export default function BlinkComparator({
               onClick={() => setShowRgb((v) => !v)} title="False-color: epoch B red, epoch A green">Color</button>
           </div>
           <span className="vsep" aria-hidden="true" />
-          <button type="button" className={`toolbtn${dock === 'tune' ? ' active' : ''}`} aria-expanded={dock === 'tune'} onClick={() => setDock((c) => (c === 'tune' ? null : 'tune'))}>Adjust</button>
-          <button type="button" className={`toolbtn${dock === 'bands' ? ' active' : ''}`} aria-expanded={dock === 'bands'} onClick={() => setDock((c) => (c === 'bands' ? null : 'bands'))}>Bands</button>
-          <button type="button" className={`toolbtn${dock === 'data' ? ' active' : ''}`} aria-expanded={dock === 'data'} onClick={() => setDock((c) => (c === 'data' ? null : 'data'))}>Measure</button>
+          <button type="button" className={`toolbtn${dock === 'tune' ? ' active' : ''}`} aria-expanded={dock === 'tune'} onClick={openPop('tune')}>Adjust</button>
+          <button type="button" className={`toolbtn${dock === 'bands' ? ' active' : ''}`} aria-expanded={dock === 'bands'} onClick={openPop('bands')}>Bands</button>
+          <button type="button" className={`toolbtn${dock === 'data' ? ' active' : ''}`} aria-expanded={dock === 'data'} onClick={openPop('data')}>Measure</button>
           <span className="vsep" aria-hidden="true" />
-          <button type="button" className={`toolbtn${dock === 'export' ? ' active' : ''}`} aria-expanded={dock === 'export'} onClick={() => setDock((c) => (c === 'export' ? null : 'export'))} title="Save and export">Save</button>
-          <button type="button" className={`toolbtn${dock === 'keys' ? ' active' : ''}`} aria-expanded={dock === 'keys'} onClick={() => setDock((c) => (c === 'keys' ? null : 'keys'))} title="Shortcuts and guide">?</button>
+          <button type="button" className={`toolbtn${dock === 'export' ? ' active' : ''}`} aria-expanded={dock === 'export'} onClick={openPop('export')} title="Save and export">Save</button>
+          <button type="button" className={`toolbtn${dock === 'keys' ? ' active' : ''}`} aria-expanded={dock === 'keys'} onClick={openPop('keys')} title="Shortcuts and guide">?</button>
           {mode === 'diff' && (
             <label className="mini-slider"><span>Gain</span>
               <input type="range" min={1} max={8} step={0.5} value={diffScale} onChange={(e) => setDiffScale(Number(e.target.value))} aria-label="Difference gain" />
@@ -658,8 +670,9 @@ export default function BlinkComparator({
             </label>
           )}
         </div>
-{dock === 'tune' && (
-          <div className="popover glass" role="dialog" aria-label="Adjust">
+{dock && <div className="pop-veil" onMouseDown={() => setDock(null)} />}
+        {dock === 'tune' && (
+          <div className="popover glass" style={popStyle} role="dialog" aria-label="Adjust">
             <div className="pop-head"><span>Adjust</span><button type="button" className="icon-btn sm" aria-label="Close Adjust panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
             <div style={rowStyle}>
               <label style={{ fontSize: 13 }}>Stretch{' '}
@@ -693,7 +706,7 @@ export default function BlinkComparator({
           </div>
         )}
 {dock === 'bands' && (
-          <div className="popover glass" role="dialog" aria-label="Bands">
+          <div className="popover glass" style={popStyle} role="dialog" aria-label="Bands">
             <div className="pop-head"><span>Bands</span><button type="button" className="icon-btn sm" aria-label="Close Bands panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
             <div className="band-row" style={{ padding: 0, background: 'transparent' }}>
               {BANDS.map((b) => (
@@ -723,7 +736,7 @@ export default function BlinkComparator({
           </div>
         )}
 {dock === 'data' && (
-          <div className="popover glass" role="dialog" aria-label="Measure">
+          <div className="popover glass" style={popStyle} role="dialog" aria-label="Measure">
             <div className="pop-head"><span>Measure</span><button type="button" className="icon-btn sm" aria-label="Close Measure panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
             <div className="mono probe-line">
               {probe
@@ -760,7 +773,7 @@ export default function BlinkComparator({
           </div>
         )}
 {dock === 'export' && (
-          <div className="popover glass" role="dialog" aria-label="Save">
+          <div className="popover glass" style={popStyle} role="dialog" aria-label="Save">
             <div className="pop-head"><span>Save</span><button type="button" className="icon-btn sm" aria-label="Close Save panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
             <div style={rowStyle}>
               <button type="button" className="epoch-chip" onClick={() => downloadPNG()}>PNG</button>
@@ -773,7 +786,7 @@ export default function BlinkComparator({
           </div>
         )}
 {dock === 'keys' && (
-          <div className="popover glass" role="dialog" aria-label="Guide">
+          <div className="popover glass" style={popStyle} role="dialog" aria-label="Guide">
             <div className="pop-head"><span>Guide</span><button type="button" className="icon-btn sm" aria-label="Close Guide panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
             <div className="keys-grid">
               <span><kbd>Space</kbd> play / pause</span>
