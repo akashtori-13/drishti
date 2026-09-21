@@ -58,10 +58,6 @@ export default function Header() {
   }, [open ]);
 
   useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
     document.title = TITLES[pathname] ?? (pathname.startsWith('/blink/') ? 'Blink — SpectraHunt' : 'SpectraHunt');
   }, [pathname]);
 
