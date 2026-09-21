@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { BANDS } from '@/lib/sky';
 import { TOURS, GLOSSARY } from '@/lib/catalogs';
 
@@ -106,8 +107,8 @@ export default function AboutPage() {
           <p style={{ margin: 0 }}>The whole sky is blinkable. Start with the comet.</p>
         </div>
         <div className="how-cta" style={{ marginTop: 0 }}>
-          <a className="btn primary" href="/sky">Open the sky map</a>
-          <a className="btn" href="/blink/3i-atlas">Blink 3I/ATLAS</a>
+          <Link className="btn primary" href="/sky">Open the sky map</Link>
+          <Link className="btn" href="/blink/3i-atlas">Blink 3I/ATLAS</Link>
         </div>
       </section>
     </div>
