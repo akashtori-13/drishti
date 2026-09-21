@@ -580,35 +580,6 @@ export default function BlinkComparator({
     <div className="deck">
       <div className="blink-grid">
         <div className="stage-col">
-        <div className="vtoolbar glass" role="toolbar" aria-label="View controls">
-          <div className="seg" role="group" aria-label="Compare mode">
-            {(['blink', 'side', 'swipe', 'diff'] as CompareMode[]).map((m) => (
-              <button key={m} type="button" className={`seg-btn${mode === m ? ' active' : ''}`} aria-pressed={mode === m}
-                onClick={() => onModeChange(m)}>
-                {m === 'blink' ? 'Blink' : m === 'side' ? 'Side' : m === 'swipe' ? 'Swipe' : 'Diff'}
-              </button>
-            ))}
-            <button type="button" className={`seg-btn${showRgb ? ' active' : ''}`} aria-pressed={showRgb}
-              onClick={() => setShowRgb((v) => !v)} title="False-color: epoch B red, epoch A green">Color</button>
-          </div>
-          <span className="vsep" aria-hidden="true" />
-          <button type="button" className={`toolbtn${dock === 'tune' ? ' active' : ''}`} aria-expanded={dock === 'tune'} onClick={() => setDock((c) => (c === 'tune' ? null : 'tune'))}>Adjust</button>
-          <button type="button" className={`toolbtn${dock === 'bands' ? ' active' : ''}`} aria-expanded={dock === 'bands'} onClick={() => setDock((c) => (c === 'bands' ? null : 'bands'))}>Bands</button>
-          <button type="button" className={`toolbtn${dock === 'data' ? ' active' : ''}`} aria-expanded={dock === 'data'} onClick={() => setDock((c) => (c === 'data' ? null : 'data'))}>Measure</button>
-          <span className="vsep" aria-hidden="true" />
-          <button type="button" className={`toolbtn${dock === 'export' ? ' active' : ''}`} aria-expanded={dock === 'export'} onClick={() => setDock((c) => (c === 'export' ? null : 'export'))} title="Save and export">Save</button>
-          <button type="button" className={`toolbtn${dock === 'keys' ? ' active' : ''}`} aria-expanded={dock === 'keys'} onClick={() => setDock((c) => (c === 'keys' ? null : 'keys'))} title="Shortcuts and guide">?</button>
-          {mode === 'diff' && (
-            <label className="mini-slider"><span>Gain</span>
-              <input type="range" min={1} max={8} step={0.5} value={diffScale} onChange={(e) => setDiffScale(Number(e.target.value))} aria-label="Difference gain" />
-            </label>
-          )}
-          {mode === 'swipe' && (
-            <label className="mini-slider"><span>Curtain</span>
-              <input type="range" min={2} max={98} value={Math.round(swipe * 100)} onChange={(e) => setSwipe(Number(e.target.value) / 100)} aria-label="Swipe position" />
-            </label>
-          )}
-        </div>
           <div className="stage-wrap square" ref={stageRef} style={{ touchAction: 'none' }}>
             {mode === 'side' ? (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, width: '100%', height: '100%' }}>
@@ -638,6 +609,54 @@ export default function BlinkComparator({
                 <span className="viewer-tag epoch mono">{cur?.label ?? '—'}</span>
               </>
             )}
+        <div className="controls-zone">
+          <div className="transport-row glass" role="group" aria-label="Blink transport">
+            <button type="button" className="icon-btn" onClick={() => step(-1)} aria-label="Previous epoch">
+              <Icon name="back" />
+            </button>
+            <button type="button" className="play mini" onClick={() => setPlaying((pp) => (n > 1 ? !pp : pp))}
+              aria-label={playing ? 'Pause blink' : 'Play blink'}>
+              <Icon name={playing ? 'pause' : 'play'} />
+            </button>
+            <button type="button" className="icon-btn" onClick={() => step(1)} aria-label="Next epoch">
+              <Icon name="fwd" />
+            </button>
+            <input className="scrub" type="range" min={0} max={Math.max(0, n - 1)} step={1} value={idx}
+              onChange={(e) => { setPlaying(false); onEpochChange(Number(e.target.value)); }}
+              aria-label="Timeline scrub" aria-valuetext={cur?.label ?? ''} />
+            <span className="mono epoch-name">{cur?.label ?? '—'}</span>
+            <button type="button" className="epoch-chip" onClick={() => setPalette(true)} title="Command palette (Ctrl+K)">⌘K</button>
+          </div>
+
+        <div className="vtoolbar glass" role="toolbar" aria-label="View controls">
+          <div className="seg" role="group" aria-label="Compare mode">
+            {(['blink', 'side', 'swipe', 'diff'] as CompareMode[]).map((m) => (
+              <button key={m} type="button" className={`seg-btn${mode === m ? ' active' : ''}`} aria-pressed={mode === m}
+                onClick={() => onModeChange(m)}>
+                {m === 'blink' ? 'Blink' : m === 'side' ? 'Side' : m === 'swipe' ? 'Swipe' : 'Diff'}
+              </button>
+            ))}
+            <button type="button" className={`seg-btn${showRgb ? ' active' : ''}`} aria-pressed={showRgb}
+              onClick={() => setShowRgb((v) => !v)} title="False-color: epoch B red, epoch A green">Color</button>
+          </div>
+          <span className="vsep" aria-hidden="true" />
+          <button type="button" className={`toolbtn${dock === 'tune' ? ' active' : ''}`} aria-expanded={dock === 'tune'} onClick={() => setDock((c) => (c === 'tune' ? null : 'tune'))}>Adjust</button>
+          <button type="button" className={`toolbtn${dock === 'bands' ? ' active' : ''}`} aria-expanded={dock === 'bands'} onClick={() => setDock((c) => (c === 'bands' ? null : 'bands'))}>Bands</button>
+          <button type="button" className={`toolbtn${dock === 'data' ? ' active' : ''}`} aria-expanded={dock === 'data'} onClick={() => setDock((c) => (c === 'data' ? null : 'data'))}>Measure</button>
+          <span className="vsep" aria-hidden="true" />
+          <button type="button" className={`toolbtn${dock === 'export' ? ' active' : ''}`} aria-expanded={dock === 'export'} onClick={() => setDock((c) => (c === 'export' ? null : 'export'))} title="Save and export">Save</button>
+          <button type="button" className={`toolbtn${dock === 'keys' ? ' active' : ''}`} aria-expanded={dock === 'keys'} onClick={() => setDock((c) => (c === 'keys' ? null : 'keys'))} title="Shortcuts and guide">?</button>
+          {mode === 'diff' && (
+            <label className="mini-slider"><span>Gain</span>
+              <input type="range" min={1} max={8} step={0.5} value={diffScale} onChange={(e) => setDiffScale(Number(e.target.value))} aria-label="Difference gain" />
+            </label>
+          )}
+          {mode === 'swipe' && (
+            <label className="mini-slider"><span>Curtain</span>
+              <input type="range" min={2} max={98} value={Math.round(swipe * 100)} onChange={(e) => setSwipe(Number(e.target.value) / 100)} aria-label="Swipe position" />
+            </label>
+          )}
+        </div>
 {dock === 'tune' && (
           <div className="popover glass" role="dialog" aria-label="Adjust">
             <div className="pop-head"><span>Adjust</span><button type="button" className="icon-btn sm" aria-label="Close Adjust panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
@@ -764,23 +783,7 @@ export default function BlinkComparator({
           </div>
         )}          </div>
 
-          <div className="transport-row glass" role="group" aria-label="Blink transport">
-            <button type="button" className="icon-btn" onClick={() => step(-1)} aria-label="Previous epoch">
-              <Icon name="back" />
-            </button>
-            <button type="button" className="play mini" onClick={() => setPlaying((pp) => (n > 1 ? !pp : pp))}
-              aria-label={playing ? 'Pause blink' : 'Play blink'}>
-              <Icon name={playing ? 'pause' : 'play'} />
-            </button>
-            <button type="button" className="icon-btn" onClick={() => step(1)} aria-label="Next epoch">
-              <Icon name="fwd" />
-            </button>
-            <input className="scrub" type="range" min={0} max={Math.max(0, n - 1)} step={1} value={idx}
-              onChange={(e) => { setPlaying(false); onEpochChange(Number(e.target.value)); }}
-              aria-label="Timeline scrub" aria-valuetext={cur?.label ?? ''} />
-            <span className="mono epoch-name">{cur?.label ?? '—'}</span>
-            <button type="button" className="epoch-chip" onClick={() => setPalette(true)} title="Command palette (Ctrl+K)">⌘K</button>
-          </div>
+        </div>
 
           <div className="filmstrip" role="group" aria-label="Epoch filmstrip">
             {frames.map((f, i) => (
