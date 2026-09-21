@@ -71,6 +71,9 @@ function unproject(x: number, y: number, ra0: number, dec0: number): { ra: numbe
 
 const normRa = (ra: number) => ((ra % 360) + 360) % 360;
 
+const skyUrl = (sRa: number, sDec: number, sFov: number, w: number, h: number, surveyId: string) =>
+  `https://alasky.cds.unistra.fr/hips-image-services/hips2fits?hips=${encodeURIComponent(surveyId)}&ra=${sRa.toFixed(2)}&dec=${sDec.toFixed(2)}&fov=${sFov.toFixed(2)}&width=${w}&height=${h}&projection=SIN&coordsys=icrs&rotation=0&format=jpg`;
+
 /** Low-precision Sun position (~0.01°). */
 export function sunRaDec(date: Date): { ra: number; dec: number } {
   const d = date.getTime() / 86400000 - 10957.5;
@@ -202,34 +205,59 @@ export default function StellariumView({
     );
   }, []);
 
-  // sky image: device cache first, prefetch neighbors on idle (fast pans)
-  const skyUrl = (sRa: number, sDec: number, sFov: number, w: number, h: number, surveyId: string) =>
-    `https://alasky.cds.unistra.fr/hips-image-services/hips2fits?hips=${encodeURIComponent(surveyId)}&ra=${sRa.toFixed(2)}&dec=${sDec.toFixed(2)}&fov=${sFov.toFixed(2)}&width=${w}&height=${h}&projection=SIN&coordsys=icrs&rotation=0&format=jpg`;
+  // sky image: snapped tiles (map-style) + two-stage preview + device cache.
+  // Background snaps to a coarse grid so pans/zooms reuse cached tiles;
+  // vector overlays track the exact view every frame. Veil only on first load.
+  const qStep = Math.max(0.05, fov / 40);
+  const raQ = Math.round(ra / qStep) * qStep;
+  const decQ = Math.round(dec / qStep) * qStep;
+  const fovQ = Math.min(90, Math.max(0.5, 0.5 * Math.pow(1.25, Math.round(Math.log(fov / 0.5) / Math.log(1.25)))));
+  const firstLoad = useRef(true);
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return;
-    setLoading(true);
+    if (firstLoad.current) setLoading(true);
     let alive = true;
-    const t = setTimeout(() => {
-      const w = Math.min(1200, Math.max(320, Math.round(host.clientWidth)));
-      const h = Math.min(1200, Math.max(320, Math.round(host.clientHeight)));
-      const v = view.current;
-      const url = skyUrl(v.ra, v.dec, v.fov, w, h, v.survey);
+    const W = Math.min(1200, Math.max(320, Math.round(host.clientWidth)));
+    const H = Math.min(1200, Math.max(320, Math.round(host.clientHeight)));
+    const v = view.current;
+    // stage 1: tiny fast preview so motion feels instant
+    const pv = setTimeout(() => {
+      const url = skyUrl(raQ, decQ, fovQ, 384, 288, v.survey);
       void loadCachedImage(url)
         .then(() => cachedImageSrc(url))
-        .then((src) => { if (alive) { setImg(src); setLoading(false); } })
-        .catch(() => { if (alive) setLoading(false); });
-      // neighbor prefetch: N/S/E/W at half-FOV offsets
-      const off = v.fov * 0.5;
+        .then((src) => {
+          if (!alive) return;
+          firstLoad.current = false;
+          setLoading(false);
+          setImg(src);
+        })
+        .catch(() => undefined);
+    }, 120);
+    // stage 2: full-res refine once settled
+    const full = setTimeout(() => {
+      const url = skyUrl(raQ, decQ, fovQ, W, H, v.survey);
+      void loadCachedImage(url)
+        .then(() => cachedImageSrc(url))
+        .then((src) => {
+          if (!alive) return;
+          firstLoad.current = false;
+          setLoading(false);
+          setImg(src);
+        })
+        .catch(() => undefined);
+      // neighbor prefetch at snapped coords
+      const off = fovQ * 0.5;
       prefetch([
-        skyUrl(v.ra, Math.max(-85, Math.min(85, v.dec + off)), v.fov, w, h, v.survey),
-        skyUrl(v.ra, Math.max(-85, Math.min(85, v.dec - off)), v.fov, w, h, v.survey),
-        skyUrl(normRa(v.ra + off), v.dec, v.fov, w, h, v.survey),
-        skyUrl(normRa(v.ra - off), v.dec, v.fov, w, h, v.survey),
+        skyUrl(raQ, Math.max(-85, Math.min(85, decQ + off)), fovQ, W, H, v.survey),
+        skyUrl(raQ, Math.max(-85, Math.min(85, decQ - off)), fovQ, W, H, v.survey),
+        skyUrl(normRa(raQ + off), decQ, fovQ, W, H, v.survey),
+        skyUrl(normRa(raQ - off), decQ, fovQ, W, H, v.survey),
       ]);
-    }, 450);
-    return () => { alive = false; clearTimeout(t); };
-  }, [ra, dec, fov, survey]);
+    }, 900);
+    return () => { alive = false; clearTimeout(pv); clearTimeout(full); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [raQ, decQ, fovQ, survey]);
 
   // overlays
   useEffect(() => {
@@ -446,7 +474,8 @@ export default function StellariumView({
         aria-label={`Observer sky view centered RA ${ra.toFixed(1)}, Dec ${dec.toFixed(1)}, field ${fov.toFixed(0)} degrees. Drag to look, scroll to zoom, click to inspect.`}
         onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerLeave={() => { drag.current = null; setCursor(null); }}
       />
-      {loading && <div className="stel-load">Loading real sky…</div>}
+      {loading && !img && <div className="stel-load">Loading real sky…</div>}
+      {loading && img && <div className="stel-sync" aria-hidden="true"><span /></div>}
 
       {/* cardinal ring */}
       <div aria-hidden="true" style={{ position: 'absolute', top: 12, left: '50%', transform: 'translateX(-50%)', zIndex: 5, display: 'flex', gap: 14, fontFamily: 'monospace', fontSize: 13 }}>

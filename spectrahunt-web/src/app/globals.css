@@ -599,3 +599,7 @@ kbd{font-family:var(--font-mono); font-size:.6875rem; border:1px solid var(--lin
 .stel-hud{position:absolute; left:0; right:0; bottom:0; z-index:5; display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:center; padding:8px 12px calc(10px + env(safe-area-inset-bottom,0px)); font-size:.75rem; color:var(--ink-2); background:linear-gradient(transparent, rgba(4,5,10,.85));}
 .stel-hud .mono{color:var(--ink);}
 .stel-load{position:absolute; inset:0; z-index:4; display:grid; place-items:center; color:var(--ink-3); font-size:.8125rem; background:rgba(4,5,10,.35);}
+.stel-sync{position:absolute; top:12px; right:12px; z-index:5; pointer-events:none;}
+.stel-sync span{display:block; width:8px; height:8px; border-radius:50%; background:#7c83fd; animation:stel-pulse 1s ease-in-out infinite;}
+@keyframes stel-pulse{0%,100%{opacity:.25;} 50%{opacity:1;}}
+@media (prefers-reduced-motion: reduce){ .stel-sync span{animation:none; opacity:.7;} }
