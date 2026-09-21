@@ -21,13 +21,22 @@ interface ConLines { features: Array<{ id: string; geometry: { coordinates: numb
 let linesCache: ConLines | null = null;
 async function loadLines(): Promise<ConLines | null> {
   if (linesCache) return linesCache;
+  // 1) vendored copy (self-reliant, always available offline)
+  try {
+    const r = await fetch('/data/constellations.lines.json');
+    if (r.ok) {
+      linesCache = (await r.json()) as ConLines;
+      return linesCache;
+    }
+  } catch { /* fall through to remote */ }
+  // 2) upstream mirror (picks up corrections)
   try {
     const r = await fetch('https://ofrohn.github.io/data/constellations.lines.json');
-    if (!r.ok) return null;
+    if (!r.ok) return linesCache;
     linesCache = (await r.json()) as ConLines;
     return linesCache;
   } catch {
-    return null;
+    return linesCache;
   }
 }
 

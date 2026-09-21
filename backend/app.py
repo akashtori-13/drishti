@@ -70,6 +70,53 @@ async def health():
     return {"ok": True, "release": RELEASE, "version": PIPELINE_VERSION}
 
 
+@app.get("/api/health")
+async def api_health():
+    """Upstream dependency status (each probed fast, cached 5 min). Never 500."""
+    from backend.cache import api_cache_get, api_cache_set
+    try:
+        cached = api_cache_get(DATABASE_PATH, "health:upstreams", 300)
+        if isinstance(cached, dict):
+            return cached
+    except Exception:
+        pass
+
+    def probe_tap() -> str:
+        try:
+            import pyvo
+            svc = pyvo.dal.TAPService("https://irsa.ipac.caltech.edu/TAP")
+            svc.search("SELECT TOP 1 s_ra FROM spherex.obscore", maxrec=1)
+            return "ok"
+        except Exception:
+            return "down"
+
+    async def probe_url(url: str, timeout: int = 12) -> str:
+        import httpx
+        try:
+            async with httpx.AsyncClient(timeout=timeout) as client:
+                r = await client.get(url, headers={"User-Agent": USER_AGENT})
+                return "ok" if r.status_code < 500 else "degraded"
+        except Exception:
+            return "down"
+
+    import asyncio
+    from backend.config import SIA2_URL, TAP_URL, USER_AGENT
+    tap, ibe, gaia = await asyncio.gather(
+        asyncio.to_thread(probe_tap),
+        probe_url("https://irsa.ipac.caltech.edu/ibe/ibe-service?REQUEST=GetCapabilities"),
+        probe_url("https://gea.esac.esa.int/tap-server/tap/availability"),
+    )
+    out = {"tap": tap, "tap_url": TAP_URL, "sia2": SIA2_URL, "ibe": ibe,
+           "gaia": gaia, "skybot": "moved",
+           "release": RELEASE, "version": PIPELINE_VERSION,
+           "generated_at": datetime.now(timezone.utc).isoformat()}
+    try:
+        api_cache_set(DATABASE_PATH, "health:upstreams", out)
+    except Exception:
+        pass
+    return out
+
+
 @app.get("/api/showcases")
 async def list_showcases() -> List[Dict[str, Any]]:
     out = []

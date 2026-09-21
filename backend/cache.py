@@ -129,19 +129,38 @@ def _api_age_s(updated_at: str) -> float:
         return float("inf")
 
 
-def api_cache_get(db_path: str, key: str, max_age_s: int) -> Optional[Any]:
-    """TTL cache for expensive pipeline products (discovery, photometry, gaia)."""
+def api_cache_get(db_path: str, key: str, max_age_s: int, allow_stale: bool = False) -> Optional[Any]:
+    """TTL cache for expensive pipeline products (discovery, photometry, gaia).
+
+    allow_stale: on outage, serve the last-known value regardless of age
+    (stale-while-revalidate). Callers must label stale output as such.
+    """
     conn = get_connection(db_path)
     try:
         row = conn.execute("SELECT value, updated_at FROM api_cache WHERE key=?", (key,)).fetchone()
     finally:
         conn.close()
-    if not row or _api_age_s(row["updated_at"]) > max_age_s:
+    if not row:
+        return None
+    age = _api_age_s(row["updated_at"])
+    if age > max_age_s and not allow_stale:
         return None
     try:
         return json.loads(row["value"])
     except (json.JSONDecodeError, TypeError):
         return None
+
+
+def api_cache_age(db_path: str, key: str) -> Optional[float]:
+    """Age in seconds of a cached entry, or None when absent."""
+    conn = get_connection(db_path)
+    try:
+        row = conn.execute("SELECT updated_at FROM api_cache WHERE key=?", (key,)).fetchone()
+    finally:
+        conn.close()
+    if not row:
+        return None
+    return _api_age_s(row["updated_at"])
 
 
 def api_cache_set(db_path: str, key: str, value: Any) -> None:
