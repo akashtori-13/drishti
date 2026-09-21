@@ -13,7 +13,16 @@ from backend.config import API_TIMEOUT_SECONDS, DATABASE_PATH, SKYBOT_URL, USER_
 async def query_skybot(ra: float, dec: float, mjd: float, radius_arcsec: float,
                        db_path: str = DATABASE_PATH) -> Optional[Dict[str, Any]]:
     """Cone-search SkyBoT. Best match dict or None. Caches both hits and misses."""
-    from backend.cache import cache_skybot, get_cached_skybot
+    from backend.cache import cache_skybot, get_cached_skybot, get_status, set_status
+    # circuit breaker: the legacy endpoint 404s since the IMCCE SSP migration.
+    # After 3 consecutive failures, skip network for 24h instead of slow-failing.
+    import time as _time
+    try:
+        dead_until = float(get_status(db_path, "skybot:dead_until") or 0)
+        if _time.time() < dead_until:
+            return None
+    except Exception:
+        pass
     try:
         cached = get_cached_skybot(db_path, ra, dec, mjd, radius_arcsec)
         if cached is not None:
@@ -39,8 +48,19 @@ async def query_skybot(ra: float, dec: float, mjd: float, radius_arcsec: float,
                                  params=params, headers={"User-Agent": USER_AGENT})
             r.raise_for_status()
             results = r.json()
+        try:
+            set_status(db_path, "skybot:fail_streak", "0")
+        except Exception:
+            pass
     except Exception as e:
         print(f"SkyBoT query failed: {e}")
+        try:
+            streak = int(get_status(db_path, "skybot:fail_streak") or 0) + 1
+            set_status(db_path, "skybot:fail_streak", str(streak))
+            if streak >= 3:
+                set_status(db_path, "skybot:dead_until", str(_time.time() + 86400))
+        except Exception:
+            pass
         return None
     if not results:
         try:
