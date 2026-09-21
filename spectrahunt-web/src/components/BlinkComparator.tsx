@@ -221,12 +221,12 @@ export default function BlinkComparator({
   // non-passive wheel zoom + resize redraw
   useEffect(() => {
     const stage = stageRef.current;
-    if (!stage) return;    const onWheel = (e: WheelEvent) => {
+    if (!stage) return;
+    const onWheel = (e: WheelEvent) => {
       e.preventDefault();
       setZoom((z) => Math.min(6, Math.max(0.6, z * (e.deltaY > 0 ? 0.92 : 1.09))));
     };
     stage.addEventListener('wheel', onWheel, { passive: false });
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     const ro = new ResizeObserver(() => setSizeTick((t) => t + 1));
     ro.observe(stage);
     const onRs = () => setDock(null);

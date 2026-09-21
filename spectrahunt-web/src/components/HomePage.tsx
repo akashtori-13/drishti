@@ -5,7 +5,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { blinkURL } from '@/lib/store';
 import { SHOWCASE_IDS, getCoverage, getShowcase, useLive, type RealCell, type Showcase } from '@/lib/showcases';
-import { buildGrid, GRID_H, GRID_W } from '@/lib/sky';
+import { BANDS, buildGrid, GRID_H, GRID_W } from '@/lib/sky';
+import { CHANNELS } from '@/lib/astro';
 import HeroSky from '@/components/HeroSky';
 import SearchBox, { type SearchTarget } from '@/components/SearchBox';
 import SurpriseButton from '@/components/SurpriseButton';
@@ -69,7 +70,6 @@ export default function HomePage() {
   const [coverage, setCoverage] = useState(false);
   const [field, setField] = useState<InspectorField | null>(null);
   const [real, setReal] = useState<Map<string, RealCell> | null>(null);
-  const [genAt, setGenAt] = useState<string | null>(null);
   const [fields, setFields] = useState<Showcase[]>([]);
 
   useEffect(() => {
@@ -83,13 +83,25 @@ export default function HomePage() {
         if (Number.isInteger(i) && Number.isInteger(j)) grid[j][i] = Math.min(v.epochs, 5);
       }
       setReal(m);
-      if (c.generated_at) setGenAt(c.generated_at.slice(0, 10));
     });
     void Promise.all(SHOWCASE_IDS.map((id) => getShowcase(id).catch(() => null))).then((docs) => {
       if (alive) setFields(docs.filter((d): d is Showcase => d !== null));
     });
     return () => { alive = false; };
   }, [grid]);
+
+  // '/' focuses search anywhere on the page (unless typing already)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
+      const tag = (e.target as HTMLElement).tagName;
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tag)) return;
+      e.preventDefault();
+      document.getElementById('hs-input')?.focus();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => {
@@ -104,6 +116,13 @@ export default function HomePage() {
     setField(fieldFromRaDec(t.ra, t.dec, grid, real ?? undefined));
   };
 
+  const cutouts = fields.flatMap((f) => f.epochs).filter((e) => e.png).length;
+  const ecliptic = fields.find((x) => x.id === 'ecliptic-mover');
+  const eclPngs = (ecliptic?.epochs.map((e) => e.png).filter(Boolean) ?? []) as string[];
+  const eclSpan = ecliptic && ecliptic.epochs[0]?.mjd !== undefined && ecliptic.epochs[1]?.mjd !== undefined
+    ? Math.round(Math.abs((ecliptic.epochs[1].mjd as number) - (ecliptic.epochs[0].mjd as number)))
+    : null;
+
   return (
     <div>
       <section className="hero" id="hero">
@@ -114,12 +133,10 @@ export default function HomePage() {
         <div className="hero-scrim" />
 
         <div className="hero-core">
-          <p className="hero-kicker">NASA Space Apps 2026 · SPHEREx Quick Release 2 · All-sky time machine</p>
+          <p className="hero-kicker">NASA Space Apps 2026 · SPHEREx</p>
           <h1>Hunt what moves in the infrared sky</h1>
           <p className="hero-sub">
-            SPHEREx photographs the entire sky every six months in 102 infrared
-            colors. SpectraHunt lines up each visit and flags what changed —
-            comets, asteroids, variable stars.
+            SPHEREx re-images the whole sky every six months. SpectraHunt shows what changed.
           </p>
 
           <SearchBox
@@ -128,64 +145,32 @@ export default function HomePage() {
           />
 
           <div className="quick">
-            <span className="quick-label">Try</span>
             <button type="button" className="chip" onClick={() => router.push(blinkURL('3i-atlas'))}>3I/ATLAS</button>
             <button type="button" className="chip" onClick={() => pick({ label: '433 Eros', ra: 210.32, dec: 9.11 })}>433 Eros</button>
             <button type="button" className="chip" onClick={() => pick({ label: 'Orion Complex', ra: 83.82, dec: -5.39 })}>Orion Complex</button>
-            <button type="button" className="chip mono" onClick={() => pick({ label: '156.09, −41.64', ra: 156.09, dec: -41.64 })}>156.09, −41.64</button>
-            <span className="quick-sep" aria-hidden="true">or</span>
-            <SurpriseButton onPick={pick} />
+            <span className="quick-sep" aria-hidden="true">·</span>
+            <SurpriseButton onPick={pick} className="surprise-quiet" />
           </div>
-          <p className="sky-hint">Or click anywhere on the real sky behind this text to inspect that field.</p>
 
-          {(() => {
-            const f = fields.find((x) => x.id === 'ecliptic-mover');
-            const pngs = (f?.epochs.map((e) => e.png).filter(Boolean) ?? []) as string[];
-            if (!f || pngs.length < 2) return null;
-            return (
-              <Link href={blinkURL('ecliptic-mover', { mode: 'diff' })} className="featured"
-                aria-label="Featured blink: ecliptic plane difference view">
-                <span className="feat-imgs" aria-hidden="true">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={pngs[0]} alt="" draggable={false} />
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={pngs[1]} alt="" draggable={false} className="b" />
+          {ecliptic && eclPngs.length >= 2 && (
+            <Link href={blinkURL('ecliptic-mover', { mode: 'diff' })} className="featured"
+              aria-label="Featured real detection: ecliptic plane difference view">
+              <span className="feat-imgs" aria-hidden="true">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={eclPngs[0]} alt="" draggable={false} />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={eclPngs[1]} alt="" draggable={false} className="b" />
+              </span>
+              <span className="feat-body">
+                <span className="feat-k">Real detection</span>
+                <span className="feat-t">A moving object found in the ecliptic plane</span>
+                <span className="feat-s">
+                  Two SPHEREx visits{eclSpan !== null ? `, ${eclSpan} days apart` : ''}. The stars cancel out; the mover remains. →
                 </span>
-                <span className="feat-body">
-                  <span className="feat-k">Featured blink · 31σ mover found</span>
-                  <span className="feat-t">Ecliptic plane, 370 days apart</span>
-                  <span className="feat-s">Difference view — stars cancel, the mover pops →</span>
-                </span>
-              </Link>
-            );
-          })()}
-
-          <div className="hero-stats pill glass" aria-label="Live survey statistics">
-            <span><b>{real ? real.size.toLocaleString() : '—'}</b> cells measured</span>
-            <span className="sep" aria-hidden="true" />
-            <span><b>{SHOWCASE_IDS.length}</b> blinkable fields</span>
-            <span className="sep" aria-hidden="true" />
-            <span><b>102</b> spectral bands</span>
-            {genAt && (
-              <>
-                <span className="sep" aria-hidden="true" />
-                <span className="rel"><span className="live-dot" />updated {genAt}</span>
-              </>
-            )}
-          </div>
-        </div>
-
-        <div className="hero-foot">
-          <div className="pill glass">
-            <span id="heroCovLabel">Coverage overlay</span>
-            <button
-              type="button" className="switch" role="switch" aria-checked={coverage}
-              aria-labelledby="heroCovLabel" onClick={() => setCoverage((c) => !c)}
-            />
-          </div>
-          <a className="scroll-cue" href="#fields" aria-label="Scroll to fields">
-            <span />fields below
-          </a>
+              </span>
+            </Link>
+          )}
+          <p className="credit-line">Built on public SPHEREx Quick Release 2 data (NASA/IPAC).</p>
         </div>
       </section>
 
@@ -193,7 +178,7 @@ export default function HomePage() {
         <div className="fields-inner">
           <div className="fields-head">
             <div>
-              <h2 id="fields-h">Fifteen fields, ready to blink</h2>
+              <h2 id="fields-h">{SHOWCASE_IDS.length} fields, ready to blink</h2>
               <p>Every card is real SPHEREx data — two or more visits, same band. Pick one and press play.</p>
             </div>
             <Link href="/sky" className="btn">Open the sky map</Link>
@@ -229,17 +214,22 @@ export default function HomePage() {
 
       <section className="nums" aria-label="By the numbers">
         <div className="nums-inner">
-          {[
-            ['2,590', 'sky cells measured'],
-            ['30', 'epoch cutouts rendered'],
-            ['102', 'spectral bands, 0.75–5 µm'],
-            ['6', 'detectors, same-band blinks'],
-          ].map(([n, label]) => (
-            <div key={label} className="num">
-              <span className="num-n">{n}</span>
-              <span className="num-l">{label}</span>
-            </div>
-          ))}
+          <div className="num">
+            <span className="num-n">{real ? real.size.toLocaleString() : '—'}</span>
+            <span className="num-l">sky cells measured</span>
+          </div>
+          <div className="num">
+            <span className="num-n">{fields.length ? String(cutouts) : '—'}</span>
+            <span className="num-l">epoch cutouts rendered</span>
+          </div>
+          <div className="num">
+            <span className="num-n">{CHANNELS.length}</span>
+            <span className="num-l">spectral bands, 0.75–5 µm</span>
+          </div>
+          <div className="num">
+            <span className="num-n">{BANDS.length}</span>
+            <span className="num-l">detectors, same-band blinks</span>
+          </div>
         </div>
       </section>
 
