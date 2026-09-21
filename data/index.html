@@ -959,45 +959,16 @@
     return [];
   }
 
-  /* ================= mock sky data (FALLBACK ONLY) =================
-   * These are used ONLY if the data files fail to load.
-   * They should NEVER be shown when real data is available.
-   */
-  const CANDIDATES = [
-    {name:'2026 XJ14',     ra:132.41, dec:-3.22,  band:5, known:false,           score:7.8, date:'2026-09-18'},
-    {name:'3I/ATLAS',      ra:131.98, dec:-2.87,  band:4, known:'3I/ATLAS',      score:9.6, date:'2026-09-16'},
-    {name:'Field 0091-D2', ra:88.10,  dec:14.55,  band:2, known:false,           score:5.4, date:'2026-09-15'},
-    {name:'433 Eros',      ra:210.32, dec:9.11,   band:1, known:'433 Eros',      score:8.9, date:'2026-09-14'},
-    {name:'Field 2204-D6', ra:301.77, dec:-22.03, band:6, known:false,           score:6.1, date:'2026-09-13'},
-    {name:'65803 Didymos', ra:19.44,  dec:5.02,   band:3, known:'65803 Didymos', score:8.2, date:'2026-09-12'},
-    {name:'Field 0730-D1', ra:44.90,  dec:-61.18, band:5, known:false,           score:6.9, date:'2026-09-11'},
-    {name:'Field 1550-D4', ra:250.02, dec:31.44,  band:2, known:false,           score:5.0, date:'2026-09-10'},
-  ];
-
-  const SUGGESTIONS = [
-    {group:'Notable fields', items:[
-      {name:'3I/ATLAS field',       meta:'132.40, −3.20',   ra:132.40, dec:-3.20,  known:true},
-      {name:'Ecliptic plane',       meta:'0.00, 0.00',      ra:0,      dec:0,      known:false},
-      {name:'Vela Molecular Ridge', meta:'127.69, −39.18',  ra:127.69, dec:-39.18, known:false},
-      {name:'Orion Complex',        meta:'83.82, −5.39',    ra:83.82,  dec:-5.39,  known:false},
-    ]},
-    {group:'Known objects', items:[
-      {name:'433 Eros',      meta:'asteroid',     ra:210.32, dec:9.11,  known:true},
-      {name:'65803 Didymos', meta:'asteroid',     ra:19.44,  dec:5.02,  known:true},
-      {name:'Ceres',         meta:'dwarf planet', ra:58.14,  dec:12.66, known:true},
-    ]},
-    {group:'Try coordinates', items:[
-      {name:'156.09, −41.64', meta:'RA, Dec', ra:156.09, dec:-41.64, known:false},
-      {name:'301.77, −22.03', meta:'RA, Dec', ra:301.77, dec:-22.03, known:false},
-    ]},
-  ];
-
-  /* ================= COVERAGE GRID (72x36, 5° cells) =================
-   * This is populated from real data (coverage.json) on init.
-   * The RNG-based grid below is ONLY a fallback if the file fails to load.
+  /* ================= REAL DATA INITIALIZATION =================
+   * Load candidates and build suggestion list from real data files.
+   * The RNG helpers (mulberry32, genStars) remain ONLY for the decorative
+   * hero background animation - they are NOT used for any scientific data.
    */
   const GRID_W = 72, GRID_H = 36;
-  let GRID = []; // Will be filled by initRealData()
+  let CANDIDATES = [];      // Will be filled by initRealData()
+  let SUGGESTIONS = [];     // Will be filled by initRealData()
+  let NAME_POOL = [];       // Built from real candidates + demo fields
+  let GRID = [];            // Coverage grid
   let coverageLoaded = false;
 
   function cellOf(ra, dec){
@@ -1009,15 +980,117 @@
 
   async function initRealData(){
     try{
+      // Load coverage grid
       const cov = await getCoverage();
       if(cov && cov.counts && cov.indexed){
         GRID = cov.counts;
         coverageLoaded = true;
         console.log('Coverage data loaded:', cov.generated_at);
       }
+      
+      // Load candidates
+      const cands = await getCandidates(500);
+      if(cands && Array.isArray(cands)){
+        CANDIDATES = cands.map(c => ({
+          name: c.name || `SH-${c.id || 'unknown'}`,
+          ra: c.ra,
+          dec: c.dec,
+          band: c.band || 3,
+          known: !!c.skybot_match,
+          knownName: c.skybot_match || null,
+          score: c.significance_sigma || 5.0,
+          date: c.created_at ? c.created_at.split('T')[0] : '2026-09-20'
+        }));
+        console.log(`Loaded ${CANDIDATES.length} candidates`);
+      }
+      
+      // Load demo fields for suggestions
+      const fields = await getDemoFields();
+      const demoFields = (fields && Array.isArray(fields)) ? fields : [];
+      
+      // Build suggestions from real data
+      const notableFields = demoFields.slice(0, 4).map(f => ({
+        name: f.name || `Field ${f.cell_i}-${f.cell_j}`,
+        meta: `${f.ra.toFixed(2)}, ${f.dec.toFixed(2)}`,
+        ra: f.ra,
+        dec: f.dec,
+        known: false
+      }));
+      
+      // Add default notable fields if none loaded
+      if(notableFields.length === 0){
+        notableFields.push(
+          {name:'Ecliptic plane', meta:'0.00, 0.00', ra:0, dec:0, known:false},
+          {name:'Orion Complex', meta:'83.82, −5.39', ra:83.82, dec:-5.39, known:false}
+        );
+      }
+      
+      // Build known objects from candidates that have SkyBoT matches
+      const knownObjects = CANDIDATES.filter(c => c.knownName).slice(0, 3).map(c => ({
+        name: c.knownName,
+        meta: 'asteroid/comet',
+        ra: c.ra,
+        dec: c.dec,
+        known: true
+      }));
+      
+      // Add default known objects if none loaded
+      if(knownObjects.length === 0){
+        knownObjects.push(
+          {name:'433 Eros', meta:'asteroid', ra:210.32, dec:9.11, known:true},
+          {name:'Ceres', meta:'dwarf planet', ra:58.14, dec:12.66, known:true}
+        );
+      }
+      
+      SUGGESTIONS = [
+        {group:'Recent candidates', items: CANDIDATES.slice(0, 5).map(c => ({
+          name: c.name,
+          meta: `${c.ra.toFixed(2)}, ${c.dec.toFixed(2)}`,
+          ra: c.ra,
+          dec: c.dec,
+          known: c.known,
+          knownName: c.knownName
+        }))},
+        {group:'Notable fields', items: notableFields},
+        {group:'Known objects', items: knownObjects},
+        {group:'Try coordinates', items:[
+          {name:'156.09, −41.64', meta:'RA, Dec', ra:156.09, dec:-41.64, known:false},
+          {name:'301.77, −22.03', meta:'RA, Dec', ra:301.77, dec:-22.03, known:false},
+        ]},
+      ];
+      
+      // Build NAME_POOL from real data
+      NAME_POOL = [];
+      SUGGESTIONS.forEach(g => g.items.forEach(it => { 
+        if(g.group !== 'Try coordinates') NAME_POOL.push(it); 
+      }));
+      
+      console.log('Real data initialization complete');
     } catch(err){
-      console.warn('Failed to load coverage.json, using RNG fallback');
-      // Fallback: generate random grid (decorative only)
+      console.warn('Failed to load real data, using fallback:', err);
+      // Fallback: use minimal defaults
+      CANDIDATES = [];
+      SUGGESTIONS = [
+        {group:'Notable fields', items:[
+          {name:'Ecliptic plane', meta:'0.00, 0.00', ra:0, dec:0, known:false},
+          {name:'Orion Complex', meta:'83.82, −5.39', ra:83.82, dec:-5.39, known:false},
+        ]},
+        {group:'Known objects', items:[
+          {name:'433 Eros', meta:'asteroid', ra:210.32, dec:9.11, known:true},
+        ]},
+        {group:'Try coordinates', items:[
+          {name:'156.09, −41.64', meta:'RA, Dec', ra:156.09, dec:-41.64, known:false},
+        ]},
+      ];
+      NAME_POOL = [];
+      SUGGESTIONS.forEach(g => g.items.forEach(it => { 
+        if(g.group !== 'Try coordinates') NAME_POOL.push(it); 
+      }));
+    }
+    
+    // Generate fallback grid if coverage failed
+    if(!coverageLoaded){
+      console.warn('Using RNG fallback for coverage grid');
       for(let j=0;j<GRID_H;j++){
         const row = [];
         for(let i=0;i<GRID_W;i++){
@@ -1322,10 +1395,18 @@
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(() => { resizeHero(); });
 
   /* ================= search (hero + map) ================= */
-  const NAME_POOL = [];
-  SUGGESTIONS.forEach(g => g.items.forEach(it => { if(g.group !== 'Try coordinates') NAME_POOL.push(it); }));
-  CANDIDATES.forEach(c => NAME_POOL.push({name:c.name, ra:c.ra, dec:c.dec, known:c.known ? c.known : false, knownName: c.known || null}));
+  // NAME_POOL is built dynamically from SUGGESTIONS after initRealData() runs
   const norm = s => s.toLowerCase().replace(/\s+/g,'');
+
+  function buildNamePool(){
+    const pool = [];
+    SUGGESTIONS.forEach(g => g.items.forEach(it => { 
+      if(g.group !== 'Try coordinates') pool.push(it); 
+    }));
+    return pool;
+  }
+  
+  let NAME_POOL = buildNamePool();
 
   function parseCoords(q){
     const s = q.replace(/[−–—]/g,'-').replace(/[°,;]/g,' ').replace(/\b(ra|dec)\b\s*[:=]?/gi,' ').trim();
@@ -1720,6 +1801,9 @@
       const cands = await getCandidates(500);
       if(cands && Array.isArray(cands)){
         realCandidates = cands;
+        // Rebuild NAME_POOL with loaded candidates
+        NAME_POOL = buildNamePool();
+        console.log(`Loaded ${realCandidates.length} candidates, NAME_POOL updated`);
       }
     } catch(err){
       console.warn('Failed to load candidates.json, using fallback');
