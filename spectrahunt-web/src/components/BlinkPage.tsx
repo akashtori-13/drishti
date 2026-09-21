@@ -101,10 +101,20 @@ export default function BlinkPage({ id }: { id: string }) {
     return () => { alive = false; };
   }, [viewing, band]);
 
-  // permalink: reflect state in URL without navigation
+  // permalink: reflect state in URL without navigation.
+  // Live fields use the canonical /blink/live page (static-safe); showcases use /blink/<id>.
   useEffect(() => {
-    const target = blinkURL(id, { band, epoch: epochIdx, mode: compareMode });
-    window.history.replaceState(null, '', target);
+    if (isLiveId(id)) {
+      const p = parseLiveId(id);
+      if (!p) return;
+      const q = new URLSearchParams({
+        ra: String(p.ra), dec: String(p.dec), band: String(band),
+        epoch: String(epochIdx), mode: compareMode,
+      });
+      window.history.replaceState(null, '', `/blink/live?${q.toString()}`);
+      return;
+    }
+    window.history.replaceState(null, '', blinkURL(id, { band, epoch: epochIdx, mode: compareMode }));
   }, [id, band, epochIdx, compareMode]);
 
   useEffect(() => {
