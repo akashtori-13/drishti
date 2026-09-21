@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SpectraHunt - SPHEREx Moving Object Discovery",
-  description: "Discover asteroids and comets in SPHEREx spectral survey data using difference imaging",
+  title: "SpectraHunt — watch the infrared sky move",
+  description: "Blink SPHEREx epochs to spot comets, asteroids and variables. NASA Space Apps 2026.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
