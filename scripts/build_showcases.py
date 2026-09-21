@@ -21,9 +21,13 @@ sys.path.insert(0, str(ROOT))
 TAP_URL = "https://irsa.ipac.caltech.edu/TAP"
 
 
-def discover_cutout_url(ra: float, dec: float, bandpass: str, size_deg: float = 0.1):
+def discover_cutout_url(ra: float, dec: float, bandpass: str, size_deg: float = 0.05,
+                        timeout_s: int = 60):
     import pyvo
-    svc = pyvo.dal.TAPService(TAP_URL)
+    import requests
+    sess = requests.Session()
+    sess.headers.update({"User-Agent": "SpectraHunt/1.0"})
+    svc = pyvo.dal.TAPService(TAP_URL, session=sess)
     # NOTE: bandpass like 'SPHEREx-D3'
     q = (
         "SELECT TOP 1 'https://irsa.ipac.caltech.edu/' || a.uri AS base_uri, p.time_bounds_lower "
@@ -32,26 +36,33 @@ def discover_cutout_url(ra: float, dec: float, bandpass: str, size_deg: float = 
         f"AND p.energy_bandpassname = '{bandpass}' "
         "ORDER BY p.time_bounds_lower DESC"
     )
-    res = svc.search(q)
+    res = svc.search(q, maxrec=1)
     if len(res) == 0:
         return None
-    base = str(res["base_uri"][0]) if "base_uri" in res.colnames else str(res[0][0])
+    row = res[0]
+    try:
+        base = str(row["base_uri"])
+    except Exception:
+        base = str(row[0])
     return f"{base}?center={ra},{dec}&size={size_deg}"
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", default=None)
-    ap.add_argument("--size", type=float, default=0.1)
+    ap.add_argument("--size", type=float, default=0.05,
+                    help="Cutout size in deg (0.05 = 3 arcmin, fast; 0.1 = 6 arcmin)")
+    ap.add_argument("--timeout", type=int, default=60,
+                    help="Per-epoch budget in seconds; indexer never blocks builds")
     args = ap.parse_args()
 
-    from backend.cutouts import fetch_cutout, parse_cutout_fits, mask_bad_pixels, render_png
+    from backend.cutouts import parse_cutout_fits, mask_bad_pixels, render_png
     import asyncio
 
-    async def fetch_one(url: str, ra: float, dec: float):
+    async def fetch_one(url: str):
         import httpx
-        from backend.config import INGEST_TIMEOUT_SECONDS, USER_AGENT
-        async with httpx.AsyncClient(timeout=INGEST_TIMEOUT_SECONDS * 3) as c:
+        from backend.config import USER_AGENT
+        async with httpx.AsyncClient(timeout=args.timeout) as c:
             r = await c.get(url, headers={"User-Agent": USER_AGENT})
             r.raise_for_status()
             return r.content
@@ -72,13 +83,14 @@ def main():
                 continue
             ra = ep.get("ra", doc["ra"])
             dec = ep.get("dec", doc["dec"])
-            size = ep.get("size_deg", args.size)
+            size = min(ep.get("size_deg", args.size), args.size)
             try:
+                print(f"[{doc['id']}] {ep.get('label')} TAP+IBE…", flush=True)
                 url = discover_cutout_url(ra, dec, bandpass_default, size)
                 if not url:
                     print(f"[{doc['id']}] no TAP image for {ra},{dec} {bandpass_default}")
                     continue
-                content = asyncio.run(fetch_one(url, ra, dec))
+                content = asyncio.run(fetch_one(url))
                 tmp = out_img / f"_{doc['id']}_tmp.fits"
                 tmp.write_bytes(content)
                 parsed = parse_cutout_fits(tmp)
