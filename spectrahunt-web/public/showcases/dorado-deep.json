@@ -12,7 +12,8 @@
       "ra": 92.5,
       "dec": -57.5,
       "size_deg": 0.15,
-      "png": null
+      "png": "/cutouts/dorado-deep_Survey-1.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2025W40_2B/l2b-v20-2025-280/3/level2_2025W40_2B_0161_1D3_spx_l2b-v20-2025-280.fits?center=92.5,-57.5&size=0.15"
     },
     {
       "label": "Survey 2 \u00b7 D3",
@@ -21,7 +22,8 @@
       "ra": 92.5,
       "dec": -57.5,
       "size_deg": 0.15,
-      "png": null
+      "png": "/cutouts/dorado-deep_Survey-2.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W14_2A/l2b-v24-2026-098/3/level2_2026W14_2A_0522_1D3_spx_l2b-v24-2026-098.fits?center=92.5,-57.5&size=0.15"
     }
   ],
   "census": {
