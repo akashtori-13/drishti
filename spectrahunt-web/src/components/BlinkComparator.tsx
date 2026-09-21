@@ -453,24 +453,6 @@ export default function BlinkComparator({
     }
   }, [mode, prevImg, curImg, pan, zoom, stretch, vmin, vmax, invert, cmap, diffScale]);
 
-  // external triggers: header Save button + Help palette shortcut
-  useEffect(() => {
-    const onExport = (e: Event) => {
-      const kind = (e as CustomEvent).detail?.kind;
-      if (kind === 'webm') void recordWebM();
-      else if (kind === 'figure') exportFigure();
-      else downloadPNG();
-    };
-    const onPal = () => setPalette(true);
-    window.addEventListener('spectrahunt:export', onExport);
-    window.addEventListener('spectrahunt:palette', onPal);
-    return () => {
-      window.removeEventListener('spectrahunt:export', onExport);
-      window.removeEventListener('spectrahunt:palette', onPal);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode, n]);
-
   const onPointerDown = (e: React.PointerEvent) => {
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
     drag.current = { x: e.clientX, y: e.clientY, pan: { ...pan }, moved: false };
@@ -614,6 +596,25 @@ export default function BlinkComparator({
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 5000);
   };
+
+  // external triggers: header Save button + Help palette shortcut
+  useEffect(() => {
+    const onExport = (e: Event) => {
+      const kind = (e as CustomEvent).detail?.kind;
+      if (kind === 'webm') void recordWebM();
+      else if (kind === 'figure') exportFigure();
+      else downloadPNG();
+    };
+    const onPal = () => setPalette(true);
+    window.addEventListener('spectrahunt:export', onExport);
+    window.addEventListener('spectrahunt:palette', onPal);
+    return () => {
+      window.removeEventListener('spectrahunt:export', onExport);
+      window.removeEventListener('spectrahunt:palette', onPal);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, n]);
+
 
   const setPreset = (p: 'faint' | 'balanced' | 'bright') => {
     if (p === 'faint') { setVmin(0.02); setVmax(0.9); }
