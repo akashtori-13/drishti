@@ -6,6 +6,7 @@ import { TOURS, GLOSSARY } from '@/lib/catalogs';
 export default function AboutPage() {
   return (
     <div className="prose">
+      <p className="hero-kicker">Mission · method · data</p>
       <h1>About SpectraHunt</h1>
       <p className="lede">A public blink comparator for the SPHEREx sky, built for the 2026 NASA Space Apps Challenge.</p>
       <p className="notice">
@@ -97,6 +98,17 @@ export default function AboutPage() {
           <li><a href="https://registry.opendata.aws/spherex-qr/" target="_blank" rel="noopener">SPHEREx Quick Release on AWS Open Data</a></li>
           <li><a href="https://vo.imcce.fr/webservices/skybot/" target="_blank" rel="noopener">IMCCE SkyBoT, solar-system cone search</a></li>
         </ul>
+      </section>
+
+      <section className="cta-band">
+        <div>
+          <h2>See for yourself</h2>
+          <p style={{ margin: 0 }}>The whole sky is blinkable. Start with the comet.</p>
+        </div>
+        <div className="how-cta" style={{ marginTop: 0 }}>
+          <a className="btn primary" href="/sky">Open the sky map</a>
+          <a className="btn" href="/blink/3i-atlas">Blink 3I/ATLAS</a>
+        </div>
       </section>
     </div>
   );
