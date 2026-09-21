@@ -474,11 +474,11 @@ export default function BlinkComparator({
       const v = c?.getContext('2d', { willReadFrequently: true })?.getImageData(px, py, 1, 1).data;
       if (!v) { setProbe(null); return; }
       const lum = Math.round(v[0] * 0.299 + v[1] * 0.587 + v[2] * 0.114);
-      // ≈6.2″/px at zoom 1 from field center
+      // ≈6.2″/px at zoom 1 from field center; screen-right = −RA (mirrored), screen-down = −Dec
       const offX = ((px - src.w / 2) * 6.2) / zoom;
       const offY = ((py - src.h / 2) * 6.2) / zoom;
       const ra = center ? center.ra - offX / 3600 / Math.max(0.2, Math.cos((center.dec * Math.PI) / 180)) : NaN;
-      const dec = center ? center.dec + offY / 3600 : NaN;
+      const dec = center ? center.dec - offY / 3600 : NaN;
       setProbe({ sx: e.clientX - r.left, sy: e.clientY - r.top, lum, ra, dec });
     } catch {
       setProbe(null);
