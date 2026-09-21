@@ -9,8 +9,9 @@ export default function AboutPage() {
       <h1>About SpectraHunt</h1>
       <p className="lede">A public blink comparator for the SPHEREx sky, built for the 2026 NASA Space Apps Challenge.</p>
       <p className="notice">
-        Live cutout PNGs fill in as the indexer runs against IRSA. Until then, viewers render
-        illustrative placeholders — the stories, coordinates, and metadata are real.
+        Most fields below blink real SPHEREx cutouts on load. A few cells are
+        still indexing (marked “cutout pending”) — coordinates and metadata are
+        always real, and live mode fetches any visited field on demand.
       </p>
 
       <section>

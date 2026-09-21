@@ -65,12 +65,11 @@ async def _fetch_frame(cutout_url: str):
             pass
 
 
-def detect_field(ra: float, dec: float, band: int = 3,
-                 size_deg: float = CUTOUT_SIZE_DEG,
-                 db_path: str = DATABASE_PATH) -> Dict[str, Any]:
-    """Two-epoch (oldest+newest) aligned difference detection. Sync wrapper around async fetch."""
-    import asyncio
-    return asyncio.run(_detect_async(ra, dec, band, size_deg, db_path))
+async def detect_field(ra: float, dec: float, band: int = 3,
+                       size_deg: float = CUTOUT_SIZE_DEG,
+                       db_path: str = DATABASE_PATH) -> Dict[str, Any]:
+    """Two-epoch (oldest+newest) aligned difference detection. Await inside running loops."""
+    return await _detect_async(ra, dec, band, size_deg, db_path)
 
 
 async def _detect_async(ra, dec, band, size_deg, db_path) -> Dict[str, Any]:
@@ -204,7 +203,7 @@ def field_report(ra: float, dec: float, band: int = 3) -> Dict[str, Any]:
     """Batch entry point for scripts/process_field.py (runs its own event loop)."""
     import asyncio
     from backend.crossmatch import query_gaia
-    det = detect_field(ra, dec, band)
+    det = asyncio.run(_detect_async(ra, dec, band, CUTOUT_SIZE_DEG, DATABASE_PATH))
     lc = asyncio.run(lightcurve_for(ra, dec, band))
     sp = asyncio.run(spectrum_for(ra, dec))
     det["lightcurve"] = lc.get("points", [])

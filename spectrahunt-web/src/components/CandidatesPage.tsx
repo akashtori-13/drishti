@@ -24,7 +24,9 @@ function cardsFrom(showcases: Showcase[]): Card[] {
     if (s.epochs.length >= 2 && mjds[0] !== undefined && mjds[1] !== undefined) {
       const a = s.epochs[0];
       const b = s.epochs[1];
-      motion = arcsecPerDay(a.ra ?? s.ra, a.dec ?? s.dec, b.ra ?? s.ra, b.dec ?? s.dec, (mjds[1] as number) - (mjds[0] as number));
+      const m = arcsecPerDay(a.ra ?? s.ra, a.dec ?? s.dec, b.ra ?? s.ra, b.dec ?? s.dec, (mjds[1] as number) - (mjds[0] as number));
+      // same-spot revisits measure registration (≈0), not a mover — show nothing
+      motion = m !== null && m > 0.05 ? m : null;
     }
     return {
       id: s.id, name: s.epochs[0]?.name ?? s.title,

@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import {
-  GRID_H, GRID_W, LEVEL_COLORS, STAR_FILL, TAU, cellOf, drawBracket,
-  genStars, SKY_ALLSKY_URL, type Star,
+  GRID_H, GRID_W, LEVEL_COLORS, TAU, cellOf, drawBracket,
+  SKY_ALLSKY_URL,
 } from '@/lib/sky';
 import { loadCachedImage } from '@/lib/skycache';
 import type { SkyHover } from '@/components/HeroSky';

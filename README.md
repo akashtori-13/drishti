@@ -49,14 +49,18 @@ cd spectrahunt-web && npm run build
 ## Repository
 
 ```
-backend/            # dev-only FastAPI: epoch discovery, cutout proxy, resolve, SkyBoT, detect
+backend/            # FastAPI: epoch discovery, cutout proxy, resolve, SkyBoT, detect
   app.py            # /health /api/showcases /api/showcase/{id} /api/epochs
-                    # /api/cutout.png /api/resolve /api/skybot /api/citation /api/detect
-  epochs.py         # TAP first (daemon-thread bounded), SIA2 fallback, never raises
+                    # /api/cutout.png /api/frame.png /api/frames /api/resolve /api/skybot
+                    # /api/stars /api/detect /api/lightcurve /api/spectrum /api/citation
+  epochs.py         # TAP first (daemon-thread bounded), SIA2 fallback, newest-first, never raises
   cutouts.py        # lazy astropy: parse/mask/render, LVF wavelength gate
-  crossmatch.py     # SkyBoT / Sesame / Horizons, SQLite-cached
-  detect.py         # source extraction (SEP→photutils→scipy→numpy) + cross-epoch matching
-  cache.py          # git-ignored scratch (WAL)
+  align.py          # WCS reproject B→A, FFT phase-correlation fallback, sky→pixel
+  photometry.py     # aperture photometry, significance maps, dipole mover/variable finder
+  pipeline.py       # orchestration + TTL caches; detect/lightcurve/spectrum/field_report
+  crossmatch.py     # SkyBoT / SIMBAD-first+Sesame / Horizons / Gaia DR3, cached
+  detect.py         # fast peak-finder path (SEP→photutils→scipy→numpy)
+  cache.py          # git-ignored scratch (WAL): kv, SkyBoT, api_cache TTL
 scripts/
   build_showcases.py  # showcase PNG indexer (oldest+newest pairing for same-spot epochs)
   real_coverage.py    # showcase-cell tallies → coverage.json
@@ -89,7 +93,7 @@ LICENSE               # MIT + required SPHEREx/IRSA attribution
 ## Checks
 
 ```bash
-.venv/bin/python -m pytest backend/tests/ -q   # 9 passed
+.venv/bin/python -m pytest backend/tests/ -q   # 14 passed
 cd spectrahunt-web && npx eslint src            # 0 errors
 cd spectrahunt-web && npm run build             # static export to out/
 ```

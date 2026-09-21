@@ -66,27 +66,35 @@ def main() -> bool:
                     continue
                 # First epoch takes the oldest visit, later epochs the newest,
                 # so same-coordinate pairs blink two different visits.
-                url = hits[0]["cutout_url"] if idx == 0 else hits[-1]["cutout_url"]
-                tmp = out_img / f"_{doc['id']}_tmp.fits"
-                asyncio.run(fetch_ibe(url, tmp, timeout=args.timeout))
-                try:
-                    parsed = parse_fits(tmp)
-                    if parsed["image"] is None:
-                        print(f"[{doc['id']}] empty IMAGE extension")
-                        continue
-                    masked, _ = mask_bad_pixels(parsed["image"], parsed.get("flags"),
-                                                parsed.get("variance"))
-                    png_path = out_img / cutout_png_name(doc["id"], label)
-                    if render_png(masked, png_path):
-                        ep["png"] = f"/cutouts/{png_path.name}"
-                        ep["cutout_url"] = url
-                        changed = True
-                        print(f"[{doc['id']}] wrote {png_path.name}")
-                finally:
+                # Try several candidates: some covering frames 422 on IBE
+                # ("Arrays do not overlap") despite matching TAP footprints.
+                cands = (hits[:5] if idx == 0 else hits[-5:][::-1])
+                png_path = out_img / cutout_png_name(doc["id"], label)
+                for url in [h["cutout_url"] for h in cands]:
+                    tmp = out_img / f"_{doc['id']}_tmp.fits"
                     try:
-                        tmp.unlink(missing_ok=True)
-                    except Exception:
-                        pass
+                        asyncio.run(fetch_ibe(url, tmp, timeout=args.timeout))
+                    except Exception as e:
+                        print(f"[{doc['id']}] IBE failed, trying next frame: {str(e)[:100]}")
+                        continue
+                    try:
+                        parsed = parse_fits(tmp)
+                        if parsed["image"] is None:
+                            print(f"[{doc['id']}] empty IMAGE extension, trying next frame")
+                            continue
+                        masked, _ = mask_bad_pixels(parsed["image"], parsed.get("flags"),
+                                                    parsed.get("variance"))
+                        if render_png(masked, png_path):
+                            ep["png"] = f"/cutouts/{png_path.name}"
+                            ep["cutout_url"] = url
+                            changed = True
+                            print(f"[{doc['id']}] wrote {png_path.name}")
+                            break
+                    finally:
+                        try:
+                            tmp.unlink(missing_ok=True)
+                        except Exception:
+                            pass
             except Exception as e:
                 print(f"[{doc['id']}] {label} failed: {e}")
         if changed:

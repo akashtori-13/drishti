@@ -54172,6 +54172,6 @@
       }
     }
   },
-  "generated_at": "2026-09-21T20:31:23.241291+00:00",
+  "generated_at": "2026-09-21T20:41:26.515581+00:00",
   "source": "IRSA TAP spherex.obscore s_ra/s_dec boxes; passes split on >20d gaps"
 }
