@@ -88,8 +88,7 @@ export default function BlinkComparator({
   const n = frames.length;
   const idx = Math.min(epochIdx, n - 1);
   const prevIdx = (idx - 1 + n) % n;
-  const [playing, setPlaying] = useState(false);
-  const [speed, setSpeed] = useState(550);
+  const [playing, setPlaying] = useState(false);  const [speed, setSpeed] = useState(550);
   const [palette, setPalette] = useState(false);
   const [palQ, setPalQ] = useState('');
   const [stretch, setStretch] = useState<Stretch>('asinh');
@@ -164,6 +163,14 @@ export default function BlinkComparator({
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) setPlaying(false);
   }, []);
+
+  // autoplay on arrival (loops forever until the user steps in)
+  useEffect(() => {
+    if (n < 2) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPlaying(true);
+  }, [n]);
 
   const step = useCallback((d: number) => {
     setPlaying(false);

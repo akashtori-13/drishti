@@ -578,9 +578,16 @@ kbd{font-family:var(--font-mono); font-size:.6875rem; border:1px solid var(--lin
 @media(min-width:961px){
   .bw-viewer{overflow:hidden;}
   .deck{flex:1; min-height:0;}
-  .blink-grid{flex:1; min-height:0; grid-template-columns:300px minmax(0,1fr); align-items:stretch;}
-  .tweak-left{grid-column:1; grid-row:1; min-height:0; overflow-y:auto; scrollbar-width:thin;}
+  .blink-grid{flex:1; min-height:0; grid-template-columns:232px minmax(0,1fr); align-items:stretch;}
+  .tweak-left{grid-column:1; grid-row:1; min-height:0; overflow-y:auto; scrollbar-width:thin; padding:4px 14px 14px;}
   .stage-col{grid-column:2; grid-row:1; min-height:0; overflow-y:auto; scrollbar-width:thin;}
+  .tweak-sec{padding:10px 0;}
+  .tweak-sec h3{font-size:.6875rem; margin-bottom:8px;}
+  .seg-btn{padding:6px 10px; font-size:.75rem;}
+  .tweak-sec .epoch-chip{font-size:.6875rem; padding:4px 9px;}
+  .tweak-sec select{font-size:.75rem !important; max-width:100%;}
+  .tweak-sec .band{font-size:.6875rem; padding:5px 9px;}
+  .stage-wrap.square{width:min(100%, calc(100dvh - 250px));}
 }
 .stage-wrap{position:relative; border-radius:20px; overflow:hidden; background:#04050a; border:1px solid var(--line);}
 .stage-wrap.square{aspect-ratio:1/1; width:min(100%, calc(100dvh - 330px)); min-width:min(100%, 280px); margin:0 auto;}
