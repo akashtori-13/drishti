@@ -18,7 +18,7 @@ type RailTab = 'overview' | 'epochs' | 'catalogs' | 'share';
 
 /** DSS2 + 2MASS context cutouts (land async via fetch_compare.py). */
 function OtherEyes({ id }: { id: string }) {
-  const [ok, setOk] = useState<{ dss: boolean; tmass: boolean }>({ dss: true, tmass: true });
+  const [ok, setOk] = useState<Record<string, boolean>>({ dss: true, '2mass': true });
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 8 }}>
       {([
