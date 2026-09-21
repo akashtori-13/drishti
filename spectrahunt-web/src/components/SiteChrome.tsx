@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Header from '@/components/Header';
 import Tutorial from '@/components/Tutorial';
