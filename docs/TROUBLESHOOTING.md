@@ -42,5 +42,6 @@ Symptom-first guide. Design context in `SYSTEM_DESIGN.md`; pipeline ops in
 | SkyBoT legacy cone API | **Retired (404)** | SSP migration; manual links until re-integrated |
 | Alasky HiPS / hips2fits | OK, CORS-open | Core imagery; device-cached |
 | ofrohn GitHub mirror | OK | Vendored locally; remote is fallback |
+| Cardinal placement | Parked | True on-screen N/E/S/W needs a proven alt-az inverse; 4 verified attempts failed (antipodal branches). Ring highlight stands in. |
 
 Check live status anytime: `curl localhost:8000/api/health`.
