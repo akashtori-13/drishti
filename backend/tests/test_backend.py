@@ -17,8 +17,10 @@ def test_bandpass_names_cover_d1_d6():
 
 def test_showcase_schema():
     from pathlib import Path
+    from backend.app import SHOWCASE_IDS
     base = Path(__file__).parent.parent.parent / "spectrahunt-web" / "public" / "showcases"
-    for sid in ("3i-atlas", "ecliptic-mover", "nep-deep"):
+    assert len(SHOWCASE_IDS) >= 9
+    for sid in SHOWCASE_IDS:
         doc = json.loads((base / f"{sid}.json").read_text())
         assert doc["id"] == sid
         assert -90 <= doc["dec"] <= 90 and 0 <= doc["ra"] < 360
