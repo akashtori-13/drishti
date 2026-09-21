@@ -2,49 +2,78 @@
 
 **NASA Space Apps Challenge 2026** - Advanced Track: Astrophysics / Planets & Moons / Software
 
-SpectraHunt compares repeated SPHEREx passes of the same patch of sky and flags what moved or changed: comets, asteroids, and variable stars.
+SpectraHunt detects moving objects (asteroids, comets, NEOs) in SPHEREx astronomical survey data using difference imaging and machine learning.
+
+## Tech Stack
+
+- **Frontend**: Next.js 14, TypeScript, Tailwind CSS, Zustand, React-Leaflet, Recharts
+- **Backend**: Python FastAPI, SQLite, astropy, astroquery, sep, reproject
+- **Deployment**: Netlify (static mode), Docker + uvicorn (live mode)
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed system architecture.
 
 ## Quick Start
 
-### Static Mode (Recommended for Demo)
+### Prerequisites
+
+- Node.js 20+
+- Python 3.11+
+- pip
+
+### Local Development
 
 ```bash
-# Install dependencies
+# Install frontend dependencies
+cd spectrahunt-web
+npm install
+
+# Install Python dependencies
+cd ..
 pip install -r requirements.txt
 
-# Build static bundle with real SPHEREx data
-python scripts/build_static_bundle.py --region "180,0,5" --max-frames 100
+# Generate static data (real SPHEREx data)
+python scripts/build_static_bundle.py --region "180,0,2" --max-frames 50
 
-# Serve locally
-cd data && python -m http.server 8000
+# Copy data to public folder
+cp data/*.json spectrahunt-web/public/
 
-# Open http://localhost:8000 in your browser
+# Set environment variables
+echo "NEXT_PUBLIC_DATA_MODE=static" > spectrahunt-web/.env.local
+
+# Start Next.js dev server
+cd spectrahunt-web
+npm run dev
+
+# Open http://localhost:3000
 ```
 
-### Live Mode (FastAPI Backend)
+### Live API Mode (Advanced)
 
 ```bash
-# Install dependencies
-pip install -r requirements.txt
-
 # Initialize database
-python -c "from backend.db import init_db; init_db('spectrahunt.db')"
+python -c "from backend.db import init_db; init_db()"
 
 # Run ingestion
-python -m backend.ingest --db spectrahunt.db --ra 180 --dec 0 --radius 5 --max-frames 100
+python -m backend.ingest --ra 180 --dec 0 --radius 2 --max-frames 50
 
 # Run detection
-python -m backend.detect --db spectrahunt.db --ra 180 --dec 0 --radius 5
+python -m backend.detect
 
-# Start API server
+# Start FastAPI server
 uvicorn backend.app:app --host 0.0.0.0 --port 8000
 
-# Open http://localhost:8000/docs for API documentation
+# Configure frontend for live mode
+cd spectrahunt-web
+echo "NEXT_PUBLIC_API_URL=http://localhost:8000/api" > .env.local
+echo "NEXT_PUBLIC_DATA_MODE=live" >> .env.local
+npm run dev
 ```
 
 ## Deployment to Netlify
 
 SpectraHunt is configured for automatic deployment to Netlify via `netlify.toml`:
+
+### Automatic Deployment
 
 1. **Push to GitHub**: Commit your code to a GitHub repository
 2. **Connect to Netlify**: 
@@ -52,11 +81,13 @@ SpectraHunt is configured for automatic deployment to Netlify via `netlify.toml`
    - Click "Add new site" → "Import an existing project"
    - Select your GitHub repository
 3. **Deploy**: Netlify will automatically:
-   - Install Python dependencies
-   - Run the static bundle builder
-   - Publish the `data/` directory
+   - Install Node.js 20 and Python 3.11
+   - Install dependencies (`npm ci` and `pip install`)
+   - Generate static data bundle
+   - Build Next.js application
+   - Deploy to global CDN
 
-The site will be live at `https://your-site-name.netlify.app`
+Your site will be live at `https://your-site-name.netlify.app`
 
 ### Manual Deploy (Netlify CLI)
 
@@ -65,8 +96,20 @@ The site will be live at `https://your-site-name.netlify.app`
 npm install -g netlify-cli
 
 # Build and deploy
-python scripts/build_static_bundle.py --region "180,0,5" --max-frames 100
-netlify deploy --prod --dir=data
+cd spectrahunt-web
+npm ci && npm run build
+netlify deploy --prod --dir=.next
+```
+
+### Vercel Deployment
+
+```bash
+# Install Vercel CLI
+npm install -g vercel
+
+# Deploy
+cd spectrahunt-web
+vercel --prod
 ```
 
 ## Data Sources
@@ -104,27 +147,47 @@ This publication makes use of data products from the Spectro-Photometer for the 
 
 ```
 spectrahunt/
-├── index.html                 # Front-end (vanilla JS, no framework)
-├── netlify.toml              # Netlify deployment config
-├── requirements.txt          # Python dependencies
 ├── README.md                 # This file
-├── scripts/
-│   └── build_static_bundle.py  # Static site generator
-├── backend/
-│   ├── config.py             # Constants and endpoints
-│   ├── db.py                 # Database schema and helpers
-│   ├── ingest.py             # SIA2 frame discovery
-│   ├── detect.py             # Difference imaging pipeline
+├── ARCHITECTURE.md           # System architecture documentation
+├── netlify.toml              # Netlify deployment configuration
+├── requirements.txt          # Python dependencies
+├── .gitignore                # Git ignore rules
+│
+├── spectrahunt-web/          # Next.js frontend application
+│   ├── src/
+│   │   ├── app/              # App Router pages and layouts
+│   │   ├── components/       # Reusable React components
+│   │   ├── store/            # Zustand state management
+│   │   ├── lib/              # Utility functions
+│   │   └── types/            # TypeScript type definitions
+│   ├── public/               # Static assets (JSON data, images)
+│   ├── package.json          # Node.js dependencies
+│   ├── tsconfig.json         # TypeScript configuration
+│   ├── tailwind.config.ts    # Tailwind CSS configuration
+│   └── next.config.mjs       # Next.js configuration
+│
+├── backend/                  # Python backend (local development only)
+│   ├── __init__.py
+│   ├── app.py                # FastAPI REST API
+│   ├── config.py             # Configuration constants
+│   ├── db.py                 # SQLite database schema
+│   ├── ingest.py             # SPHEREx frame ingestion
+│   ├── detect.py             # Moving object detection pipeline
 │   ├── cutouts.py            # FITS cutout processing
-│   ├── crossmatch.py         # SkyBoT/Horizons integration
-│   └── app.py                # FastAPI REST API
-└── data/                     # Generated static files
-    ├── index.html
-    ├── status.json
-    ├── coverage.json
-    ├── candidates.json
-    ├── demo_fields.json
-    └── spectrahunt.db
+│   ├── crossmatch.py         # SkyBoT/Horizons cross-matching
+│   └── tests/                # Unit and integration tests
+│
+├── scripts/                  # Build and utility scripts
+│   ├── build_static_bundle.py    # Generate static JSON files
+│   └── probe_endpoints.py        # Verify external API endpoints
+│
+└── data/                   # Generated static data for deployment
+    ├── status.json         # Pipeline status and statistics
+    ├── coverage.json       # 72×36 sky grid coverage counts
+    ├── candidates.json     # Detected moving objects
+    ├── demo_fields.json    # Pre-computed field data
+    ├── spectrahunt.db      # SQLite database
+    └── img/                # Rendered PNG cutouts
 ```
 
 ## API Endpoints (Live Mode)
