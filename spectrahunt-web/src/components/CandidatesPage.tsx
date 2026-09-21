@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { SHOWCASE_IDS, getShowcase, type Showcase } from '@/lib/showcases';
 import { BANDS } from '@/lib/sky';
-import { useAppStore } from '@/lib/store';
+import { useRouter } from 'next/navigation';
+import { blinkURL } from '@/lib/store';
 import { arcsecPerDay, toCSV } from '@/lib/astro';
 
 interface Card {
@@ -57,7 +58,7 @@ function Thumb({ card }: { card: Card }) {
 }
 
 export default function CandidatesPage() {
-  const { openShowcase } = useAppStore();
+  const router = useRouter();
   const [cards, setCards] = useState<Card[]>([]);
   const [filter, setFilter] = useState<Filter>('all');
 
@@ -122,7 +123,7 @@ export default function CandidatesPage() {
             <button
               key={c.id} type="button" className="cand"
               aria-label={`${c.name}, ${c.known ? 'known object' : 'unidentified'}, ${c.score.toFixed(1)} sigma, ${band.label}${c.motion !== null ? `, ${c.motion.toFixed(1)} arcsec per day` : ''}`}
-              onClick={() => openShowcase(c.id)}
+              onClick={() => router.push(blinkURL(c.id))}
             >
               <div className="cand-thumb">
                 <Thumb card={c} />

@@ -61,6 +61,54 @@ export const getCoverage = () => fetchJSON<Coverage>('/coverage.json').catch(():
 
 export const getShowcase = (id: string) => fetchJSON<Showcase>(`/showcases/${id}.json`);
 
+// ---------- live on-demand fields (any visited sky position, live API only) ----------
+export const isLiveId = (id: string) => id.startsWith('live:');
+
+export function liveIdFor(ra: number, dec: number, band = 3): string {
+  return `live:${ra.toFixed(3)}:${dec.toFixed(3)}:${band}`;
+}
+
+export function parseLiveId(id: string): { ra: number; dec: number; band: number } | null {
+  const m = id.match(/^live:(-?[\d.]+):(-?[\d.]+):(\d+)$/);
+  if (!m) return null;
+  const ra = parseFloat(m[1]);
+  const dec = parseFloat(m[2]);
+  const band = parseInt(m[3], 10);
+  if (!Number.isFinite(ra) || !Number.isFinite(dec) || ra < 0 || ra >= 360 || dec < -90 || dec > 90) return null;
+  return { ra, dec, band: band >= 1 && band <= 6 ? band : 3 };
+}
+
+interface FramesResponse {
+  epochs: Array<{ epoch: number; mjd?: number; bandpass?: string; png?: string }>;
+  detail: string;
+  count?: number;
+}
+
+export async function fetchLiveShowcase(ra: number, dec: number, band = 3): Promise<Showcase> {
+  if (!useLive) throw new Error('Live fields need the dev API (DATA_MODE=live)');
+  const r = await fetch(
+    `${API_BASE}/api/frames?ra=${ra}&dec=${dec}&band=${band}&size_deg=0.15`);
+  if (!r.ok) throw new Error(`frames HTTP ${r.status}`);
+  const j = (await r.json()) as FramesResponse;
+  if (!j.epochs.length) throw new Error(j.detail === 'need-2-epochs' ? 'Fewer than 2 SPHEREx visits here' : 'No IRSA coverage');
+  const { mjdToDate } = await import('@/lib/astro');
+  return {
+    id: liveIdFor(ra, dec, band),
+    title: `Field RA ${ra.toFixed(2)}°, Dec ${dec.toFixed(2)}° — live blink`,
+    ra, dec,
+    story: `${j.count ?? j.epochs.length} SPHEREx visits found at this position; blinking ${j.epochs.length} sampled same-band epochs fetched live from IRSA.`,
+    epochs: j.epochs.map((e, i) => ({
+      label: e.mjd ? `${mjdToDate(e.mjd)} · epoch ${e.epoch}` : `Epoch ${i + 1}`,
+      band, mjd: e.mjd,
+      png: e.png ? `${API_BASE}${e.png}` : null,
+      note: e.bandpass ?? undefined,
+    })),
+    tap: { collection: 'spherex_qr2', bandpass: `SPHEREx-D${band}`, endpoint: 'https://irsa.ipac.caltech.edu/TAP' },
+    links: { irsa_viewer: 'https://irsa.ipac.caltech.edu/irsaviewer/' },
+    citation: { doi: '10.26131/IRSA652', text: 'SPHEREx QR2 via IRSA.' },
+  };
+}
+
 export async function resolveQuery(query: string): Promise<{ ra: number; dec: number } | null> {
   if (useLive) {
     try {

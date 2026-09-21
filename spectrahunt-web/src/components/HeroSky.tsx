@@ -10,11 +10,14 @@ import { loadCachedImage } from '@/lib/skycache';
 export interface SkyHover { i: number; j: number; ra: number; dec: number; n: number; x: number; y: number }
 
 /** Full-page hero sky: REAL 2MASS infrared all-sky image + coverage tint + click-to-inspect. */
+export interface HeroMarker { id: string; ra: number; dec: number }
 export default function HeroSky({
-  grid, coverage, onInspect,
+  grid, coverage, onInspect, markers = [], onMarker,
 }: {
   grid: number[][]; coverage: boolean;
   onInspect: (ra: number, dec: number, x: number, y: number) => void;
+  markers?: HeroMarker[];
+  onMarker?: (id: string) => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const hostRef = useRef<HTMLDivElement>(null);
@@ -25,12 +28,14 @@ export default function HeroSky({
     selected: { nx: number; ny: number } | null;
     grid: number[][]; coverage: boolean;
     img: HTMLImageElement | null;
-  }>({ w: 0, h: 0, hover: null, selected: null, grid, coverage, img: null });
-  const cb = useRef(onInspect);
+    markers: HeroMarker[];
+  }>({ w: 0, h: 0, hover: null, selected: null, grid, coverage, img: null, markers });
+  const cb = useRef({ onInspect, onMarker });
   useEffect(() => {
-    cb.current = onInspect;
+    cb.current = { onInspect, onMarker };
     state.current.grid = grid;
     state.current.coverage = coverage;
+    state.current.markers = markers;
   });
 
   // real infrared sky (2MASS all-sky CAR, cached on device)
@@ -140,6 +145,30 @@ export default function HeroSky({
         ctx.lineWidth = 1.5;
         drawBracket(ctx, st.selected.nx * w, st.selected.ny * h, 14, 6);
       }
+      // blinkable-field markers: the bg doubles as a mini-map
+      ctx.textBaseline = 'middle';
+      for (const m of st.markers) {
+        const mx = (m.ra / 360) * w;
+        const my = ((90 - m.dec) / 180) * h;
+        const isHov = st.hover && Math.hypot(st.hover.x - mx, st.hover.y - my) < 16;
+        const g = ctx.createRadialGradient(mx, my, 0, mx, my, 16);
+        g.addColorStop(0, isHov ? 'rgba(124,131,253,.8)' : 'rgba(124,131,253,.45)');
+        g.addColorStop(1, 'rgba(124,131,253,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(mx, my, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.beginPath(); ctx.arc(mx, my, isHov ? 4 : 3, 0, Math.PI * 2); ctx.fill();
+        ctx.font = `${isHov ? 600 : 500} 10px "Geist Mono", ui-monospace, monospace`;
+        ctx.textAlign = mx > w - 110 ? 'right' : 'left';
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = 'rgba(5,6,12,.9)';
+        const label = m.id.replace(/-/g, ' ');
+        const lx = mx + (mx > w - 110 ? -10 : 10);
+        ctx.strokeText(label, lx, my - 10);
+        ctx.fillStyle = isHov ? '#fff' : 'rgba(196,202,226,.85)';
+        ctx.fillText(label, lx, my - 10);
+        ctx.textAlign = 'left';
+      }
     };
 
     const tick = () => {
@@ -168,8 +197,17 @@ export default function HeroSky({
       const r = canvas.getBoundingClientRect();
       const nx = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
       const ny = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
+      // markers first: jump straight into the blink
+      for (const m of st.markers) {
+        const mx = (m.ra / 360) * r.width;
+        const my = ((90 - m.dec) / 180) * r.height;
+        if (Math.hypot(e.clientX - r.left - mx, e.clientY - r.top - my) < 18 && cb.current.onMarker) {
+          cb.current.onMarker(m.id);
+          return;
+        }
+      }
       st.selected = { nx, ny };
-      cb.current(nx * 360, 90 - ny * 180, e.clientX, e.clientY);
+      cb.current.onInspect(nx * 360, 90 - ny * 180, e.clientX, e.clientY);
       kick();
     };
     canvas.addEventListener('pointermove', move);

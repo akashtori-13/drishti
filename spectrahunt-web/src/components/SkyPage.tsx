@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useAppStore } from '@/lib/store';
+import { useRouter } from 'next/navigation';
+import { blinkURL } from '@/lib/store';
 import { LEVEL_COLORS } from '@/lib/sky';
 import { buildGrid, GRID_H, GRID_W } from '@/lib/sky';
 import { getCoverage, type RealCell } from '@/lib/showcases';
@@ -66,7 +67,7 @@ function fieldFromRaDec(ra: number, dec: number, grid: number[][], real?: Map<st
 
 /** Full-page sky map view: search tools, coverage canvas, legend, inspector. */
 export default function SkyPage() {
-  const { openShowcase } = useAppStore();
+  const router = useRouter();
   const grid = useMemo(() => {
     const g = buildGrid();
     return g;
@@ -100,7 +101,7 @@ export default function SkyPage() {
   };
 
   const pick = (t: SearchTarget) => {
-    if (t.showcaseId) { openShowcase(t.showcaseId); return; }
+    if (t.showcaseId) { router.push(blinkURL(t.showcaseId)); return; }
     if (observer) setFocus({ ra: t.ra, dec: t.dec, key: Date.now() });
     inspect(t.ra, t.dec);
   };
@@ -180,12 +181,13 @@ export default function SkyPage() {
       )}
 
       <Inspector
-        field={field} blinkId={field ? nearestShowcase(field.ra, field.dec) : null}
+        field={field} blinkId={field ? (nearestShowcase(field.ra, field.dec) ?? (useLive && field.epochs >= 2 ? 'live' : null)) : null}
         onClose={() => { setField(null); setSel(null); }}
         onOpenBlink={() => {
           if (field) {
             const id = nearestShowcase(field.ra, field.dec);
-            if (id) openShowcase(id);
+            if (id) router.push(blinkURL(id));
+            else if (useLive && field.epochs >= 2) router.push(`/blink/live?ra=${field.ra.toFixed(3)}&dec=${field.dec.toFixed(3)}&band=3`);
           }
           setField(null);
         }}

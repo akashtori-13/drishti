@@ -230,9 +230,14 @@ export function decodeView(hash: string): ViewState {
   return out;
 }
 
+// ---------- time ----------
+/** MJD (UTC) -> YYYY-MM-DD. */
+export function mjdToDate(mjd: number): string {
+  return new Date((mjd - 40587) * 86400000).toISOString().slice(0, 10);
+}
+
 // ---------- export helpers ----------
-export function toCSV(rows: Array<Record<string, string | number | null | undefined>>): string {
-  if (!rows.length) return '';
+export function toCSV(rows: Array<Record<string, string | number | null | undefined>>): string {  if (!rows.length) return '';
   const keys = Object.keys(rows[0]);
   const esc = (v: unknown) => {
     const s = v === null || v === undefined ? '' : String(v);
