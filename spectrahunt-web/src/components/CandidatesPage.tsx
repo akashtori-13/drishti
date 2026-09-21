@@ -92,7 +92,7 @@ export default function CandidatesPage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-400">Rate</span>
-                    <span>{(candidate.motion_arcsec / Math.abs(candidate.mjd_b - candidate.mjd_a)).toFixed(2)}″/day</span>
+                    <span>{(() => { const dt = Math.abs((candidate.mjd_b ?? 0) - (candidate.mjd_a ?? 0)); return dt > 0 ? `${(candidate.motion_arcsec / dt).toFixed(2)}″/day` : '—'; })()}</span>
                   </div>
                 </div>
 
@@ -106,7 +106,7 @@ export default function CandidatesPage() {
 
                 {/* Thumbnail placeholders */}
                 <div className="mt-4 flex space-x-2">
-                  {candidate.thumb_urls.slice(0, 2).map((url, i) => (
+                  {(candidate.thumb_urls ?? []).slice(0, 2).map((url, i) => (
                     <div
                       key={i}
                       className="w-16 h-16 bg-slate-700 rounded-lg flex items-center justify-center text-xs text-slate-500"

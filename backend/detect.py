@@ -147,11 +147,12 @@ def pair_dipoles(sources_a, sources_b, max_separation_arcsec=30.0, pixel_scale=6
             idx_b, src_b = best_match
             used_b.add(idx_b)
             
-            # Calculate motion vector
+            # Calculate motion vector (PA east of north)
             dx = src_b['x'] - src_a['x']
             dy = src_b['y'] - src_a['y']
-            motion_arcsec = dist * pixel_scale
-            pa_deg = (90 - (180 / 3.14159) * (dy / max(dx, 0.001))) % 360
+            motion_arcsec = best_dist * pixel_scale
+            import math
+            pa_deg = (math.degrees(math.atan2(dx, dy))) % 360
             
             dipoles.append({
                 'source_a': src_a,
@@ -209,7 +210,8 @@ def crossmatch_skybot(ra, dec, mjd, radius_arcsec=10.0):
         from astroquery.imcce import Skybot
         from astropy.time import Time
         from astropy.coordinates import SkyCoord
-        
+        import astropy.units as u
+
         # Convert MJD to date
         obs_time = Time(mjd, format='mjd')
         

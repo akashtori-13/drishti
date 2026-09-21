@@ -181,14 +181,14 @@ def main():
     
     # Get candidates
     candidates = conn.execute("""
-        SELECT id, name, ra, dec, band, epoch_a, epoch_b, 
+        SELECT id, name, ra, dec, band, epoch_a, epoch_b, mjd_a, mjd_b,
                significance_sigma, motion_arcsec, motion_pa_deg,
                skybot_match, status, created_at
         FROM candidates
         ORDER BY created_at DESC
         LIMIT 500
     """).fetchall()
-    
+
     candidates_list = []
     for c in candidates:
         candidates_list.append({
@@ -199,6 +199,8 @@ def main():
             'band': c['band'],
             'epoch_a': c['epoch_a'],
             'epoch_b': c['epoch_b'],
+            'mjd_a': c['mjd_a'],
+            'mjd_b': c['mjd_b'],
             'significance_sigma': c['significance_sigma'],
             'motion_arcsec': c['motion_arcsec'],
             'motion_pa_deg': c['motion_pa_deg'],
@@ -214,9 +216,10 @@ def main():
     
     try:
         coverage_data = conn.execute("""
-            SELECT i, j, COUNT(DISTINCT planning_period) as epoch_count
-            FROM frame_cell_map
-            GROUP BY i, j
+            SELECT fcm.i AS i, fcm.j AS j, COUNT(DISTINCT f.planning_period) as epoch_count
+            FROM frame_cell_map fcm
+            JOIN frames f ON fcm.frame_id = f.frame_id
+            GROUP BY fcm.i, fcm.j
         """).fetchall()
         
         for row in coverage_data:
@@ -271,6 +274,45 @@ def main():
                 'known': bool(c['skybot_match']),
                 'knownName': c['skybot_match']
             })
+
+    # Fallback demo content so static deploys are never empty
+    # (real IRSA ingest often returns 0 frames in CI/sandbox).
+    if frames_indexed == 0:
+        # Ecliptic band coverage demo: cells near dec~0 get 1-3 epochs
+        for j in range(GRID_H):
+            dec_center = 90.0 - (j + 0.5) * (180.0 / GRID_H)
+            if abs(dec_center) < 20:
+                for i in range(GRID_W):
+                    if (i + j) % 3 == 0:
+                        coverage_grid[j][i] = 2 if (i + j) % 6 == 0 else 1
+                        indexed_grid[j][i] = True
+        if not candidates_list:
+            now = datetime.now(timezone.utc).isoformat()
+            candidates_list = [
+                {'id': 1, 'name': 'SH-DEMO-1', 'ra': 180.5, 'dec': 2.3,
+                 'band': 3, 'epoch_a': '2025W19_2B', 'epoch_b': '2025W32_2B',
+                 'mjd_a': 60700.0, 'mjd_b': 60791.0,
+                 'significance_sigma': 8.2, 'motion_arcsec': 18.5,
+                 'motion_pa_deg': 45.0, 'skybot_match': None,
+                 'status': 'pending', 'created_at': now},
+                {'id': 2, 'name': 'SH-DEMO-2 (Ceres)', 'ra': 83.8, 'dec': -5.4,
+                 'band': 2, 'epoch_a': '2025W19_2B', 'epoch_b': '2025W32_2B',
+                 'mjd_a': 60700.0, 'mjd_b': 60791.0,
+                 'significance_sigma': 12.4, 'motion_arcsec': 42.1,
+                 'motion_pa_deg': 120.0, 'skybot_match': '1 Ceres',
+                 'status': 'verified', 'created_at': now},
+            ]
+            with open(output_dir / 'candidates.json', 'w') as f:
+                json.dump(candidates_list, f, indent=2)
+            print(f"  ! candidates.json replaced with {len(candidates_list)} demo candidates (no live frames)")
+            with open(output_dir / 'coverage.json', 'w') as f:
+                json.dump({'grid': {'w': GRID_W, 'h': GRID_H}, 'counts': coverage_grid,
+                           'indexed': indexed_grid,
+                           'generated_at': datetime.now(timezone.utc).isoformat()}, f, indent=2)
+        status['frames_indexed'] = frames_indexed
+        status['note'] = 'demo-fallback: IRSA returned no frames; showing illustrative coverage'
+        with open(output_dir / 'status.json', 'w') as f:
+            json.dump(status, f, indent=2)
     
     # Add some fixed notable fields (ecliptic, etc.)
     if ra == 180 and dec == 0:
@@ -283,16 +325,9 @@ def main():
         json.dump(demo_fields, f, indent=2)
     print(f"  ✓ demo_fields.json ({len(demo_fields)} fields)")
     
-    # Step 5: Copy index.html
-    print(f"\n[5/5] Copying front-end...")
-    index_src = Path(__file__).parent.parent / 'index.html'
-    index_dst = output_dir / 'index.html'
-    
-    if index_src.exists():
-        shutil.copy2(index_src, index_dst)
-        print(f"  ✓ index.html ({index_src.stat().st_size:,} bytes)")
-    else:
-        print(f"  ⚠ index.html not found at {index_src}")
+    # Step 5: static front-end lives in spectrahunt-web/ (Next.js export).
+    # Nothing to copy here; CI copies data/*.json -> spectrahunt-web/public/data/.
+    print(f"\n[5/5] Front-end is Next.js static export (spectrahunt-web/out/). Skipping index.html copy.")
     
     # Summary
     print("\n" + "=" * 60)
@@ -300,7 +335,6 @@ def main():
     print("=" * 60)
     print(f"Output directory: {output_dir.absolute()}")
     print(f"Files generated:")
-    print(f"  - index.html (front-end)")
     print(f"  - status.json (metadata)")
     print(f"  - coverage.json (sky map)")
     print(f"  - candidates.json (detections)")
@@ -309,10 +343,13 @@ def main():
     print()
     print("To serve locally:")
     print(f"  cd {output_dir} && python -m http.server 8000")
-    print(f"  Then open http://localhost:8000")
+    print()
+    print("Frontend (Next.js static export):")
+    print("  cp data/*.json spectrahunt-web/public/data/ && cd spectrahunt-web && npm ci && npm run build")
+    print("  npx serve out")
     print()
     print("To deploy to Netlify:")
-    print("  netlify deploy --prod --dir=data")
+    print("  git push origin main (auto-builds spectrahunt-web/out)")
     print("=" * 60)
     
     return True

@@ -1,5 +1,8 @@
-// API layer for SpectraHunt - works with both live backend and static JSON files
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
+// API layer for SpectraHunt - live backend with static-JSON fallback.
+// Static files are served from /data/* (spectrahunt-web/public/data/*).
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
+const DATA_MODE = process.env.NEXT_PUBLIC_DATA_MODE || 'static';
+const useLive = Boolean(API_BASE) && DATA_MODE === 'live';
 
 interface Status {
   release: string;
@@ -11,12 +14,16 @@ interface Status {
   pipeline_version: string;
 }
 
+export type { Status };
+
 interface Coverage {
   grid: { w: number; h: number };
   counts: number[][];
   indexed: boolean[][];
   generated_at: string;
 }
+
+export type { Coverage };
 
 interface Candidate {
   id: string;
@@ -32,10 +39,12 @@ interface Candidate {
   motion_arcsec: number;
   motion_pa_deg: number;
   skybot_match: string | null;
-  status: 'pending' | 'verified' | 'artifact';
-  thumb_urls: string[];
+  status: 'pending' | 'verified' | 'artifact' | 'unreviewed' | 'real';
+  thumb_urls?: string[];
   created_at: string;
 }
+
+export type { Candidate };
 
 interface FieldEpoch {
   epoch_id: string;
@@ -103,6 +112,15 @@ interface ResolveResult {
 // In-memory cache
 const cache = new Map<string, any>();
 
+function normalizeCandidate(c: Candidate): Candidate {
+  return {
+    ...c,
+    id: String((c as any).id ?? (c as any).name ?? ''),
+    thumb_urls: Array.isArray((c as any).thumb_urls) ? (c as any).thumb_urls : [],
+    skybot_match: (c as any).skybot_match ?? null,
+  };
+}
+
 async function fetchJSON<T>(url: string, useCache = true): Promise<T> {
   const cacheKey = url;
   
@@ -133,22 +151,28 @@ async function fetchJSON<T>(url: string, useCache = true): Promise<T> {
   }
 }
 
+export type { Field, BlinkData, SearchSuggestion, ResolveResult };
+
 export async function getStatus(): Promise<Status> {
-  try {
-    return await fetchJSON<Status>(`${API_BASE}/api/status`);
-  } catch {
-    // Fallback to static file
-    return await fetchJSON<Status>('/data/status.json');
+  if (useLive) {
+    try {
+      return await fetchJSON<Status>(`${API_BASE}/api/status`);
+    } catch {
+      // fall through to static
+    }
   }
+  return await fetchJSON<Status>('/data/status.json');
 }
 
 export async function getCoverage(): Promise<Coverage> {
-  try {
-    return await fetchJSON<Coverage>(`${API_BASE}/api/coverage`);
-  } catch {
-    // Fallback to static file
-    return await fetchJSON<Coverage>('/data/coverage.json');
+  if (useLive) {
+    try {
+      return await fetchJSON<Coverage>(`${API_BASE}/api/coverage`);
+    } catch {
+      // fall through to static
+    }
   }
+  return await fetchJSON<Coverage>('/data/coverage.json');
 }
 
 export async function getCandidates(params?: {
@@ -165,38 +189,47 @@ export async function getCandidates(params?: {
 
   const query = queryParams.toString();
   const url = `${API_BASE}/api/candidates${query ? `?${query}` : ''}`;
-  
-  try {
-    return await fetchJSON<Candidate[]>(url);
-  } catch {
-    // Fallback to static file
-    return await fetchJSON<Candidate[]>('/data/candidates.json');
+
+  if (useLive) {
+    try {
+      const rows = await fetchJSON<Candidate[]>(url);
+      return rows.map(normalizeCandidate);
+    } catch {
+      // fall through to static
+    }
   }
+  const rows = await fetchJSON<Candidate[]>('/data/candidates.json');
+  return rows.map(normalizeCandidate);
 }
 
 export async function getField(ra: number, dec: number): Promise<Field> {
-  const url = `${API_BASE}/api/field?ra=${ra}&dec=${dec}`;
-  
-  try {
-    return await fetchJSON<Field>(url);
-  } catch {
-    // Fallback to demo fields or throw
-    const demoFields = await fetchJSON<Record<string, Field>>('/data/demo_fields.json');
-    const key = `${ra.toFixed(4)},${dec.toFixed(4)}`;
-    
-    // Find closest field
-    for (const field of Object.values(demoFields)) {
-      const dist = Math.sqrt(Math.pow(field.ra - ra, 2) + Math.pow(field.dec - dec, 2));
-      if (dist < 0.5) return field;
+  if (useLive) {
+    try {
+      return await fetchJSON<Field>(`${API_BASE}/api/field?ra=${ra}&dec=${dec}`);
+    } catch {
+      // fall through to demo fields
     }
-    
-    throw new Error('No data available for this location');
   }
+  // demo_fields.json is an array of {name, ra, dec, ...}; synthesize a Field
+  const demo = await fetchJSON<Array<{ name?: string; ra: number; dec: number }>>('/data/demo_fields.json');
+  let best: { name?: string; ra: number; dec: number } | null = null;
+  let bestDist = Infinity;
+  for (const f of demo) {
+    const dist = Math.hypot(f.ra - ra, f.dec - dec);
+    if (dist < bestDist) { bestDist = dist; best = f; }
+  }
+  if (best && bestDist < 5) {
+    return { ra: best.ra, dec: best.dec, epochs: [], bands_present: [], survey: 'wide' };
+  }
+  throw new Error('No data available for this location');
 }
 
 export async function getBlink(ra: number, dec: number, band: number, sizeArcmin: number = 10): Promise<BlinkData> {
+  if (!useLive) {
+    throw new Error('No blink data available - insufficient epochs or wavelength mismatch');
+  }
   const url = `${API_BASE}/api/blink?ra=${ra}&dec=${dec}&band=${band}&size_arcmin=${sizeArcmin}`;
-  
+
   try {
     return await fetchJSON<BlinkData>(url);
   } catch {
@@ -205,29 +238,30 @@ export async function getBlink(ra: number, dec: number, band: number, sizeArcmin
 }
 
 export async function resolve(query: string): Promise<ResolveResult | null> {
-  const url = `${API_BASE}/api/resolve?q=${encodeURIComponent(query)}`;
-  
-  try {
-    return await fetchJSON<ResolveResult | null>(url);
-  } catch {
-    // Try coordinate parsing
-    const match = query.match(/^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)$/);
-    if (match) {
-      const ra = parseFloat(match[1]);
-      const dec = parseFloat(match[2]);
-      
-      if (!isNaN(ra) && !isNaN(dec) && ra >= -180 && ra <= 180 && dec >= -90 && dec <= 90) {
-        return {
-          name: query,
-          ra,
-          dec,
-          type: 'coordinate'
-        };
-      }
+  if (useLive) {
+    try {
+      return await fetchJSON<ResolveResult | null>(`${API_BASE}/api/resolve?q=${encodeURIComponent(query)}`);
+    } catch {
+      // fall through to local coordinate parsing
     }
-    
-    return null;
   }
+  // Try coordinate parsing
+  const match = query.match(/^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)$/);
+  if (match) {
+    const ra = parseFloat(match[1]);
+    const dec = parseFloat(match[2]);
+
+    if (!isNaN(ra) && !isNaN(dec) && ra >= -180 && ra <= 180 && dec >= -90 && dec <= 90) {
+      return {
+        name: query,
+        ra,
+        dec,
+        type: 'coordinate'
+      };
+    }
+  }
+
+  return null;
 }
 
 export async function getSuggestions(query: string): Promise<SearchSuggestion[]> {
@@ -268,6 +302,7 @@ export async function getSuggestions(query: string): Promise<SearchSuggestion[]>
 }
 
 export async function getSkybot(ra: number, dec: number, mjd: number, radiusArcsec: number = 10) {
+  if (!useLive) return { matches: [] };
   const url = `${API_BASE}/api/skybot?ra=${ra}&dec=${dec}&mjd=${mjd}&radius_arcsec=${radiusArcsec}`;
   
   try {

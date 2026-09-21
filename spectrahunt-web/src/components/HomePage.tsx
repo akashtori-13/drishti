@@ -131,7 +131,7 @@ export default function HomePage() {
                           <div className="text-sm text-slate-400">{suggestion.description}</div>
                         )}
                       </div>
-                      {suggestion.ra !== undefined && (
+                      {suggestion.ra !== undefined && suggestion.dec !== undefined && (
                         <div className="text-xs text-slate-500 font-mono">
                           {suggestion.ra.toFixed(4)}, {suggestion.dec.toFixed(4)}
                         </div>
