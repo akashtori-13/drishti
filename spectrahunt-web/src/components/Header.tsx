@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Icon from '@/components/Icon';
+import { useAppStore } from '@/lib/store';
 
 const NAV = [
   { href: '/sky', label: 'Sky map', blurb: 'Observer and all-sky views' },
@@ -16,6 +17,10 @@ export default function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [utc, setUtc] = useState('');
+  const { band, epochIdx, compareMode } = useAppStore();
+  const blinkMatch = pathname.match(/^\/blink\/([^/]+)/);
+  const blinkId = blinkMatch ? decodeURIComponent(blinkMatch[1]) : null;
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
@@ -28,6 +33,17 @@ export default function Header() {
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  useEffect(() => {
+    const tick = () => {
+      const d = new Date();
+      const p = (n: number) => String(n).padStart(2, '0');
+      setUtc(`${p(d.getUTCHours())}:${p(d.getUTCMinutes())}:${p(d.getUTCSeconds())} UTC`);
+    };
+    tick();
+    const t = setInterval(tick, 1000);
+    return () => clearInterval(t);
   }, []);
 
   useEffect(() => {
@@ -66,6 +82,12 @@ export default function Header() {
           )}
         </nav>
         <div className="nav-right">
+          {blinkId && (
+            <Link href={pathname} className="nav-context mono" title="Current blink field and state">
+              {blinkId === 'live' ? 'live field' : blinkId.replace(/-/g, ' ')} · D{band} · E{epochIdx + 1} · {compareMode}
+            </Link>
+          )}
+          <span className="nav-clock mono" title="Coordinated Universal Time">{utc}</span>
           <button
             type="button" className="nav-menu-btn" aria-expanded={open}
             aria-controls="navTabs" aria-label={open ? 'Close menu' : 'Open menu'}
@@ -76,6 +98,7 @@ export default function Header() {
           </button>
         </div>
       </div>
+      <div className="nav-hairline" aria-hidden="true" />
     </header>
   );
 }
