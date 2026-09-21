@@ -214,7 +214,8 @@ Frame switching < 200 ms after preload; first view < 3 s (static shell + cached 
 ## 7. Coordinate consistency (verified, not assumed)
 
 A past bug class: background imagery disagreed with overlay math. Closed by
-measurement (real IRSA/CDS frames inspected pixel-level):
+measurement (real IRSA/CDS frames inspected pixel-level — see
+`docs/assets/orion-sin.jpg` and `docs/assets/full-2mass-log.jpg`):
 
 | Surface | Truth | Handling |
 |---|---|---|
@@ -242,7 +243,7 @@ same blink, in every projection.
 - Static export (`next build` → `out/`) on any CDN; `netlify.toml` pins build,
   security headers, immutable-asset caching. No server, no secrets, no DB.
 - Weekly refresh: `refresh.yml` reruns census + indexer → rebuild → push.
-- Overnight pattern used in development: `overnight.sh` loop
+- Overnight pattern used in development: `scripts/nightly.sh` loop
   (merge → fill → build → verify → commit) while shard workers measure the sky.
 - Observability: structured stdout logs per worker (`/tmp/opencode/spectrahunt-logs/`
   locally); verify scripts assert cells/PNGs/API counts each pass.

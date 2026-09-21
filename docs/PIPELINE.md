@@ -36,7 +36,7 @@ cd spectrahunt-web && npm run build
 ```
 
 `.github/workflows/refresh.yml` automates this weekly. During heavy ingestion
-we run `overnight.sh`-style loops: merge → fill → build → verify
+we run `scripts/nightly.sh`: merge → fill → build → verify
 (cells/PNGs/API/tests) → commit-if-changed, with a **regression guard**
 (never publish fewer cells than live).
 
