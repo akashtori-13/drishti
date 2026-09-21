@@ -642,39 +642,10 @@ export default function BlinkComparator({
             aria-label="Timeline scrub" aria-valuetext={cur?.label ?? ''} />
           <button type="button" className="epoch-chip" onClick={() => setPalette(true)} title="Command palette (Ctrl+K)">⌘K</button>
         </div>
-      </div>
-
-      {/* filmstrip: every loaded epoch as a thumbnail */}
-      <div className="filmstrip" role="group" aria-label="Epoch filmstrip">
-        {frames.map((f, i) => (
-          <button key={f.label} type="button" onClick={() => { setPlaying(false); onEpochChange(i); }}
-            className={`film${i === idx ? ' active' : ''}`} aria-pressed={i === idx} title={f.mjd ? `${f.label} · MJD ${f.mjd}` : f.label}>
-            {f.png && loaded[f.png] ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={f.png} alt="" draggable={false} />
-            ) : (
-              <span className="film-empty">{f.mjd ? String(Math.round(f.mjd)).slice(2) : `E${i + 1}`}</span>
-            )}
-          </button>
-        ))}
-        <label className="rate">Rate
-          <input type="range" min={150} max={1200} step={10} value={speed} onChange={(e) => setSpeed(Number(e.target.value))} aria-label="Blink rate" />
-        </label>
-      </div>
-
-      <div className="deck-bottom">
-        {/* tool rail */}
-        <div className="tool-rail glass" role="toolbar" aria-label="Viewer tools">
-          {dockBtn('tune', 'Enhance', '◐', 'compare modes, stretch, colors, levels')}
-          {dockBtn('bands', 'Bands', '≈', 'detectors, channels, RGB composite')}
-          {dockBtn('data', 'Measure', '⌖', 'pixel probe, histogram, detected movers')}
-          {dockBtn('export', 'Save', '⤓', 'PNG, animation, share link')}
-          {dockBtn('keys', 'Guide', '?', 'shortcuts and gestures')}
-        </div>
-
-        {/* dock panel */}
+      {/* floating dock panel over the stage: options need no scroll */}
         {dock === 'tune' && (
-          <div className="dock-panel glass" role="group" aria-label="Compare and image tuning">
+          <div className="dock-panel glass" role="group" aria-label="Enhance">
+            <div className="dock-head"><span>Enhance</span><button type="button" className="icon-btn sm" aria-label="Close panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
             <div style={rowStyle} role="group" aria-label="Compare mode">
               {(['blink', 'side', 'swipe', 'diff'] as CompareMode[]).map((m) => (
                 <button key={m} type="button" className="epoch-chip" aria-pressed={mode === m}
@@ -728,7 +699,8 @@ export default function BlinkComparator({
           </div>
         )}
         {dock === 'bands' && (
-          <div className="dock-panel glass" role="group" aria-label="Spectral bands">
+          <div className="dock-panel glass" role="group" aria-label="Bands">
+            <div className="dock-head"><span>Bands</span><button type="button" className="icon-btn sm" aria-label="Close panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
             <div className="band-row" style={{ padding: 0, background: 'transparent' }}>
               {BANDS.map((b) => (
                 <button key={b.id} type="button" className="band" style={{ ['--band-color' as string]: b.color }}
@@ -757,7 +729,8 @@ export default function BlinkComparator({
           </div>
         )}
         {dock === 'data' && (
-          <div className="dock-panel glass" role="group" aria-label="Live measurements">
+          <div className="dock-panel glass" role="group" aria-label="Measure">
+            <div className="dock-head"><span>Measure</span><button type="button" className="icon-btn sm" aria-label="Close panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
             <div style={rowStyle}>
               <div>
                 <div style={{ fontSize: 12, color: '#8a90ab', marginBottom: 4 }}>Frame histogram</div>
@@ -797,7 +770,8 @@ export default function BlinkComparator({
           </div>
         )}
         {dock === 'export' && (
-          <div className="dock-panel glass" role="group" aria-label="Export">
+          <div className="dock-panel glass" role="group" aria-label="Save">
+            <div className="dock-head"><span>Save</span><button type="button" className="icon-btn sm" aria-label="Close panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
             <div style={rowStyle}>
               <button type="button" className="epoch-chip" onClick={() => downloadPNG()}>Download PNG</button>
               <button type="button" className="epoch-chip" onClick={() => void recordWebM()} disabled={recording || n < 2}>
@@ -809,7 +783,8 @@ export default function BlinkComparator({
           </div>
         )}
         {dock === 'keys' && (
-          <div className="dock-panel glass" role="group" aria-label="Keyboard shortcuts">
+          <div className="dock-panel glass" role="group" aria-label="Guide">
+            <div className="dock-head"><span>Guide</span><button type="button" className="icon-btn sm" aria-label="Close panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
             <div className="keys-grid">
               <span><kbd>Space</kbd> play / pause</span>
               <span><kbd>←</kbd><kbd>→</kbd> step epoch</span>
@@ -819,6 +794,39 @@ export default function BlinkComparator({
             </div>
           </div>
         )}
+      </div>
+
+      {/* filmstrip: every loaded epoch as a thumbnail */}
+      <div className="filmstrip" role="group" aria-label="Epoch filmstrip">
+        {frames.map((f, i) => (
+          <button key={f.label} type="button" onClick={() => { setPlaying(false); onEpochChange(i); }}
+            className={`film${i === idx ? ' active' : ''}`} aria-pressed={i === idx} title={f.mjd ? `${f.label} · MJD ${f.mjd}` : f.label}>
+            {f.png && loaded[f.png] ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={f.png} alt="" draggable={false} />
+            ) : (
+              <span className="film-empty">{f.mjd ? String(Math.round(f.mjd)).slice(2) : `E${i + 1}`}</span>
+            )}
+          </button>
+        ))}
+        <label className="rate">Rate
+          <input type="range" min={150} max={1200} step={10} value={speed} onChange={(e) => setSpeed(Number(e.target.value))} aria-label="Blink rate" />
+        </label>
+      </div>
+
+
+      <div className="deck-bottom">
+        {/* tool rail */}
+        <div className="tool-rail glass" role="toolbar" aria-label="Viewer tools">
+          {dockBtn('tune', 'Enhance', '◐', 'compare modes, stretch, colors, levels')}
+          {dockBtn('bands', 'Bands', '≈', 'detectors, channels, RGB composite')}
+          {dockBtn('data', 'Measure', '⌖', 'pixel probe, histogram, detected movers')}
+          {dockBtn('export', 'Save', '⤓', 'PNG, animation, share link')}
+          {dockBtn('keys', 'Guide', '?', 'shortcuts and gestures')}
+        </div>
+
+        {/* dock panel */}
+
       </div>
 
       {/* command palette */}
