@@ -53,8 +53,11 @@ def test_api_cache_ttl(tmp_path):
     api_cache_set(db, "k", {"v": [1, 2]})
     assert api_cache_get(db, "k", 60) == {"v": [1, 2]}
     time.sleep(0.05)
-    assert api_cache_get(db, "k", 0.01) is None or True  # expiry path exercised
+    assert api_cache_get(db, "k", 0.01) is None  # expiry path exercised
     assert api_cache_get(db, "missing", 60) is None
+    # stale reads survive outages
+    api_cache_set(db, "s", [1])
+    assert api_cache_get(db, "s", 3600, allow_stale=True) == [1]
 
 
 def test_skybot_breaker_skips_network(tmp_path):

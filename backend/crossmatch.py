@@ -121,19 +121,6 @@ async def resolve_name(name: str) -> Optional[Dict[str, Any]]:
     return None
 
 
-async def query_horizons(object_name: str, mjd: float) -> Optional[Dict[str, Any]]:
-    """JPL Horizons ephemeris at MJD. Returns {ra, dec, mjd} or None."""
-    try:
-        from astroquery.jplhorizons import Horizons
-        eph = Horizons(id=object_name, location="500",
-                       epochs=float(mjd) + 2400000.5).ephemerides()
-        return {"ra": float(eph["RA"][0]), "dec": float(eph["DEC"][0]),
-                "mjd": float(mjd), "source": "horizons"}
-    except Exception as e:
-        print(f"Horizons failed for '{object_name}': {e}")
-        return None
-
-
 GAIA_TAP_URL = "https://gea.esac.esa.int/tap-server/tap"
 
 
