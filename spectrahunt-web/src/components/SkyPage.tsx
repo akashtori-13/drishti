@@ -194,6 +194,8 @@ export default function SkyPage() {
               ))}
             </span>
             <span>1 to 5+</span>
+            <span className="sep" aria-hidden="true" />
+            <span title="Asteroids stream through the ecliptic band" style={{ color: '#e8c34a' }}>◆ ecliptic</span>
           </div>
           <span className="sep" aria-hidden="true" />
           <span className="mono" id="skyReadout" aria-hidden="true">

@@ -114,6 +114,7 @@ export default function BlinkComparator({
   const [recording, setRecording] = useState(false);
   const [probe, setProbe] = useState<{ sx: number; sy: number; lum: number; ra: number; dec: number } | null>(null);
   const [specVals, setSpecVals] = useState<number[] | null>(null);
+  const [sideHover, setSideHover] = useState<{ x: number; y: number; a: number; b: number } | null>(null);
   const [measureChip, setMeasureChip] = useState<{ x: number; y: number; lum: number; label: string } | null>(null);
 
   const mainRef = useRef<HTMLCanvasElement>(null);
@@ -124,6 +125,8 @@ export default function BlinkComparator({
   const histRef = useRef<HTMLCanvasElement>(null);
   const diffStatRef = useRef<HTMLSpanElement>(null);
   const drag = useRef<{ x: number; y: number; pan: { x: number; y: number }; moved: boolean } | null>(null);
+  const panRaf = useRef(0);
+  const panPending = useRef<{ x: number; y: number } | null>(null);
   const probeSrc = useRef<{ img: HTMLImageElement; w: number; h: number } | null>(null);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -516,10 +519,14 @@ export default function BlinkComparator({
     } catch { /* tainted or tiny canvas */ }
   }, [curImg, prevImg, mode, stretch, vmin, vmax, invert, cmap, diffScale, swipe, pan, zoom, showMarkers, showRgb, falseColor, loadedBand, rgb, bandPngs, fovArcmin, candidates, sizeTick]);
 
-  // side-by-side render (synchronized pan/zoom)
+  // side-by-side render (synchronized pan/zoom + linked cursor)
   useEffect(() => {
     if (mode !== 'side') return;
-    for (const [ref, img] of [[leftRef, prevImg], [rightRef, curImg]] as const) {
+    const panes: Array<{ ref: typeof leftRef; img?: HTMLImageElement }> = [
+      { ref: leftRef, img: prevImg },
+      { ref: rightRef, img: curImg },
+    ];
+    for (const { ref, img } of panes) {
       const canvas = ref.current;
       if (!canvas) continue;
       const host = canvas.parentElement;
@@ -539,8 +546,44 @@ export default function BlinkComparator({
         drawCover(ctx, img, w, h, pan, zoom);
         stylize(canvas, stretch, vmin, vmax, invert, cmap, false, diffScale);
       }
+      if (sideHover) {
+        const hx = sideHover.x * w;
+        const hy = sideHover.y * h;
+        ctx.strokeStyle = 'rgba(255,255,255,.8)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(hx - 10, hy); ctx.lineTo(hx + 10, hy);
+        ctx.moveTo(hx, hy - 10); ctx.lineTo(hx, hy + 10);
+        ctx.stroke();
+        ctx.strokeStyle = 'rgba(124,131,253,.9)';
+        ctx.beginPath(); ctx.arc(hx, hy, 6, 0, Math.PI * 2); ctx.stroke();
+      }
     }
-  }, [mode, prevImg, curImg, pan, zoom, stretch, vmin, vmax, invert, cmap, diffScale]);
+  }, [mode, prevImg, curImg, pan, zoom, stretch, vmin, vmax, invert, cmap, diffScale, sideHover]);
+
+  const sampleAt = (img: HTMLImageElement | undefined, x: number, y: number): number => {
+    if (!img) return 0;
+    try {
+      const c = document.createElement('canvas');
+      c.width = 32; c.height = 32;
+      const cctx = c.getContext('2d', { willReadFrequently: true });
+      if (!cctx) return 0;
+      cctx.drawImage(img, 0, 0, 32, 32);
+      const d = cctx.getImageData(
+        Math.max(0, Math.min(31, Math.floor(x * 32))),
+        Math.max(0, Math.min(31, Math.floor(y * 32))), 1, 1).data;
+      return Math.round((d[0] * 0.299 + d[1] * 0.587 + d[2] * 0.114));
+    } catch {
+      return 0;
+    }
+  };
+
+  const onSideMove = (e: React.MouseEvent) => {
+    const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const x = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+    const y = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
+    setSideHover({ x, y, a: sampleAt(prevImg, x, y), b: sampleAt(curImg, x, y) });
+  };
 
   const onPointerDown = (e: React.PointerEvent) => {
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
@@ -556,7 +599,14 @@ export default function BlinkComparator({
       const dy = e.clientY - drag.current.y;
       if (Math.hypot(dx, dy) > 4) drag.current.moved = true;
       else return;
-      setPan({ x: drag.current.pan.x + dx, y: drag.current.pan.y + dy });
+      // rAF-throttle: full-res restyle runs at most once per frame while dragging
+      panPending.current = { x: drag.current.pan.x + dx, y: drag.current.pan.y + dy };
+      if (!panRaf.current) {
+        panRaf.current = requestAnimationFrame(() => {
+          panRaf.current = 0;
+          if (panPending.current) setPan(panPending.current);
+        });
+      }
       return;
     }
     // hover probe: sample source pixels + approximate sky offset
@@ -755,6 +805,16 @@ export default function BlinkComparator({
     <div className="deck">
       <div className="blink-grid">
         <div className="stage-col">
+          {mode === 'side' && sideHover && (
+            <p className="mono side-readout">
+              A {sideHover.a} · B {sideHover.b} · Δ {(sideHover.b - sideHover.a) >= 0 ? '+' : ''}{sideHover.b - sideHover.a}
+            </p>
+          )}
+          {mode === 'side' && sideHover && (
+            <p className="mono side-readout" aria-live="off">
+              A {sideHover.a} · B {sideHover.b} · Δ {(sideHover.b - sideHover.a) >= 0 ? '+' : ''}{sideHover.b - sideHover.a}
+            </p>
+          )}
           <div className="stage-wrap square" ref={stageRef} style={{ touchAction: 'none' }}>
             {mode === 'side' ? (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, width: '100%', height: '100%' }}>

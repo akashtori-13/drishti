@@ -8,6 +8,7 @@ WEB=NOT_SET
 for i in $(seq 1 50); do
   echo "=== audit pass $i $(date '+%H:%M:%S') ===" | tee -a "$LOG"
   .venv/bin/python -m pytest backend/tests/ -q 2>&1 | tail -1 | tee -a "$LOG"
+  (cd spectrahunt-web && (npm run test 2>&1 | tail -3)) | tee -a "$LOG"
   (cd spectrahunt-web && npx tsc --noEmit 2>&1 | grep -c error | xargs echo "tsc errors:") | tee -a "$LOG"
   (cd spectrahunt-web && npx eslint src 2>&1 | tail -1) | tee -a "$LOG"
   ok=0; fail=0
