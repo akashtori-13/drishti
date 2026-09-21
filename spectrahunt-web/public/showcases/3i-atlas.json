@@ -48,5 +48,43 @@
   "citation": {
     "doi": "10.26131/IRSA652",
     "text": "This publication makes use of data products from SPHEREx (JPL/Caltech, NASA)."
+  },
+  "bands": {
+    "1": {
+      "png": "/cutouts/3i-atlas_D1.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W10_2B/l2b-v24-2026-094/1/level2_2026W10_2B_0044_1D1_spx_l2b-v24-2026-094.fits?center=252.6633,-17.4904&size=0.15",
+      "mjd": 61104.726712,
+      "wavelength_um": 0.92
+    },
+    "2": {
+      "png": "/cutouts/3i-atlas_D2.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W32_2A/l2b-v27-2026-223/2/level2_2026W32_2A_0207_1D2_spx_l2b-v27-2026-223.fits?center=252.6633,-17.4904&size=0.15",
+      "mjd": 61259.333673,
+      "wavelength_um": 1.36
+    },
+    "3": {
+      "png": "/cutouts/3i-atlas_2025-12-14.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2025W50_2A/l2b-v20-2025-349/3/level2_2025W50_2A_0755_4D3_spx_l2b-v20-2025-349.fits?center=166.9781,5.2264&size=0.05",
+      "mjd": 61023.46,
+      "wavelength_um": 2.02
+    },
+    "4": {
+      "png": "/cutouts/3i-atlas_D4.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W10_2B/l2b-v24-2026-094/4/level2_2026W10_2B_0044_1D4_spx_l2b-v24-2026-094.fits?center=252.6633,-17.4904&size=0.15",
+      "mjd": 61104.726712,
+      "wavelength_um": 3.12
+    },
+    "5": {
+      "png": "/cutouts/3i-atlas_D5.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W32_2A/l2b-v27-2026-223/5/level2_2026W32_2A_0207_2D5_spx_l2b-v27-2026-223.fits?center=252.6633,-17.4904&size=0.15",
+      "mjd": 61259.335165,
+      "wavelength_um": 4.12
+    },
+    "6": {
+      "png": "/cutouts/3i-atlas_D6.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W11_2A/l2b-v24-2026-094/6/level2_2026W11_2A_0247_4D6_spx_l2b-v24-2026-094.fits?center=252.6633,-17.4904&size=0.15",
+      "mjd": 61112.604449,
+      "wavelength_um": 4.71
+    }
   }
 }

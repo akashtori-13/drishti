@@ -75,7 +75,7 @@ const selStyle: React.CSSProperties = { background: '#151929', border: '1px soli
 
 export default function BlinkComparator({
   frames, band, onBandChange, title, mode, onModeChange, epochIdx, onEpochChange,
-  showMarkers, onToggleMarkers, fovArcmin = 10, onSample, center, bandPngs,
+  showMarkers, onToggleMarkers, fovArcmin = 10, onSample, center, bandPngs, onStats,
 }: {
   frames: BlinkFrame[]; band: number; onBandChange: (b: number) => void; title: string;
   mode: CompareMode; onModeChange: (m: CompareMode) => void;
@@ -85,6 +85,7 @@ export default function BlinkComparator({
   center?: { ra: number; dec: number };
   /** Newest-epoch PNG per detector (1-6) for true false-color composites. */
   bandPngs?: Record<number, string | null>;
+  onStats?: (s: { movers: number; variables: number; ready: boolean } | null) => void;
 }) {
   const n = frames.length;
   const idx = Math.min(epochIdx, n - 1);
@@ -257,6 +258,18 @@ export default function BlinkComparator({
       return [];
     }
   }, [curImg, prevImg]);
+  // detection summary for the data rail (parent-owned state, effect boundary)
+  useEffect(() => {
+    if (!onStats) return;
+    if (!curImg || !prevImg) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      onStats(null);
+      return;
+    }
+    const movers = candidates.filter((c) => c.kind === 'mover').length;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    onStats({ movers, variables: candidates.length - movers, ready: true });
+  }, [candidates, curImg, prevImg, onStats]);
   const bandMeta = BANDS[band - 1];
   const detChannels = useMemo(() => CHANNELS.filter((c) => c.detector === band), [band]);
 
