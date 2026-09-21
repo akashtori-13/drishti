@@ -8,6 +8,7 @@ import { getCoverage, type RealCell } from '@/lib/showcases';
 import CoverageMap, { type MapSelection } from '@/components/CoverageMap';
 import StellariumView, { type StelFocus } from '@/components/StellariumView';
 import SearchBox, { type SearchTarget } from '@/components/SearchBox';
+import SurpriseButton from '@/components/SurpriseButton';
 import Inspector, { type InspectorField } from '@/components/Inspector';
 import type { SkyHover } from '@/components/HeroSky';
 import { fmtDec, fmtRa } from '@/lib/sky';
@@ -134,7 +135,12 @@ export default function SkyPage() {
       )}
 
       <div className="map-tools glass">
-        <SearchBox id="ms" placeholder="Object or RA, Dec" compact onPick={pick} />
+        <div style={{ display: 'flex', gap: 8, alignItems: 'stretch' }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <SearchBox id="ms" placeholder="Object or RA, Dec" compact onPick={pick} />
+          </div>
+          <SurpriseButton compact onPick={pick} className="lucky-icon-btn" />
+        </div>
         <div className="tool-row">
           <div className="segment" role="group" aria-label="Sky view">
             <button type="button" aria-pressed={observer} onClick={() => setObserver(true)}>Observer</button>

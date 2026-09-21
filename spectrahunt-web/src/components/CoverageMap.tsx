@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   GRID_H, GRID_W, LEVEL_COLORS, STAR_FILL, TAU, cellOf, drawBracket,
-  genStars, type Star,
+  genStars, SKY_ALLSKY_URL, type Star,
 } from '@/lib/sky';
+import { loadCachedImage } from '@/lib/skycache';
 import type { SkyHover } from '@/components/HeroSky';
 
 export interface MapSelection { nx: number; ny: number; ra: number; dec: number }

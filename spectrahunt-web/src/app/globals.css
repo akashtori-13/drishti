@@ -209,6 +209,24 @@ main:focus{outline:none;}
   padding:7px 14px; font-size:.8125rem; color:var(--ink-2); transition:color .15s, border-color .15s, background .15s;
 }
 .chip:hover{color:var(--ink); border-color:var(--line-strong); background:rgba(20,23,40,.8);}
+.chip .icon{width:15px; height:15px;}
+.chip.lucky{
+  display:inline-flex; align-items:center; gap:8px;
+  color:var(--ink); border-color:rgba(124,131,253,.55);
+  background:linear-gradient(135deg, rgba(124,131,253,.18), rgba(79,201,168,.14));
+  font-weight:600;
+}
+.chip.lucky:hover{border-color:#7c83fd; background:linear-gradient(135deg, rgba(124,131,253,.3), rgba(79,201,168,.22));}
+.chip.lucky .icon{width:16px; height:16px; color:#a5acff;}
+.quick-sep{font-size:.8125rem; color:var(--ink-3); font-style:italic;}
+.lucky-icon-btn{
+  flex-shrink:0; width:46px; border-radius:14px;
+  display:grid; place-items:center;
+  background:linear-gradient(135deg, rgba(124,131,253,.2), rgba(79,201,168,.16));
+  border:1px solid rgba(124,131,253,.5); color:#c3c8ff;
+}
+.lucky-icon-btn:hover{border-color:#7c83fd; color:#fff;}
+.lucky-icon-btn .icon{width:20px; height:20px;}
 
 .hero-foot{
   position:absolute; left:0; right:0; bottom:calc(22px + env(safe-area-inset-bottom,0px));
