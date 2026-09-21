@@ -256,7 +256,6 @@ export default function StellariumView({
       ]);
     }, 900);
     return () => { alive = false; clearTimeout(pv); clearTimeout(full); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [raQ, decQ, fovQ, survey]);
 
   // overlays
