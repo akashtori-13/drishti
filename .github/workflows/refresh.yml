@@ -1,0 +1,56 @@
+name: weekly-data-refresh
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"  # Monday 03:00 UTC, after IRSA weekly ingest
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install science deps
+        run: pip install -r requirements.txt
+
+      - name: Refresh showcase cutouts (serial, bounded)
+        run: |
+          for sid in 3i-atlas ecliptic-mover nep-deep; do
+            timeout 1200 python scripts/build_showcases.py --only "$sid" --timeout 90 || true
+          done
+
+      - name: Refresh coverage tallies
+        run: timeout 2400 python scripts/real_coverage.py || true
+
+      - name: Enforce bundle budget (<10MB PNG+JSON)
+        run: |
+          size=$(du -sb spectrahunt-web/public/cutouts spectrahunt-web/public/showcases spectrahunt-web/public/coverage.json 2>/dev/null | awk '{s+=$1} END {print s}')
+          echo "bundle bytes: $size"
+          test "$size" -lt 10485760
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: spectrahunt-web/package-lock.json
+
+      - name: Build static export
+        working-directory: spectrahunt-web
+        run: |
+          npm ci
+          npm run build
+
+      - name: Commit refreshed data
+        run: |
+          git config user.name "spectrahunt-bot"
+          git config user.email "spectrahunt-bot@users.noreply.github.com"
+          git add spectrahunt-web/public/cutouts spectrahunt-web/public/showcases spectrahunt-web/public/coverage.json
+          git diff --cached --quiet || git commit -m "Weekly data refresh: cutouts + coverage tallies"
+          git push
