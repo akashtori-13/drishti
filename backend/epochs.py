@@ -21,8 +21,11 @@ def bandpass_name(band: int) -> str:
 
 
 def tap_cutout_urls(ra: float, dec: float, band: int = 3, size_deg: float = 0.05,
-                    limit: int = 50, collection: Optional[str] = None) -> List[Dict[str, Any]]:
+                    limit: int = 50, collection: Optional[str] = None,
+                    timeout: int = 60) -> List[Dict[str, Any]]:
     """Query TAP for covering images. Returns [{cutout_url, mjd, bandpass}]."""
+    import concurrent.futures
+
     import pyvo
 
     bp = bandpass_name(band)
@@ -35,7 +38,9 @@ def tap_cutout_urls(ra: float, dec: float, band: int = 3, size_deg: float = 0.05
         f"AND p.energy_bandpassname = '{bp}' "
         "ORDER BY p.time_bounds_lower"
     )
-    rows = svc.search(q, maxrec=int(limit))
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+        future = pool.submit(svc.search, q, maxrec=int(limit))
+        rows = future.result(timeout=timeout)
     out = []
     for row in rows:
         try:

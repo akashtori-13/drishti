@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAppStore } from '@/lib/store';
 import { SHOWCASE_IDS, getCoverage, type RealCell } from '@/lib/showcases';
-import { buildGrid, pinCells, GRID_H, GRID_W } from '@/lib/sky';
+import { buildGrid, GRID_H, GRID_W } from '@/lib/sky';
 import HeroSky from '@/components/HeroSky';
 import SearchBox, { type SearchTarget } from '@/components/SearchBox';
 import Inspector, { type InspectorField } from '@/components/Inspector';
@@ -17,8 +17,7 @@ const SHOWCASE_POINTS = [
 function nearestShowcase(ra: number, dec: number): string | null {
   let best: string | null = null;
   let bestD = 3.0;
-  for (const s of SHOWCASE_POINTS) {
-    const d = Math.hypot(s.ra - ra, s.dec - dec);
+  for (const s of SHOWCASE_POINTS) {    const d = Math.hypot(s.ra - ra, s.dec - dec);
     if (d < bestD) { bestD = d; best = s.id; }
   }
   return best;
@@ -36,17 +35,13 @@ function fieldFromRaDec(ra: number, dec: number, grid: number[][], real?: Map<st
       hasCandidate: hit.showcase === '3i-atlas',
       planning: 'QR2 · weekly releases',
       detector: 1 + (i + j) % 6,
+      measured: true,
     };
   }
-  const n = grid[j][i];
-  const seed = 500 + i * 100 + j;
   return {
-    ra, dec, epochs: n,
-    bands: n === 0 ? 0 : 3 + (seed % 4),
-    survey: seed % 5 === 0 ? 'Deep' : 'Wide',
-    hasCandidate: n >= 2 && seed % 3 === 0,
-    planning: `2026W${10 + Math.max(1, n) * 3}_2B`,
-    detector: 1 + (seed % 6),
+    ra, dec, epochs: 0, bands: 0, survey: '—',
+    hasCandidate: false, planning: 'Not yet surveyed', detector: '—',
+    measured: false,
   };
 }
 
@@ -54,7 +49,6 @@ export default function HomePage() {
   const { openShowcase, setCurrentView } = useAppStore();
   const grid = useMemo(() => {
     const g = buildGrid();
-    pinCells(g, SHOWCASE_POINTS);
     return g;
   }, []);
   const [coverage, setCoverage] = useState(false);
@@ -132,7 +126,7 @@ export default function HomePage() {
         <div className="pill glass">
           <span className="rel"><span className="live-dot" />QR2 release, updated weekly</span>
           <span className="sep rel" aria-hidden="true" />
-          <span><b>{(GRID_W * GRID_H).toLocaleString('en-US')}</b> fields indexed</span>
+          <span><b>{real ? real.size : 0}</b> cells surveyed</span>
           <span className="sep" aria-hidden="true" />
           <span><b>{SHOWCASE_IDS.length}</b> showcases live</span>
         </div>
