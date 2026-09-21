@@ -1,67 +1,50 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SHOWCASE_IDS, getShowcase, type Showcase } from '@/lib/showcases';
-import { BANDS, genStars, hexToRgba, TAU } from '@/lib/sky';
+import { BANDS } from '@/lib/sky';
 import { useAppStore } from '@/lib/store';
 
 interface Card {
   id: string; name: string; ra: number; dec: number; band: number;
-  known: string | false; score: number; date: string; seed: number;
+  known: string | false; score: number; date: string; png: string | null;
 }
 
 type Filter = 'all' | 'unknown' | 'known';
 
 function cardsFrom(showcases: Showcase[]): Card[] {
-  return showcases.map((s, i) => {
+  return showcases.map((s) => {
     const m = s.epochs[0]?.skybot_match;
     const known = typeof m === 'string' && m ? m : false;
     return {
       id: s.id, name: s.epochs[0]?.name ?? s.title,
       ra: s.ra, dec: s.dec, band: s.epochs[0]?.band ?? 3,
-      known, score: known ? 8.5 + (i % 3) : 5.0 + (i % 5),
+      known, score: known ? 8.5 : 6.2,
       date: (s.epochs[0]?.mjd ? `MJD ${s.epochs[0].mjd}` : 'QR2'),
-      seed: 5000 + i * 131,
+      png: s.epochs[0]?.png ?? null,
     };
   });
 }
 
 function Thumb({ card }: { card: Card }) {
-  const ref = useRef<HTMLCanvasElement>(null);
-  useEffect(() => {
-    const canvas = ref.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const band = BANDS[card.band - 1];
-    const stars = genStars(card.seed, 30);
-    const mi = Math.floor(((card.seed * 0.618) % 1) * stars.length);
-    let flip = 0;
-    let timer: ReturnType<typeof setInterval> | null = null;
-    const draw = () => {
-      ctx.globalCompositeOperation = 'source-over';
-      ctx.fillStyle = '#040509';
-      ctx.fillRect(0, 0, 260, 260);
-      ctx.globalCompositeOperation = 'lighter';
-      stars.forEach((s, i) => {
-        let x = s.x * 260;
-        let y = s.y * 260;
-        if (i === mi && flip === 1) { x += 12; y -= 8; }
-        ctx.beginPath();
-        ctx.fillStyle = i === mi ? hexToRgba(band.color, 0.95) : `rgba(230,231,239,${s.b})`;
-        ctx.arc(x, y, i === mi ? s.r * 1.5 : s.r, 0, TAU);
-        ctx.fill();
-      });
-      ctx.globalCompositeOperation = 'source-over';
-      flip = 1 - flip;
-    };
-    draw();
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      timer = setInterval(draw, 900);
-    }
-    return () => { if (timer) clearInterval(timer); };
-  }, [card]);
-  return <canvas ref={ref} width={260} height={260} aria-hidden="true" />;
+  const band = BANDS[card.band - 1];
+  if (card.png) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={card.png} alt="" width={260} height={260} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} draggable={false} />;
+  }
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        width: '100%', height: '100%',
+        background: `radial-gradient(circle at 50% 40%, ${band.color}33, #04050a 70%)`,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: '#8a90ab', fontSize: 12,
+      }}
+    >
+      cutout pending
+    </div>
+  );
 }
 
 export default function CandidatesPage() {

@@ -5,7 +5,8 @@ import { fmtDec, fmtRa } from '@/lib/sky';
 
 export interface InspectorField {
   ra: number; dec: number; epochs: number; bands: number; survey: string;
-  hasCandidate: boolean; planning: string; detector: number;
+  hasCandidate: boolean; planning: string; detector: number | string;
+  measured: boolean;
 }
 
 /** Field inspector rail (desktop) / bottom sheet (mobile). */

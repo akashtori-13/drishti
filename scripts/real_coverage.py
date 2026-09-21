@@ -28,19 +28,16 @@ def cell_of(ra, dec):
 
 
 def main():
-    import pyvo
-    svc = pyvo.dal.TAPService("https://irsa.ipac.caltech.edu/TAP")
+    from backend.epochs import bandpass_name, tap_cutout_urls
+
     cells = {}
     for sid, (ra, dec) in TARGETS.items():
         all_mjd, per_band = [], {}
-        for bp in BANDS:
-            q = (f"SELECT TOP 2000 p.time_bounds_lower AS mjd FROM spherex.artifact a "
-                 f"JOIN spherex.plane p ON a.planeid=p.planeid "
-                 f"WHERE 1=CONTAINS(POINT('ICRS',{ra},{dec}),p.poly) "
-                 f"AND p.energy_bandpassname='{bp}' ORDER BY mjd")
+        for i in range(1, 7):
+            bp = bandpass_name(i)
             try:
-                r = svc.search(q)
-                ms = sorted(float(x) for x in r["mjd"])
+                hits = tap_cutout_urls(ra, dec, band=i, limit=2000, timeout=120)
+                ms = sorted(h["mjd"] for h in hits)
             except Exception as e:
                 print(f"[{sid} {bp}] failed: {e}", flush=True)
                 ms = []

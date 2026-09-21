@@ -69,28 +69,13 @@ export function cellOf(ra: number, dec: number): { i: number; j: number } {
   };
 }
 
-/** Coverage grid: real counts override a dim generated base (offline-safe). */
-export function buildGrid(realCells?: Map<string, number>): number[][] {
+/** Coverage grid: all cells start unmeasured (dark). Real TAP tallies pin values. */
+export function buildGrid(): number[][] {
   const grid: number[][] = [];
   for (let j = 0; j < GRID_H; j++) {
-    const row: number[] = [];
-    for (let i = 0; i < GRID_W; i++) {
-      const hit = realCells?.get(`${i},${j}`);
-      if (hit !== undefined) { row.push(hit); continue; }
-      const l = mulberry32(i * 131 + j * 977 + 13)();
-      row.push(l < 0.12 ? 0 : l < 0.3 ? 1 : l < 0.5 ? 2 : l < 0.7 ? 3 : l < 0.87 ? 4 : 5);
-    }
-    grid.push(row);
+    grid.push(new Array<number>(GRID_W).fill(0));
   }
   return grid;
-}
-
-/** Force curated fields to read as well-observed (demo consistency). */
-export function pinCells(grid: number[][], points: Array<{ ra: number; dec: number }>, min = 4) {
-  for (const p of points) {
-    const c = cellOf(p.ra, p.dec);
-    grid[c.j][c.i] = Math.max(grid[c.j][c.i], min);
-  }
 }
 
 export function drawBracket(ctx: CanvasRenderingContext2D, x: number, y: number, b: number, l: number) {

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAppStore } from '@/lib/store';
 import { LEVEL_COLORS } from '@/lib/sky';
-import { buildGrid, pinCells, GRID_H, GRID_W } from '@/lib/sky';
+import { buildGrid, GRID_H, GRID_W } from '@/lib/sky';
 import { getCoverage, type RealCell } from '@/lib/showcases';
 import CoverageMap, { type MapSelection } from '@/components/CoverageMap';
 import SearchBox, { type SearchTarget } from '@/components/SearchBox';
@@ -39,17 +39,13 @@ function fieldFromRaDec(ra: number, dec: number, grid: number[][], real?: Map<st
       hasCandidate: hit.showcase === '3i-atlas',
       planning: 'QR2 · weekly releases',
       detector: 1 + (i + j) % 6,
+      measured: true,
     };
   }
-  const n = grid[j][i];
-  const seed = 500 + i * 100 + j;
   return {
-    ra, dec, epochs: n,
-    bands: n === 0 ? 0 : 3 + (seed % 4),
-    survey: seed % 5 === 0 ? 'Deep' : 'Wide',
-    hasCandidate: n >= 2 && seed % 3 === 0,
-    planning: `2026W${10 + Math.max(1, n) * 3}_2B`,
-    detector: 1 + (seed % 6),
+    ra, dec, epochs: 0, bands: 0, survey: '—',
+    hasCandidate: false, planning: 'Not yet surveyed', detector: '—',
+    measured: false,
   };
 }
 
@@ -58,11 +54,6 @@ export default function SkyPage() {
   const { openShowcase } = useAppStore();
   const grid = useMemo(() => {
     const g = buildGrid();
-    pinCells(g, [
-      { ra: 252.6633, dec: -17.4904 },
-      { ra: 180, dec: 0 },
-      { ra: 270, dec: 66.5 },
-    ]);
     return g;
   }, []);
   const [coverage, setCoverage] = useState(true);
