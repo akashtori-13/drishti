@@ -1,51 +1,82 @@
 # SpectraHunt Netlify Configuration
 # Deploy: https://spectrahunt.netlify.app
+# Stack: Next.js 14 + TypeScript + Tailwind CSS + FastAPI backend
 
 [build]
-  # Install Python dependencies and build static bundle with real SPHEREx data
+  # Install dependencies and build Next.js app
   command = """
+    npm install && \
     pip install -r requirements.txt && \
-    python scripts/build_static_bundle.py --region "180,0,5" --max-frames 100
+    python scripts/build_static_bundle.py --region "180,0,5" --max-frames 100 && \
+    cp -r data/*.json public/ 2>/dev/null || true && \
+    cp -r data/*.db public/ 2>/dev/null || true && \
+    npm run build
   """
-  # Publish the data directory which contains index.html and all JSON files
-  publish = "data"
+  # Next.js outputs to .next directory
+  publish = ".next"
 
 [build.environment]
+  NODE_VERSION = "20"
   PYTHON_VERSION = "3.11"
+  NPM_FLAGS = "--legacy-peer-deps"
 
-# MIME types for astronomy data files
+# Redirects for Next.js App Router
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# SPA fallback for client-side routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Security headers
 [[headers]]
   for = "/*"
   [headers.values]
-    X-Content-Type-Options = "nosniff"
     X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://irsa.ipac.caltech.edu https://vo.imcce.fr https://api.nasa.gov blob:"
 
+# Cache static assets aggressively
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# JSON data files
 [[headers]]
   for = "*.json"
   [headers.values]
-    Content-Type = "application/json"
+    Content-Type = "application/json; charset=utf-8"
     Cache-Control = "public, max-age=3600"
 
+# SQLite database
 [[headers]]
   for = "*.db"
   [headers.values]
     Content-Type = "application/octet-stream"
-    Cache-Control = "public, max-age=86400"
+    Cache-Control = "public, max-age=3600"
 
+# Images
 [[headers]]
   for = "*.png"
   [headers.values]
     Content-Type = "image/png"
     Cache-Control = "public, max-age=86400"
 
-# SPA routing for hash-based navigation
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# FITS files
+[[headers]]
+  for = "*.fits"
+  [headers.values]
+    Content-Type = "application/fits"
 
-# Security: Block access to sensitive files
+# Block sensitive files
 [[redirects]]
   from = "/.git/*"
   to = "/"
@@ -53,5 +84,10 @@
 
 [[redirects]]
   from = "/.env*"
+  to = "/"
+  status = 404
+
+[[redirects]]
+  from = "/requirements.txt"
   to = "/"
   status = 404
