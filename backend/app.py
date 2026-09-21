@@ -3,10 +3,14 @@ SpectraHunt FastAPI Backend
 
 Provides REST API endpoints for the front-end.
 Supports both live mode (API server) and static bundle generation.
+
+Run as: uvicorn backend.app:app --host 0.0.0.0 --port 8000
+Or:     python -m uvicorn backend.app:app --host 0.0.0.0 --port 8000
 """
 
 import json
 import os
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional, List, Dict, Any
@@ -17,13 +21,16 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from .config import (
+# Add parent directory to path so relative imports work when run directly
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from backend.config import (
     RELEASE, RELEASE_DOI, PIPELINE_VERSION, CITATION_TEXT,
     GRID_W, GRID_H, DATABASE_PATH, PNG_CACHE_DIR, CORS_ORIGINS
 )
-from .db import init_db, get_connection, get_coverage_counts, get_candidates, get_candidate_by_id, get_status
-from .ingest import run_ingest
-from .detect import run_detection
+from backend.db import init_db, get_connection, get_coverage_counts, get_candidates, get_candidate_by_id, get_status
+from backend.ingest import run_ingest
+from backend.detect import run_detection
 
 
 # Pydantic models for API responses
@@ -138,10 +145,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static files for serving PNGs
+# Mount static files for serving PNGs and index.html
 data_dir = Path("data")
 if data_dir.exists():
     app.mount("/data", StaticFiles(directory="data"), name="data")
+
+# Serve index.html at root for live mode
+@app.get("/")
+async def serve_root():
+    """Serve the main index.html file."""
+    from fastapi.responses import FileResponse
+    index_path = data_dir / "index.html"
+    if index_path.exists():
+        return FileResponse(index_path)
+    raise HTTPException(status_code=404, detail="index.html not found. Run build_static_bundle.py first.")
 
 
 def esc(s: str) -> str:
