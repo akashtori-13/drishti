@@ -231,21 +231,21 @@ export default function BlinkPage({ id }: { id: string }) {
     return () => { alive = false; };
   }, [viewing, band]);
 
-  // permalink: reflect state in URL without navigation.
-  // Live fields use the canonical /blink/live page (static-safe); showcases use /blink/<id>.
-  useEffect(() => {
+  // Share links are built on demand from live state. The address bar is never
+  // rewritten while browsing — stepping frames must not touch the URL.
+  const shareURL = () => {
+    const base = window.location.origin + window.location.pathname;
     if (isLiveId(id)) {
       const p = parseLiveId(id);
-      if (!p) return;
+      if (!p) return window.location.href;
       const q = new URLSearchParams({
         ra: String(p.ra), dec: String(p.dec), band: String(band),
         epoch: String(epochIdx), mode: compareMode,
       });
-      window.history.replaceState(null, '', `/blink/live?${q.toString()}`);
-      return;
+      return `${base}?${q.toString()}`;
     }
-    window.history.replaceState(null, '', blinkURL(id, { band, epoch: epochIdx, mode: compareMode }));
-  }, [id, band, epochIdx, compareMode]);
+    return window.location.origin + blinkURL(id, { band, epoch: epochIdx, mode: compareMode });
+  };
 
   useEffect(() => {
     try {
@@ -266,7 +266,7 @@ export default function BlinkPage({ id }: { id: string }) {
   }, [viewing, m0, m1, epochs]);
 
   const copyLink = async () => {
-    const url = window.location.href;
+    const url = shareURL();
     try {
       await navigator.clipboard.writeText(url);
     } catch {

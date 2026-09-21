@@ -1,0 +1,51 @@
+{
+  "id": "carina-field",
+  "title": "Carina Nebula \u2014 massive star factory",
+  "ra": 161.26,
+  "dec": -59.68,
+  "measured_at": "2026-09-21T23:08:34.996505+00:00",
+  "detail": "ok",
+  "movers": 12,
+  "variables": 24,
+  "top_sigma": 171.2,
+  "n_epochs": 1,
+  "span_days": null,
+  "variable_flag": false,
+  "known": null,
+  "lightcurve": [
+    {
+      "mjd": 61052.028818,
+      "flux": 0.0
+    }
+  ],
+  "spectrum": [
+    {
+      "band": 1,
+      "wavelength_um": 0.92,
+      "flux": -72.60128784179688,
+      "flux_err": 58.6817500499989,
+      "mjd": 61045.103299
+    },
+    {
+      "band": 2,
+      "wavelength_um": 1.36,
+      "flux": 0.0,
+      "flux_err": 63.489437876546404,
+      "mjd": 61041.982693
+    },
+    {
+      "band": 5,
+      "wavelength_um": 4.12,
+      "flux": 0.0,
+      "flux_err": 0.0,
+      "mjd": 61045.918728
+    },
+    {
+      "band": 6,
+      "wavelength_um": 4.71,
+      "flux": 0.0,
+      "flux_err": 0.0,
+      "mjd": 61194.178994
+    }
+  ]
+}
