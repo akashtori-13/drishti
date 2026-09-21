@@ -16,6 +16,33 @@ import { horizonsURL, irsaViewerURL, mpcCheckerURL, simbadURL, skybotURL } from 
 
 type RailTab = 'overview' | 'epochs' | 'catalogs' | 'share';
 
+/** DSS2 + 2MASS context cutouts (land async via fetch_compare.py). */
+function OtherEyes({ id }: { id: string }) {
+  const [ok, setOk] = useState<{ dss: boolean; tmass: boolean }>({ dss: true, tmass: true });
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 8 }}>
+      {([
+        ['dss', 'DSS2 color', `/compare/${id}_dss.jpg`],
+        ['2mass', '2MASS IR', `/compare/${id}_2mass.jpg`],
+      ] as const).map(([k, label, src]) => (
+        <figure key={k} style={{ margin: 0 }}>
+          {ok[k] ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={src} alt={`${label} view`} loading="lazy" draggable={false}
+              style={{ width: '100%', aspectRatio: '1/1', objectFit: 'cover', borderRadius: 10, display: 'block', background: '#04050a' }}
+              onError={() => setOk((o) => ({ ...o, [k]: false }))} />
+          ) : (
+            <span style={{ display: 'grid', placeItems: 'center', width: '100%', aspectRatio: '1/1', borderRadius: 10, background: '#04050a', color: '#8a90ab', fontSize: 11 }}>
+              indexing…
+            </span>
+          )}
+          <figcaption className="mono" style={{ fontSize: 11, color: '#8a90ab', marginTop: 4 }}>{label} · 0.5°</figcaption>
+        </figure>
+      ))}
+    </div>
+  );
+}
+
 /** Real mini-spectrum: center brightness of each detector-band cutout. */
 function BandSpectrum({ viewing, sample, liveSpec, band }: {
   viewing: Showcase;
@@ -378,6 +405,8 @@ export default function BlinkPage({ id }: { id: string }) {
                   </div>
                   <h3>Provenance</h3>
                   <p>Level-2 spectral image MEF, QR2 pipeline, IRSA/IPAC.</p>
+                  <h3>Same sky, other eyes</h3>
+                  <OtherEyes id={viewing.id} />
                   <p className="cite-box">Data: NASA/JPL–Caltech SPHEREx, processed by IRSA (IPAC). DOI 10.26131/IRSA652.</p>
                 </>
               )}
