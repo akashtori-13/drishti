@@ -221,7 +221,9 @@ export default function BlinkPage({ id }: { id: string }) {
               epochIdx={epochIdx}
               onEpochChange={setEpochIdx}
               showMarkers={showMarkers}
+              onToggleMarkers={() => setShowMarkers(!showMarkers)}
               onSample={setSample}
+              center={{ ra: viewing.ra, dec: viewing.dec }}
             />
           </section>
 

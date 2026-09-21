@@ -14,7 +14,7 @@ export interface BlinkFrame {
 }
 
 export type CompareMode = 'blink' | 'side' | 'swipe' | 'diff';
-type Panel = 'view' | 'image' | 'bands';
+type Dock = null | 'tune' | 'bands' | 'data' | 'export' | 'keys';
 
 /** Load an image element with CORS-clean pixels for canvas sampling. */
 function loadImage(src: string): Promise<HTMLImageElement> {
@@ -74,20 +74,23 @@ const selStyle: React.CSSProperties = { background: '#151929', border: '1px soli
 
 export default function BlinkComparator({
   frames, band, onBandChange, title, mode, onModeChange, epochIdx, onEpochChange,
-  showMarkers, fovArcmin = 10, onSample,
+  showMarkers, onToggleMarkers, fovArcmin = 10, onSample, center,
 }: {
   frames: BlinkFrame[]; band: number; onBandChange: (b: number) => void; title: string;
   mode: CompareMode; onModeChange: (m: CompareMode) => void;
   epochIdx: number; onEpochChange: (i: number) => void;
-  showMarkers: boolean; fovArcmin?: number;
+  showMarkers: boolean; onToggleMarkers?: () => void; fovArcmin?: number;
   onSample?: (args: { x: number; y: number; values: number[] }) => void;
+  center?: { ra: number; dec: number };
 }) {
   const n = frames.length;
   const idx = Math.min(epochIdx, n - 1);
   const prevIdx = (idx - 1 + n) % n;
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(550);
-  const [panel, setPanel] = useState<Panel>('view');
+  const [dock, setDock] = useState<Dock>(null);
+  const [palette, setPalette] = useState(false);
+  const [palQ, setPalQ] = useState('');
   const [stretch, setStretch] = useState<Stretch>('asinh');
   const [cmap, setCmap] = useState<Colormap>('cividis');
   const [invert, setInvert] = useState(false);
@@ -105,24 +108,29 @@ export default function BlinkComparator({
   const [showRgb, setShowRgb] = useState(false);
   const [loaded, setLoaded] = useState<Record<string, HTMLImageElement>>({});
   const [recording, setRecording] = useState(false);
+  const [probe, setProbe] = useState<{ sx: number; sy: number; lum: number; ra: number; dec: number } | null>(null);
 
   const mainRef = useRef<HTMLCanvasElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const leftRef = useRef<HTMLCanvasElement>(null);
   const rightRef = useRef<HTMLCanvasElement>(null);
+  const histRef = useRef<HTMLCanvasElement>(null);
+  const diffStatRef = useRef<HTMLSpanElement>(null);
   const drag = useRef<{ x: number; y: number; pan: { x: number; y: number }; moved: boolean } | null>(null);
+  const probeSrc = useRef<{ img: HTMLImageElement; w: number; h: number } | null>(null);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // preload all frames
+  // preload frames progressively (each arrival re-renders; no blank wait)
   useEffect(() => {
     let alive = true;
     const urls = [...new Set(frames.map((f) => f.png).filter((u): u is string => !!u))];
-    void Promise.all(urls.map((u) => loadImage(u).then((img) => ({ u, img })).catch(() => null))).then((arr) => {
-      if (!alive) return;
-      const map: Record<string, HTMLImageElement> = {};
-      for (const e of arr) if (e) map[e.u] = e.img;
-      setLoaded(map);
-    });
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setLoaded({});
+    for (const u of urls) {
+      void loadImage(u).then((img) => {
+        if (alive) setLoaded((m) => (m[u] ? m : { ...m, [u]: img }));
+      }).catch(() => undefined);
+    }
     return () => { alive = false; };
   }, [frames]);
 
@@ -144,9 +152,41 @@ export default function BlinkComparator({
     onEpochChange((idx + d + n) % n);
   }, [idx, n, onEpochChange]);
 
+  const cur = frames[idx];
+  const prev = frames[prevIdx];
+  const curLbl = cur?.label ?? '—';
+  const downloadPNG = useCallback(() => {
+    const canvas = mode === 'side' ? rightRef.current : mainRef.current;
+    if (!canvas || curLbl === '—') return;
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = `spectrahunt-${curLbl.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.png`;
+    a.click();
+  }, [mode, curLbl]);
+
+  const copyLink = useCallback(() => {
+    void navigator.clipboard?.writeText(window.location.href).catch(() => undefined);
+  }, []);
+
+  // keyboard: transport + palette + dock
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const mod = e.metaKey || e.ctrlKey;
+      if ((mod && e.key.toLowerCase() === 'k') || e.key === '/') {
+        const tag = (e.target as HTMLElement).tagName;
+        if (!['INPUT', 'TEXTAREA', 'SELECT'].includes(tag)) {
+          e.preventDefault();
+          setPalette((p) => !p);
+          setPalQ('');
+          return;
+        }
+      }
+      if (e.key === 'Escape') {
+        if (palette) setPalette(false);
+        else if (dock) setDock(null);
+        return;
+      }
+      if (mod || e.altKey) return;
       const tag = (e.target as HTMLElement).tagName;
       if (['INPUT', 'BUTTON', 'A', 'SELECT', 'TEXTAREA'].includes(tag)) return;
       if (e.key === ' ') { e.preventDefault(); setPlaying((p) => (n > 1 ? !p : p)); }
@@ -155,9 +195,9 @@ export default function BlinkComparator({
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [step, n]);
+  }, [step, n, palette, dock]);
 
-  // non-passive wheel zoom (no console warnings, works on trackpads)
+  // non-passive wheel zoom
   useEffect(() => {
     const stage = stageRef.current;
     if (!stage) return;
@@ -169,21 +209,32 @@ export default function BlinkComparator({
     return () => stage.removeEventListener('wheel', onWheel);
   }, []);
 
-  const cur = frames[idx];
-  const prev = frames[prevIdx];
   const curImg = cur?.png ? loaded[cur.png] : undefined;
   const prevImg = prev?.png ? loaded[prev.png] : undefined;
   const bandMeta = BANDS[band - 1];
   const detChannels = useMemo(() => CHANNELS.filter((c) => c.detector === band), [band]);
 
-  // render main canvas
+  // probe source: natural-res offscreen of current frame
+  useEffect(() => {
+    if (!curImg) { probeSrc.current = null; return; }
+    const c = document.createElement('canvas');
+    c.width = curImg.naturalWidth || curImg.width;
+    c.height = curImg.naturalHeight || curImg.height;
+    const cctx = c.getContext('2d', { willReadFrequently: true });
+    if (!cctx) { probeSrc.current = null; return; }
+    cctx.drawImage(curImg, 0, 0);
+    probeSrc.current = { img: curImg, w: c.width, h: c.height };
+    (probeSrc as { canvas?: HTMLCanvasElement }).canvas = c;
+  }, [curImg]);
+
+  // render main canvas + histogram + diff stats (DOM-direct, no react state)
   useEffect(() => {
     const canvas = mainRef.current;
     if (!canvas) return;
     const host = canvas.parentElement;
     if (!host) return;
     const w = host.clientWidth;
-    const h = host.clientWidth; // square stage
+    const h = host.clientWidth;
     if (!w || !h) return;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = Math.round(w * dpr);
@@ -202,9 +253,9 @@ export default function BlinkComparator({
       return cctx?.getImageData(0, 0, c.width, c.height);
     };
 
-    if (mode === 'side') return; // side canvases render separately
+    if (mode === 'side') return;
+    let diffMode = false;
     if (showRgb && curImg && prevImg) {
-      // motion false-color: R=epoch B, G=epoch A, B=|B-A|
       const A = mk(prevImg);
       const B = mk(curImg);
       if (A && B) {
@@ -226,6 +277,7 @@ export default function BlinkComparator({
         ctx.putImageData(out, 0, 0);
       }
     } else if (mode === 'diff' && curImg && prevImg) {
+      diffMode = true;
       const A = mk(prevImg);
       const B = mk(curImg);
       if (A && B) {
@@ -289,13 +341,46 @@ export default function BlinkComparator({
     ctx.font = '600 12px ui-monospace, monospace';
     ctx.textAlign = 'left';
     ctx.fillText('N ↑   E ←', 14, 22);
-    // scale bar (~1 arcmin of the FOV)
     const barW = Math.max(30, w / fovArcmin);
     ctx.fillRect(w - barW - 14, h - 18, barW, 3);
     ctx.textAlign = 'right';
     ctx.fillText('1′', w - 14, h - 24);
     ctx.textAlign = 'left';
-  }, [curImg, prevImg, mode, stretch, vmin, vmax, invert, cmap, diffScale, swipe, pan, zoom, showMarkers, showRgb, fovArcmin]);
+
+    // histogram + diff stats, drawn DOM-direct (no react state churn)
+    try {
+      const id = ctx.getImageData(0, 0, Math.round(w), Math.round(h));
+      const bins = new Array<number>(48).fill(0);
+      let hot = 0;
+      const d = id.data;
+      for (let i = 0; i < d.length; i += 16) {
+        const lum = (d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114) / 255;
+        bins[Math.min(47, Math.floor(lum * 48))]++;
+        if (diffMode && Math.abs(lum - 0.5) > 0.2) hot++;
+      }
+      const hc = histRef.current;
+      if (hc) {
+        const hw = (hc.width = 220);
+        const hh = (hc.height = 44);
+        const hctx = hc.getContext('2d');
+        if (hctx) {
+          hctx.clearRect(0, 0, hw, hh);
+          const mx = Math.max(1, ...bins);
+          hctx.fillStyle = diffMode ? '#e8c34a' : '#7c83fd';
+          bins.forEach((v, bi) => {
+            const bh = Math.max(1, (v / mx) * (hh - 4));
+            hctx.fillRect((bi / bins.length) * hw, hh - bh, hw / bins.length - 0.5, bh);
+          });
+        }
+      }
+      if (diffStatRef.current) {
+        const total = d.length / 16;
+        diffStatRef.current.textContent = diffMode
+          ? `${((hot / total) * 100).toFixed(1)}% pixels strongly changed`
+          : '';
+      }
+    } catch { /* tainted or tiny canvas */ }
+  });
 
   // side-by-side render (synchronized pan/zoom)
   useEffect(() => {
@@ -332,16 +417,42 @@ export default function BlinkComparator({
       const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
       setSwipe(Math.min(0.98, Math.max(0.02, (e.clientX - r.left) / r.width)));
     }
-    if (!drag.current) return;
-    const dx = e.clientX - drag.current.x;
-    const dy = e.clientY - drag.current.y;
-    if (Math.hypot(dx, dy) > 4) drag.current.moved = true;
-    setPan({ x: drag.current.pan.x + dx, y: drag.current.pan.y + dy });
+    if (drag.current) {
+      const dx = e.clientX - drag.current.x;
+      const dy = e.clientY - drag.current.y;
+      if (Math.hypot(dx, dy) > 4) drag.current.moved = true;
+      else return;
+      setPan({ x: drag.current.pan.x + dx, y: drag.current.pan.y + dy });
+      return;
+    }
+    // hover probe: sample source pixels + approximate sky offset
+    if (e.pointerType === 'touch' || !probeSrc.current || !curImg) { setProbe(null); return; }
+    const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const src = probeSrc.current;
+    const scale = Math.max(r.width / src.w, r.height / src.h) * zoom;
+    const dx = (r.width - src.w * scale) / 2 + pan.x;
+    const dy = (r.height - src.h * scale) / 2 + pan.y;
+    const px = Math.floor((e.clientX - r.left - dx) / scale);
+    const py = Math.floor((e.clientY - r.top - dy) / scale);
+    if (px < 0 || py < 0 || px >= src.w || py >= src.h) { setProbe(null); return; }
+    try {
+      const c = (probeSrc as { canvas?: HTMLCanvasElement }).canvas;
+      const v = c?.getContext('2d', { willReadFrequently: true })?.getImageData(px, py, 1, 1).data;
+      if (!v) { setProbe(null); return; }
+      const lum = Math.round(v[0] * 0.299 + v[1] * 0.587 + v[2] * 0.114);
+      // ≈6.2″/px at zoom 1 from field center
+      const offX = ((px - src.w / 2) * 6.2) / zoom;
+      const offY = ((py - src.h / 2) * 6.2) / zoom;
+      const ra = center ? center.ra - offX / 3600 / Math.max(0.2, Math.cos((center.dec * Math.PI) / 180)) : NaN;
+      const dec = center ? center.dec + offY / 3600 : NaN;
+      setProbe({ sx: e.clientX - r.left, sy: e.clientY - r.top, lum, ra, dec });
+    } catch {
+      setProbe(null);
+    }
   };
   const onPointerUp = () => { drag.current = null; };
   const onClickSample = (e: React.MouseEvent) => {
-    if (!onSample || (drag.current as { moved?: boolean } | null)?.moved) return;
-    // note: drag.current is cleared on pointerup before click; use movement ref
+    if (!onSample || drag.current?.moved) return;
     const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const x = (e.clientX - r.left) / r.width;
     const y = (e.clientY - r.top) / r.height;
@@ -359,15 +470,6 @@ export default function BlinkComparator({
       } catch { return 0; }
     });
     onSample({ x, y, values });
-  };
-
-  const downloadPNG = () => {
-    const canvas = mode === 'side' ? rightRef.current : mainRef.current;
-    if (!canvas) return;
-    const a = document.createElement('a');
-    a.href = canvas.toDataURL('image/png');
-    a.download = `spectrahunt-${cur?.label.replace(/[^a-z0-9]+/gi, '-').toLowerCase() || 'frame'}.png`;
-    a.click();
   };
 
   const recordWebM = async () => {
@@ -403,11 +505,53 @@ export default function BlinkComparator({
     if (p === 'bright') { setVmin(0.15); setVmax(1); }
   };
 
+  const setBandAndChannel = (b: number) => {
+    onBandChange(b);
+    const ch = CHANNELS.filter((c) => c.detector === b);
+    setChannel(ch[Math.floor(ch.length / 2)]?.idx ?? 0);
+  };
+
   const modeLabel = mode === 'diff' ? 'Difference B−A' : mode === 'swipe' ? 'Swipe A | B' : mode === 'side' ? 'Side-by-side' : showRgb ? 'Motion color' : 'Blink';
 
+  interface Cmd { name: string; hint: string; run: () => void }
+  const commands: Cmd[] = [
+      { name: playing ? 'Pause blink' : 'Play blink', hint: 'Space', run: () => setPlaying((p) => (n > 1 ? !p : p)) },
+      { name: 'Next epoch', hint: '→', run: () => step(1) },
+      { name: 'Previous epoch', hint: '←', run: () => step(-1) },
+      ...frames.map((f, i) => ({ name: `Go to ${f.label}`, hint: `E${i + 1}`, run: () => { setPlaying(false); onEpochChange(i); } })),
+      ...(['blink', 'side', 'swipe', 'diff'] as CompareMode[]).map((m) => ({
+        name: `Mode: ${m}`, hint: '', run: () => onModeChange(m),
+      })),
+      { name: 'Toggle motion color', hint: '', run: () => setShowRgb((v) => !v) },
+      ...(['linear', 'log', 'sqrt', 'asinh'] as Stretch[]).map((s) => ({
+        name: `Stretch: ${s}`, hint: '', run: () => setStretch(s),
+      })),
+      ...(['cividis', 'grayscale', 'viridis', 'inferno'] as Colormap[]).map((c) => ({
+        name: `Colormap: ${c}`, hint: '', run: () => setCmap(c),
+      })),
+      { name: 'Toggle invert', hint: '', run: () => setInvert((v) => !v) },
+      ...BANDS.map((b) => ({ name: `Band ${b.label} (${b.range})`, hint: '', run: () => setBandAndChannel(b.id) })),
+      { name: 'Reset view', hint: '', run: () => { setPan({ x: 0, y: 0 }); setZoom(1); } },
+      { name: 'Download PNG', hint: '', run: () => downloadPNG() },
+      { name: 'Record WebM', hint: '', run: () => void recordWebM() },
+      { name: 'Copy share link', hint: '', run: () => copyLink() },
+      ...(onToggleMarkers ? [{ name: 'Toggle mover markers', hint: '', run: onToggleMarkers }] : []),
+    ];
+  // eslint-disable-next-line react-hooks/refs -- commands only invoke the stable parent callback from events
+  const palHits = commands.filter((c) => c.name.toLowerCase().includes(palQ.trim().toLowerCase())).slice(0, 12);
+
+  const dockBtn = (d: Exclude<Dock, null>, label: string, glyph: string) => (
+    <button key={d} type="button" className={`trail-btn${dock === d ? ' active' : ''}`}
+      aria-pressed={dock === d} title={label} aria-label={label}
+      onClick={() => setDock((cur) => (cur === d ? null : d))}>
+      <span aria-hidden="true" className="glyph">{glyph}</span>
+      <span className="trail-label">{label}</span>
+    </button>
+  );
+
   return (
-    <div className="viewer">
-      <div className="viewer-stage" ref={stageRef} style={{ touchAction: 'none' }}>
+    <div className="deck">
+      <div className="stage-wrap" ref={stageRef} style={{ touchAction: 'none' }}>
         {mode === 'side' ? (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, width: '100%' }}>
             <div style={{ position: 'relative', aspectRatio: '1/1' }}>
@@ -436,194 +580,202 @@ export default function BlinkComparator({
             <span className="viewer-tag epoch mono">{cur?.label ?? '—'}</span>
           </>
         )}
+        {probe && mode !== 'side' && (
+          <div className="probe-float mono" style={{ left: Math.min(probe.sx + 14, 220), top: Math.max(probe.sy - 10, 30) }}>
+            px {probe.lum}{Number.isFinite(probe.ra) ? ` · ${probe.ra.toFixed(3)}°, ${probe.dec >= 0 ? '+' : ''}${probe.dec.toFixed(3)}°` : ''}
+          </div>
+        )}
+
+        {/* floating transport */}
+        <div className="float-transport glass" role="group" aria-label="Blink transport">
+          <button type="button" className="icon-btn" onClick={() => step(-1)} aria-label="Previous epoch">
+            <Icon name="back" />
+          </button>
+          <button type="button" className="play mini" onClick={() => setPlaying((p) => (n > 1 ? !p : p))}
+            aria-label={playing ? 'Pause blink' : 'Play blink'}>
+            <Icon name={playing ? 'pause' : 'play'} />
+          </button>
+          <button type="button" className="icon-btn" onClick={() => step(1)} aria-label="Next epoch">
+            <Icon name="fwd" />
+          </button>
+          <input className="scrub" type="range" min={0} max={Math.max(0, n - 1)} step={1} value={idx}
+            onChange={(e) => { setPlaying(false); onEpochChange(Number(e.target.value)); }}
+            aria-label="Timeline scrub" aria-valuetext={cur?.label ?? ''} />
+          <button type="button" className="epoch-chip" onClick={() => setPalette(true)} title="Command palette (Ctrl+K)">⌘K</button>
+        </div>
       </div>
 
-      <div className="viewer-tabs" role="tablist" aria-label="Viewer controls">
-        {(['view', 'image', 'bands'] as Panel[]).map((p) => (
-          <button key={p} type="button" role="tab" aria-selected={panel === p}
-            className={`vtab${panel === p ? ' active' : ''}`} onClick={() => setPanel(p)}>
-            {p === 'view' ? 'View' : p === 'image' ? 'Image' : 'Bands'}
+      {/* filmstrip: every loaded epoch as a thumbnail */}
+      <div className="filmstrip" role="group" aria-label="Epoch filmstrip">
+        {frames.map((f, i) => (
+          <button key={f.label} type="button" onClick={() => { setPlaying(false); onEpochChange(i); }}
+            className={`film${i === idx ? ' active' : ''}`} aria-pressed={i === idx} title={f.mjd ? `${f.label} · MJD ${f.mjd}` : f.label}>
+            {f.png && loaded[f.png] ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={f.png} alt="" draggable={false} />
+            ) : (
+              <span className="film-empty">{f.mjd ? String(Math.round(f.mjd)).slice(2) : `E${i + 1}`}</span>
+            )}
           </button>
         ))}
+        <label className="rate">Rate
+          <input type="range" min={150} max={1200} step={10} value={speed} onChange={(e) => setSpeed(Number(e.target.value))} aria-label="Blink rate" />
+        </label>
       </div>
 
-      {panel === 'view' && (
-        <div className="viewer-controls">
-          <label className="tline" htmlFor="epochSlider">
-            <span>Timeline · {n} epochs</span>
-          </label>
-          <input
-            id="epochSlider"
-            type="range" min={0} max={Math.max(0, n - 1)} step={1} value={idx}
-            onChange={(e) => { setPlaying(false); onEpochChange(Number(e.target.value)); }}
-            style={{ width: '100%', accentColor: '#7c83fd' }}
-            aria-valuetext={cur?.label ?? ''}
-          />
-          <div className="ticks" role="group" aria-label="Jump to epoch">
-            {frames.map((f, i) => (
-              <button key={f.label} type="button" onClick={() => { setPlaying(false); onEpochChange(i); }}
-                className={`tick${i === idx ? ' active' : ''}`} aria-pressed={i === idx}
-                title={f.mjd ? `${f.label} · MJD ${f.mjd}` : f.label}>
-                {f.mjd ? String(Math.round(f.mjd)).slice(2) : `E${i + 1}`}
-              </button>
-            ))}
-          </div>
-          <div className="transport">
-            <button type="button" className="icon-btn" onClick={() => step(-1)} aria-label="Previous epoch">
-              <Icon name="back" />
-            </button>
-            <button type="button" className="play" onClick={() => setPlaying((p) => (n > 1 ? !p : p))}
-              aria-label={playing ? 'Pause blink' : 'Play blink'}>
-              <Icon name={playing ? 'pause' : 'play'} />
-            </button>
-            <button type="button" className="icon-btn" onClick={() => step(1)} aria-label="Next epoch">
-              <Icon name="fwd" />
-            </button>
-            <label className="speed">
-              <span>Rate</span>
-              <input type="range" min={150} max={1200} step={10} value={speed}
-                onChange={(e) => setSpeed(Number(e.target.value))} aria-label="Blink rate milliseconds" />
-              <output>{speed} ms</output>
-            </label>
-          </div>
-          <div style={rowStyle} role="group" aria-label="Compare mode">
-            {(['blink', 'side', 'swipe', 'diff'] as CompareMode[]).map((m) => (
-              <button key={m} type="button" className="epoch-chip" aria-pressed={mode === m}
-                onClick={() => onModeChange(m)}
-                style={mode === m ? { color: '#fff', borderColor: '#7c83fd' } : undefined}>
-                {m === 'blink' ? 'Blink' : m === 'side' ? 'Side' : m === 'swipe' ? 'Swipe' : 'Diff'}
-              </button>
-            ))}
-            <button type="button" className="epoch-chip" aria-pressed={showRgb}
-              onClick={() => setShowRgb((v) => !v)} title="False-color: epoch B red, epoch A green">
-              Color
-            </button>
-          </div>
-          {mode === 'diff' && (
-            <label className="speed"><span>Diff gain</span>
-              <input type="range" min={1} max={8} step={0.5} value={diffScale} onChange={(e) => setDiffScale(Number(e.target.value))} />
-              <output>{diffScale.toFixed(1)}×</output>
-            </label>
-          )}
-          {mode === 'swipe' && (
-            <label className="speed"><span>Curtain</span>
-              <input type="range" min={2} max={98} value={Math.round(swipe * 100)} onChange={(e) => setSwipe(Number(e.target.value) / 100)} />
-              <output>{Math.round(swipe * 100)}%</output>
-            </label>
-          )}
-          <div style={rowStyle}>
-            <button type="button" className="epoch-chip" onClick={downloadPNG}>PNG</button>
-            <button type="button" className="epoch-chip" onClick={recordWebM} disabled={recording || n < 2}>
-              {recording ? 'Recording…' : 'WebM'}
-            </button>
-            <button type="button" className="epoch-chip" onClick={() => { setPan({ x: 0, y: 0 }); setZoom(1); }}>Reset view</button>
-          </div>
-          <div style={rowStyle} aria-label="Quick image controls">
-            <label style={{ fontSize: 12, color: '#8a90ab' }}>Stretch{' '}
-              <select value={stretch} onChange={(e) => setStretch(e.target.value as Stretch)} style={selStyle} aria-label="Quick stretch">
-                <option value="linear">linear</option>
-                <option value="log">log</option>
-                <option value="sqrt">sqrt</option>
-                <option value="asinh">asinh</option>
-              </select>
-            </label>
-            <label style={{ fontSize: 12, color: '#8a90ab' }}>Colors{' '}
-              <select value={cmap} onChange={(e) => setCmap(e.target.value as Colormap)} style={selStyle} aria-label="Quick colormap">
-                <option value="cividis">cividis ✓</option>
-                <option value="grayscale">gray</option>
-                <option value="viridis">viridis</option>
-                <option value="inferno">inferno</option>
-              </select>
-            </label>
-            <button type="button" className="epoch-chip" aria-pressed={invert} onClick={() => setInvert((v) => !v)}
-              style={invert ? { color: '#fff', borderColor: '#7c83fd' } : undefined}>Invert</button>
-            <label style={{ fontSize: 12, color: '#8a90ab' }}>Band{' '}
-              <select value={band} onChange={(e) => {
-                const b = Number(e.target.value);
-                onBandChange(b);
-                const ch = CHANNELS.filter((c) => c.detector === b);
-                setChannel(ch[Math.floor(ch.length / 2)]?.idx ?? 0);
-              }} style={selStyle} aria-label="Quick band">
-                {BANDS.map((b) => (
-                  <option key={b.id} value={b.id}>D{b.id} · {b.range}</option>
-                ))}
-              </select>
-            </label>
-            <button type="button" className="epoch-chip" onClick={() => setPanel('image')} title="All image controls">More…</button>
-          </div>
-          <p className="keys"><kbd>Space</kbd> play · <kbd>←</kbd><kbd>→</kbd> step · drag pan · scroll zoom{onSample ? ' · click spectrum' : ''}</p>
+      <div className="deck-bottom">
+        {/* tool rail */}
+        <div className="tool-rail glass" role="toolbar" aria-label="Viewer tools">
+          {dockBtn('tune', 'Tune', '◐')}
+          {dockBtn('bands', 'Bands', '≈')}
+          {dockBtn('data', 'Measure', '⌖')}
+          {dockBtn('export', 'Export', '⤓')}
+          {dockBtn('keys', 'Keys', '?')}
         </div>
-      )}
 
-      {panel === 'image' && (
-        <div className="viewer-controls">
-          <div style={rowStyle}>
-            <label style={{ fontSize: 13 }}>Stretch{' '}
-              <select value={stretch} onChange={(e) => setStretch(e.target.value as Stretch)} style={selStyle}>
-                <option value="linear">linear</option>
-                <option value="log">log</option>
-                <option value="sqrt">sqrt</option>
-                <option value="asinh">asinh</option>
-              </select>
+        {/* dock panel */}
+        {dock === 'tune' && (
+          <div className="dock-panel glass" role="group" aria-label="Compare and image tuning">
+            <div style={rowStyle} role="group" aria-label="Compare mode">
+              {(['blink', 'side', 'swipe', 'diff'] as CompareMode[]).map((m) => (
+                <button key={m} type="button" className="epoch-chip" aria-pressed={mode === m}
+                  onClick={() => onModeChange(m)} style={mode === m ? { color: '#fff', borderColor: '#7c83fd' } : undefined}>
+                  {m === 'blink' ? 'Blink' : m === 'side' ? 'Side' : m === 'swipe' ? 'Swipe' : 'Diff'}
+                </button>
+              ))}
+              <button type="button" className="epoch-chip" aria-pressed={showRgb} onClick={() => setShowRgb((v) => !v)}>Color</button>
+            </div>
+            {mode === 'diff' && (
+              <label className="speed"><span>Diff gain</span>
+                <input type="range" min={1} max={8} step={0.5} value={diffScale} onChange={(e) => setDiffScale(Number(e.target.value))} />
+                <output>{diffScale.toFixed(1)}×</output>
+              </label>
+            )}
+            {mode === 'swipe' && (
+              <label className="speed"><span>Curtain</span>
+                <input type="range" min={2} max={98} value={Math.round(swipe * 100)} onChange={(e) => setSwipe(Number(e.target.value) / 100)} />
+                <output>{Math.round(swipe * 100)}%</output>
+              </label>
+            )}
+            <div style={rowStyle}>
+              <label style={{ fontSize: 13 }}>Stretch{' '}
+                <select value={stretch} onChange={(e) => setStretch(e.target.value as Stretch)} style={selStyle}>
+                  <option value="linear">linear</option>
+                  <option value="log">log</option>
+                  <option value="sqrt">sqrt</option>
+                  <option value="asinh">asinh</option>
+                </select>
+              </label>
+              <label style={{ fontSize: 13 }}>Colors{' '}
+                <select value={cmap} onChange={(e) => setCmap(e.target.value as Colormap)} style={selStyle}>
+                  <option value="cividis">cividis ✓ colorblind-safe</option>
+                  <option value="grayscale">grayscale</option>
+                  <option value="viridis">viridis</option>
+                  <option value="inferno">inferno</option>
+                </select>
+              </label>
+              <button type="button" className="epoch-chip" aria-pressed={invert} onClick={() => setInvert((v) => !v)}
+                style={invert ? { color: '#fff', borderColor: '#7c83fd' } : undefined}>Invert</button>
+              {(['faint', 'balanced', 'bright'] as const).map((p) => (
+                <button key={p} type="button" className="epoch-chip" onClick={() => setPreset(p)}>{p}</button>
+              ))}
+            </div>
+            <label className="speed"><span>Black {Math.round(vmin * 100)}%</span>
+              <input type="range" min={0} max={50} value={Math.round(vmin * 100)} onChange={(e) => setVmin(Number(e.target.value) / 100)} />
             </label>
-            <label style={{ fontSize: 13 }}>Colors{' '}
-              <select value={cmap} onChange={(e) => setCmap(e.target.value as Colormap)} style={selStyle}>
-                <option value="cividis">cividis ✓ colorblind-safe</option>
-                <option value="grayscale">grayscale</option>
-                <option value="viridis">viridis</option>
-                <option value="inferno">inferno</option>
-              </select>
+            <label className="speed"><span>White {Math.round(vmax * 100)}%</span>
+              <input type="range" min={50} max={100} value={Math.round(vmax * 100)} onChange={(e) => setVmax(Number(e.target.value) / 100)} />
             </label>
-            <label style={{ fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
-              <input type="checkbox" checked={invert} onChange={(e) => setInvert(e.target.checked)} /> Invert
-            </label>
-            {(['faint', 'balanced', 'bright'] as const).map((p) => (
-              <button key={p} type="button" className="epoch-chip" onClick={() => setPreset(p)}>{p}</button>
-            ))}
           </div>
-          <label className="speed"><span>Black {Math.round(vmin * 100)}%</span>
-            <input type="range" min={0} max={50} value={Math.round(vmin * 100)} onChange={(e) => setVmin(Number(e.target.value) / 100)} />
-          </label>
-          <label className="speed"><span>White {Math.round(vmax * 100)}%</span>
-            <input type="range" min={50} max={100} value={Math.round(vmax * 100)} onChange={(e) => setVmax(Number(e.target.value) / 100)} />
-          </label>
-        </div>
-      )}
-
-      {panel === 'bands' && (
-        <div className="viewer-controls">
-          <div className="band-row" style={{ padding: 0, background: 'transparent' }}>
-            {BANDS.map((b) => (
-              <button key={b.id} type="button" className="band"
-                style={{ ['--band-color' as string]: b.color }}
-                aria-pressed={b.id === band} title={`${b.label}: ${b.range}`}
-                onClick={() => {
-                  onBandChange(b.id);
-                  const ch = CHANNELS.filter((c) => c.detector === b.id);
-                  setChannel(ch[Math.floor(ch.length / 2)]?.idx ?? 0);
-                }}>
-                <span className="sw" style={{ background: b.color }} />{b.label}
+        )}
+        {dock === 'bands' && (
+          <div className="dock-panel glass" role="group" aria-label="Spectral bands">
+            <div className="band-row" style={{ padding: 0, background: 'transparent' }}>
+              {BANDS.map((b) => (
+                <button key={b.id} type="button" className="band" style={{ ['--band-color' as string]: b.color }}
+                  aria-pressed={b.id === band} title={`${b.label}: ${b.range}`} onClick={() => setBandAndChannel(b.id)}>
+                  <span className="sw" style={{ background: b.color }} />{b.label}
+                </button>
+              ))}
+            </div>
+            <p style={{ fontSize: 12, color: '#8a90ab' }}>{bandMeta.label} ({bandMeta.range}) · 102 channels · same-band blink only</p>
+            <div style={rowStyle}>
+              <label style={{ fontSize: 13 }}>Channel{' '}
+                <select value={channel} onChange={(e) => setChannel(Number(e.target.value))} style={{ ...selStyle, maxWidth: 200 }} aria-label="Spectral channel">
+                  {detChannels.map((c) => (
+                    <option key={c.idx} value={c.idx}>#{c.idx + 1} · {c.wave_um.toFixed(2)} µm</option>
+                  ))}
+                </select>
+              </label>
+              <span style={{ fontSize: 13, color: '#8a90ab' }}>RGB</span>
+              {(['R', 'G', 'B'] as const).map((k, ki) => (
+                <select key={k} value={rgb[ki]} aria-label={`${k} channel`} style={selStyle}
+                  onChange={(e) => setRgb(([r, g, b]) => { const v = [r, g, b] as [number, number, number]; v[ki] = Number(e.target.value); return v; })}>
+                  {CHANNELS.map((c) => <option key={c.idx} value={c.idx}>{k} #{c.idx + 1}</option>)}
+                </select>
+              ))}
+            </div>
+          </div>
+        )}
+        {dock === 'data' && (
+          <div className="dock-panel glass" role="group" aria-label="Live measurements">
+            <div style={rowStyle}>
+              <div>
+                <div style={{ fontSize: 12, color: '#8a90ab', marginBottom: 4 }}>Frame histogram</div>
+                <canvas ref={histRef} className="hist" aria-label="Brightness histogram of the displayed frame" />
+              </div>
+              <div style={{ fontSize: 12, color: '#8a90ab' }}>
+                <div>Hover the image for pixel probe{onSample ? '; click for spectrum' : ''}.</div>
+                <div style={{ marginTop: 6 }}>Change map: <span ref={diffStatRef} className="mono" style={{ color: '#e8c34a' }} /></div>
+                {mode !== 'diff' && <span className="mono">switch to Diff to quantify change</span>}
+              </div>
+            </div>
+          </div>
+        )}
+        {dock === 'export' && (
+          <div className="dock-panel glass" role="group" aria-label="Export">
+            <div style={rowStyle}>
+              <button type="button" className="epoch-chip" onClick={() => downloadPNG()}>Download PNG</button>
+              <button type="button" className="epoch-chip" onClick={() => void recordWebM()} disabled={recording || n < 2}>
+                {recording ? 'Recording…' : 'Record WebM'}
               </button>
-            ))}
+              <button type="button" className="epoch-chip" onClick={() => { setPan({ x: 0, y: 0 }); setZoom(1); }}>Reset view</button>
+              <button type="button" className="epoch-chip" onClick={() => copyLink()}>Copy share link</button>
+            </div>
           </div>
-          <p style={{ fontSize: 12, color: '#8a90ab' }}>{bandMeta.label} ({bandMeta.range}) · 102 channels · same-band blink only</p>
-          <div style={rowStyle}>
-            <label style={{ fontSize: 13 }}>Channel{' '}
-              <select value={channel} onChange={(e) => setChannel(Number(e.target.value))} style={{ ...selStyle, maxWidth: 200 }} aria-label="Spectral channel">
-                {detChannels.map((c) => (
-                  <option key={c.idx} value={c.idx}>#{c.idx + 1} · {c.wave_um.toFixed(2)} µm</option>
-                ))}
-              </select>
-            </label>
+        )}
+        {dock === 'keys' && (
+          <div className="dock-panel glass" role="group" aria-label="Keyboard shortcuts">
+            <div className="keys-grid">
+              <span><kbd>Space</kbd> play / pause</span>
+              <span><kbd>←</kbd><kbd>→</kbd> step epoch</span>
+              <span><kbd>Ctrl/⌘ K</kbd> command palette</span>
+              <span><kbd>Esc</kbd> close panel</span>
+              <span>drag pan · scroll zoom</span>
+            </div>
           </div>
-          <div style={rowStyle}>
-            <span style={{ fontSize: 13, color: '#8a90ab' }}>RGB</span>
-            {(['R', 'G', 'B'] as const).map((k, ki) => (
-              <select key={k} value={rgb[ki]} aria-label={`${k} channel`} style={selStyle}
-                onChange={(e) => setRgb(([r, g, b]) => { const v = [r, g, b] as [number, number, number]; v[ki] = Number(e.target.value); return v; })}>
-                {CHANNELS.map((c) => <option key={c.idx} value={c.idx}>{k} #{c.idx + 1}</option>)}
-              </select>
-            ))}
+        )}
+      </div>
+
+      {/* command palette */}
+      {palette && (
+        <div className="pal-veil" onMouseDown={() => setPalette(false)}>
+          <div className="palette glass" role="dialog" aria-modal="true" aria-label="Command palette"
+            onMouseDown={(e) => e.stopPropagation()}>
+            <input autoFocus value={palQ} onChange={(e) => setPalQ(e.target.value)}
+              placeholder="Type a command or epoch…" aria-label="Command search"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && palHits[0]) { palHits[0].run(); setPalette(false); }
+              }} />
+            <div className="pal-list" role="listbox" aria-label="Commands">
+              {palHits.map((c) => (
+                <button key={c.name} type="button" role="option" aria-selected={false}
+                  onClick={() => { c.run(); setPalette(false); }}>
+                  <span>{c.name}</span>{c.hint && <kbd>{c.hint}</kbd>}
+                </button>
+              ))}
+              {!palHits.length && <div className="s-empty">No matching command.</div>}
+            </div>
           </div>
         </div>
       )}
