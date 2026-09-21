@@ -25,11 +25,13 @@ export default function HeroSky({
   const state = useRef<{
     w: number; h: number;
     hover: (SkyHover & { nx: number; ny: number }) | null;
+    hoverMarker: string | null;
+    bright: boolean;
     selected: { nx: number; ny: number } | null;
     grid: number[][]; coverage: boolean;
     img: HTMLImageElement | null;
     markers: HeroMarker[];
-  }>({ w: 0, h: 0, hover: null, selected: null, grid, coverage, img: null, markers });
+  }>({ w: 0, h: 0, hover: null, hoverMarker: null, bright: false, selected: null, grid, coverage, img: null, markers });
   const cb = useRef({ onInspect, onMarker });
   useEffect(() => {
     cb.current = { onInspect, onMarker };
@@ -60,6 +62,13 @@ export default function HeroSky({
     const st = state.current;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
     let raf = 0;
+    let idleTimer: ReturnType<typeof setTimeout> | null = null;
+    const wake = () => {
+      st.bright = true;
+      if (idleTimer) clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => { st.bright = false; kick(); }, 2500);
+      kick();
+    };
 
     const layout = () => {
       const w = host.clientWidth;
@@ -89,8 +98,8 @@ export default function HeroSky({
         ctx.scale(-1, 1);
         ctx.drawImage(st.img, (w - dw) / 2, (h - dh) / 2, dw, dh);
         ctx.restore();
-        // dim slightly so text stays readable
-        ctx.fillStyle = 'rgba(4,5,10,.28)';
+        // base dim for text contrast; lifts while the user interacts with the sky
+        ctx.fillStyle = st.bright ? 'rgba(4,5,10,.06)' : 'rgba(4,5,10,.30)';
         ctx.fillRect(0, 0, w, h);
       } else {
         ctx.fillStyle = '#04050a';
@@ -145,29 +154,32 @@ export default function HeroSky({
         ctx.lineWidth = 1.5;
         drawBracket(ctx, st.selected.nx * w, st.selected.ny * h, 14, 6);
       }
-      // blinkable-field markers: the bg doubles as a mini-map
+      // blinkable-field markers: tiny unlabeled dots; label is a hover tooltip only
       ctx.textBaseline = 'middle';
       for (const m of st.markers) {
         const mx = (m.ra / 360) * w;
         const my = ((90 - m.dec) / 180) * h;
-        const isHov = st.hover && Math.hypot(st.hover.x - mx, st.hover.y - my) < 16;
-        const g = ctx.createRadialGradient(mx, my, 0, mx, my, 16);
-        g.addColorStop(0, isHov ? 'rgba(124,131,253,.8)' : 'rgba(124,131,253,.45)');
+        const isHov = st.hoverMarker === m.id;
+        const g = ctx.createRadialGradient(mx, my, 0, mx, my, isHov ? 20 : 13);
+        g.addColorStop(0, isHov ? 'rgba(124,131,253,.9)' : 'rgba(124,131,253,.4)');
         g.addColorStop(1, 'rgba(124,131,253,0)');
         ctx.fillStyle = g;
-        ctx.beginPath(); ctx.arc(mx, my, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(mx, my, isHov ? 20 : 13, 0, Math.PI * 2); ctx.fill();
         ctx.fillStyle = '#fff';
-        ctx.beginPath(); ctx.arc(mx, my, isHov ? 4 : 3, 0, Math.PI * 2); ctx.fill();
-        ctx.font = `${isHov ? 600 : 500} 10px "Geist Mono", ui-monospace, monospace`;
-        ctx.textAlign = mx > w - 110 ? 'right' : 'left';
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = 'rgba(5,6,12,.9)';
-        const label = m.id.replace(/-/g, ' ');
-        const lx = mx + (mx > w - 110 ? -10 : 10);
-        ctx.strokeText(label, lx, my - 10);
-        ctx.fillStyle = isHov ? '#fff' : 'rgba(196,202,226,.85)';
-        ctx.fillText(label, lx, my - 10);
-        ctx.textAlign = 'left';
+        ctx.beginPath(); ctx.arc(mx, my, isHov ? 3.5 : 2.2, 0, Math.PI * 2); ctx.fill();
+        if (isHov) {
+          ctx.font = '600 11px "Geist Mono", ui-monospace, monospace';
+          ctx.textAlign = mx > w - 130 ? 'right' : 'left';
+          const label = m.id.replace(/-/g, ' ');
+          const lx = mx + (mx > w - 130 ? -12 : 12);
+          const twd = ctx.measureText(label).width;
+          const bx = mx > w - 130 ? lx - twd - 6 : lx - 6;
+          ctx.fillStyle = 'rgba(5,6,12,.85)';
+          ctx.fillRect(bx, my - 22, twd + 12, 20);
+          ctx.fillStyle = '#fff';
+          ctx.fillText(label, lx, my - 12);
+          ctx.textAlign = 'left';
+        }
       }
     };
 
@@ -190,9 +202,18 @@ export default function HeroSky({
       const dec = 90 - ny * 180;
       const c = cellOf(ra, dec);
       st.hover = { ...c, ra, dec, n: st.grid[c.j][c.i], x: nx * st.w, y: ny * st.h, nx, ny };
-      kick();
+      // marker tooltip target (hover affordance doubles as the click hint)
+      let found: string | null = null;
+      for (const m of st.markers) {
+        const mx = (m.ra / 360) * r.width;
+        const my = ((90 - m.dec) / 180) * r.height;
+        if (Math.hypot(e.clientX - r.left - mx, e.clientY - r.top - my) < 18) { found = m.id; break; }
+      }
+      st.hoverMarker = found;
+      canvas.style.cursor = found ? 'pointer' : 'crosshair';
+      wake();
     };
-    const leave = () => { st.hover = null; kick(); };
+    const leave = () => { st.hover = null; st.hoverMarker = null; kick(); };
     const click = (e: MouseEvent) => {
       const r = canvas.getBoundingClientRect();
       const nx = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
@@ -208,7 +229,7 @@ export default function HeroSky({
       }
       st.selected = { nx, ny };
       cb.current.onInspect(nx * 360, 90 - ny * 180, e.clientX, e.clientY);
-      kick();
+      wake();
     };
     canvas.addEventListener('pointermove', move);
     canvas.addEventListener('pointerleave', leave);
@@ -220,6 +241,7 @@ export default function HeroSky({
     kick();
     return () => {
       cancelAnimationFrame(raf);
+      if (idleTimer) clearTimeout(idleTimer);
       document.removeEventListener('visibilitychange', onVis);
       reduce.removeEventListener?.('change', onChange);
       canvas.removeEventListener('pointermove', move);

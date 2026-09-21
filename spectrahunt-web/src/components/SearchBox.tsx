@@ -121,6 +121,7 @@ export default function SearchBox({
     >
         <Icon name="search" className="s-icon icon" />
         <input
+          id={`${id}-input`}
           value={q}
           onChange={(e) => { setQ(e.target.value); setOpts(build(e.target.value)); setHl(-1); setErr(null); setOpen(true); }}
           onFocus={() => { setOpts(build(q)); setOpen(true); }}
@@ -133,7 +134,6 @@ export default function SearchBox({
           placeholder={placeholder} aria-label={placeholder}
           autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} enterKeyHint="search"
         />
-        {!compact && <kbd className="s-kbd" aria-hidden="true">/</kbd>}
         <button type="submit" className="s-go" disabled={busy}>
           <Icon name="search" className="s-go-icon icon" />
           <span className="s-go-label">{busy ? '…' : compact ? 'Go' : 'Search'}</span>
