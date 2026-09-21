@@ -24,7 +24,7 @@ def test_showcase_schema():
         doc = json.loads((base / f"{sid}.json").read_text())
         assert doc["id"] == sid
         assert -90 <= doc["dec"] <= 90 and 0 <= doc["ra"] < 360
-        assert len(doc["epochs"]) == 2
+        assert 2 <= len(doc["epochs"]) <= 8  # multiepoch filler grows fields over time
         for ep in doc["epochs"]:
             assert ep["label"] and ep.get("band") in (None, 1, 2, 3, 4, 5, 6)
 
