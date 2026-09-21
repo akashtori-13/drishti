@@ -142,16 +142,30 @@ Expected: Few or no candidates.
 
 ## Deployment
 
-### Static Hosting (GitHub Pages / Netlify)
+### Static Hosting (GitHub Pages / Netlify) - RECOMMENDED
+
+The static bundle mode is the most reliable for demos and hackathons.
 
 ```bash
-# Build bundle
-python scripts/build_static_bundle.py --output dist/data
+# Build bundle (this generates data/ directory with all files)
+python scripts/build_static_bundle.py --region "180,0,2" --max-frames 50
 
-# Copy index.html
-cp index.html dist/
+# The script automatically copies index.html to data/
+# Just deploy the entire data/ folder to your hosting
+```
 
-# Deploy dist/ folder
+**Netlify:**
+1. Connect your GitHub repository
+2. Set build command: `pip install -r requirements.txt && python scripts/build_static_bundle.py --region "180,0,2" --max-frames 50`
+3. Set publish directory: `data`
+4. Deploy! The `netlify.toml` file handles all configuration automatically.
+
+**GitHub Pages:**
+```bash
+# Build to docs folder
+python scripts/build_static_bundle.py --output docs --region "180,0,2" --max-frames 50
+
+# Push docs/ to gh-pages branch or use GitHub Actions
 ```
 
 ### Docker (Live Mode)
@@ -164,6 +178,12 @@ RUN pip install -r requirements.txt
 COPY . .
 EXPOSE 8000
 CMD ["uvicorn", "backend.app:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+Build and run:
+```bash
+docker build -t spectrahunt .
+docker run -p 8000:8000 spectrahunt
 ```
 
 ### Cron Job (Daily Ingest)
