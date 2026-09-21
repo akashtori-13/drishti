@@ -22,8 +22,12 @@ def bandpass_name(band: int) -> str:
 
 def tap_cutout_urls(ra: float, dec: float, band: int = 3, size_deg: float = 0.05,
                     limit: int = 50, collection: Optional[str] = None,
-                    timeout: int = 60, newest: bool = False) -> List[Dict[str, Any]]:
-    """Query TAP for covering images. Returns [{cutout_url, mjd, bandpass}]."""
+                    timeout: int = 60, newest: bool = False, retries: int = 1) -> List[Dict[str, Any]]:
+    """Query TAP for covering images. Returns [{cutout_url, mjd, bandpass}].
+
+    Retries once on failure: IRSA queues often answer the second attempt
+    after warming up. Total wait stays bounded by (retries+1) × timeout.
+    """
     import threading
 
     import pyvo
@@ -40,21 +44,29 @@ def tap_cutout_urls(ra: float, dec: float, band: int = 3, size_deg: float = 0.05
     )
     # Daemon thread: join() bounds the wait, and a hung query can never
     # wedge the process (ThreadPoolExecutor.__exit__ would wait forever).
-    box: Dict[str, Any] = {}
+    last: Optional[Exception] = None
+    for _ in range(retries + 1):
+        box: Dict[str, Any] = {}
 
-    def target() -> None:
-        try:
-            box["rows"] = svc.search(q, maxrec=int(limit))
-        except Exception as e:  # noqa: BLE001
-            box["error"] = e
+        def target() -> None:
+            try:
+                box["rows"] = svc.search(q, maxrec=int(limit))
+            except Exception as e:  # noqa: BLE001
+                box["error"] = e
 
-    worker = threading.Thread(target=target, daemon=True)
-    worker.start()
-    worker.join(timeout=timeout)
-    if worker.is_alive():
-        raise TimeoutError(f"TAP query exceeded {timeout}s")
-    if "error" in box:
-        raise box["error"]
+        worker = threading.Thread(target=target, daemon=True)
+        worker.start()
+        worker.join(timeout=timeout)
+        if worker.is_alive():
+            last = TimeoutError(f"TAP query exceeded {timeout}s")
+            continue
+        if "error" in box:
+            last = box["error"]
+            continue
+        last = None
+        break
+    if last is not None:
+        raise last
     rows = box.get("rows", [])
     out = []
     for row in rows:
