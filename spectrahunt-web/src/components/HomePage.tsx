@@ -138,7 +138,29 @@ export default function HomePage() {
           </div>
           <p className="sky-hint">Or click anywhere on the real sky behind this text to inspect that field.</p>
 
-          <div className="hero-stats" aria-label="Live survey statistics">
+          {(() => {
+            const f = fields.find((x) => x.id === 'ecliptic-mover');
+            const pngs = (f?.epochs.map((e) => e.png).filter(Boolean) ?? []) as string[];
+            if (!f || pngs.length < 2) return null;
+            return (
+              <Link href={blinkURL('ecliptic-mover', { mode: 'diff' })} className="featured"
+                aria-label="Featured blink: ecliptic plane difference view">
+                <span className="feat-imgs" aria-hidden="true">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={pngs[0]} alt="" draggable={false} />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={pngs[1]} alt="" draggable={false} className="b" />
+                </span>
+                <span className="feat-body">
+                  <span className="feat-k">Featured blink · 31σ mover found</span>
+                  <span className="feat-t">Ecliptic plane, 370 days apart</span>
+                  <span className="feat-s">Difference view — stars cancel, the mover pops →</span>
+                </span>
+              </Link>
+            );
+          })()}
+
+          <div className="hero-stats pill glass" aria-label="Live survey statistics">
             <span><b>{real ? real.size.toLocaleString() : '—'}</b> cells measured</span>
             <span className="sep" aria-hidden="true" />
             <span><b>{SHOWCASE_IDS.length}</b> blinkable fields</span>
