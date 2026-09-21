@@ -12,7 +12,8 @@
       "ra": 270.0,
       "dec": 66.5,
       "size_deg": 0.15,
-      "png": "/cutouts/nep-deep_Deep-stack-early.png"
+      "png": "/cutouts/nep-deep_Deep-stack-early.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2025W17_4B/l2b-v20-2025-240/4/level2_2025W17_4B_0021_1D4_spx_l2b-v20-2025-240.fits?center=270.0,66.5&size=0.05"
     },
     {
       "label": "Deep stack late",
@@ -21,7 +22,8 @@
       "ra": 270.0,
       "dec": 66.5,
       "size_deg": 0.15,
-      "png": null
+      "png": "/cutouts/nep-deep_Deep-stack-late.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W32_2A/l2b-v27-2026-223/4/level2_2026W32_2A_0746_2D4_spx_l2b-v27-2026-223.fits?center=270.0,66.5&size=0.05"
     }
   ],
   "tap": {
