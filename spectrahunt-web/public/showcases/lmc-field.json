@@ -12,7 +12,8 @@
       "ra": 80.89,
       "dec": -69.76,
       "size_deg": 0.15,
-      "png": null
+      "png": "/cutouts/lmc-field_Survey-1.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2025W18_2B/l2b-v20-2025-241/3/level2_2025W18_2B_0401_4D3_spx_l2b-v20-2025-241.fits?center=80.89,-69.76&size=0.15"
     },
     {
       "label": "Survey 2 \u00b7 D3",
@@ -21,7 +22,8 @@
       "ra": 80.89,
       "dec": -69.76,
       "size_deg": 0.15,
-      "png": null
+      "png": "/cutouts/lmc-field_Survey-2.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W30_1B/l2b-v27-2026-222/3/level2_2026W30_1B_0679_1D3_spx_l2b-v27-2026-222.fits?center=80.89,-69.76&size=0.15"
     }
   ],
   "tap": {

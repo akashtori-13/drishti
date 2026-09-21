@@ -19,7 +19,7 @@ def test_showcase_schema():
     from pathlib import Path
     from backend.app import SHOWCASE_IDS
     base = Path(__file__).parent.parent.parent / "spectrahunt-web" / "public" / "showcases"
-    assert len(SHOWCASE_IDS) >= 9
+    assert len(SHOWCASE_IDS) >= 15
     for sid in SHOWCASE_IDS:
         doc = json.loads((base / f"{sid}.json").read_text())
         assert doc["id"] == sid

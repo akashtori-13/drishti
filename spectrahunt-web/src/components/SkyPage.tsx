@@ -21,6 +21,12 @@ const SHOWCASE_POINTS = [
   { id: 'lmc-field', ra: 80.89, dec: -69.76 },
   { id: 'virgo-field', ra: 200, dec: 0 },
   { id: 'eros-field', ra: 210.32, dec: 9.11 },
+  { id: 'crab-field', ra: 83.63, dec: 22.01 },
+  { id: 'omega-cen-field', ra: 201.69, dec: -47.48 },
+  { id: 'carina-field', ra: 161.26, dec: -59.68 },
+  { id: 'm51-field', ra: 202.47, dec: 47.2 },
+  { id: 'm101-field', ra: 210.8, dec: 54.35 },
+  { id: 'smc-field', ra: 13.18, dec: -72.83 },
 ];
 
 function nearestShowcase(ra: number, dec: number): string | null {

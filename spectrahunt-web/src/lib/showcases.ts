@@ -33,7 +33,7 @@ export interface Showcase {
   citation?: { doi: string; text: string };
 }
 
-export const SHOWCASE_IDS = ['3i-atlas', 'ecliptic-mover', 'nep-deep', 'orion-field', 'galactic-center', 'm31-field', 'lmc-field', 'virgo-field', 'eros-field'] as const;
+export const SHOWCASE_IDS = ['3i-atlas', 'ecliptic-mover', 'nep-deep', 'orion-field', 'galactic-center', 'm31-field', 'lmc-field', 'virgo-field', 'eros-field', 'crab-field', 'omega-cen-field', 'carina-field', 'm51-field', 'm101-field', 'smc-field'] as const;
 
 export interface RealCell {
   showcase: string; ra: number; dec: number;

@@ -61,8 +61,9 @@ scripts/
   build_showcases.py  # showcase PNG indexer (oldest+newest pairing for same-spot epochs)
   real_coverage.py    # showcase-cell tallies → coverage.json
 spectrahunt-web/
-  public/showcases/   # 9 fields (3i-atlas, ecliptic-mover, nep-deep, orion, galcenter,
-                        # m31, lmc, virgo, eros — real coords/epochs, png fills in via indexer)
+  public/showcases/   # 15 fields (3i-atlas, ecliptic-mover, nep-deep, orion, galcenter,
+                        # m31, lmc, virgo, eros, crab, omega-cen, carina, m51, m101, smc —
+                        # real coords/epochs, png fills in via indexer)
   public/cutouts/     # rendered PNGs, ≤100KB, immutable cache
   public/coverage.json# measured cells {epochs, images, bands, span}
   src/lib/astro.ts    # coordinates, 88 constellations, 102 channels, stretch/colormaps, permalinks

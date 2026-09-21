@@ -61,7 +61,38 @@ def main():
     ap.add_argument("--timeout", type=int, default=120)
     ap.add_argument("--publish-only", action="store_true",
                     help="write coverage.json from current progress without querying")
+    ap.add_argument("--shard", default=None,
+                    help="shard partition I/N, e.g. 0/4 (this worker handles boxes[I::N])")
+    ap.add_argument("--progress", default=None,
+                    help="progress file for this worker (default: data/census_progress.json)")
+    ap.add_argument("--merge", action="store_true",
+                    help="merge data/census_shard_*.json into coverage.json without querying")
+    ap.add_argument("--seed", default=None,
+                    help="extra progress file to seed done/cells from (e.g. main progress)")
     args = ap.parse_args()
+
+    if args.merge:
+        merged: dict = {"done": [], "cells": {}}
+        # shard files only (they partition all boxes; main progress is superseded)
+        for src in sorted((ROOT / "data").glob("census_shard_*.json")):
+            try:
+                part = json.loads(Path(src).read_text())
+            except Exception:
+                continue
+            for k in part.get("done", []):
+                if k not in merged["done"]:
+                    merged["done"].append(k)
+            for ck, c in part.get("cells", {}).items():
+                m = merged["cells"].setdefault(ck, {"images": 0, "mjds": [], "per_band": {}, "capped": False})
+                m["images"] += c.get("images", 0)
+                m["mjds"].extend(c.get("mjds", []))
+                for bp, v in c.get("per_band", {}).items():
+                    m["per_band"][bp] = m["per_band"].get(bp, 0) + v
+                if c.get("capped"):
+                    m["capped"] = True
+        finalize(merged["cells"])
+        print(f"merged {len(merged['done'])} boxes", flush=True)
+        return True
 
     if args.publish_only:
         try:
@@ -76,10 +107,22 @@ def main():
 
     from backend.epochs import bandpass_name
 
+    prog_path = Path(args.progress) if args.progress else PROGRESS
     try:
-        progress = json.loads(PROGRESS.read_text())
+        progress = json.loads(prog_path.read_text())
     except Exception:
         progress = {"done": [], "cells": {}}
+    if args.seed:
+        try:
+            seed = json.loads(Path(args.seed).read_text())
+            for k in seed.get("done", []):
+                if k not in progress.get("done", []):
+                    progress.setdefault("done", []).append(k)
+            for ck, c in seed.get("cells", {}).items():
+                if ck not in progress.get("cells", {}):
+                    progress.setdefault("cells", {})[ck] = c
+        except Exception as e:
+            print(f"seed failed: {e}", flush=True)
     done = set(progress.get("done", []))
     cells = progress.get("cells", {})
 
@@ -93,6 +136,15 @@ def main():
                           round(dec, 1), round(min(90.0, dec + args.dec_step), 1)))
             dec += args.dec_step
         ra += args.ra_step
+
+    if args.shard:
+        try:
+            si, sn = (int(x) for x in args.shard.split("/"))
+            boxes = [b for k, b in enumerate(boxes) if k % sn == si]
+            print(f"shard {si}/{sn}: {len(boxes)} boxes", flush=True)
+        except Exception as e:
+            print(f"bad --shard: {e}", flush=True)
+            return False
 
     for b in boxes:
         key = f"{b[0]}:{b[1]}:{b[2]}:{b[3]}"
@@ -122,8 +174,8 @@ def main():
                 c["capped"] = True
         done.add(key)
         progress = {"done": sorted(done), "cells": cells}
-        PROGRESS.parent.mkdir(parents=True, exist_ok=True)
-        PROGRESS.write_text(json.dumps(progress))
+        prog_path.parent.mkdir(parents=True, exist_ok=True)
+        prog_path.write_text(json.dumps(progress))
         print(f"[box {key}] rows={len(rows)} cells={len(cells)}", flush=True)
     finalize(cells)
     return True
