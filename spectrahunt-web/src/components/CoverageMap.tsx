@@ -53,7 +53,6 @@ export default function CoverageMap({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     const s = st.current;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
     let raf = 0;
     let hover: (SkyHover & { nx: number; ny: number }) | null = null;
 
