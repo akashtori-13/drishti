@@ -95,6 +95,13 @@ export default function SkyPage() {
         onHover={setHover}
         onInspect={inspect}
       />
+      {/* compass + FOV indicator overlays */}
+      <div aria-hidden="true" style={{ position: 'absolute', top: 'calc(var(--nav-total) + 170px)', right: 18, zIndex: 5, width: 56, height: 56, borderRadius: '50%', background: 'rgba(5,6,12,.78)', border: '1px solid var(--line)', display: 'grid', placeItems: 'center', fontSize: 12, color: '#eef0f8', fontFamily: 'monospace' }}>
+        <span>N ↑<br />E ←</span>
+      </div>
+      <div className="glass mono" style={{ position: 'absolute', top: 'calc(var(--nav-total) + 236px)', right: 18, zIndex: 5, fontSize: 11, padding: '4px 10px', borderRadius: 999, color: '#aab0c8' }}>
+        FOV 10′ · cell 5°×5°
+      </div>
 
       <div className="map-tools glass">
         <SearchBox id="ms" placeholder="Object or RA, Dec" compact onPick={pick} />

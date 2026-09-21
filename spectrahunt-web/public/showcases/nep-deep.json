@@ -5,10 +5,35 @@
   "dec": 66.5,
   "story": "Hundreds of visits per channel. Stack for depth, blink for variables and slow movers. QR2 deep collection: spherex_qr2_deep.",
   "epochs": [
-    {"label": "Deep stack early", "band": 4, "wavelength_um": 3.12, "ra": 270.0, "dec": 66.5, "size_deg": 0.15, "png": null},
-    {"label": "Deep stack late", "band": 4, "wavelength_um": 3.12, "ra": 270.0, "dec": 66.5, "size_deg": 0.15, "png": null}
+    {
+      "label": "Deep stack early",
+      "band": 4,
+      "wavelength_um": 3.12,
+      "ra": 270.0,
+      "dec": 66.5,
+      "size_deg": 0.15,
+      "png": "/cutouts/nep-deep_Deep-stack-early.png"
+    },
+    {
+      "label": "Deep stack late",
+      "band": 4,
+      "wavelength_um": 3.12,
+      "ra": 270.0,
+      "dec": 66.5,
+      "size_deg": 0.15,
+      "png": null
+    }
   ],
-  "tap": {"collection": "spherex_qr2_deep", "bandpass": "SPHEREx-D4", "endpoint": "https://irsa.ipac.caltech.edu/TAP"},
-  "links": {"irsa_viewer": "https://irsa.ipac.caltech.edu/irsaviewer/"},
-  "citation": {"doi": "10.26131/IRSA652", "text": "SPHEREx QR2 Deep via IRSA."}
+  "tap": {
+    "collection": "spherex_qr2_deep",
+    "bandpass": "SPHEREx-D4",
+    "endpoint": "https://irsa.ipac.caltech.edu/TAP"
+  },
+  "links": {
+    "irsa_viewer": "https://irsa.ipac.caltech.edu/irsaviewer/"
+  },
+  "citation": {
+    "doi": "10.26131/IRSA652",
+    "text": "SPHEREx QR2 Deep via IRSA."
+  }
 }

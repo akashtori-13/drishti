@@ -156,3 +156,40 @@ async def api_skybot(ra: float = Query(...), dec: float = Query(...),
 async def api_citation():
     return {"citation": CITATION_TEXT, "doi": DOI, "release": RELEASE,
             "generated_at": datetime.now(timezone.utc).isoformat()}
+
+
+@app.get("/api/detect")
+async def api_detect(ra: float = Query(...), dec: float = Query(...),
+                     band: int = Query(3, ge=1, le=6),
+                     size_deg: float = Query(CUTOUT_SIZE_DEG, gt=0, le=0.5)):
+    """Cross-epoch mover/variable detection for one sky position (bounded, never 500)."""
+    from backend.cutouts import fetch_ibe, mask_bad_pixels, parse_fits
+    from backend.detect import arcsec_per_day, detect_sources, match_epochs
+    from backend.epochs import discover_epochs
+    import tempfile
+
+    try:
+        hits = [h for h in discover_epochs(ra, dec, band=band, size_deg=size_deg) if h.get("cutout_url")]
+        if len(hits) < 2:
+            return {"candidates": [], "matched": 0, "detail": "need-2-epochs"}
+        first, last = hits[0], hits[-1]
+        srcs = []
+        for h in (first, last):
+            with tempfile.NamedTemporaryFile(suffix=".fits", delete=True) as tmp:
+                await fetch_ibe(h["cutout_url"], Path(tmp.name))
+                parsed = parse_fits(Path(tmp.name))
+                if parsed["image"] is None:
+                    return {"candidates": [], "matched": 0, "detail": "empty-image"}
+                masked, _ = mask_bad_pixels(parsed["image"], parsed.get("flags"), parsed.get("variance"))
+                srcs.append(detect_sources(masked))
+        m = match_epochs(srcs[0], srcs[1])
+        cands = [{"kind": c["kind"], "x": c["x"], "y": c["y"]} for c in (m["movers"] + m["variables"])[:50]]
+        motion = arcsec_per_day(ra, dec, ra, dec, (last.get("mjd") or 0) - (first.get("mjd") or 0))
+        return {"candidates": cands, "matched": m["matched"],
+                "movers": len(m["movers"]), "variables": len(m["variables"]),
+                "motion_arcsec_day": motion,
+                "mjd_a": first.get("mjd"), "mjd_b": last.get("mjd"),
+                "detail": "ok"}
+    except Exception as e:
+        print(f"detect failed: {e}")
+        return {"candidates": [], "matched": 0, "detail": "error"}
