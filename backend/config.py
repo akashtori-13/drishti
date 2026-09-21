@@ -1,79 +1,69 @@
 """
-SpectraHunt Backend Configuration
+SpectraHunt Configuration
 
-All constants, endpoints, thresholds and configuration live here.
+All constants, endpoints, and thresholds in one place.
 No magic numbers scattered in the code.
 """
 
-# SPHEREx QR2 release info
-RELEASE = "QR2"
-RELEASE_DOI = "10.26131/IRSA652"  # QR2 current (QR1 is 10.26131/IRSA629)
-PIPELINE_VERSION = "v1.0.0"
+# Data release
+RELEASE = 'QR2'
+DOI = '10.26131/IRSA652'  # QR2 DOI (QR1: 10.26131/IRSA629)
 
-# IRSA / AWS endpoints
-IRSA_SIA2_ENDPOINT = "https://irsa.ipac.caltech.edu/SIA"
-IRSA_TAP_ENDPOINT = "https://irsa.ipac.caltech.edu/TAP"
-IRSA_CUTOUT_BASE = "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2"
-AWS_BUCKET = "nasa-irsa-spherex"
-AWS_REGION = "us-east-1"
-AWS_PREFIX = "qr2/level2"
+# IRSA Endpoints
+IRSA_SIA2_URL = 'https://irsa.ipac.caltech.edu/SIA'
+IRSA_TAP_URL = 'https://irsa.ipac.caltech.edu/TAP'
+IRSA_CUTOUT_BASE = 'https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2'
+IRSA_SIA2_COLLECTION = 'spherex_qr2'  # Wide survey (primary)
+IRSA_DEEP_COLLECTION = 'spherex_qr2_deep'
 
-# SIA2 collections
-SIA2_COLLECTION_WIDE = "spherex_qr2"
-SIA2_COLLECTION_DEEP = "spherex_qr2_deep"
-SIA2_COLLECTION_CAL = "spherex_qr2_cal"
+# AWS Open Data (unsigned requests)
+AWS_BUCKET = 'nasa-irsa-spherex'
+AWS_REGION = 'us-east-1'
+AWS_PREFIX = 'qr2/level2'
 
-# SkyBoT endpoint (IMCCE)
-SKYBOT_ENDPOINT = "https://vo.imcce.fr/webservices/skybot/"
+# SkyBoT (IMCCE) for solar system object cross-match
+SKYBOT_URL = 'http://vo.imcce.fr/webservices/skybot/'
+SKYBOT_RADIUS_ARCSEC = 10.0  # Default search radius
 
-# Band definitions (SPHEREx LVF bands)
+# SPHEREx detector/band definitions
 BANDS = [
-    {"id": 1, "label": "Band 1", "range_um": (0.75, 1.09), "R": 39, "color": "#7c83fd"},
-    {"id": 2, "label": "Band 2", "range_um": (1.10, 1.62), "R": 41, "color": "#5aa9e6"},
-    {"id": 3, "label": "Band 3", "range_um": (1.63, 2.41), "R": 41, "color": "#4fc9a8"},
-    {"id": 4, "label": "Band 4", "range_um": (2.42, 3.82), "R": 35, "color": "#e8c34a"},
-    {"id": 5, "label": "Band 5", "range_um": (3.83, 4.41), "R": 112, "color": "#f08a4b"},
-    {"id": 6, "label": "Band 6", "range_um": (4.42, 5.00), "R": 128, "color": "#e85d4a"},
+    {'id': 1, 'label': 'Band 1', 'range': '0.75–1.09 µm', 'R': 39},
+    {'id': 2, 'label': 'Band 2', 'range': '1.10–1.62 µm', 'R': 41},
+    {'id': 3, 'label': 'Band 3', 'range': '1.63–2.41 µm', 'R': 41},
+    {'id': 4, 'label': 'Band 4', 'range': '2.42–3.82 µm', 'R': 35},
+    {'id': 5, 'label': 'Band 5', 'range': '3.83–4.41 µm', 'R': 112},
+    {'id': 6, 'label': 'Band 6', 'range': '4.42–5.00 µm', 'R': 128},
 ]
 
-# Detector properties
-DETECTOR_PIXELS = 2040  # image HDU is 2040x2040
-PIXEL_SCALE_ARCSEC = 6.2  # nominal pixel scale
+# Detector specs
+DETECTOR_PIXELS = (2040, 2040)  # Image HDU dimensions
+PIXEL_SCALE_ARCSEC = 6.2  # Arcseconds per pixel
+PSF_FWHM_ARCSEC = 6.0  # Approximate PSF FWHM
 
 # Detection pipeline thresholds
-DETECTION_SIGMA_THRESHOLD = 5.0  # SEP extraction threshold in sigma
-DIPOLE_MAX_SEPARATION_ARCSEC = 30.0  # max separation for dipole pairing
-DIPOLE_MAX_MOTION_ARCSEC_PER_DAY = 1000.0  # physically plausible motion cap
-SKYBOT_MATCH_RADIUS_ARCSEC = 10.0  # cross-match radius for SkyBoT
-WAVELENGTH_MATCH_TOLERANCE_FACTOR = 0.5  # |Δλ| < 0.5 × CBAND for wavelength matching
+DETECTION_SIGMA_THRESHOLD = 5.0  # Minimum significance for SEP extraction
+DIPOLE_MAX_SEPARATION_ARCSEC = 30.0  # Max separation for dipole pairing
+WAVELENGTH_MATCH_TOLERANCE = 0.5  # Tolerance factor for wavelength matching (fraction of bandwidth)
+FLAGS_BAD_BITS = [0, 1, 2, 4, 8]  # Bad pixel flag bits (from SPHEREx Explanatory Supplement)
 
-# Cutout settings
-CUTOUT_SIZE_DEG = 0.15  # cutout size in degrees (~9 arcmin)
-CUTOUT_CACHE_DIR = "data/cutouts"
-PNG_CACHE_DIR = "data/img"
+# Grid dimensions
+GRID_W = 72  # 5° cells in RA (360/5)
+GRID_H = 36  # 5° cells in Dec (180/5)
 
-# Coverage grid (matches front-end)
-GRID_W = 72
-GRID_H = 36
-CELL_SIZE_DEG = 5.0
+# API configuration
+API_CONCURRENCY_LIMIT = 4  # Max concurrent requests to IRSA
+API_TIMEOUT_SECONDS = 30
+USER_AGENT = 'SpectraHunt/1.0 (NASA Space Apps 2026; github.com/your-org/spectrahunt)'
 
-# Ingest settings
-MAX_CONCURRENT_IRSA_REQUESTS = 4
-INGEST_TIMEOUT_SECONDS = 30
-USER_AGENT = "SpectraHunt/1.0.0 (NASA Space Apps Challenge 2026; astrophysics moving-object detection)"
+# Cache directories
+CACHE_DIR = '.cache'
+CUTOUT_CACHE_DIR = '.cache/cutouts'
+PNG_CACHE_DIR = '.cache/pngs'
 
-# Database
-DATABASE_PATH = "data/spectrahunt.db"
+# Pipeline version
+PIPELINE_VERSION = '1.0.0'
 
-# API settings
-API_HOST = "0.0.0.0"
-API_PORT = 8000
-CORS_ORIGINS = ["*"]
-
-# FLAGS bitmask interpretation (from SPHEREx Explanatory Supplement)
-# These bits indicate bad/unusable pixels
-FLAGS_BAD_BITS = [0, 1, 2, 3, 7]  # verify from documentation
-FLAGS_BAD_MASK = sum(1 << b for b in FLAGS_BAD_BITS)
-
-# Required citation text
-CITATION_TEXT = """This publication makes use of data products from the Spectro-Photometer for the History of the Universe, Epoch of Reionization and Ices Explorer (SPHEREx), which is a joint project of the Jet Propulsion Laboratory and the California Institute of Technology, and is funded by the National Aeronautics and Space Administration."""
+# Citation text (required by SPHEREx)
+CITATION_TEXT = """
+This publication makes use of data products from the Spectro-Photometer for the History of the Universe, Epoch of Reionization and Ices Explorer (SPHEREx), which is a joint project of the Jet Propulsion Laboratory and the California Institute of Technology, and is funded by the National Aeronautics and Space Administration.
+""".strip()

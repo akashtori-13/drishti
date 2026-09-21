@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "name": "Ecliptic plane",
+    "meta": "180.00, 0.00",
+    "ra": 180.0,
+    "dec": 0.0,
+    "known": false
+  },
+  {
+    "name": "Anti-solar point",
+    "meta": "180.00, 0.00",
+    "ra": 180.0,
+    "dec": 0.0,
+    "known": false
+  }
+]
