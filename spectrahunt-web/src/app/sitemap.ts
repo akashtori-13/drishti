@@ -1,4 +1,6 @@
 import type { MetadataRoute } from 'next';
+
+export const dynamic = 'force-static';
 import { SHOWCASE_IDS } from '@/lib/showcases';
 
 export default function sitemap(): MetadataRoute.Sitemap {
