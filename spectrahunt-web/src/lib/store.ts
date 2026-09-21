@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type View = 'home' | 'blink' | 'sky' | 'about';
+export type View = 'home' | 'blink' | 'sky' | 'candidates' | 'about';
 
 interface AppState {
   currentView: View;
@@ -13,6 +13,7 @@ const HASH: Record<View, string> = {
   home: '#/',
   blink: '#/blink',
   sky: '#/sky',
+  candidates: '#/candidates',
   about: '#/about',
 };
 

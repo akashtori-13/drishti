@@ -1,53 +1,76 @@
 'use client';
 
+import { BANDS } from '@/lib/sky';
+
 export default function AboutPage() {
   return (
-    <div className="min-h-screen p-4">
-      <div className="max-w-3xl mx-auto space-y-6">
-        <h1 className="text-3xl font-bold">About SpectraHunt</h1>
+    <div className="prose">
+      <h1>About SpectraHunt</h1>
+      <p className="lede">A public blink comparator for the SPHEREx sky, built for the 2026 NASA Space Apps Challenge.</p>
+      <p className="notice">
+        Live cutout PNGs fill in as the indexer runs against IRSA. Until then, viewers render
+        illustrative placeholders — the stories, coordinates, and metadata are real.
+      </p>
 
-        <section className="bg-slate-800/30 border border-slate-700/50 rounded-2xl p-6">
-          <h2 className="font-semibold mb-2">What it is</h2>
-          <p className="text-sm text-slate-300">
-            Since 2025, NASA&apos;s SPHEREx mission maps the whole sky every six months in
-            102 near-infrared bands. Comets, asteroids and variable stars reveal themselves
-            by shifting between visits. SpectraHunt is a public blink comparator: same sky,
-            different time, drag the slider.
-          </p>
-        </section>
+      <section>
+        <h2>What SPHEREx is watching for</h2>
+        <p>
+          SPHEREx (Spectro-Photometer for the History of the Universe, Epoch of Reionization,
+          and Ices Explorer) is a NASA all-sky survey observatory, imaging the entire sky
+          roughly every six months across 102 near-infrared bands from 0.75 to 5 microns.
+          Because it revisits the same sky repeatedly, anything that moves, brightens, or
+          fades between visits stands out once you compare epochs directly: comets,
+          asteroids, variable stars, and more.
+        </p>
+        <table className="band-table">
+          <thead><tr><th scope="col"><span className="sr-only">Color</span></th><th scope="col">Band</th><th scope="col">Wavelength</th></tr></thead>
+          <tbody>
+            {BANDS.map((b) => (
+              <tr key={b.id}>
+                <td><span className="sw" style={{ background: b.color }} /></td>
+                <td>{b.label}</td>
+                <td>{b.range}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
 
-        <section className="bg-slate-800/30 border border-slate-700/50 rounded-2xl p-6">
-          <h2 className="font-semibold mb-2">The one rule that matters</h2>
-          <p className="text-sm text-slate-300">
-            SPHEREx uses linear variable filters: the same detector pixel sees a different
-            wavelength depending on sky position. We only blink <strong>same-band epochs</strong>
-            {' '}(|Δλ| &lt; ½ bandwidth) — otherwise stellar colors fake motion.
-          </p>
-        </section>
+      <section>
+        <h2>How detection works</h2>
+        <p>
+          Each field with two or more same-band epochs gets aligned to a common grid,
+          background-subtracted, and differenced. Whatever is left after masking bad pixels
+          gets extracted. Real movers show up as paired bright-and-dark dipoles; noise and
+          cosmic rays don&apos;t pair the same way. Every candidate is cross-checked against
+          SkyBoT&apos;s catalog of known solar-system objects before it reaches the feed.
+        </p>
+        <p>
+          One rule governs every blink: SPHEREx uses linear variable filters, so the same
+          detector pixel sees a different wavelength depending on sky position. We only
+          compare epochs whose wavelengths agree within half the local bandwidth.
+        </p>
+      </section>
 
-        <section className="bg-slate-800/30 border border-slate-700/50 rounded-2xl p-6">
-          <h2 className="font-semibold mb-2">Data</h2>
-          <ul className="text-sm text-slate-300 space-y-1">
-            <li>· SPHEREx Quick Release 2 via IRSA (weekly; QR3 next)</li>
-            <li>· Discovery: TAP <span className="font-mono text-xs">spherex.artifact ⋈ spherex.plane</span>, SIA2 fallback</li>
-            <li>· Pixels: IBE cutouts <span className="font-mono text-xs">?center=RA,Dec&amp;size=deg</span>, zscale PNGs</li>
-            <li>· Context: Aladin Lite / DSS2 HiPS · Cross-checks: SkyBoT, MPC, Sesame</li>
-          </ul>
-        </section>
+      <section>
+        <h2>Required data citation</h2>
+        <div className="cite-block">
+          This publication makes use of data products from the Spectro-Photometer for the
+          History of the Universe, Epoch of Reionization and Ices Explorer (SPHEREx), which
+          is a joint project of the Jet Propulsion Laboratory and the California Institute
+          of Technology, and is funded by the National Aeronautics and Space Administration.
+        </div>
+      </section>
 
-        <section className="bg-slate-800/30 border border-slate-700/50 rounded-2xl p-6">
-          <h2 className="font-semibold mb-2">Citation</h2>
-          <p className="text-xs font-mono text-slate-300">
-            This publication makes use of data products from SPHEREx (JPL/Caltech, NASA).
-            DOI: 10.26131/IRSA652 (QR2).
-          </p>
-          <div className="text-sm mt-3 space-y-1">
-            <a className="block text-blue-400 hover:underline" target="_blank" rel="noreferrer" href="https://irsa.ipac.caltech.edu/Missions/spherex.html">→ SPHEREx at IRSA</a>
-            <a className="block text-blue-400 hover:underline" target="_blank" rel="noreferrer" href="https://irsa.ipac.caltech.edu/data/SPHEREx/docs/comet3iatlas/">→ 3I/ATLAS observations</a>
-            <a className="block text-blue-400 hover:underline" target="_blank" rel="noreferrer" href="https://registry.opendata.aws/spherex-qr/">→ AWS Open Data</a>
-          </div>
-        </section>
-      </div>
+      <section>
+        <h2>Sources</h2>
+        <ul className="source-list">
+          <li><a href="https://irsa.ipac.caltech.edu/Missions/spherex.html" target="_blank" rel="noopener">SPHEREx archive at IRSA</a></li>
+          <li><a href="https://irsa.ipac.caltech.edu/data/SPHEREx/docs/overview_qr.html" target="_blank" rel="noopener">SPHEREx Quick Release overview, IRSA</a></li>
+          <li><a href="https://registry.opendata.aws/spherex-qr/" target="_blank" rel="noopener">SPHEREx Quick Release on AWS Open Data</a></li>
+          <li><a href="https://vo.imcce.fr/webservices/skybot/" target="_blank" rel="noopener">IMCCE SkyBoT, solar-system cone search</a></li>
+        </ul>
+      </section>
     </div>
   );
 }

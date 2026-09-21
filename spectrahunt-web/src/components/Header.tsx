@@ -1,54 +1,53 @@
 'use client';
 
-import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { useAppStore, type View } from '@/lib/store';
-import { Search, Zap, Globe, Info } from 'lucide-react';
+import Icon from '@/components/Icon';
 
-const NAV: Array<{ id: View; label: string; icon: typeof Search; hash: string }> = [
-  { id: 'home', label: 'Home', icon: Search, hash: '#/' },
-  { id: 'blink', label: 'Blink', icon: Zap, hash: '#/blink' },
-  { id: 'sky', label: 'Sky', icon: Globe, hash: '#/sky' },
-  { id: 'about', label: 'About', icon: Info, hash: '#/about' },
+const NAV: Array<{ id: View; label: string }> = [
+  { id: 'sky', label: 'Sky map' },
+  { id: 'blink', label: 'Blink' },
+  { id: 'candidates', label: 'Candidates' },
+  { id: 'about', label: 'About' },
 ];
 
 export default function Header() {
   const { currentView, setCurrentView } = useAppStore();
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
 
   return (
-    <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur-sm sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 py-3">
-        <div className="flex items-center justify-between">
-          <Link href="#/" className="flex items-center space-x-3 group">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center">
-              <span className="text-white font-bold text-lg">S</span>
-            </div>
-            <div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                SpectraHunt
-              </h1>
-              <p className="text-xs text-slate-400">Watch the infrared sky move</p>
-            </div>
-          </Link>
-
-          <nav className="flex items-center space-x-1">
-            {NAV.map((item) => {
-              const Icon = item.icon;
-              const active = currentView === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setCurrentView(item.id)}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all ${
-                    active ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span className="text-sm font-medium hidden sm:inline">{item.label}</span>
-                </button>
-              );
-            })}
-          </nav>
-        </div>
+    <header className={`nav${open ? ' menu-open' : ''}`}>
+      <div className="nav-inner">
+        <a className="brand" href="#/" aria-label="SpectraHunt home">
+          <Icon name="logo" className="logo icon" />
+          <span className="brand-name">SpectraHunt</span>
+        </a>
+        <nav className="tabs" id="navTabs" aria-label="Primary">
+          {NAV.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => { setCurrentView(item.id); setOpen(false); }}
+              className={currentView === item.id || (item.id === 'blink' && currentView === 'blink') ? 'active' : ''}
+              aria-current={currentView === item.id ? 'page' : undefined}
+            >
+              {item.label}
+            </button>
+          ))}
+        </nav>
+        <button
+          type="button" className="nav-menu-btn" aria-expanded={open}
+          aria-controls="navTabs" aria-label={open ? 'Close menu' : 'Open menu'}
+          onClick={() => setOpen((o) => !o)}
+        >
+          <Icon name="menu" className="icon nav-menu-ic" />
+          <Icon name="x" className="icon nav-close-ic" />
+        </button>
       </div>
     </header>
   );

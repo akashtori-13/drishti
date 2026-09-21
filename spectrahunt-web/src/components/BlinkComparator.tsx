@@ -1,102 +1,152 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import Icon from '@/components/Icon';
+import { BANDS } from '@/lib/sky';
 
-interface BlinkEpoch {
+export interface BlinkFrame {
   label: string;
   png?: string | null;
   note?: string;
+  obs_id?: string;
+  mjd?: number;
 }
 
-export default function BlinkComparator({ before, after }: { before: BlinkEpoch; after: BlinkEpoch }) {
-  const [pos, setPos] = useState(0.5);
+/**
+ * Epoch blink player: autoplay transport, speed, step, difference mode,
+ * band selector, epoch chips, keyboard. PNG layers when cached, styled
+ * fallback placeholders offline.
+ */
+export default function BlinkComparator({
+  frames, band, onBandChange, title,
+}: {
+  frames: BlinkFrame[]; band: number; onBandChange: (b: number) => void; title: string;
+}) {
+  const [idx, setIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const [mode, setMode] = useState<'slider' | 'onion' | 'diff'>('slider');
-  const trackRef = useRef<HTMLDivElement>(null);
+  const [speed, setSpeed] = useState(550);
+  const [diff, setDiff] = useState(false);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const n = frames.length;
+  const cur = frames[Math.min(idx, n - 1)];
 
   useEffect(() => {
-    if (!playing) return;
-    timer.current = setInterval(() => {
-      setPos((p) => (p > 0.5 ? 0 : 1));
-    }, 900);
+    if (!playing || n < 2) return;
+    timer.current = setInterval(() => setIdx((i) => (i + 1) % n), speed);
     return () => { if (timer.current) clearInterval(timer.current); };
-  }, [playing]);
+  }, [playing, speed, n]);
 
-  const onPointer = useCallback((e: React.PointerEvent) => {
-    const el = trackRef.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const x = Math.min(Math.max((e.clientX - r.left) / r.width, 0), 1);
-    setPos(x);
-  }, []);
+  const step = useCallback((d: number) => {
+    setPlaying(false);
+    setIdx((i) => (i + d + n) % n);
+  }, [n]);
 
-  const frame = (e: BlinkEpoch, tint: string) => (
-    <div className="absolute inset-0 flex items-center justify-center" style={{ background: tint }}>
-      {e.png ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={e.png} alt={e.label} className="w-full h-full object-cover" draggable={false} />
-      ) : (
-        <div className="text-center px-6">
-          <div className="text-5xl mb-3">✦</div>
-          <div className="font-semibold text-white">{e.label}</div>
-          <div className="text-xs text-slate-300 mt-2 max-w-sm">
-            Live cutout loads via IRSA IBE when online. Offline you still get the story + metadata below.
-          </div>
-        </div>
-      )}
-    </div>
-  );
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const tag = (e.target as HTMLElement).tagName;
+      if (['INPUT', 'BUTTON', 'A', 'SELECT', 'TEXTAREA'].includes(tag)) return;
+      if (e.key === ' ') { e.preventDefault(); setPlaying((p) => (n > 1 ? !p : p)); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [step, n]);
+
+  const bandMeta = BANDS[band - 1];
 
   return (
-    <div>
-      <div className="flex gap-2 mb-3 text-sm">
-        {(['slider', 'onion', 'diff'] as const).map((m) => (
-          <button key={m} onClick={() => setMode(m)}
-            className={`px-3 py-1 rounded-full border ${mode === m ? 'bg-purple-600 border-purple-500 text-white' : 'border-slate-700 text-slate-300'}`}>
-            {m === 'slider' ? 'Slider' : m === 'onion' ? 'Onion-skin' : 'A−B'}
-          </button>
-        ))}
-        <button onClick={() => setPlaying((p) => !p)}
-          className="ml-auto px-3 py-1 rounded-full border border-slate-700 text-slate-200">
-          {playing ? '⏸ Pause' : '▶ Blink'}
-        </button>
-      </div>
-
-      <div ref={trackRef} onPointerDown={onPointer} onPointerMove={(e) => e.buttons && onPointer(e)}
-        className="relative w-full aspect-video rounded-xl overflow-hidden border border-slate-700 select-none cursor-ew-resize bg-slate-900">
-        {mode === 'slider' && (
-          <>
-            {frame(before, 'radial-gradient(circle at 30% 30%, #1e2a5a, #05060c)')}
-            <div className="absolute inset-0" style={{ clipPath: `inset(0 ${(1 - pos) * 100}% 0 0)` }}>
-              {frame(after, 'radial-gradient(circle at 70% 30%, #5a2a1e, #05060c)')}
-            </div>
-            <div className="absolute top-0 bottom-0" style={{ left: `${pos * 100}%` }}>
-              <div className="w-0.5 h-full bg-white/80" />
-            </div>
-          </>
-        )}
-        {mode === 'onion' && (
-          <>
-            {frame(before, 'radial-gradient(circle at 30% 30%, #1e2a5a, #05060c)')}
-            <div className="absolute inset-0" style={{ opacity: pos }}>
-              {frame(after, 'radial-gradient(circle at 70% 30%, #5a2a1e, #05060c)')}
-            </div>
-          </>
-        )}
-        {mode === 'diff' && (
-          <div className="absolute inset-0 flex items-center justify-center bg-[repeating-linear-gradient(45deg,#0b0d18,#0b0d18_12px,#101423_12px,#101423_24px)]">
-            <div className="text-center text-slate-300 text-sm px-6">
-              A−B difference is computed in the pipeline (reproject + zodi-subtract + SEP). Live diff PNGs appear here once cached.
+    <div className="viewer">
+      <div className="viewer-stage">
+        {cur?.png ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={cur.png} alt={`${title} — ${cur.label}`}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            draggable={false}
+          />
+        ) : (
+          <div style={{
+            width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'radial-gradient(circle at 50% 40%, #1a2145, #04050a 70%)',
+          }}>
+            <div style={{ textAlign: 'center', padding: 24 }}>
+              <div style={{ fontSize: 44, marginBottom: 12 }}>✦</div>
+              <div style={{ fontWeight: 600, color: '#fff' }}>{cur?.label ?? '—'}</div>
+              <div style={{ fontSize: 12, color: '#aab0c8', marginTop: 8, maxWidth: 340 }}>
+                {diff
+                  ? 'Difference frame renders once the cutout pipeline caches this field.'
+                  : 'Cutout PNG loads via IRSA IBE when the indexer runs. Story + metadata below work offline.'}
+              </div>
             </div>
           </div>
         )}
-        <div className="absolute top-2 left-2 text-[11px] bg-black/60 px-2 py-1 rounded">A · {before.label}</div>
-        <div className="absolute top-2 right-2 text-[11px] bg-black/60 px-2 py-1 rounded">B · {after.label}</div>
+        <span className="viewer-tag mono">{diff ? 'Difference mode' : 'Raw frames'}</span>
+        <span className="viewer-tag epoch mono">{cur?.label ?? '—'}</span>
       </div>
 
-      <input type="range" min={0} max={1000} value={Math.round(pos * 1000)}
-        onChange={(e) => setPos(Number(e.target.value) / 1000)} className="w-full mt-3" aria-label="Blink position" />
+      <div className="viewer-controls">
+        <div className="transport">
+          <button type="button" className="icon-btn" onClick={() => step(-1)} aria-label="Previous epoch">
+            <Icon name="back" />
+          </button>
+          <button
+            type="button" className="play" onClick={() => setPlaying((p) => (n > 1 ? !p : p))}
+            aria-label={playing ? 'Pause blink' : 'Play blink'}
+          >
+            <Icon name={playing ? 'pause' : 'play'} />
+          </button>
+          <button type="button" className="icon-btn" onClick={() => step(1)} aria-label="Next epoch">
+            <Icon name="fwd" />
+          </button>
+          <label className="speed">
+            <span>Blink rate</span>
+            <input
+              type="range" min={150} max={1200} step={10} value={speed}
+              onChange={(e) => setSpeed(Number(e.target.value))}
+            />
+            <output>{speed} ms</output>
+          </label>
+        </div>
+        <div className="diff-row">
+          <span id="diffLabel">Difference mode cancels stationary stars and keeps the mover</span>
+          <button
+            type="button" className="switch" role="switch" aria-checked={diff}
+            aria-labelledby="diffLabel" onClick={() => setDiff((d) => !d)}
+          />
+        </div>
+        <p className="keys"><kbd>Space</kbd> play or pause &nbsp; <kbd>←</kbd> <kbd>→</kbd> step through epochs</p>
+      </div>
+
+      <div className="band-row">
+        {BANDS.map((b) => (
+          <button
+            key={b.id} type="button" className="band"
+            style={{ ['--band-color' as string]: b.color }}
+            aria-pressed={b.id === band}
+            onClick={() => onBandChange(b.id)}
+          >
+            <span className="sw" style={{ background: b.color }} />{b.label}
+          </button>
+        ))}
+      </div>
+      <div className="band-row" style={{ paddingTop: 0 }}>
+        {frames.map((f, i) => (
+          <button
+            key={f.label} type="button" className="epoch-chip"
+            aria-pressed={i === idx}
+            onClick={() => { setPlaying(false); setIdx(i); }}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+      <div className="band-row" style={{ paddingTop: 0 }}>
+        <span style={{ fontSize: 12, color: '#8a90ab' }}>
+          {bandMeta.label} ({bandMeta.range}) · same-band blink only
+        </span>
+      </div>
     </div>
   );
 }

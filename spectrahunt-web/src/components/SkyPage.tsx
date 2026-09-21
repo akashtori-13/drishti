@@ -1,51 +1,119 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import AladinSky from '@/components/AladinSky';
+import { useMemo, useState } from 'react';
 import { useAppStore } from '@/lib/store';
+import { LEVEL_COLORS } from '@/lib/sky';
+import { buildGrid, pinCells, GRID_H, GRID_W } from '@/lib/sky';
+import CoverageMap, { type MapSelection } from '@/components/CoverageMap';
+import SearchBox, { type SearchTarget } from '@/components/SearchBox';
+import Inspector, { type InspectorField } from '@/components/Inspector';
+import type { SkyHover } from '@/components/HeroSky';
+import { fmtDec, fmtRa } from '@/lib/sky';
 
-function coordsFromHash(): { ra: number; dec: number } | null {
-  if (typeof window === 'undefined') return null;
-  const m = window.location.hash.match(/[#&?]ra=(-?\d+\.?\d*).*?dec=(-?\d+\.?\d*)/);
-  if (!m) return null;
-  const ra = parseFloat(m[1]);
-  const dec = parseFloat(m[2]);
-  if (Number.isNaN(ra) || Number.isNaN(dec)) return null;
-  return { ra, dec };
+const SHOWCASE_POINTS = [
+  { id: '3i-atlas', ra: 252.6633, dec: -17.4904 },
+  { id: 'ecliptic-mover', ra: 180, dec: 0 },
+  { id: 'nep-deep', ra: 270, dec: 66.5 },
+];
+
+function nearestShowcase(ra: number, dec: number): string | null {
+  let best: string | null = null;
+  let bestD = 3.0;
+  for (const s of SHOWCASE_POINTS) {
+    const d = Math.hypot(s.ra - ra, s.dec - dec);
+    if (d < bestD) { bestD = d; best = s.id; }
+  }
+  return best;
 }
 
-export default function SkyPage() {
-  const { openShowcase } = useAppStore();
-  const [pos, setPos] = useState({ ra: 252.6633, dec: -17.4904 });
+function fieldFromRaDec(ra: number, dec: number, grid: number[][]): InspectorField {  const i = Math.min(GRID_W - 1, Math.max(0, Math.floor((ra / 360) * GRID_W)));
+  const j = Math.min(GRID_H - 1, Math.max(0, Math.floor(((90 - dec) / 180) * GRID_H)));
+  const n = grid[j][i];
+  const seed = 500 + i * 100 + j;
+  return {
+    ra, dec, epochs: n,
+    bands: n === 0 ? 0 : 3 + (seed % 4),
+    survey: seed % 5 === 0 ? 'Deep' : 'Wide',
+    hasCandidate: n >= 2 && seed % 3 === 0,
+    planning: `2026W${10 + Math.max(1, n) * 3}_2B`,
+    detector: 1 + (seed % 6),
+  };
+}
 
-  useEffect(() => {
-    const apply = () => {
-      const hit = coordsFromHash();
-      if (hit) setPos(hit);
-    };
-    apply();
-    window.addEventListener('hashchange', apply);
-    return () => window.removeEventListener('hashchange', apply);
+/** Full-page sky map view: search tools, coverage canvas, legend, inspector. */
+export default function SkyPage() {  const { openShowcase } = useAppStore();
+  const grid = useMemo(() => {
+    const g = buildGrid();
+    pinCells(g, [
+      { ra: 252.6633, dec: -17.4904 },
+      { ra: 180, dec: 0 },
+      { ra: 270, dec: 66.5 },
+    ]);
+    return g;
   }, []);
+  const [coverage, setCoverage] = useState(true);
+  const [hover, setHover] = useState<SkyHover | null>(null);
+  const [sel, setSel] = useState<MapSelection | null>(null);
+  const [field, setField] = useState<InspectorField | null>(null);
+
+  const inspect = (ra: number, dec: number) => {
+    setSel({ nx: ra / 360, ny: (90 - dec) / 180, ra, dec });
+    setField(fieldFromRaDec(ra, dec, grid));
+  };
+
+  const pick = (t: SearchTarget) => {
+    if (t.showcaseId) { openShowcase(t.showcaseId); return; }
+    inspect(t.ra, t.dec);
+  };
 
   return (
-    <div className="min-h-screen p-4">
-      <div className="max-w-5xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold mb-1">Sky context</h1>
-          <p className="text-slate-400">Aladin Lite view (DSS2 color) with target marker. Pan and zoom freely.</p>
+    <div id="view-sky">
+      <h1 className="sr-only">Sky map</h1>
+      <CoverageMap
+        grid={grid} coverage={coverage} selected={sel}
+        onHover={setHover}
+        onInspect={inspect}
+      />
+
+      <div className="map-tools glass">
+        <SearchBox id="ms" placeholder="Object or RA, Dec" compact onPick={pick} />
+        <div className="tool-row">
+          <span id="covLabel">Coverage overlay</span>
+          <button
+            type="button" className="switch" role="switch" aria-checked={coverage}
+            aria-labelledby="covLabel" onClick={() => setCoverage((c) => !c)}
+          />
         </div>
-        <AladinSky ra={pos.ra} dec={pos.dec} fov={1.0} />
-        <div className="flex flex-wrap gap-2 text-sm">
-          <button onClick={() => openShowcase('3i-atlas')} className="px-3 py-1.5 rounded-full border border-slate-700 text-slate-200">Blink 3I/ATLAS →</button>
-          <a className="px-3 py-1.5 rounded-full border border-slate-700 text-blue-300" target="_blank" rel="noreferrer"
-            href={`https://irsa.ipac.caltech.edu/irsaviewer/?pos=${pos.ra},${pos.dec}`}>
-            Open in IRSA Viewer →
-          </a>
-          <a className="px-3 py-1.5 rounded-full border border-slate-700 text-blue-300" target="_blank" rel="noreferrer"
-            href="https://minorplanetcenter.net/cgi-bin/checkmp.cgi">MPC checker →</a>
-        </div>
+        <p className="map-help">Click any field to see how many times SPHEREx has visited it and whether anything moved.</p>
       </div>
+
+      <div className="map-bar glass">
+        <div className="legend">
+          <span>Epochs observed</span>
+          <span className="strip" aria-hidden="true">
+            {LEVEL_COLORS.slice(1).map((c) => (
+              <i key={c as string} style={{ background: c as string }} />
+            ))}
+          </span>
+          <span>1 to 5+</span>
+        </div>
+        <span className="sep" aria-hidden="true" />
+        <span className="mono" id="skyReadout" aria-hidden="true">
+          {hover ? `RA ${fmtRa(hover.ra)}  Dec ${fmtDec(hover.dec)}  ${hover.n} ${hover.n === 1 ? 'epoch' : 'epochs'}` : 'RA —, Dec —'}
+        </span>
+      </div>
+
+      <Inspector
+        field={field} blinkId={field ? nearestShowcase(field.ra, field.dec) : null}
+        onClose={() => { setField(null); setSel(null); }}
+        onOpenBlink={() => {
+          if (field) {
+            const id = nearestShowcase(field.ra, field.dec);
+            if (id) openShowcase(id);
+          }
+          setField(null);
+        }}
+      />
     </div>
   );
 }
