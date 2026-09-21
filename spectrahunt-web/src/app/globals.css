@@ -32,7 +32,6 @@ body{
   -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
   overflow-x:hidden; font-variant-numeric:tabular-nums;
 }
-body[data-view="blink"]{overflow:hidden;}
 h1,h2,h3,h4,p,ol,ul,dl,dd,figure{margin:0;}
 ol,ul{padding:0; list-style:none;}
 a{color:inherit;}
@@ -279,7 +278,7 @@ main:focus{outline:none;}
 
 /* ---------- footer ---------- */
 .site-foot{border-top:1px solid var(--line); background:var(--space); padding:32px 20px calc(36px + env(safe-area-inset-bottom,0px));}
-body[data-view="blink"] .site-foot{display:none;}
+body[data-view="sky"] .site-foot{display:none;}
 .foot-inner{max-width:1120px; margin:0 auto; display:flex; flex-wrap:wrap; justify-content:space-between; gap:20px 48px; align-items:flex-start;}
 .foot-brand{display:flex; flex-direction:column; gap:10px; max-width:46ch;}
 .foot-note,.foot-cite{color:var(--ink-3); font-size:.8125rem; line-height:1.6;}
