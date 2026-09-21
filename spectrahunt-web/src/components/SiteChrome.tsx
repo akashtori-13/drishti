@@ -23,8 +23,27 @@ export default function SiteChrome({ children, showTutorial = false }: { childre
               <span className="brand-name">SpectraHunt</span>
               <p className="foot-note">A public blink comparator for the SPHEREx sky. NASA Space Apps Challenge 2026.</p>
             </div>
-            <p className="foot-cite">Data: NASA/JPL–Caltech SPHEREx, processed by IRSA (IPAC). DOI 10.26131/IRSA652.</p>
+            <nav className="foot-cols" aria-label="Footer">
+              <div className="foot-col">
+                <span className="foot-h">Explore</span>
+                <Link href="/sky">Sky map</Link>
+                <Link href="/candidates">Candidates</Link>
+                <Link href="/blink/3i-atlas">3I/ATLAS blink</Link>
+              </div>
+              <div className="foot-col">
+                <span className="foot-h">Learn</span>
+                <Link href="/about">About + tours</Link>
+                <Link href="/#how">How it works</Link>
+                <Link href="/#fields">Fields</Link>
+              </div>
+              <div className="foot-col">
+                <span className="foot-h">Data</span>
+                <a href="https://irsa.ipac.caltech.edu/Missions/spherex.html" target="_blank" rel="noreferrer">IRSA archive</a>
+                <a href="https://doi.org/10.26131/IRSA652" target="_blank" rel="noreferrer">DOI 10.26131/IRSA652</a>
+              </div>
+            </nav>
           </div>
+          <p className="foot-cite">Data: NASA/JPL–Caltech SPHEREx, processed by IRSA (IPAC). DOI 10.26131/IRSA652.</p>
         </footer>
       )}
     </div>

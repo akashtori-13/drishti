@@ -13,6 +13,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
   return (
     <SiteChrome>
       <div className="page" style={{ textAlign: 'center', paddingTop: 80 }}>
+        <p className="hero-kicker">rendering fault · data is safe</p>
         <div style={{ fontSize: 64 }} aria-hidden="true">☄</div>
         <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', marginTop: 16 }}>Something flared up</h1>
         <p style={{ color: 'var(--ink-2)', marginTop: 12 }}>This view failed to render. Your data is safe — try again or pick another field.</p>

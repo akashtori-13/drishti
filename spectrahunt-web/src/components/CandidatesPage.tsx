@@ -98,6 +98,7 @@ export default function CandidatesPage() {
     <div className="page">
       <div className="page-head">
         <div>
+          <p className="hero-kicker">Nightly pipeline · human review queue</p>
           <h1>This week&apos;s candidates</h1>
           <p>Every field where two or more epochs disagree is differenced and searched automatically. These are the results waiting on a human look.</p>
         </div>
