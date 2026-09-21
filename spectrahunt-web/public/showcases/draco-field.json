@@ -1,0 +1,44 @@
+{
+  "id": "draco-field",
+  "title": "Draco \u2014 high-latitude stare",
+  "ra": 267.5,
+  "dec": 57.5,
+  "story": "Far above the dusty plane, this Draco field gets revisited again and again. Clean sightlines make variables easy to spot across two D3 epochs.",
+  "epochs": [
+    {
+      "label": "Survey 1 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": 2.02,
+      "ra": 267.5,
+      "dec": 57.5,
+      "size_deg": 0.15,
+      "png": null
+    },
+    {
+      "label": "Survey 2 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": 2.02,
+      "ra": 267.5,
+      "dec": 57.5,
+      "size_deg": 0.15,
+      "png": null
+    }
+  ],
+  "census": {
+    "images": 2547,
+    "epochs": 4,
+    "span_days": 468
+  },
+  "tap": {
+    "collection": "spherex_qr2",
+    "bandpass": "SPHEREx-D3",
+    "endpoint": "https://irsa.ipac.caltech.edu/TAP"
+  },
+  "links": {
+    "irsa_viewer": "https://irsa.ipac.caltech.edu/irsaviewer/"
+  },
+  "citation": {
+    "doi": "10.26131/IRSA652",
+    "text": "SPHEREx QR2 via IRSA."
+  }
+}

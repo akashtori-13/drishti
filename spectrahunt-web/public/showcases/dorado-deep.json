@@ -1,0 +1,44 @@
+{
+  "id": "dorado-deep",
+  "title": "Dorado Deep Field \u2014 southern stare",
+  "ra": 92.5,
+  "dec": -57.5,
+  "story": "Thousands of SPHEREx visits pile up in this far-southern field. Depth like this turns up faint variables and slow movers \u2014 blink two same-band (D3) epochs.",
+  "epochs": [
+    {
+      "label": "Survey 1 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": 2.02,
+      "ra": 92.5,
+      "dec": -57.5,
+      "size_deg": 0.15,
+      "png": null
+    },
+    {
+      "label": "Survey 2 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": 2.02,
+      "ra": 92.5,
+      "dec": -57.5,
+      "size_deg": 0.15,
+      "png": null
+    }
+  ],
+  "census": {
+    "images": 4660,
+    "epochs": 4,
+    "span_days": 470
+  },
+  "tap": {
+    "collection": "spherex_qr2",
+    "bandpass": "SPHEREx-D3",
+    "endpoint": "https://irsa.ipac.caltech.edu/TAP"
+  },
+  "links": {
+    "irsa_viewer": "https://irsa.ipac.caltech.edu/irsaviewer/"
+  },
+  "citation": {
+    "doi": "10.26131/IRSA652",
+    "text": "SPHEREx QR2 via IRSA."
+  }
+}

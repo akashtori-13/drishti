@@ -94,9 +94,12 @@ export default function AboutPage() {
       <section>
         <h2>Sources</h2>
         <ul className="source-list">
-          <li><a href="https://irsa.ipac.caltech.edu/Missions/spherex.html" target="_blank" rel="noopener">SPHEREx archive at IRSA</a></li>
+          <li><a href="https://irsa.ipac.caltech.edu/Missions/spherex.html" target="_blank" rel="noopener">SPHEREx archive at IRSA (NASA/IPAC)</a></li>
           <li><a href="https://irsa.ipac.caltech.edu/data/SPHEREx/docs/overview_qr.html" target="_blank" rel="noopener">SPHEREx Quick Release overview, IRSA</a></li>
           <li><a href="https://registry.opendata.aws/spherex-qr/" target="_blank" rel="noopener">SPHEREx Quick Release on AWS Open Data</a></li>
+          <li><a href="https://gea.esac.esa.int/archive/" target="_blank" rel="noopener">Gaia DR3 (ESA) — star cross-matches</a></li>
+          <li><a href="https://alasky.cds.unistra.fr/" target="_blank" rel="noopener">DSS2 and 2MASS sky imagery (CDS, Strasbourg)</a></li>
+          <li><a href="https://simbad.cds.unistra.fr/simbad/" target="_blank" rel="noopener">SIMBAD astronomical database (CDS)</a></li>
           <li><a href="https://vo.imcce.fr/webservices/skybot/" target="_blank" rel="noopener">IMCCE SkyBoT, solar-system cone search</a></li>
         </ul>
       </section>

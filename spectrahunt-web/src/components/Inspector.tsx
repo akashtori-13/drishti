@@ -48,13 +48,13 @@ export default function Inspector({
               </>
             )}
             {field.epochs >= 2 && field.hasCandidate && (
-              <span className="badge unknown"><span className="dot" /> Flagged candidate here</span>
+              <span className="badge unknown"><span className="dot" /> Known mover here — blink it</span>
             )}
             {field.epochs >= 2 && !field.hasCandidate && (
-              <span className="badge">No motion flagged</span>
+              <span className="badge">{field.epochs} visits — blink to look yourself</span>
             )}
             <button type="button" className="btn primary block" onClick={onOpenBlink} disabled={field.epochs < 2 || !blinkId}>
-              {blinkId ? 'Open blink view' : 'No blinkable showcase here yet'}
+              {blinkId ? 'Open blink view' : 'No blinkable field here yet'}
             </button>
           </div>
         </>

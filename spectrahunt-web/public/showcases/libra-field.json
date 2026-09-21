@@ -1,0 +1,44 @@
+{
+  "id": "libra-field",
+  "title": "Libra \u2014 ecliptic crossing",
+  "ra": 212.5,
+  "dec": -2.5,
+  "story": "Right on the ecliptic, asteroids stream through here. Three visits (D3) \u2014 blink for the dot that jumps.",
+  "epochs": [
+    {
+      "label": "Survey 1 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": 2.02,
+      "ra": 212.5,
+      "dec": -2.5,
+      "size_deg": 0.15,
+      "png": null
+    },
+    {
+      "label": "Survey 2 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": 2.02,
+      "ra": 212.5,
+      "dec": -2.5,
+      "size_deg": 0.15,
+      "png": null
+    }
+  ],
+  "census": {
+    "images": 875,
+    "epochs": 3,
+    "span_days": 402
+  },
+  "tap": {
+    "collection": "spherex_qr2",
+    "bandpass": "SPHEREx-D3",
+    "endpoint": "https://irsa.ipac.caltech.edu/TAP"
+  },
+  "links": {
+    "irsa_viewer": "https://irsa.ipac.caltech.edu/irsaviewer/"
+  },
+  "citation": {
+    "doi": "10.26131/IRSA652",
+    "text": "SPHEREx QR2 via IRSA."
+  }
+}

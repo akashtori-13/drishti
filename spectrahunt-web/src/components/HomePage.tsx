@@ -28,6 +28,11 @@ const SHOWCASE_POINTS = [
   { id: 'm51-field', ra: 202.47, dec: 47.2 },
   { id: 'm101-field', ra: 210.8, dec: 54.35 },
   { id: 'smc-field', ra: 13.18, dec: -72.83 },
+  { id: 'dorado-deep', ra: 92.5, dec: -57.5 },
+  { id: 'draco-field', ra: 267.5, dec: 57.5 },
+  { id: 'ophiuchus-field', ra: 247.5, dec: -7.5 },
+  { id: 'libra-field', ra: 212.5, dec: -2.5 },
+  { id: 'hercules-field', ra: 252.5, dec: 12.5 },
 ];
 
 function nearestShowcase(ra: number, dec: number): string | null {
@@ -202,7 +207,7 @@ export default function HomePage() {  const router = useRouter();
 
           <div className="quick">
             <button type="button" className="chip" onClick={() => router.push(blinkURL('3i-atlas'))}>3I/ATLAS</button>
-            <button type="button" className="chip" onClick={() => pick({ label: '433 Eros', ra: 210.32, dec: 9.11 })}>433 Eros</button>
+            <button type="button" className="chip" onClick={() => router.push(blinkURL('galactic-center'))}>Galactic Center</button>
             <button type="button" className="chip" onClick={() => pick({ label: 'Orion Complex', ra: 83.82, dec: -5.39 })}>Orion Complex</button>
             <span className="quick-sep" aria-hidden="true">·</span>
             <SurpriseButton onPick={pick} />
