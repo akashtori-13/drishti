@@ -95,6 +95,17 @@ export default function SearchBox({
   };
 
   const submit = async (value: string) => {
+    if (!value.trim()) {
+      // empty submit: shake gently (or nothing on reduced motion) and focus
+      const el = boxRef.current;
+      if (el && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        el.classList.remove('shake');
+        void el.offsetWidth;
+        el.classList.add('shake');
+      }
+      boxRef.current?.querySelector('input')?.focus();
+      return;
+    }
     const list = build(value);
     if (!list.length) {
       setErr(`No match for "${value}". Try "M31", "Ori", "10:12:30 +12:30:00", or 132.40, −3.20.`);
@@ -134,6 +145,7 @@ export default function SearchBox({
           placeholder={placeholder} aria-label={placeholder}
           autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} enterKeyHint="search"
         />
+        {!compact && <kbd className="s-kbd" aria-hidden="true">/</kbd>}
         <button type="submit" className="s-go" disabled={busy}>
           <Icon name="search" className="s-go-icon icon" />
           <span className="s-go-label">{busy ? '…' : compact ? 'Go' : 'Search'}</span>

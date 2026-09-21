@@ -21,6 +21,11 @@ export default function HeroSky({
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const hostRef = useRef<HTMLDivElement>(null);
+  const tipRef = useRef<HTMLDivElement>(null);
+  const tipTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const downPos = useRef<{ x: number; y: number } | null>(null);
+  const ripples = useRef<Array<{ x: number; y: number; t0: number }>>([]);
+  const rippleRaf = useRef(0);
   const [skyReady, setSkyReady] = useState(false);
   const state = useRef<{
     w: number; h: number;
@@ -81,7 +86,7 @@ export default function HeroSky({
       st.w = w; st.h = h;
     };
 
-    const draw = () => {
+    const draw = (nowMs = 0) => {
       const { w, h } = st;
       if (!w || !h) return;
       if (st.img && st.img.complete && st.img.naturalWidth) {
@@ -185,7 +190,7 @@ export default function HeroSky({
 
     const tick = () => {
       raf = 0;
-      draw();
+      draw(performance.now());
     };
     const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
     const onVis = () => kick();
@@ -211,13 +216,51 @@ export default function HeroSky({
       }
       st.hoverMarker = found;
       canvas.style.cursor = found ? 'pointer' : 'crosshair';
+      // reticle tooltip pill (delayed fade-in via CSS, positioned by.CLIENT coords)
+      const tip = tipRef.current;
+      if (tip) {
+        tip.textContent = found
+          ? found.replace(/-/g, ' ')
+          : `RA ${fmtRa(ra)}  Dec ${fmtDec(dec)}`;
+        tip.style.opacity = '0';
+        tip.style.left = `${Math.min(r.width - 150, e.clientX - r.left + 16)}px`;
+        tip.style.top = `${Math.max(8, e.clientY - r.top - 14)}px`;
+        if (tipTimer.current) clearTimeout(tipTimer.current);
+        tipTimer.current = setTimeout(() => { if (tipRef.current) tipRef.current.style.opacity = '1'; }, 150);
+      }
       wake();
     };
-    const leave = () => { st.hover = null; st.hoverMarker = null; kick(); };
+    const leave = () => {
+      st.hover = null; st.hoverMarker = null;
+      if (tipRef.current) tipRef.current.style.opacity = '0';
+      if (tipTimer.current) clearTimeout(tipTimer.current);
+      kick();
+    };
+    const onDown = (e: PointerEvent) => {
+      downPos.current = { x: e.clientX, y: e.clientY };
+    };
+    const kickRipple = () => {
+      if (rippleRaf.current) return;
+      const step = () => {
+        rippleRaf.current = 0;
+        if (ripples.current.length) {
+          draw(performance.now());
+          rippleRaf.current = requestAnimationFrame(step);
+        }
+      };
+      rippleRaf.current = requestAnimationFrame(step);
+    };
     const click = (e: MouseEvent) => {
+      // drag (>5px) is a pan gesture, not a click
+      if (downPos.current && Math.hypot(e.clientX - downPos.current.x, e.clientY - downPos.current.y) > 5) return;
       const r = canvas.getBoundingClientRect();
       const nx = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
       const ny = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
+      // click ripple (~300ms), skipped under reduced motion
+      if (!reduce.matches) {
+        ripples.current.push({ x: nx * st.w, y: ny * st.h, t0: performance.now() });
+        kickRipple();
+      }
       // markers first: jump straight into the blink
       for (const m of st.markers) {
         const mx = (m.ra / 360) * r.width;
@@ -233,6 +276,7 @@ export default function HeroSky({
     };
     canvas.addEventListener('pointermove', move);
     canvas.addEventListener('pointerleave', leave);
+    canvas.addEventListener('pointerdown', onDown);
     canvas.addEventListener('click', click);
 
     layout();
@@ -241,11 +285,14 @@ export default function HeroSky({
     kick();
     return () => {
       cancelAnimationFrame(raf);
+      cancelAnimationFrame(rippleRaf.current);
       if (idleTimer) clearTimeout(idleTimer);
+      if (tipTimer.current) clearTimeout(tipTimer.current);
       document.removeEventListener('visibilitychange', onVis);
       reduce.removeEventListener?.('change', onChange);
       canvas.removeEventListener('pointermove', move);
       canvas.removeEventListener('pointerleave', leave);
+      canvas.removeEventListener('pointerdown', onDown);
       canvas.removeEventListener('click', click);
       ro.disconnect();
     };
@@ -254,6 +301,7 @@ export default function HeroSky({
   return (
     <div ref={hostRef} style={{ position: 'absolute', inset: 0 }}>
       <canvas ref={canvasRef} id="heroCanvas" aria-hidden="true" />
+      <div ref={tipRef} className="sky-tip mono" aria-hidden="true" />
     </div>
   );
 }
