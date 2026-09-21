@@ -89,7 +89,8 @@ export default function BlinkComparator({
   const prevIdx = (idx - 1 + n) % n;
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(550);
-  const [dock, setDock] = useState<Dock>(null);
+  const [dock, setDock] = useState<Dock>(() =>
+    typeof window !== 'undefined' && window.innerWidth >= 961 ? 'tune' : null);
   const [palette, setPalette] = useState(false);
   const [palQ, setPalQ] = useState('');
   const [stretch, setStretch] = useState<Stretch>('asinh');
@@ -577,9 +578,9 @@ export default function BlinkComparator({
   // eslint-disable-next-line react-hooks/refs -- commands only invoke the stable parent callback from events
   const palHits = commands.filter((c) => c.name.toLowerCase().includes(palQ.trim().toLowerCase())).slice(0, 12);
 
-  const dockBtn = (d: Exclude<Dock, null>, label: string, glyph: string) => (
+  const dockBtn = (d: Exclude<Dock, null>, label: string, glyph: string, desc: string) => (
     <button key={d} type="button" className={`trail-btn${dock === d ? ' active' : ''}`}
-      aria-pressed={dock === d} title={label} aria-label={label}
+      aria-pressed={dock === d} title={`${label} — ${desc}`} aria-label={`${label}: ${desc}`}
       onClick={() => setDock((cur) => (cur === d ? null : d))}>
       <span aria-hidden="true" className="glyph">{glyph}</span>
       <span className="trail-label">{label}</span>
@@ -615,6 +616,7 @@ export default function BlinkComparator({
             />
             <span className="viewer-tag mono">{modeLabel}</span>
             <span className="viewer-tag epoch mono">{cur?.label ?? '—'}</span>
+            <span className="viewer-hint">drag pan · scroll zoom · hover probe{onSample ? ' · click spectrum' : ''}</span>
           </>
         )}
         {probe && mode !== 'side' && (
@@ -663,11 +665,11 @@ export default function BlinkComparator({
       <div className="deck-bottom">
         {/* tool rail */}
         <div className="tool-rail glass" role="toolbar" aria-label="Viewer tools">
-          {dockBtn('tune', 'Tune', '◐')}
-          {dockBtn('bands', 'Bands', '≈')}
-          {dockBtn('data', 'Measure', '⌖')}
-          {dockBtn('export', 'Export', '⤓')}
-          {dockBtn('keys', 'Keys', '?')}
+          {dockBtn('tune', 'Enhance', '◐', 'compare modes, stretch, colors, levels')}
+          {dockBtn('bands', 'Bands', '≈', 'detectors, channels, RGB composite')}
+          {dockBtn('data', 'Measure', '⌖', 'pixel probe, histogram, detected movers')}
+          {dockBtn('export', 'Save', '⤓', 'PNG, animation, share link')}
+          {dockBtn('keys', 'Guide', '?', 'shortcuts and gestures')}
         </div>
 
         {/* dock panel */}
