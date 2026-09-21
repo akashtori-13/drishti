@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';import BlinkComparator from '@/components/BlinkComparator';
 import Icon from '@/components/Icon';
+import WaitGame from '@/components/WaitGame';
 import SpectrumPlot, { LightCurve } from '@/components/Plots';
 import {
   fetchLiveShowcase, getShowcase, isLiveId, parseLiveId,
@@ -284,7 +285,10 @@ export default function BlinkPage({ id }: { id: string }) {
         </div>
       </div>
 
-      {loading && <div className="bw-status">Loading {isLiveId(id) ? 'live IRSA frames (discovery + renders, ~1 min first time)' : id}…</div>}
+      {loading && (isLiveId(id)
+        ? <WaitGame status="Fetching live IRSA frames — discovery, renders, cross-match…" />
+        : <div className="bw-status">Loading {id}…</div>
+      )}
       {err && !loading && (
         <div className="bw-status error">
           Couldn’t load this field: {err} — try a <Link href="/blink/3i-atlas">curated blink</Link> or pick another map point.
