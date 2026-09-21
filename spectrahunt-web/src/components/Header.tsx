@@ -6,7 +6,8 @@ import { useEffect, useRef, useState } from 'react';
 import Icon from '@/components/Icon';
 
 const NAV = [
-  { href: '/blink/3i-atlas', label: 'Blink' },
+  { href: '/', label: 'Home', home: true },
+  { href: '/blink/3i-atlas', label: 'Blink', match: '/blink' },
   { href: '/candidates', label: 'Candidates' },
   { href: '/about', label: 'About' },
 ];
@@ -61,7 +62,8 @@ export default function Header() {
     document.title = TITLES[pathname] ?? (pathname.startsWith('/blink/') ? 'Blink — SpectraHunt' : 'SpectraHunt');
   }, [pathname]);
 
-  const isActive = (href: string) => pathname === href;
+  const isActive = (href: string, match?: string) =>
+    match !== undefined ? pathname.startsWith(match) : pathname === href;
 
   return (
     <header className={`nav${open ? ' menu-open' : ''}`}>
@@ -71,15 +73,20 @@ export default function Header() {
           <span className="brand-name">SpectraHunt</span>
         </Link>
         <nav className="tabs tabs-desktop" aria-label="Primary">
-          {NAV.map((item) => (
-            <Link
-              key={item.href} href={item.href}
-              className={isActive(item.href) ? 'active' : undefined}
-              aria-current={isActive(item.href) ? 'page' : undefined}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {NAV.filter((item) => !(item.home && pathname === '/')).map((item) => {
+            const active = item.match !== undefined
+              ? pathname.startsWith(item.match)
+              : pathname === item.href;
+            return (
+              <Link
+                key={item.href} href={item.href}
+                className={active ? 'active' : undefined}
+                aria-current={active ? 'page' : undefined}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
           <Link href="/sky" className="btn-primary-sm">Open sky map</Link>
         </nav>
         <button
@@ -94,11 +101,11 @@ export default function Header() {
       </div>
       {open && (
         <div ref={menuRef} id="navSheet" className="nav-sheet" role="dialog" aria-label="Menu">
-          {NAV.map((item) => (
+          {NAV.filter((item) => !(item.home && pathname === '/')).map((item) => (
             <Link
               key={item.href} href={item.href}
-              className={isActive(item.href) ? 'active' : undefined}
-              aria-current={isActive(item.href) ? 'page' : undefined}
+              className={isActive(item.href, item.match) ? 'active' : undefined}
+              aria-current={isActive(item.href, item.match) ? 'page' : undefined}
               onClick={() => setOpen(false)}
             >
               {item.label}
