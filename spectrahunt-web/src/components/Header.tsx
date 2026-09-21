@@ -9,41 +9,29 @@ import SurpriseButton from '@/components/SurpriseButton';
 import { blinkURL } from '@/lib/store';
 
 const LINKS = [
-  { href: '/sky', label: 'Sky map', desc: 'Observer and all-sky views' },
-  { href: '/blink/3i-atlas', label: 'Blink', match: '/blink', desc: 'Compare epochs' },
-  { href: '/candidates', label: 'Candidates', desc: 'Measured fields' },
-  { href: '/about', label: 'About', desc: 'Mission and method' },
+  { href: '/sky', label: 'Sky' },
+  { href: '/blink/3i-atlas', label: 'Blink', match: '/blink' },
+  { href: '/candidates', label: 'Candidates' },
+  { href: '/about', label: 'About' },
 ];
 
-function contextFor(pathname: string): string {
-  if (pathname === '/') return 'Home';
-  if (pathname === '/sky') return 'Sky map';
-  if (pathname === '/candidates') return 'Candidates';
-  if (pathname === '/about') return 'About';
-  const m = pathname.match(/^\/blink\/([^/]+)/);
-  if (m) {
-    const id = decodeURIComponent(m[1]);
-    if (id === 'live') return 'Live field';
-    return id.replace(/-/g, ' ');
-  }
-  return 'SpectraHunt';
-}
-
-/** Command-bar HUD: brand dot, context pill, overlay nav + search. */
+/** Dynamic-island navbar: brand, views, search, surprise in one floating pill. */
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [menu, setMenu] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     document.title = pathname === '/'
       ? 'SpectraHunt: hunt what moves in the infrared sky'
-      : `${contextFor(pathname)} — SpectraHunt`;
+      : `${LINKS.find((n) => pathname === n.href || (n.match && pathname.startsWith(n.match)))?.label ?? 'SpectraHunt'} — SpectraHunt`;
   }, [pathname]);
 
   useEffect(() => {
     setOpen(false);
+    setMenu(false);
   }, [pathname]);
 
   useEffect(() => {
@@ -91,44 +79,81 @@ export default function Header() {
     router.push('/sky');
   };
 
+  const isActive = (href: string, match?: string) =>
+    match !== undefined ? pathname.startsWith(match) : pathname === href;
+
   return (
     <>
-      <div className="cmdbar">
-        <Link className="cmd-brand" href="/" aria-label="SpectraHunt home">
+      <div className="island glass" role="navigation" aria-label="Primary">
+        <Link className="island-brand" href="/" aria-label="SpectraHunt home">
           <Icon name="logo" className="logo icon" />
+          <span className="brand-name">SpectraHunt</span>
         </Link>
-        <button type="button" className="cmd-pill" onClick={() => setOpen((o) => !o)}
-          aria-expanded={open} aria-haspopup="dialog" title="Navigate or jump anywhere (Ctrl+K)">
-          <span className="cmd-context">{contextFor(pathname)}</span>
-          <kbd className="cmd-kbd" aria-hidden="true">⌘K</kbd>
+        <nav className="island-links" aria-label="Views">
+          {LINKS.map((item) => {
+            const on = isActive(item.href, item.match);
+            return (
+              <Link key={item.href} href={item.href}
+                className={on ? 'active' : undefined}
+                aria-current={on ? 'page' : undefined}>
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+        <button type="button" className="island-icon" aria-label="Search and navigate (Ctrl+K)"
+          title="Search and navigate (Ctrl+K)" onClick={() => setOpen(true)}>
+          <Icon name="search" className="icon" />
+        </button>
+        <SurpriseButton
+          compact
+          className="island-icon"
+          onPick={(t) => {
+            if (t.showcaseId) router.push(blinkURL(t.showcaseId));
+            else {
+              try {
+                sessionStorage.setItem('sh-target', JSON.stringify({ ra: t.ra, dec: t.dec }));
+              } catch { /* noop */ }
+              router.push('/sky');
+            }
+          }}
+        />
+        <button type="button" className="island-menu" aria-label="Open menu"
+          aria-expanded={menu} onClick={() => { setMenu((m) => !m); setOpen(true); }}>
+          <Icon name="menu" className="icon" />
         </button>
       </div>
       {open && (
-        <div className="cmd-veil" onMouseDown={() => setOpen(false)}>
+        <div className="cmd-veil" onMouseDown={() => { setOpen(false); setMenu(false); }}>
           <div ref={panelRef} className="cmd-panel glass" role="dialog" aria-modal="true" aria-label="Navigate"
             onMouseDown={(e) => e.stopPropagation()}>
+            {menu && (
+              <nav className="cmd-links sheet" aria-label="Views">
+                {[{ href: '/', label: 'Home', desc: 'Front door' }, ...LINKS.map((l) => ({
+                  ...l,
+                  desc: l.label === 'Sky' ? 'Observer and all-sky views'
+                    : l.label === 'Blink' ? 'Compare epochs'
+                    : l.label === 'Candidates' ? 'Measured fields' : 'Mission and method',
+                }))].map((item) => (
+                  <Link key={item.href} href={item.href} onClick={() => { setOpen(false); setMenu(false); }}>
+                    <span className="cmd-link-label">{item.label}</span>
+                    <span className="cmd-link-desc">{item.desc}</span>
+                  </Link>
+                ))}
+              </nav>
+            )}
             <SearchBox id="nav-search" placeholder="Jump to an object, field, or coordinates" onPick={pick} />
-            <nav className="cmd-links" aria-label="Primary">
-              {LINKS.map((item) => (
-                <Link key={item.href} href={item.href} onClick={() => setOpen(false)}>
-                  <span className="cmd-link-label">{item.label}</span>
-                  <span className="cmd-link-desc">{item.desc}</span>
-                </Link>
-              ))}
-            </nav>
             <div className="cmd-foot">
-              <SurpriseButton
-                onPick={(t) => {
-                  setOpen(false);
-                  if (t.showcaseId) router.push(blinkURL(t.showcaseId));
-                  else {
-                    try {
-                      sessionStorage.setItem('sh-target', JSON.stringify({ ra: t.ra, dec: t.dec }));
-                    } catch { /* noop */ }
-                    router.push('/sky');
-                  }
-                }}
-              />
+              <SurpriseButton onPick={(t) => {
+                setOpen(false); setMenu(false);
+                if (t.showcaseId) router.push(blinkURL(t.showcaseId));
+                else {
+                  try {
+                    sessionStorage.setItem('sh-target', JSON.stringify({ ra: t.ra, dec: t.dec }));
+                  } catch { /* noop */ }
+                  router.push('/sky');
+                }
+              }} />
             </div>
           </div>
         </div>
