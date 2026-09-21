@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react';import BlinkComparator from
 import Icon from '@/components/Icon';
 import SpectrumPlot, { LightCurve } from '@/components/Plots';
 import {
-  SHOWCASE_IDS, fetchLiveShowcase, getShowcase, isLiveId, parseLiveId,
+  fetchLiveShowcase, getShowcase, isLiveId, parseLiveId,
   skybotMatches, useLive, type Showcase,
 } from '@/lib/showcases';
 import { blinkURL, useAppStore } from '@/lib/store';
@@ -188,15 +188,6 @@ export default function BlinkPage({ id }: { id: string }) {
     <div className="blink-workspace">
       <div className="bw-bar">
         <Link href="/sky" className="back"><Icon name="back" /><span>Sky</span></Link>
-        <div className="bw-chips" role="group" aria-label="Fields">
-          {SHOWCASE_IDS.map((s) => (
-            <Link key={s} href={blinkURL(s)}
-              className={`mini-chip${s === id ? ' active' : ''}`}
-              aria-current={s === id ? 'page' : undefined}>
-              {s.replace(/-/g, ' ')}
-            </Link>
-          ))}
-        </div>
         <div className="bw-toggles">
           <span id="markLabel">Movers</span>
           <button type="button" className="switch" role="switch" aria-checked={showMarkers} aria-labelledby="markLabel" onClick={() => setShowMarkers(!showMarkers)} />
