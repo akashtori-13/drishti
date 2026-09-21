@@ -90,6 +90,8 @@ export default function BlinkComparator({
   const [speed, setSpeed] = useState(550);
   const [palette, setPalette] = useState(false);
   const [palQ, setPalQ] = useState('');
+  type Pop = null | 'tune' | 'bands' | 'data' | 'export' | 'keys';
+  const [dock, setDock] = useState<Pop>(null);
   const [stretch, setStretch] = useState<Stretch>('asinh');
   const [cmap, setCmap] = useState<Colormap>('cividis');
   const [invert, setInvert] = useState(false);
@@ -578,6 +580,35 @@ export default function BlinkComparator({
     <div className="deck">
       <div className="blink-grid">
         <div className="stage-col">
+        <div className="vtoolbar glass" role="toolbar" aria-label="View controls">
+          <div className="seg" role="group" aria-label="Compare mode">
+            {(['blink', 'side', 'swipe', 'diff'] as CompareMode[]).map((m) => (
+              <button key={m} type="button" className={`seg-btn${mode === m ? ' active' : ''}`} aria-pressed={mode === m}
+                onClick={() => onModeChange(m)}>
+                {m === 'blink' ? 'Blink' : m === 'side' ? 'Side' : m === 'swipe' ? 'Swipe' : 'Diff'}
+              </button>
+            ))}
+            <button type="button" className={`seg-btn${showRgb ? ' active' : ''}`} aria-pressed={showRgb}
+              onClick={() => setShowRgb((v) => !v)} title="False-color: epoch B red, epoch A green">Color</button>
+          </div>
+          <span className="vsep" aria-hidden="true" />
+          <button type="button" className={`toolbtn${dock === 'tune' ? ' active' : ''}`} aria-expanded={dock === 'tune'} onClick={() => setDock((c) => (c === 'tune' ? null : 'tune'))}>Adjust</button>
+          <button type="button" className={`toolbtn${dock === 'bands' ? ' active' : ''}`} aria-expanded={dock === 'bands'} onClick={() => setDock((c) => (c === 'bands' ? null : 'bands'))}>Bands</button>
+          <button type="button" className={`toolbtn${dock === 'data' ? ' active' : ''}`} aria-expanded={dock === 'data'} onClick={() => setDock((c) => (c === 'data' ? null : 'data'))}>Measure</button>
+          <span className="vsep" aria-hidden="true" />
+          <button type="button" className={`toolbtn${dock === 'export' ? ' active' : ''}`} aria-expanded={dock === 'export'} onClick={() => setDock((c) => (c === 'export' ? null : 'export'))} title="Save and export">Save</button>
+          <button type="button" className={`toolbtn${dock === 'keys' ? ' active' : ''}`} aria-expanded={dock === 'keys'} onClick={() => setDock((c) => (c === 'keys' ? null : 'keys'))} title="Shortcuts and guide">?</button>
+          {mode === 'diff' && (
+            <label className="mini-slider"><span>Gain</span>
+              <input type="range" min={1} max={8} step={0.5} value={diffScale} onChange={(e) => setDiffScale(Number(e.target.value))} aria-label="Difference gain" />
+            </label>
+          )}
+          {mode === 'swipe' && (
+            <label className="mini-slider"><span>Curtain</span>
+              <input type="range" min={2} max={98} value={Math.round(swipe * 100)} onChange={(e) => setSwipe(Number(e.target.value) / 100)} aria-label="Swipe position" />
+            </label>
+          )}
+        </div>
           <div className="stage-wrap square" ref={stageRef} style={{ touchAction: 'none' }}>
             {mode === 'side' ? (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, width: '100%', height: '100%' }}>
@@ -607,7 +638,131 @@ export default function BlinkComparator({
                 <span className="viewer-tag epoch mono">{cur?.label ?? '—'}</span>
               </>
             )}
+{dock === 'tune' && (
+          <div className="popover glass" role="dialog" aria-label="Adjust">
+            <div className="pop-head"><span>Adjust</span><button type="button" className="icon-btn sm" aria-label="Close Adjust panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
+            <div style={rowStyle}>
+              <label style={{ fontSize: 13 }}>Stretch{' '}
+                <select value={stretch} onChange={(e) => setStretch(e.target.value as Stretch)} style={selStyle}>
+                  <option value="linear">linear</option>
+                  <option value="log">log</option>
+                  <option value="sqrt">sqrt</option>
+                  <option value="asinh">asinh</option>
+                </select>
+              </label>
+              <label style={{ fontSize: 13 }}>Colors{' '}
+                <select value={cmap} onChange={(e) => setCmap(e.target.value as Colormap)} style={selStyle}>
+                  <option value="cividis">cividis ✓ colorblind-safe</option>
+                  <option value="grayscale">grayscale</option>
+                  <option value="viridis">viridis</option>
+                  <option value="inferno">inferno</option>
+                </select>
+              </label>
+              <button type="button" className="epoch-chip" aria-pressed={invert} onClick={() => setInvert((v) => !v)}
+                style={invert ? { color: '#fff', borderColor: '#7c83fd' } : undefined}>Invert</button>
+              {(['faint', 'balanced', 'bright'] as const).map((pp) => (
+                <button key={pp} type="button" className="epoch-chip" onClick={() => setPreset(pp)}>{pp}</button>
+              ))}
+            </div>
+            <label className="speed"><span>Black {Math.round(vmin * 100)}%</span>
+              <input type="range" min={0} max={50} value={Math.round(vmin * 100)} onChange={(e) => setVmin(Number(e.target.value) / 100)} />
+            </label>
+            <label className="speed"><span>White {Math.round(vmax * 100)}%</span>
+              <input type="range" min={50} max={100} value={Math.round(vmax * 100)} onChange={(e) => setVmax(Number(e.target.value) / 100)} />
+            </label>
           </div>
+        )}
+{dock === 'bands' && (
+          <div className="popover glass" role="dialog" aria-label="Bands">
+            <div className="pop-head"><span>Bands</span><button type="button" className="icon-btn sm" aria-label="Close Bands panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
+            <div className="band-row" style={{ padding: 0, background: 'transparent' }}>
+              {BANDS.map((b) => (
+                <button key={b.id} type="button" className="band" style={{ ['--band-color' as string]: b.color }}
+                  aria-pressed={b.id === band} title={`${b.label}: ${b.range}`} onClick={() => setBandAndChannel(b.id)}>
+                  <span className="sw" style={{ background: b.color }} />{b.label}
+                </button>
+              ))}
+            </div>
+            <p style={{ fontSize: 12, color: '#8a90ab' }}>{bandMeta.label} ({bandMeta.range}) · 102 channels · same-band blink only</p>
+            <div style={rowStyle}>
+              <label style={{ fontSize: 13 }}>Channel{' '}
+                <select value={channel} onChange={(e) => setChannel(Number(e.target.value))} style={{ ...selStyle, maxWidth: 200 }} aria-label="Spectral channel">
+                  {detChannels.map((c) => (
+                    <option key={c.idx} value={c.idx}>#{c.idx + 1} · {c.wave_um.toFixed(2)} µm</option>
+                  ))}
+                </select>
+              </label>
+              <span style={{ fontSize: 13, color: '#8a90ab' }}>RGB</span>
+              {(['R', 'G', 'B'] as const).map((k, ki) => (
+                <select key={k} value={rgb[ki]} aria-label={`${k} channel`} style={selStyle}
+                  onChange={(e) => setRgb(([r, g, b]) => { const v = [r, g, b] as [number, number, number]; v[ki] = Number(e.target.value); return v; })}>
+                  {CHANNELS.map((c) => <option key={c.idx} value={c.idx}>{k} #{c.idx + 1}</option>)}
+                </select>
+              ))}
+            </div>
+          </div>
+        )}
+{dock === 'data' && (
+          <div className="popover glass" role="dialog" aria-label="Measure">
+            <div className="pop-head"><span>Measure</span><button type="button" className="icon-btn sm" aria-label="Close Measure panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
+            <div className="mono probe-line">
+              {probe
+                ? <>px {probe.lum}{Number.isFinite(probe.ra) ? <> · {probe.ra.toFixed(3)}°, {probe.dec >= 0 ? '+' : ''}{probe.dec.toFixed(3)}°</> : ' · hover'}</>
+                : 'Hover the image to probe pixels'}
+              {onSample ? ' · click for spectrum' : ''}
+            </div>
+            <canvas ref={histRef} className="hist" aria-label="Brightness histogram of the displayed frame" />
+            <div style={{ fontSize: 12, color: '#8a90ab' }}>
+              Change map: <span ref={diffStatRef} className="mono" style={{ color: '#e8c34a' }} />
+              {mode !== 'diff' && <span className="mono"> — switch to Diff to quantify change</span>}
+            </div>
+            <div style={{ fontSize: 12, color: '#8a90ab' }}>
+              {candidates.length
+                ? `${candidates.length} candidate${candidates.length === 1 ? '' : 's'} — real pixel differencing, ≥5σ`
+                : 'Scanning pixels for movers…'}
+            </div>
+            {candidates.length > 0 ? (
+              <ul className="cand-detect-list">
+                {candidates.slice(0, 5).map((c, i) => (
+                  <li key={i} className="mono">
+                    <span className={c.kind === 'mover' ? 'tag-mover' : 'tag-var'}>
+                      {c.kind === 'mover' ? 'MOVER' : 'VARIABLE'}
+                    </span>{' '}
+                    #{i + 1} · {c.sigma.toFixed(1)}σ
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              curImg && prevImg && (
+                <p style={{ fontSize: 12, color: '#8a90ab' }}>No movers above 5σ between these epochs — quiet field.</p>
+              )
+            )}
+          </div>
+        )}
+{dock === 'export' && (
+          <div className="popover glass" role="dialog" aria-label="Save">
+            <div className="pop-head"><span>Save</span><button type="button" className="icon-btn sm" aria-label="Close Save panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
+            <div style={rowStyle}>
+              <button type="button" className="epoch-chip" onClick={() => downloadPNG()}>PNG</button>
+              <button type="button" className="epoch-chip" onClick={() => void recordWebM()} disabled={recording || n < 2}>
+                {recording ? 'Recording…' : 'WebM'}
+              </button>
+              <button type="button" className="epoch-chip" onClick={() => { setPan({ x: 0, y: 0 }); setZoom(1); }}>Reset view</button>
+              <button type="button" className="epoch-chip" onClick={() => copyLink()}>Copy link</button>
+            </div>
+          </div>
+        )}
+{dock === 'keys' && (
+          <div className="popover glass" role="dialog" aria-label="Guide">
+            <div className="pop-head"><span>Guide</span><button type="button" className="icon-btn sm" aria-label="Close Guide panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
+            <div className="keys-grid">
+              <span><kbd>Space</kbd> play / pause</span>
+              <span><kbd>←</kbd><kbd>→</kbd> step epoch</span>
+              <span>drag pan · scroll zoom</span>
+            </div>
+            <button type="button" className="epoch-chip" onClick={() => setPalette(true)}>Command palette (Ctrl+K)</button>
+          </div>
+        )}          </div>
 
           <div className="transport-row glass" role="group" aria-label="Blink transport">
             <button type="button" className="icon-btn" onClick={() => step(-1)} aria-label="Previous epoch">
@@ -645,153 +800,7 @@ export default function BlinkComparator({
           </div>
         </div>
 
-        <aside className="tweak-col glass" aria-label="Image controls">
-          <details className="tweak-sec" aria-label="Compare mode" open>
-            <summary>Compare</summary>
-            <div style={rowStyle} role="group" aria-label="Compare mode">
-              {(['blink', 'side', 'swipe', 'diff'] as CompareMode[]).map((m) => (
-                <button key={m} type="button" className="epoch-chip" aria-pressed={mode === m}
-                  onClick={() => onModeChange(m)} style={mode === m ? { color: '#fff', borderColor: '#7c83fd' } : undefined}>
-                  {m === 'blink' ? 'Blink' : m === 'side' ? 'Side' : m === 'swipe' ? 'Swipe' : 'Diff'}
-                </button>
-              ))}
-              <button type="button" className="epoch-chip" aria-pressed={showRgb} onClick={() => setShowRgb((v) => !v)}
-                title="False-color: epoch B red, epoch A green">Color</button>
-            </div>
-            {mode === 'diff' && (
-              <label className="speed"><span>Diff gain</span>
-                <input type="range" min={1} max={8} step={0.5} value={diffScale} onChange={(e) => setDiffScale(Number(e.target.value))} />
-                <output>{diffScale.toFixed(1)}×</output>
-              </label>
-            )}
-            {mode === 'swipe' && (
-              <label className="speed"><span>Curtain</span>
-                <input type="range" min={2} max={98} value={Math.round(swipe * 100)} onChange={(e) => setSwipe(Number(e.target.value) / 100)} />
-                <output>{Math.round(swipe * 100)}%</output>
-              </label>
-            )}
-          </details>
 
-          <details className="tweak-sec" aria-label="Enhance">
-            <summary>Enhance</summary>
-            <div style={rowStyle}>
-              <label style={{ fontSize: 13 }}>Stretch{' '}
-                <select value={stretch} onChange={(e) => setStretch(e.target.value as Stretch)} style={selStyle}>
-                  <option value="linear">linear</option>
-                  <option value="log">log</option>
-                  <option value="sqrt">sqrt</option>
-                  <option value="asinh">asinh</option>
-                </select>
-              </label>
-              <label style={{ fontSize: 13 }}>Colors{' '}
-                <select value={cmap} onChange={(e) => setCmap(e.target.value as Colormap)} style={selStyle}>
-                  <option value="cividis">cividis ✓ colorblind-safe</option>
-                  <option value="grayscale">grayscale</option>
-                  <option value="viridis">viridis</option>
-                  <option value="inferno">inferno</option>
-                </select>
-              </label>
-              <button type="button" className="epoch-chip" aria-pressed={invert} onClick={() => setInvert((v) => !v)}
-                style={invert ? { color: '#fff', borderColor: '#7c83fd' } : undefined}>Invert</button>
-              {(['faint', 'balanced', 'bright'] as const).map((pp) => (
-                <button key={pp} type="button" className="epoch-chip" onClick={() => setPreset(pp)}>{pp}</button>
-              ))}
-            </div>
-            <label className="speed"><span>Black {Math.round(vmin * 100)}%</span>
-              <input type="range" min={0} max={50} value={Math.round(vmin * 100)} onChange={(e) => setVmin(Number(e.target.value) / 100)} />
-            </label>
-            <label className="speed"><span>White {Math.round(vmax * 100)}%</span>
-              <input type="range" min={50} max={100} value={Math.round(vmax * 100)} onChange={(e) => setVmax(Number(e.target.value) / 100)} />
-            </label>
-          </details>
-
-          <details className="tweak-sec" aria-label="Spectral bands">
-            <summary>Bands</summary>
-            <div className="band-row" style={{ padding: 0, background: 'transparent' }}>
-              {BANDS.map((b) => (
-                <button key={b.id} type="button" className="band" style={{ ['--band-color' as string]: b.color }}
-                  aria-pressed={b.id === band} title={`${b.label}: ${b.range}`} onClick={() => setBandAndChannel(b.id)}>
-                  <span className="sw" style={{ background: b.color }} />{b.label}
-                </button>
-              ))}
-            </div>
-            <p style={{ fontSize: 12, color: '#8a90ab' }}>{bandMeta.label} ({bandMeta.range}) · 102 channels · same-band blink only</p>
-            <div style={rowStyle}>
-              <label style={{ fontSize: 13 }}>Channel{' '}
-                <select value={channel} onChange={(e) => setChannel(Number(e.target.value))} style={{ ...selStyle, maxWidth: 200 }} aria-label="Spectral channel">
-                  {detChannels.map((c) => (
-                    <option key={c.idx} value={c.idx}>#{c.idx + 1} · {c.wave_um.toFixed(2)} µm</option>
-                  ))}
-                </select>
-              </label>
-              <span style={{ fontSize: 13, color: '#8a90ab' }}>RGB</span>
-              {(['R', 'G', 'B'] as const).map((k, ki) => (
-                <select key={k} value={rgb[ki]} aria-label={`${k} channel`} style={selStyle}
-                  onChange={(e) => setRgb(([r, g, b]) => { const v = [r, g, b] as [number, number, number]; v[ki] = Number(e.target.value); return v; })}>
-                  {CHANNELS.map((c) => <option key={c.idx} value={c.idx}>{k} #{c.idx + 1}</option>)}
-                </select>
-              ))}
-            </div>
-          </details>
-
-          <details className="tweak-sec" aria-label="Measurements">
-            <summary>Measure</summary>
-            <div className="mono probe-line">
-              {probe
-                ? <>px {probe.lum}{Number.isFinite(probe.ra) ? <> · {probe.ra.toFixed(3)}°, {probe.dec >= 0 ? '+' : ''}{probe.dec.toFixed(3)}°</> : ' · hover'}</>
-                : 'Hover the image to probe pixels'}
-              {onSample ? ' · click for spectrum' : ''}
-            </div>
-            <canvas ref={histRef} className="hist" aria-label="Brightness histogram of the displayed frame" />
-            <div style={{ fontSize: 12, color: '#8a90ab' }}>
-              Change map: <span ref={diffStatRef} className="mono" style={{ color: '#e8c34a' }} />
-              {mode !== 'diff' && <span className="mono"> — switch to Diff to quantify change</span>}
-            </div>
-            <div style={{ fontSize: 12, color: '#8a90ab' }}>
-              {candidates.length
-                ? `${candidates.length} candidate${candidates.length === 1 ? '' : 's'} — real pixel differencing, ≥5σ`
-                : 'Scanning pixels for movers…'}
-            </div>
-            {candidates.length > 0 ? (
-              <ul className="cand-detect-list">
-                {candidates.slice(0, 5).map((c, i) => (
-                  <li key={i} className="mono">
-                    <span className={c.kind === 'mover' ? 'tag-mover' : 'tag-var'}>
-                      {c.kind === 'mover' ? 'MOVER' : 'VARIABLE'}
-                    </span>{' '}
-                    #{i + 1} · {c.sigma.toFixed(1)}σ
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              curImg && prevImg && (
-                <p style={{ fontSize: 12, color: '#8a90ab' }}>No movers above 5σ between these epochs — quiet field.</p>
-              )
-            )}
-          </details>
-
-          <details className="tweak-sec" aria-label="Export">
-            <summary>Save</summary>
-            <div style={rowStyle}>
-              <button type="button" className="epoch-chip" onClick={() => downloadPNG()}>PNG</button>
-              <button type="button" className="epoch-chip" onClick={() => void recordWebM()} disabled={recording || n < 2}>
-                {recording ? 'Recording…' : 'WebM'}
-              </button>
-              <button type="button" className="epoch-chip" onClick={() => { setPan({ x: 0, y: 0 }); setZoom(1); }}>Reset view</button>
-              <button type="button" className="epoch-chip" onClick={() => copyLink()}>Copy link</button>
-            </div>
-          </details>
-
-          <details className="tweak-sec" aria-label="Shortcuts">
-            <summary>Guide</summary>
-            <div className="keys-grid">
-              <span><kbd>Space</kbd> play / pause</span>
-              <span><kbd>←</kbd><kbd>→</kbd> step epoch</span>
-              <span>drag pan · scroll zoom</span>
-            </div>
-            <button type="button" className="epoch-chip" onClick={() => setPalette(true)}>Command palette (Ctrl+K)</button>
-          </details>
-        </aside>
       </div>
 
       {/* command palette */}
