@@ -105,6 +105,16 @@ export default function CoverageMap({
       }
 
       ctx.lineWidth = 1;
+      // ecliptic highway: |dec| <= 15° band where asteroids stream (positional truth)
+      const ey0 = ((90 - 15) / 180) * h;
+      const ey1 = ((90 + 15) / 180) * h;
+      ctx.fillStyle = 'rgba(240,187,82,.045)';
+      ctx.fillRect(0, ey0, w, ey1 - ey0);
+      ctx.strokeStyle = 'rgba(240,187,82,.28)';
+      ctx.setLineDash([6, 5]);
+      ctx.beginPath(); ctx.moveTo(0, ey0 + 0.5); ctx.lineTo(w, ey0 + 0.5); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, ey1 + 0.5); ctx.lineTo(w, ey1 + 0.5); ctx.stroke();
+      ctx.setLineDash([]);
       for (let ra = 30; ra < 360; ra += 30) {
         const x = Math.round((ra / 360) * w) + 0.5;
         ctx.strokeStyle = 'rgba(255,255,255,.07)';
