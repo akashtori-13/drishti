@@ -626,7 +626,9 @@ kbd{font-family:var(--font-mono); font-size:.6875rem; border:1px solid var(--lin
 .transport-row .play.mini .icon{width:17px; height:17px;}
 .transport-row .icon-btn{width:32px; height:32px; flex-shrink:0;}
 .transport-row .scrub{flex:1; min-width:80px; accent-color:#7c83fd;}
-.transport-row .epoch-name{font-size:.75rem; color:var(--ink-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:220px;}
+.transport-row .epoch-name{font-size:.75rem; color:var(--ink-2); width:190px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-variant-numeric:tabular-nums;}
+.viewer-tag{max-width:46%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.viewer-tag.epoch{max-width:44%;}
 .filmstrip{display:flex; gap:6px; align-items:center; overflow-x:auto; padding:2px; scrollbar-width:thin; flex-shrink:0;}
 .film{flex-shrink:0; width:48px; height:48px; border-radius:10px; overflow:hidden; border:2px solid transparent; background:#04050a; padding:0; cursor:pointer;}
 .film img{width:100%; height:100%; object-fit:cover; display:block;}
