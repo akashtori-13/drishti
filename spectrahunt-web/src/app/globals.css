@@ -92,6 +92,12 @@ main:focus{outline:none;}
   padding:8px 14px; border-radius:999px; transition:color .15s, background .15s;
 }
 .tabs button:hover{color:var(--ink); background:rgba(255,255,255,.06);}
+.tabs a{
+  color:var(--ink-2); font-size:.875rem; font-weight:500; text-decoration:none;
+  padding:8px 14px; border-radius:999px; transition:color .15s, background .15s;
+  display:inline-block;
+}
+.tabs a:hover{color:var(--ink); background:rgba(255,255,255,.06);}
 .tabs button.active{color:var(--ink); background:rgba(255,255,255,.1);}
 .tabs a:hover{color:var(--ink) !important; background:rgba(255,255,255,.06);}
 .tabs a.active{color:var(--ink) !important; background:rgba(255,255,255,.1);}
