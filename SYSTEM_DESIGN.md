@@ -85,9 +85,9 @@ Two runtimes, one contract:
 ```mermaid
 flowchart TB
     subgraph Views
-        HOME[Home `#/` hero]
+        HOME[Home `/` hero + field rail]
         SKY[Sky `/sky`]
-        BLINK[Blink `/blink/id`]
+        BLINK[Blink `/blink/id` + live]
         CAND[Candidates]
         ABOUT[About]
     end
@@ -95,18 +95,20 @@ flowchart TB
         HERO[HeroSky<br/>real CAR bg + markers]
         STEL[StellariumView<br/>HiPS SIN + Gaia + Sun/Moon]
         COVM[CoverageMap<br/>real CAR bg + tiles]
-        BCOMP[BlinkComparator<br/>canvas engine]
+        BCOMP[BlinkComparator<br/>square stage + side tweaks]
     end
     subgraph Lib
-        ASTRO[astro: coords · 102ch · stretch · cmaps · permalinks]
-        CAT[ catalogs: links · tours · glossary]
+        ASTRO[astro: coords · 102ch · stretch · cmaps · CSV]
+        CAT[catalogs: links · tours · glossary]
         CACHE[skycache: IndexedDB + LS]
+        MOTION[motion: in-browser dipoles]
         STORE[zustand UI state]
     end
     HOME --> HERO
     SKY --> STEL
     SKY --> COVM
     BLINK --> BCOMP
+    BLINK --> MOTION
     STEL --> CACHE
     HERO --> CACHE
     COVM --> CACHE

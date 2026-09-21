@@ -54,13 +54,13 @@ Shared constant: `SKY_ALLSKY_URL` (`lib/sky.ts`) — 2MASS CAR, log stretch.
 ## Blink workspace (`BlinkPage` + `BlinkComparator`)
 
 Page layout (no page-scroll on desktop): title bar → viewer column (square
-stage sized `min(100%, 100dvh−330px)` + transport row + filmstrip) + 340 px
-control column (accordion sections, Compare open by default) + data rail tabs
-(Overview / Epochs / Catalogs / Share).
+stage + transport row + filmstrip) + tweak column (View/Display/Bands/Measure
+sections) + data rail tabs (Overview / Epochs / Catalogs / Share). Toolbar and
+popovers were removed in favor of the always-visible side column.
 
 `BlinkComparator` props: `frames, band, onBandChange, title, mode, onModeChange,
 epochIdx, onEpochChange, showMarkers, onToggleMarkers?, fovArcmin?, onSample?,
-center?`. Internals:
+center?, bandPngs?`. Internals:
 
 - Canvas engine: cover-fit draw → stretch/colormap/invert (`lib/astro.ts`
   mirrors the backend render); modes blink/side/swipe/true-diff/motion-color.
@@ -76,8 +76,9 @@ center?`. Internals:
 
 ## Data layer (`lib/`)
 
-- `showcases.ts` — `SHOWCASE_IDS` (15), static JSON fetch, `useLive` flag,
-  `fetchLiveShowcase` (`/api/frames` → `Showcase`), `API_BASE` export.
+- `showcases.ts` — `SHOWCASE_IDS` (20), static JSON fetch, `useLive` flag,
+  `fetchLiveShowcase` (`/api/frames` → `Showcase`), `isLiveId`/`liveIdFor`,
+  `API_BASE` export. `Showcase.bands` carries per-detector newest-visit PNGs.
 - `astro.ts` — coordinate parse/format (decimal, sexagesimal, HMS/DMS),
   88 constellations, 102 LVF channels, stretch/colormaps, motion math,
   permalinks, CSV, `mjdToDate`.

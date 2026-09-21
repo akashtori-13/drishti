@@ -46,26 +46,30 @@ dark ("not yet surveyed").
   / bottom sheet (mobile) with epochs/bands/survey/status + blink entry —
   static showcases nearby, or **live on-demand blink for any visited field**
   (`/blink/live?ra=&dec=&band=`). Footer hidden — fullscreen page.
-* **Blink `/blink/<id>?band=&epoch=&mode=`** — Fixed-viewport workspace (no page
-  scroll on desktop): viewer tabs (View: timeline slider with date ticks,
-  autoplay transport, blink / side-by-side / swipe / real B−A difference with
-  gain, motion-color composite, synced pan/zoom, PNG/WebM export; Image:
-  stretch, colormap, invert, presets, black/white; Bands: 6 detectors × 102
-  channels + RGB picker), keyboard (Space/←/→), 1′ scale bar, epoch tags;
-  tabbed data rail (Overview: story, verdict, motion ″/day, metadata, real or
-  proxy light curve; Epochs: clickable list + click-spectrum; Catalogs:
-  SkyBoT/MPC/Horizons/SIMBAD + provenance + citation; Share: link, CSV/JSON,
-  community flags); tours + glossary in collapsibles.
+* **Blink `/blink/<id>?band=&epoch=&mode=`** — Sandwich layout, no page scroll
+  on desktop: square stage (badges only) center, tweak column left, info rail
+  right. Toolbar under the image (segmented Blink/Side/Swipe/Diff/Color +
+  Display/Measure tool buttons + contextual gain/curtain); timeline transport
+  + filmstrip below; Display/Bands/Measure open as smart popovers (flip
+  above/below by viewport space, never over pixels). Left rail: View, Display
+  (stretch, colormap, invert, presets, black/white), Bands (6 detectors × 102
+  channels + true RGB false-color from per-band cutouts), Measure (cursor
+  probe, histogram, diff stats, ≥5σ dipole list). Canvas engine: synced
+  pan/zoom, progressive preload, in-browser motion detection, click spectrum,
+  PNG/WebM/figure export, ⌘K palette, keyboard (Space/←/→). Data rail tabs
+  (Overview/Epochs/Catalogs/Share) with measured verdicts, real light curves,
+  multi-survey context (DSS2/2MASS), provenance + citation.
 * **Candidates `/candidates`** — Cards from all showcases with real PNG thumbs
-  (honest pending tile otherwise), known (green) / unidentified (amber) badges,
-  σ scores, measured motion ″/day, all/unknown/known filters with counts,
-  CSV/JSON export. Click → real blink page.
+  (honest pending tile otherwise), measured kinds (Known / Mover / Variable /
+  Unidentified, from pipeline reports — never invented), top-σ + baseline stats,
+  all/unknown/known filters with counts, CSV/JSON export. Click → real blink page.
 * **About `/about`** — Mission, LVF same-band rule, band table, method, live-data
   notice, citation block, sources (IRSA, QR overview, AWS Open Data, SkyBoT).
 
-Global: real multipage routes with per-page titles (hash router retired);
-`blinkURL()` permalinks; skip-link, focus management, hamburger nav ≤640px,
-`prefers-reduced-motion` freezes all animation, touch targets ≥44px.
+Global: real multipage routes with per-page titles; dynamic-island pill navbar
+(command bar with context + search overlay + mobile sheet); `blinkURL()`
+permalinks; skip-link, focus management, touch targets ≥44px,
+`prefers-reduced-motion` freezes all animation.
 
 ## 3. Backend (dev-only; never on the CDN)
 

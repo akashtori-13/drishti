@@ -24,7 +24,7 @@ curl localhost:8000/api/health
 
 | Method | Path | Notes |
 |---|---|---|
-| GET | `/api/showcases` | `{id,title,ra,dec}[]` for all 15 fields |
+| GET | `/api/showcases` | `{id,title,ra,dec}[]` for all 20 fields |
 | GET | `/api/showcase/{sid}` | Full showcase JSON (404 for unknown) |
 | GET | `/api/citation` | QR2 citation text + DOI + timestamp |
 
