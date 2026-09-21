@@ -8,6 +8,8 @@ No magic numbers scattered in the code.
 # Data release
 RELEASE = 'QR2'
 DOI = '10.26131/IRSA652'  # QR2 DOI (QR1: 10.26131/IRSA629)
+RELEASE_DOI = DOI  # alias used by older backend modules
+PIPELINE_VERSION = '1.0.0'
 
 # IRSA Endpoints
 IRSA_SIA2_URL = 'https://irsa.ipac.caltech.edu/SIA'
@@ -52,13 +54,32 @@ GRID_H = 36  # 5° cells in Dec (180/5)
 
 # API configuration
 API_CONCURRENCY_LIMIT = 4  # Max concurrent requests to IRSA
+MAX_CONCURRENT_IRSA_REQUESTS = API_CONCURRENCY_LIMIT
 API_TIMEOUT_SECONDS = 30
+INGEST_TIMEOUT_SECONDS = API_TIMEOUT_SECONDS
 USER_AGENT = 'SpectraHunt/1.0 (NASA Space Apps 2026; github.com/your-org/spectrahunt)'
+
+# SkyBoT endpoint alias (older modules import SKYBOT_ENDPOINT)
+SKYBOT_ENDPOINT = SKYBOT_URL
+
+# Cutouts
+CUTOUT_SIZE_DEG = 0.15  # ~9 arcmin cutouts
 
 # Cache directories
 CACHE_DIR = '.cache'
 CUTOUT_CACHE_DIR = '.cache/cutouts'
 PNG_CACHE_DIR = '.cache/pngs'
+
+# Database (default location; callers may override with explicit path)
+DATABASE_PATH = 'data/spectrahunt.db'
+
+# API server
+API_HOST = '0.0.0.0'
+API_PORT = 8000
+CORS_ORIGINS = ['*']
+
+# FLAGS bitmask (SPHEREx Explanatory Supplement)
+FLAGS_BAD_MASK = sum(1 << b for b in FLAGS_BAD_BITS)
 
 # Pipeline version
 PIPELINE_VERSION = '1.0.0'

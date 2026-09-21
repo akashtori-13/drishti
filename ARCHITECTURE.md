@@ -80,7 +80,7 @@ SpectraHunt is a web application for detecting moving objects (asteroids, comets
 ## Tech Stack
 
 ### Frontend
-- **Framework**: Next.js 14 (App Router)
+- **Framework**: Next.js 16 (App Router, `output: 'export'` static site)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 - **State**: Zustand
@@ -103,8 +103,8 @@ SpectraHunt is a web application for detecting moving objects (asteroids, comets
 - **Scheduling**: APScheduler
 
 ### Deployment
-- **Static Mode**: Netlify (CDN, auto HTTPS)
-- **Live Mode**: Docker + uvicorn (local dev)
+- **Static Mode**: Netlify serving `spectrahunt-web/out` (no Python at CDN build time; `spectrahunt-web/public/data/*.json` is committed)
+- **Live Mode**: Docker + uvicorn (local dev, `backend/app.py`)
 
 ## Directory Structure
 
@@ -133,28 +133,28 @@ spectrahunt/
 │   ├── tailwind.config.ts    # Tailwind config
 │   └── next.config.mjs       # Next.js config
 │
-├── backend/                  # Python backend (local dev only)
+├── backend/                  # Python backend (live API + pipeline)
 │   ├── __init__.py
-│   ├── app.py                # FastAPI application
+│   ├── __main__.py             # python -m backend
+│   ├── app.py                # FastAPI application (restored)
 │   ├── config.py             # Configuration constants
 │   ├── db.py                 # Database schema & helpers
 │   ├── ingest.py             # Frame ingestion pipeline
-│   ├── cutouts.py            # FITS cutout handling
+│   ├── cutouts.py            # FITS cutout handling (restored)
 │   ├── detect.py             # Detection pipeline
-│   ├── crossmatch.py         # SkyBoT/Horizons integration
-│   └── tests/                # Unit & integration tests
+│   ├── crossmatch.py         # SkyBoT/Horizons integration (restored)
+│   └── tests/                # Unit tests (pytest)
 │
 ├── scripts/                  # Build & utility scripts
 │   ├── build_static_bundle.py    # Generate static JSON files
 │   └── probe_endpoints.py        # Verify external APIs
 │
-└── data/                   # Generated static data (for Netlify)
+└── data/                   # Generated static data (committed JSON only)
     ├── status.json         # Pipeline status & stats
     ├── coverage.json       # 72×36 sky grid coverage
-    ├── candidates.json     # Detected moving objects
+    ├── candidates.json     # Detected moving objects (+demo fallback when IRSA empty)
     ├── demo_fields.json    # Pre-computed field data
-    ├── spectrahunt.db      # SQLite database
-    └── img/                # Rendered PNG cutouts
+    └── spectrahunt.db      # Local-only SQLite (git-ignored, not deployed)
 ```
 
 ## Data Flow

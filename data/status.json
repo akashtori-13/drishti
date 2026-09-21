@@ -1,9 +1,10 @@
 {
   "release": "QR2",
-  "last_ingest_at": "2026-09-21T15:58:39.998965+00:00",
+  "last_ingest_at": "2026-09-21T17:34:21.975467+00:00",
   "newest_planning_period": null,
   "frames_indexed": 0,
   "fields_indexed": 0,
   "candidates_this_week": 0,
-  "pipeline_version": "1.0.0"
+  "pipeline_version": "1.0.0",
+  "note": "demo-fallback: IRSA returned no frames; showing illustrative coverage"
 }

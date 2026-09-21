@@ -6,9 +6,9 @@ SpectraHunt detects moving objects (asteroids, comets, NEOs) in SPHEREx astronom
 
 ## Tech Stack
 
-- **Frontend**: Next.js 14, TypeScript, Tailwind CSS, Zustand, React-Leaflet, Recharts
+- **Frontend**: Next.js 16, TypeScript, Tailwind CSS, Zustand, React-Leaflet, Recharts
 - **Backend**: Python FastAPI, SQLite, astropy, astroquery, sep, reproject
-- **Deployment**: Netlify (static mode), Docker + uvicorn (live mode)
+- **Deployment**: Netlify (static export `spectrahunt-web/out`), uvicorn locally (live mode)
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed system architecture.
 
@@ -76,16 +76,8 @@ SpectraHunt is configured for automatic deployment to Netlify via `netlify.toml`
 ### Automatic Deployment
 
 1. **Push to GitHub**: Commit your code to a GitHub repository
-2. **Connect to Netlify**: 
-   - Go to [Netlify](https://netlify.com)
-   - Click "Add new site" → "Import an existing project"
-   - Select your GitHub repository
-3. **Deploy**: Netlify will automatically:
-   - Install Node.js 20 and Python 3.11
-   - Install dependencies (`npm ci` and `pip install`)
-   - Generate static data bundle
-   - Build Next.js application
-   - Deploy to global CDN
+2. **Connect to Netlify** with base directory `spectrahunt-web/`, build `npm ci && npm run build`, publish `spectrahunt-web/out`
+3. **Deploy**: Netlify builds the static Next.js export and serves global CDN. No Python/IRSA calls at CDN build time — `spectrahunt-web/public/data/*.json` is committed (regenerate locally via `python scripts/build_static_bundle.py` + copy to `public/data/`).
 
 Your site will be live at `https://your-site-name.netlify.app`
 

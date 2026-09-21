@@ -1,0 +1,36 @@
+[
+  {
+    "id": 1,
+    "name": "SH-DEMO-1",
+    "ra": 180.5,
+    "dec": 2.3,
+    "band": 3,
+    "epoch_a": "2025W19_2B",
+    "epoch_b": "2025W32_2B",
+    "mjd_a": 60700.0,
+    "mjd_b": 60791.0,
+    "significance_sigma": 8.2,
+    "motion_arcsec": 18.5,
+    "motion_pa_deg": 45.0,
+    "skybot_match": null,
+    "status": "pending",
+    "created_at": "2026-09-21T17:34:21.977179+00:00"
+  },
+  {
+    "id": 2,
+    "name": "SH-DEMO-2 (Ceres)",
+    "ra": 83.8,
+    "dec": -5.4,
+    "band": 2,
+    "epoch_a": "2025W19_2B",
+    "epoch_b": "2025W32_2B",
+    "mjd_a": 60700.0,
+    "mjd_b": 60791.0,
+    "significance_sigma": 12.4,
+    "motion_arcsec": 42.1,
+    "motion_pa_deg": 120.0,
+    "skybot_match": "1 Ceres",
+    "status": "verified",
+    "created_at": "2026-09-21T17:34:21.977179+00:00"
+  }
+]
