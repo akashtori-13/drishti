@@ -19,9 +19,11 @@ export default function CoverageMap({
   onInspect: (ra: number, dec: number) => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const st = useRef<{ w: number; h: number; stars: Star[] } & {
+  const [skyReady, setSkyReady] = useState(false);
+  const st = useRef<{ w: number; h: number } & {
     grid: number[][]; coverage: boolean; selected: MapSelection | null;
-  }>({ w: 0, h: 0, stars: [], grid, coverage, selected });
+    img: HTMLImageElement | null;
+  }>({ w: 0, h: 0, grid, coverage, selected, img: null });
   const cb = useRef({ onHover, onInspect });
   useEffect(() => {
     cb.current = { onHover, onInspect };
@@ -29,6 +31,19 @@ export default function CoverageMap({
     st.current.coverage = coverage;
     st.current.selected = selected;
   });
+
+  // real infrared all-sky background, cached on device
+  useEffect(() => {
+    let alive = true;
+    void loadCachedImage(SKY_ALLSKY_URL)
+      .then((im) => {
+        if (!alive) return;
+        st.current.img = im;
+        setSkyReady(true);
+      })
+      .catch(() => undefined);
+    return () => { alive = false; };
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -54,24 +69,29 @@ export default function CoverageMap({
       s.stars = genStars(2024, Math.min(1500, Math.floor((w * h) / 3200)));
     };
 
-    const draw = (t: number) => {
+    const draw = () => {
       const { w, h } = s;
       if (!w || !h) return;
-      ctx.fillStyle = '#05060c';
-      ctx.fillRect(0, 0, w, h);
-      ctx.globalCompositeOperation = 'lighter';
-      const m = Math.max(w, h);
-      [235, 205, 20, 265, 300].forEach((hue, k) => {
-        const x = ((k * 0.23 + 0.07) % 1) * w;
-        const y = (((k * 0.37 + 0.11) % 1) * 0.8 + 0.1) * h;
-        const r = (0.14 + ((k * 0.13) % 0.2)) * m;
-        const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-        g.addColorStop(0, `hsla(${hue},62%,46%,.05)`);
-        g.addColorStop(1, `hsla(${hue},62%,46%,0)`);
-        ctx.fillStyle = g;
-        ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill();
-      });
-      ctx.globalCompositeOperation = 'source-over';
+      if (s.img && s.img.complete && s.img.naturalWidth) {
+        // mirrored cover: image RA runs LEFT, overlay math runs RIGHT
+        const iw = s.img.naturalWidth;
+        const ih = s.img.naturalHeight;
+        const scale = Math.max(w / iw, h / ih);
+        const dw = iw * scale;
+        const dh = ih * scale;
+        ctx.fillStyle = '#05060c';
+        ctx.fillRect(0, 0, w, h);
+        ctx.save();
+        ctx.translate(w, 0);
+        ctx.scale(-1, 1);
+        ctx.globalAlpha = 0.85;
+        ctx.drawImage(s.img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+        ctx.restore();
+        ctx.globalAlpha = 1;
+      } else {
+        ctx.fillStyle = '#05060c';
+        ctx.fillRect(0, 0, w, h);
+      }
 
       const cw = w / GRID_W;
       const ch = h / GRID_H;
@@ -114,14 +134,6 @@ export default function CoverageMap({
         label(`${dec > 0 ? '+' : '−'}${Math.abs(dec)}°`, w - 10, ((90 - dec) / 180) * h - 6, 'right');
       }
       label('0°', w - 10, eqY - 6, 'right');
-
-      const tw = t * 0.0011;
-      s.stars.forEach((star, i) => {
-        ctx.globalAlpha = Math.min(1, star.b * (0.88 + 0.12 * Math.sin(tw + i * 12.9898)));
-        ctx.fillStyle = STAR_FILL[star.ci];
-        ctx.beginPath(); ctx.arc(star.x * w, star.y * h, star.r * 0.85, 0, TAU); ctx.fill();
-      });
-      ctx.globalAlpha = 1;
 
       if (hover) {
         ctx.strokeStyle = 'rgba(238,240,248,.75)';
