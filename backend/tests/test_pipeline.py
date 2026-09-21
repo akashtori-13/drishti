@@ -55,3 +55,24 @@ def test_api_cache_ttl(tmp_path):
     time.sleep(0.05)
     assert api_cache_get(db, "k", 0.01) is None or True  # expiry path exercised
     assert api_cache_get(db, "missing", 60) is None
+
+
+def test_skybot_breaker_skips_network(tmp_path):
+    import asyncio
+    import time
+    from backend.cache import init_db, set_status
+    from backend import crossmatch
+    db = str(tmp_path / "br.db")
+    init_db(db)
+    # tripped breaker: future dead_until -> immediate None, no network
+    set_status(db, "skybot:dead_until", str(time.time() + 3600))
+    t0 = time.time()
+    out = asyncio.run(crossmatch.query_skybot(180.0, 0.0, 60800.0, 60.0, db_path=db))
+    assert out is None and (time.time() - t0) < 5
+    # streak counting: three failures trip the breaker (no network stubbed by 404 host)
+    set_status(db, "skybot:dead_until", "0")
+    set_status(db, "skybot:fail_streak", "2")
+    out = asyncio.run(crossmatch.query_skybot(180.0, 0.0, 60800.0, 60.0, db_path=db))
+    assert out is None
+    from backend.cache import get_status
+    assert float(get_status(db, "skybot:dead_until") or 0) > time.time()

@@ -616,6 +616,10 @@ export default function BlinkComparator({
   }, [mode, n]);
 
 
+  const onModeChangeWrap = (m: CompareMode) => {
+    setMeasureChip(null);
+    onModeChange(m);
+  };
   const setPreset = (p: 'faint' | 'balanced' | 'bright') => {
     if (p === 'faint') { setVmin(0.02); setVmax(0.9); }
     if (p === 'balanced') { setVmin(0.05); setVmax(0.98); }
@@ -637,7 +641,7 @@ export default function BlinkComparator({
       { name: 'Previous epoch', hint: '←', run: () => step(-1) },
       ...frames.map((f, i) => ({ name: `Go to ${f.label}`, hint: `E${i + 1}`, run: () => { setPlaying(false); onEpochChange(i); } })),
       ...(['blink', 'side', 'swipe', 'diff'] as CompareMode[]).map((m) => ({
-        name: `Mode: ${m}`, hint: '', run: () => onModeChange(m),
+        name: `Mode: ${m}`, hint: '', run: () => onModeChangeWrap(m),
       })),
       { name: 'Toggle motion color', hint: '', run: () => setShowRgb((v) => !v) },
       ...(['linear', 'log', 'sqrt', 'asinh'] as Stretch[]).map((s) => ({
@@ -722,7 +726,7 @@ export default function BlinkComparator({
           <div className="seg" role="group" aria-label="Compare mode">
             {(['blink', 'side', 'swipe', 'diff'] as CompareMode[]).map((m) => (
               <button key={m} type="button" className={`seg-btn${mode === m ? ' active' : ''}`} aria-pressed={mode === m}
-                onClick={() => onModeChange(m)}>
+                onClick={() => onModeChangeWrap(m)}>
                 {m === 'blink' ? 'Blink' : m === 'side' ? 'Side' : m === 'swipe' ? 'Swipe' : 'Diff'}
               </button>
             ))}
