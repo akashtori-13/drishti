@@ -101,6 +101,13 @@ export default function AboutPage() {
         </ul>
       </section>
 
+      <section>
+        <h2>Keyboard shortcuts</h2>
+        <p>Every blink view answers to the keyboard: <kbd>Space</kbd> plays or pauses,
+          <kbd>←</kbd> <kbd>→</kbd> step through epochs, <kbd>Ctrl/⌘ K</kbd> opens the
+          command palette, <kbd>Esc</kbd> closes panels. Drag pans, scroll zooms.</p>
+      </section>
+
       <section className="cta-band">
         <div>
           <h2>See for yourself</h2>
