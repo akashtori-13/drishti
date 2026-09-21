@@ -518,6 +518,39 @@ export default function BlinkComparator({
             </button>
             <button type="button" className="epoch-chip" onClick={() => { setPan({ x: 0, y: 0 }); setZoom(1); }}>Reset view</button>
           </div>
+          <div style={rowStyle} aria-label="Quick image controls">
+            <label style={{ fontSize: 12, color: '#8a90ab' }}>Stretch{' '}
+              <select value={stretch} onChange={(e) => setStretch(e.target.value as Stretch)} style={selStyle} aria-label="Quick stretch">
+                <option value="linear">linear</option>
+                <option value="log">log</option>
+                <option value="sqrt">sqrt</option>
+                <option value="asinh">asinh</option>
+              </select>
+            </label>
+            <label style={{ fontSize: 12, color: '#8a90ab' }}>Colors{' '}
+              <select value={cmap} onChange={(e) => setCmap(e.target.value as Colormap)} style={selStyle} aria-label="Quick colormap">
+                <option value="cividis">cividis ✓</option>
+                <option value="grayscale">gray</option>
+                <option value="viridis">viridis</option>
+                <option value="inferno">inferno</option>
+              </select>
+            </label>
+            <button type="button" className="epoch-chip" aria-pressed={invert} onClick={() => setInvert((v) => !v)}
+              style={invert ? { color: '#fff', borderColor: '#7c83fd' } : undefined}>Invert</button>
+            <label style={{ fontSize: 12, color: '#8a90ab' }}>Band{' '}
+              <select value={band} onChange={(e) => {
+                const b = Number(e.target.value);
+                onBandChange(b);
+                const ch = CHANNELS.filter((c) => c.detector === b);
+                setChannel(ch[Math.floor(ch.length / 2)]?.idx ?? 0);
+              }} style={selStyle} aria-label="Quick band">
+                {BANDS.map((b) => (
+                  <option key={b.id} value={b.id}>D{b.id} · {b.range}</option>
+                ))}
+              </select>
+            </label>
+            <button type="button" className="epoch-chip" onClick={() => setPanel('image')} title="All image controls">More…</button>
+          </div>
           <p className="keys"><kbd>Space</kbd> play · <kbd>←</kbd><kbd>→</kbd> step · drag pan · scroll zoom{onSample ? ' · click spectrum' : ''}</p>
         </div>
       )}
