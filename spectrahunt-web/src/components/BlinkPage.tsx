@@ -3,30 +3,22 @@
 import { useEffect, useState } from 'react';
 import BlinkComparator from '@/components/BlinkComparator';
 import AladinSky from '@/components/AladinSky';
+import { SHOWCASE_IDS, getShowcase, type Showcase } from '@/lib/showcases';
+import { useAppStore } from '@/lib/store';
 
-interface Showcase {
-  id: string; title: string; ra: number; dec: number; story: string;
-  epochs: Array<{ label: string; png?: string | null; note?: string; obs_id?: string; band?: number; wavelength_um?: number; mjd?: number }>;
-  links?: Record<string, string>;
-}
-
-const IDS = ['3i-atlas', 'ecliptic-mover', 'nep-deep'] as const;
-
-export default function BlinkPage({ initialId = '3i-atlas' }: { initialId?: string }) {
-  const [id, setId] = useState(initialId);
+export default function BlinkPage() {
+  const { showcaseId, openShowcase } = useAppStore();
   const [data, setData] = useState<Showcase | null>(null);
   const [err, setErr] = useState<string | null>(null);
-  const viewing = data && data.id === id ? data : null;
+  const viewing = data && data.id === showcaseId ? data : null;
 
   useEffect(() => {
     let alive = true;
-    fetch(`/showcases/${id}.json`).then((r) => {
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      return r.json();
-    }).then((d) => { if (alive) { setData(d); setErr(null); } })
+    getShowcase(showcaseId)
+      .then((d) => { if (alive) { setData(d); setErr(null); } })
       .catch((e: unknown) => { if (alive) setErr(e instanceof Error ? e.message : String(e)); });
     return () => { alive = false; };
-  }, [id]);
+  }, [showcaseId]);
 
   return (
     <div className="min-h-screen p-4">
@@ -35,16 +27,16 @@ export default function BlinkPage({ initialId = '3i-atlas' }: { initialId?: stri
         <p className="text-slate-400 mb-4">Same sky, different time. Drag, onion-skin, or auto-blink.</p>
 
         <div className="flex flex-wrap gap-2 mb-6">
-          {IDS.map((s) => (
-            <button key={s} onClick={() => setId(s)}
-              className={`px-3 py-1.5 rounded-full text-sm border ${id === s ? 'bg-purple-600 border-purple-500 text-white' : 'border-slate-700 text-slate-300'}`}>
+          {SHOWCASE_IDS.map((s) => (
+            <button key={s} onClick={() => openShowcase(s)}
+              className={`px-3 py-1.5 rounded-full text-sm border ${showcaseId === s ? 'bg-purple-600 border-purple-500 text-white' : 'border-slate-700 text-slate-300'}`}>
               {s}
             </button>
           ))}
         </div>
 
-        {err && <div className="bg-red-500/10 border border-red-500 text-red-300 px-4 py-3 rounded-lg">Failed to load {id}: {err}</div>}
-        {!viewing && !err && <div className="text-slate-400">Loading {id}…</div>}
+        {err && <div className="bg-red-500/10 border border-red-500 text-red-300 px-4 py-3 rounded-lg">Failed to load {showcaseId}: {err}</div>}
+        {!viewing && !err && <div className="text-slate-400">Loading {showcaseId}…</div>}
 
         {viewing && (
           <div className="space-y-6">
@@ -62,7 +54,7 @@ export default function BlinkPage({ initialId = '3i-atlas' }: { initialId?: stri
                   <div className="font-semibold mb-1">Epoch {i === 0 ? 'A' : 'B'} · {e.label}</div>
                   <div className="text-slate-400 font-mono text-xs space-y-1">
                     {e.obs_id && <div>obs {e.obs_id}</div>}
-                    {e.band && <div>band D{e.band} · λ≈{e.wavelength_um}µm (same-band blink only)</div>}
+                    {e.band && <div>band D{e.band} · λ≈{e.wavelength_um}µm · same-band blink only</div>}
                     {e.mjd && <div>MJD {e.mjd}</div>}
                     {e.note && <div className="text-slate-300">{e.note}</div>}
                   </div>

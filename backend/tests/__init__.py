@@ -1,1 +1,1 @@
-"""test pkg"""
+"""SpectraHunt backend tests."""

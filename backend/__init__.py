@@ -1,8 +1,8 @@
-"""SpectraHunt Backend Package."""
+"""SpectraHunt backend: TAP discovery + IBE cutouts + cross-match (dev API)."""
 
-from backend.config import RELEASE, DOI, PIPELINE_VERSION, BANDS, GRID_W, GRID_H, CITATION_TEXT
-from backend.db import init_db, get_connection
+from backend.cache import get_connection, init_db
+from backend.config import BANDS, CITATION_TEXT, DOI, PIPELINE_VERSION, RELEASE
 
 __version__ = "1.0.0"
-__all__ = ["RELEASE", "DOI", "PIPELINE_VERSION", "BANDS", "GRID_W", "GRID_H",
-           "CITATION_TEXT", "init_db", "get_connection"]
+__all__ = ["RELEASE", "DOI", "PIPELINE_VERSION", "BANDS", "CITATION_TEXT",
+           "init_db", "get_connection"]

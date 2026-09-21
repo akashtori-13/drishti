@@ -4,91 +4,46 @@ import { useEffect } from 'react';
 import { useAppStore } from '@/lib/store';
 import Header from '@/components/Header';
 import HomePage from '@/components/HomePage';
-import MapPage from '@/components/MapPage';
-import FieldPage from '@/components/FieldPage';
-import CandidatesPage from '@/components/CandidatesPage';
-import AboutPage from '@/components/AboutPage';
 import BlinkPage from '@/components/BlinkPage';
+import SkyPage from '@/components/SkyPage';
+import AboutPage from '@/components/AboutPage';
 
 export default function Home() {
-  const { 
-    currentView, 
-    loadStatus, 
-    loadCoverage, 
-    loadCandidates,
-    setSelectedField 
-  } = useAppStore();
+  const { currentView, openShowcase } = useAppStore();
 
-  // Load initial data on mount
   useEffect(() => {
-    loadStatus();
-    loadCoverage();
-    loadCandidates({ limit: 20 });
-
-    // Handle hash routing
-    const handleHashChange = () => {
+    const apply = () => {
       const hash = window.location.hash;
-      
-      if (hash === '#/' || hash === '') {
-        useAppStore.getState().setCurrentView('home');
-      } else if (hash === '#/map') {
-        useAppStore.getState().setCurrentView('map');
-      } else if (hash.startsWith('#/field')) {
-        const params = new URLSearchParams(hash.replace('#/field', ''));
-        const ra = parseFloat(params.get('ra') || '0');
-        const dec = parseFloat(params.get('dec') || '0');
-        setSelectedField(ra, dec);
-      } else if (hash === '#/candidates') {
-        useAppStore.getState().setCurrentView('candidates');
+      const s = useAppStore.getState();
+      if (hash.startsWith('#/blink/')) {
+        openShowcase(hash.replace('#/blink/', '').split('?')[0] || '3i-atlas');
       } else if (hash.startsWith('#/blink')) {
-        useAppStore.getState().setCurrentView('blink');
-      } else if (hash === '#/about') {
-        useAppStore.getState().setCurrentView('about');
+        s.setCurrentView('blink');
+      } else if (hash.startsWith('#/sky')) {
+        s.setCurrentView('sky');
+      } else if (hash.startsWith('#/about')) {
+        s.setCurrentView('about');
+      } else {
+        s.setCurrentView('home');
       }
     };
-
-    // Initial check
-    handleHashChange();
-
-    // Listen for changes
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, [loadStatus, loadCoverage, loadCandidates, setSelectedField]);
-
-  const renderView = () => {
-    switch (currentView) {
-      case 'home':
-        return <HomePage />;
-      case 'map':
-        return <MapPage />;
-      case 'field':
-        return <FieldPage />;
-      case 'candidates':
-        return <CandidatesPage />;
-      case 'blink':
-        return <BlinkPage />;
-      case 'about':
-        return <AboutPage />;
-      default:
-        return <HomePage />;
-    }
-  };
+    apply();
+    window.addEventListener('hashchange', apply);
+    return () => window.removeEventListener('hashchange', apply);
+  }, [openShowcase]);
 
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1">
-        {renderView()}
+        {currentView === 'home' && <HomePage />}
+        {currentView === 'blink' && <BlinkPage />}
+        {currentView === 'sky' && <SkyPage />}
+        {currentView === 'about' && <AboutPage />}
       </main>
       <footer className="border-t border-slate-800 py-6 px-4">
         <div className="max-w-7xl mx-auto text-center text-slate-400 text-sm">
-          <p>SpectraHunt © 2026 NASA Space Apps Challenge</p>
-          <p className="mt-2">
-            Data from SPHEREx QR2 release • 
-            <a href="https://irsa.ipac.caltech.edu/data/SPHEREx/docs/" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline ml-1">
-              IRSA Archive
-            </a>
-          </p>
+          <p>SpectraHunt · NASA Space Apps 2026 · SPHEREx QR2 · DOI 10.26131/IRSA652</p>
         </div>
       </footer>
     </div>
