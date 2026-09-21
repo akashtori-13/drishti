@@ -290,7 +290,7 @@ export default function BlinkPage({ id }: { id: string }) {
                       ? 'Checking SkyBoT…'
                       : skybot.length
                         ? `SkyBoT match: ${skybot[0].name}.`
-                        : 'No cataloged object in radius — possibly uncatalogued.'}
+                        : 'No SkyBoT match — service unreachable or field empty; verify with the links below.'}
                   </p>
                   {viewing.epochs[0]?.note && <p>{viewing.epochs[0].note}</p>}
                   <div className="ext-links">

@@ -106,14 +106,19 @@ async def _detect_async(ra, dec, band, size_deg, db_path) -> Dict[str, Any]:
         motion = arcsec_per_day(ra, dec, ra, dec, (mjd_b or 0) - (mjd_a or 0))
     except Exception:
         pass
-    # label candidates: Gaia star within 8" -> known star; else SkyBoT check at field center
+    # label candidates: Gaia star within 8" -> known star; else SkyBoT check at field center.
+    # NOTE: IMCCE retired the legacy skybot_cone_search.php endpoint (404 since
+    # the SSP migration); query_skybot degrades to None and the UI links out
+    # for manual checks until the new SSP API is integrated.
     gaia = query_gaia(ra, dec, 8.0, db_path=db_path)
     skybot = None
+    skybot_status = "unavailable"
     try:
         if mjd_a:
             skybot = await query_skybot(ra, dec, float(mjd_a), 60.0, db_path=db_path)
+            skybot_status = "ok" if skybot else "empty"
     except Exception:
-        pass
+        skybot_status = "error"
     for c in meas["candidates"]:
         c["gaia"] = gaia[0] if gaia else None
         c["label"] = ("Known star" if gaia and (gaia[0].get("separation_arcsec", 99) or 99) < 5
@@ -123,7 +128,7 @@ async def _detect_async(ra, dec, band, size_deg, db_path) -> Dict[str, Any]:
             "variables": sum(1 for c in meas["candidates"] if c["kind"] == "variable"),
             "sigma_max": meas["sigma_max"], "sigma_min": meas["sigma_min"],
             "npix_sig5": meas["npix_sig5"], "align": align_info,
-            "gaia": gaia, "skybot": skybot,
+            "gaia": gaia, "skybot": skybot, "skybot_status": skybot_status,
             "motion_arcsec_day": motion, "mjd_a": mjd_a, "mjd_b": mjd_b,
             "detail": "ok"}
 
