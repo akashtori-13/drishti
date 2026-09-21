@@ -1,9 +1,9 @@
 'use client';
 
-import { CHANNELS } from '@/lib/astro';
-
-/** Flux vs wavelength mini-plot from sampled frame brightness. Honest label: proxy until per-pixel spectra land. */
-export default function SpectrumPlot({ values, band }: { values: number[]; band: number }) {
+/** Real per-band spectrum when `waves` is given, else epoch proxy. */
+export default function SpectrumPlot({ values, band, waves }: {
+  values: number[]; band: number; waves?: number[];
+}) {
   const W = 280;
   const H = 120;
   const max = Math.max(1, ...values);
@@ -14,7 +14,7 @@ export default function SpectrumPlot({ values, band }: { values: number[]; band:
   });
   return (
     <div>
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Mini spectrum: sampled brightness vs epoch" style={{ width: '100%', background: '#04050a', borderRadius: 10 }}>
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Mini spectrum, detector D${band}`} style={{ width: '100%', background: '#04050a', borderRadius: 10 }}>
         {[0.25, 0.5, 0.75].map((f) => (
           <line key={f} x1={30} x2={W - 6} y1={H * f} y2={H * f} stroke="rgba(255,255,255,.08)" strokeWidth={1} />
         ))}
@@ -25,13 +25,17 @@ export default function SpectrumPlot({ values, band }: { values: number[]; band:
         {pts.map((p, i) => (
           <g key={i}>
             <circle cx={p.x} cy={p.y} r={3.5} fill={i === 0 ? '#4fc9a8' : '#e8c34a'} />
-            <text x={p.x} y={H - 2} fontSize={8} fill="#8a90ab" textAnchor="middle">E{i + 1}</text>
+            <text x={p.x} y={H - 2} fontSize={8} fill="#8a90ab" textAnchor="middle">
+              {waves && waves[i] !== undefined ? waves[i].toFixed(1) : `E${i + 1}`}
+            </text>
           </g>
         ))}
         <text x={4} y={12} fontSize={9} fill="#8a90ab">flux</text>
       </svg>
       <p style={{ fontSize: 11, color: '#8a90ab', marginTop: 6 }}>
-        Sampled image brightness per epoch (proxy). Full 102-channel spectrum ({CHANNELS.length} channels, D{band}) arrives with live per-pixel spectra.
+        {waves
+          ? 'Sampled center brightness per detector band from real cutouts (proxy spectrum).'
+          : 'Sampled image brightness per epoch (proxy). Full 102-channel spectrum arrives with live per-pixel spectra.'}
       </p>
     </div>
   );

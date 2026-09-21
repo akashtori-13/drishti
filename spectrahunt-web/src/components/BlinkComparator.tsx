@@ -74,7 +74,7 @@ const selStyle: React.CSSProperties = { background: '#151929', border: '1px soli
 
 export default function BlinkComparator({
   frames, band, onBandChange, title, mode, onModeChange, epochIdx, onEpochChange,
-  showMarkers, onToggleMarkers, fovArcmin = 10, onSample, center,
+  showMarkers, onToggleMarkers, fovArcmin = 10, onSample, center, bandPngs,
 }: {
   frames: BlinkFrame[]; band: number; onBandChange: (b: number) => void; title: string;
   mode: CompareMode; onModeChange: (m: CompareMode) => void;
@@ -82,6 +82,8 @@ export default function BlinkComparator({
   showMarkers: boolean; onToggleMarkers?: () => void; fovArcmin?: number;
   onSample?: (args: { x: number; y: number; values: number[] }) => void;
   center?: { ra: number; dec: number };
+  /** Newest-epoch PNG per detector (1-6) for true false-color composites. */
+  bandPngs?: Record<number, string | null>;
 }) {
   const n = frames.length;
   const idx = Math.min(epochIdx, n - 1);
@@ -105,7 +107,9 @@ export default function BlinkComparator({
   });
   const [rgb, setRgb] = useState<[number, number, number]>([16, 33, 50]);
   const [showRgb, setShowRgb] = useState(false);
+  const [falseColor, setFalseColor] = useState(false);
   const [loaded, setLoaded] = useState<Record<string, HTMLImageElement>>({});
+  const [loadedBand, setLoadedBand] = useState<Record<string, HTMLImageElement>>({});
   const [recording, setRecording] = useState(false);
   const [probe, setProbe] = useState<{ sx: number; sy: number; lum: number; ra: number; dec: number } | null>(null);
   const [measureChip, setMeasureChip] = useState<{ x: number; y: number; lum: number; label: string } | null>(null);
@@ -134,6 +138,19 @@ export default function BlinkComparator({
     }
     return () => { alive = false; };
   }, [frames]);
+
+  // preload band PNGs for true false-color
+  useEffect(() => {
+    let alive = true;
+    const urls = [...new Set(Object.values(bandPngs ?? {}).filter((u): u is string => !!u))];
+    void Promise.all(urls.map((u) => loadImage(u).then((img) => ({ u, img })).catch(() => null))).then((arr) => {
+      if (!alive) return;
+      const map: Record<string, HTMLImageElement> = {};
+      for (const e of arr) if (e) map[e.u] = e.img;
+      setLoadedBand(map);
+    });
+    return () => { alive = false; };
+  }, [bandPngs]);
 
   // autoplay
   useEffect(() => {
@@ -273,7 +290,46 @@ export default function BlinkComparator({
 
     if (mode === 'side') return;
     let diffMode = false;
-    if (showRgb && curImg && prevImg) {
+    if (falseColor) {
+      // TRUE false-color: the three chosen channels' detector images → R/G/B
+      const detOf = (ch: number) => CHANNELS[ch]?.detector ?? 3;
+      const chImgs = ([rgb[0], rgb[1], rgb[2]] as number[]).map((ch) => {
+        const url = bandPngs?.[detOf(ch)];
+        return url ? loadedBand[url] : undefined;
+      });
+      if (chImgs[0] && chImgs[1] && chImgs[2]) {
+        const chans = (chImgs as HTMLImageElement[]).map((img) => {
+          const c = document.createElement('canvas');
+          c.width = Math.round(w); c.height = Math.round(h);
+          const cctx = c.getContext('2d', { willReadFrequently: true });
+          if (cctx) drawCover(cctx, img, w, h, pan, zoom);
+          return cctx?.getImageData(0, 0, c.width, c.height);
+        });
+        if (chans[0] && chans[1] && chans[2]) {
+          const out = ctx.createImageData(Math.round(w), Math.round(h));
+          const span = Math.max(1e-6, vmax - vmin);
+          const norm = (lum: number) => {
+            const t = Math.min(1, Math.max(0, (lum - vmin) / span));
+            return applyStretch(t, stretch);
+          };
+          const lumOf = (d: ImageData, i: number) =>
+            (d.data[i] * 0.299 + d.data[i + 1] * 0.587 + d.data[i + 2] * 0.114) / 255;
+          const [R, G, B] = chans as ImageData[];
+          for (let i = 0; i < out.data.length; i += 4) {
+            out.data[i] = Math.round(norm(lumOf(R, i)) * 255);
+            out.data[i + 1] = Math.round(norm(lumOf(G, i)) * 255);
+            out.data[i + 2] = Math.round(norm(lumOf(B, i)) * 255);
+            out.data[i + 3] = 255;
+          }
+          ctx.putImageData(out, 0, 0);
+        }
+      } else {
+        ctx.fillStyle = '#aab0c8';
+        ctx.font = '13px system-ui';
+        ctx.textAlign = 'center';
+        ctx.fillText('Band images still indexing — false color arrives with them.', w / 2, h / 2);
+      }
+    } else if (showRgb && curImg && prevImg) {
       const A = mk(prevImg);
       const B = mk(curImg);
       if (A && B) {
@@ -416,7 +472,7 @@ export default function BlinkComparator({
           : '';
       }
     } catch { /* tainted or tiny canvas */ }
-  }, [curImg, prevImg, mode, stretch, vmin, vmax, invert, cmap, diffScale, swipe, pan, zoom, showMarkers, showRgb, fovArcmin, candidates, sizeTick]);
+  }, [curImg, prevImg, mode, stretch, vmin, vmax, invert, cmap, diffScale, swipe, pan, zoom, showMarkers, showRgb, falseColor, loadedBand, rgb, bandPngs, fovArcmin, candidates, sizeTick]);
 
   // side-by-side render (synchronized pan/zoom)
   useEffect(() => {
@@ -622,7 +678,7 @@ export default function BlinkComparator({
     setChannel(ch[Math.floor(ch.length / 2)]?.idx ?? 0);
   };
 
-  const modeLabel = mode === 'diff' ? 'Difference B−A' : mode === 'swipe' ? 'Swipe A | B' : mode === 'side' ? 'Side-by-side' : showRgb ? 'Motion color' : 'Blink';
+  const modeLabel = mode === 'diff' ? 'Difference B−A' : mode === 'swipe' ? 'Swipe A | B' : mode === 'side' ? 'Side-by-side' : falseColor ? 'False color' : showRgb ? 'Motion color' : 'Blink';
 
   interface Cmd { name: string; hint: string; run: () => void }
   const commands: Cmd[] = [
@@ -811,6 +867,17 @@ export default function BlinkComparator({
                   {CHANNELS.map((c) => <option key={c.idx} value={c.idx}>{k} #{c.idx + 1}</option>)}
                 </select>
               ))}
+              <button
+                type="button" className="epoch-chip" aria-pressed={falseColor}
+                onClick={() => setFalseColor((v) => !v)}
+                disabled={Object.values(bandPngs ?? {}).filter(Boolean).length < 3}
+                title={Object.values(bandPngs ?? {}).filter(Boolean).length < 3
+                  ? 'Needs 3+ band images (still indexing)'
+                  : 'Render the chosen R/G/B detector images as false color'}
+                style={falseColor ? { color: '#fff', borderColor: '#7c83fd' } : undefined}
+              >
+                {falseColor ? 'Color on' : 'Show in color'}
+              </button>
             </div>
           </section>
           <section className="tweak-sec" aria-label="Measure">
