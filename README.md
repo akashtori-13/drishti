@@ -1,239 +1,206 @@
 # SpectraHunt
 
-**Hunt what moves in the infrared sky** — A web tool for detecting moving objects and transients in SPHEREx data.
+**NASA Space Apps Challenge 2026** - Advanced Track: Astrophysics / Planets & Moons / Software
 
-Built for the 2026 NASA Space Apps Challenge (Advanced Track: Astrophysics / Planets & Moons / Software).
+SpectraHunt compares repeated SPHEREx passes of the same patch of sky and flags what moved or changed: comets, asteroids, and variable stars.
 
 ## Quick Start
 
-### Static Bundle Mode (Recommended for Demo)
-
-This mode works with no backend server — ideal for GitHub Pages, Netlify, or local demo.
+### Static Mode (Recommended for Demo)
 
 ```bash
-# 1. Install dependencies
+# Install dependencies
 pip install -r requirements.txt
 
-# 2. Build static bundle with real SPHEREx data
-python scripts/build_static_bundle.py --region "180,0,2" --max-frames 50
+# Build static bundle with real SPHEREx data
+python scripts/build_static_bundle.py --region "180,0,5" --max-frames 100
 
-# 3. Serve locally (or deploy to static hosting)
-python -m http.server 8000
+# Serve locally
+cd data && python -m http.server 8000
 
-# 4. Open http://localhost:8000 in your browser
+# Open http://localhost:8000 in your browser
 ```
 
-### Live API Mode
+### Live Mode (FastAPI Backend)
 
 ```bash
-# 1. Install dependencies
+# Install dependencies
 pip install -r requirements.txt
 
-# 2. Initialize database and run ingestion
-python -c "from backend.db import init_db; init_db()"
-python backend/ingest.py --ra 180 --dec 0 --radius 2 --max-frames 50
+# Initialize database
+python -c "from backend.db import init_db; init_db('spectrahunt.db')"
 
-# 3. Run detection pipeline
-python backend/detect.py
+# Run ingestion
+python -m backend.ingest --db spectrahunt.db --ra 180 --dec 0 --radius 5 --max-frames 100
 
-# 4. Start FastAPI server
+# Run detection
+python -m backend.detect --db spectrahunt.db --ra 180 --dec 0 --radius 5
+
+# Start API server
 uvicorn backend.app:app --host 0.0.0.0 --port 8000
 
-# 5. Open http://localhost:8000/docs for API docs
+# Open http://localhost:8000/docs for API documentation
+```
+
+## Deployment to Netlify
+
+SpectraHunt is configured for automatic deployment to Netlify via `netlify.toml`:
+
+1. **Push to GitHub**: Commit your code to a GitHub repository
+2. **Connect to Netlify**: 
+   - Go to [Netlify](https://netlify.com)
+   - Click "Add new site" → "Import an existing project"
+   - Select your GitHub repository
+3. **Deploy**: Netlify will automatically:
+   - Install Python dependencies
+   - Run the static bundle builder
+   - Publish the `data/` directory
+
+The site will be live at `https://your-site-name.netlify.app`
+
+### Manual Deploy (Netlify CLI)
+
+```bash
+# Install Netlify CLI
+npm install -g netlify-cli
+
+# Build and deploy
+python scripts/build_static_bundle.py --region "180,0,5" --max-frames 100
+netlify deploy --prod --dir=data
 ```
 
 ## Data Sources
 
-| Source | Endpoint | Purpose | Status |
-|--------|----------|---------|--------|
-| IRSA SIA2 | `https://irsa.ipac.caltech.edu/SIA` | Frame discovery | Verified |
-| IRSA TAP | `https://irsa.ipac.caltech.edu/TAP` | Alternative frame indexing | Probe to verify |
-| SkyBoT | `https://vo.imcce.fr/webservices/skybot/` | Solar system cross-match | Verified |
-| AWS Open Data | `s3://nasa-irsa-spherex` | Direct FITS access | Optional |
+- **SPHEREx QR2**: NASA/IPAC Infrared Science Archive (IRSA)
+  - DOI: [`10.26131/IRSA652`](https://doi.org/10.26131/IRSA652)
+  - Access: [IRSA SIA2](https://irsa.ipac.caltech.edu/SIA?COLLECTION=spherex_qr2)
+  - AWS Open Data: `s3://nasa-irsa-spherex/qr2/`
+  
+- **SkyBoT**: IMCCE solar system object database
+  - Endpoint: `http://vo.imcce.fr/webservices/skybot/`
+  
+- **CDS Sesame**: Astronomical object name resolution
+  - Used for fixed targets (nebulae, stars, galaxies)
 
-**Note:** SIA2 lags new ingests by ~1 day. For freshest data, use AWS S3 listing.
+## Required Citation
+
+This publication makes use of data products from the Spectro-Photometer for the History of the Universe, Epoch of Reionization and Ices Explorer (SPHEREx), which is a joint project of the Jet Propulsion Laboratory and the California Institute of Technology, and is funded by the National Aeronautics and Space Administration.
 
 ## Architecture
 
+### Static Bundle Mode (Default)
+- Pre-computed JSON files (`status.json`, `coverage.json`, `candidates.json`)
+- No backend required
+- Works on GitHub Pages, Netlify, Vercel
+- Ideal for hackathon demos
+
+### Live Mode
+- FastAPI backend with SQLite database
+- Real-time SIA2 queries to IRSA
+- On-demand detection pipeline
+- Scheduled daily ingest via APScheduler
+
+## File Structure
+
 ```
-IRSA SIA2/TAP → ingest.py → SQLite DB → detect.py → candidates
-                                              ↓
-                              FastAPI (/api/*) or static JSON
-                                              ↓
-                                        index.html
+spectrahunt/
+├── index.html                 # Front-end (vanilla JS, no framework)
+├── netlify.toml              # Netlify deployment config
+├── requirements.txt          # Python dependencies
+├── README.md                 # This file
+├── scripts/
+│   └── build_static_bundle.py  # Static site generator
+├── backend/
+│   ├── config.py             # Constants and endpoints
+│   ├── db.py                 # Database schema and helpers
+│   ├── ingest.py             # SIA2 frame discovery
+│   ├── detect.py             # Difference imaging pipeline
+│   ├── cutouts.py            # FITS cutout processing
+│   ├── crossmatch.py         # SkyBoT/Horizons integration
+│   └── app.py                # FastAPI REST API
+└── data/                     # Generated static files
+    ├── index.html
+    ├── status.json
+    ├── coverage.json
+    ├── candidates.json
+    ├── demo_fields.json
+    └── spectrahunt.db
 ```
 
-### Two Deployment Modes
-
-1. **Live Mode**: Python FastAPI backend + SQLite database
-   - Real-time queries to IRSA
-   - On-demand detection
-   - Requires server infrastructure
-
-2. **Static Bundle Mode**: Pre-generated JSON files
-   - No backend needed
-   - Works on GitHub Pages / Netlify
-   - Data is real but pre-computed
-   - Recommended for hackathon demo
-
-## Configuration
-
-All constants live in `backend/config.py`:
-
-- Endpoints (IRSA, SkyBoT, AWS)
-- Detection thresholds (σ, wavelength tolerance)
-- Band definitions
-- Grid dimensions (72×36 cells, 5° each)
-
-**No magic numbers scattered in code.**
-
-## API Endpoints
+## API Endpoints (Live Mode)
 
 | Endpoint | Description |
 |----------|-------------|
-| `GET /api/status` | Release info, ingest stats |
-| `GET /api/coverage` | Sky coverage grid |
-| `GET /api/field?ra=&dec=` | Field metadata |
-| `GET /api/blink?ra=&dec=&band=` | Blink frames |
-| `GET /api/candidates` | Candidate list |
+| `GET /api/status` | Release info, counts, last ingest time |
+| `GET /api/coverage` | 72×36 grid with epoch counts per cell |
+| `GET /api/candidates` | List of detected moving objects |
+| `GET /api/field?ra=&dec=` | Frames covering a position |
+| `GET /api/blink?ra=&dec=&band=` | Ordered frames for blink viewer |
 | `GET /api/resolve?q=` | Name/coordinate resolution |
-| `GET /api/skybot?ra=&dec=&mjd=` | SkyBoT cross-match |
+| `GET /api/skybot?ra=&dec=&mjd=` | Cached SkyBoT lookup |
 
 ## Detection Pipeline
 
-The pipeline (`backend/detect.py`) performs:
-
-1. **Wavelength matching**: Only difference epochs where the LVF wavelength at the target position agrees within 0.5× bandwidth
-2. **Background subtraction**: SEP Background2D
-3. **Difference imaging**: B−A for matched pairs
-4. **Source extraction**: SEP at 5σ threshold
-5. **Dipole pairing**: Match positive/negative blobs
-6. **SkyBoT cross-match**: Identify known solar system objects
-7. **Scoring**: Significance + dipole quality + multi-pair agreement
+1. **Wavelength Matching**: Only difference pairs whose wavelength at the target position agrees within the local bandwidth (critical due to SPHEREx linear variable filters)
+2. **Background Subtraction**: Remove zodiacal light model and residual smooth background
+3. **Difference Imaging**: Subtract consecutive epochs
+4. **Source Extraction**: SEP algorithm at 5σ threshold
+5. **Dipole Pairing**: Match positive-negative source pairs (moving object signature)
+6. **Scoring**: Significance, dipole quality, multi-band agreement
+7. **Cross-Match**: SkyBoT query for known solar system objects
 
 ### Known Limitations
 
-- **Wavelength matching**: Many epoch pairs won't match due to LVF design. Cells may show "no wavelength-matched epochs".
-- **Sparse epochs**: SPHEREx covers the whole sky every ~6 months. Many fields have only 1-2 epochs.
-- **False positives**: Cosmic rays, diffraction spikes, and latents can create dipole-like artifacts.
-- **SkyBoT completeness**: Only catalogs known objects. New discoveries won't match.
+- **Wavelength Matching**: Same-band observations may still have different wavelengths due to LVF position; some valid pairs may be rejected
+- **Sparse Epochs**: SPHEREx covers the whole sky every ~6 months; many cells have only 1-2 epochs
+- **False Positives**: Cosmic rays, diffraction spikes, and latents can trigger detections
+- **SkyBoT Completeness**: Only matches known objects; newly discovered movers won't have matches
+- **IRSA SIA2 Lag**: New ingests take ~1 day to appear in SIA2 queries
 
-## Validation
-
-### Recovery Test
-
-Run on the 3I/ATLAS field (position from Horizons):
+## Testing
 
 ```bash
-python scripts/build_static_bundle.py --region "RA,DEC,2"
+# Run unit tests
+pytest backend/tests/ -v
+
+# Test specific module
+python -m pytest backend/tests/test_backend.py::test_coordinate_parsing -v
 ```
 
-Check if 3I/ATLAS is recovered in candidates with SkyBoT match.
+## Troubleshooting
 
-### False Positive Check
+### "SIA2 query failed"
+- IRSA services may be temporarily unavailable
+- Try reducing the search radius
+- Use pre-generated static bundle for demo
 
-Run on high-latitude empty fields:
-
+### "Address already in use"
 ```bash
-python backend/detect.py --cell-i 36 --cell-j 5  # Example off-ecliptic cell
+# Kill existing server
+pkill -f "python.*http.server"
+
+# Or use a different port
+python -m http.server 8080
 ```
 
-Expected: Few or no candidates.
+### Empty coverage grid
+- Ingestion found no frames (IRSA outage or region has no coverage)
+- Try a different region (ecliptic plane has most coverage)
+- Increase search radius
 
-## Deployment
+## Demo Day Checklist
 
-### Static Hosting (GitHub Pages / Netlify) - RECOMMENDED
-
-The static bundle mode is the most reliable for demos and hackathons.
-
-```bash
-# Build bundle (this generates data/ directory with all files)
-python scripts/build_static_bundle.py --region "180,0,2" --max-frames 50
-
-# The script automatically copies index.html to data/
-# Just deploy the entire data/ folder to your hosting
-```
-
-**Netlify:**
-1. Connect your GitHub repository
-2. Set build command: `pip install -r requirements.txt && python scripts/build_static_bundle.py --region "180,0,2" --max-frames 50`
-3. Set publish directory: `data`
-4. Deploy! The `netlify.toml` file handles all configuration automatically.
-
-**GitHub Pages:**
-```bash
-# Build to docs folder
-python scripts/build_static_bundle.py --output docs --region "180,0,2" --max-frames 50
-
-# Push docs/ to gh-pages branch or use GitHub Actions
-```
-
-### Docker (Live Mode)
-
-```dockerfile
-FROM python:3.11-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-COPY . .
-EXPOSE 8000
-CMD ["uvicorn", "backend.app:app", "--host", "0.0.0.0", "--port", "8000"]
-```
-
-Build and run:
-```bash
-docker build -t spectrahunt .
-docker run -p 8000:8000 spectrahunt
-```
-
-### Cron Job (Daily Ingest)
-
-```cron
-0 2 * * * cd /path/to/spectrahunt && python backend/ingest.py --max-frames 100
-0 3 * * * cd /path/to/spectrahunt && python backend/detect.py
-```
-
-## Citation
-
-> This publication makes use of data products from the Spectro-Photometer for the History of the Universe, Epoch of Reionization and Ices Explorer (SPHEREx), which is a joint project of the Jet Propulsion Laboratory and the California Institute of Technology, and is funded by the National Aeronautics and Space Administration.
-
-**DOIs:**
-- QR2 (current): `10.26131/IRSA652`
-- QR1 (legacy): `10.26131/IRSA629`
-
-## What Is Real vs. Limitation
-
-| Feature | Status | Notes |
-|---------|--------|-------|
-| Coverage map | Real | From indexed frames |
-| Epoch counts | Real | Distinct planning periods |
-| Candidates | Real | From detection pipeline |
-| SkyBoT matches | Real | Cached queries |
-| Blink images | Static bundle | Pre-rendered PNGs |
-| Wavelength matching | Implemented | May reject many pairs |
-| Full-sky index | Limited | Sample regions only in demo |
-| 3I/ATLAS recovery | To verify | Depends on actual coverage |
-
-## Development
-
-```bash
-# Run probe script to verify endpoints
-python scripts/probe_endpoints.py
-
-# Run tests
-pytest backend/tests/
-
-# Format code
-# (Add your preferred formatter)
-```
+- [ ] Pre-build static bundle with `--region "180,0,5"` (ecliptic plane)
+- [ ] Verify all JSON files are present in `data/`
+- [ ] Test locally at `http://localhost:8000`
+- [ ] Have offline fallback ready (static bundle doesn't need network)
+- [ ] Prepare talking points about wavelength matching limitation
+- [ ] Cite SPHEREx properly in presentation
 
 ## License
 
-MIT License — see LICENSE file.
+MIT License - see LICENSE file
 
-## Credits
+## Acknowledgments
 
-- SPHEREx mission team (JPL/Caltech)
-- IRSA/IPAC for data archive and tools
-- IMCCE for SkyBoT
-- NASA Space Apps Challenge 2026
+Built for NASA Space Apps Challenge 2026. Uses SPHEREx QR2 data from IRSA/IPAC.
