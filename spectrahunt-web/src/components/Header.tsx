@@ -30,6 +30,7 @@ export default function Header() {
   }, [pathname]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setOpen(false);
     setMenu(false);
   }, [pathname]);

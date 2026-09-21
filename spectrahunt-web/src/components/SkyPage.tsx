@@ -93,6 +93,7 @@ export default function SkyPage() {
       sessionStorage.removeItem('sh-target');
       const t = JSON.parse(raw) as { ra: number; dec: number };
       if (Number.isFinite(t.ra) && Number.isFinite(t.dec)) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setFocus({ ra: t.ra, dec: t.dec, key: Date.now() });
         inspect(t.ra, t.dec);
       }
