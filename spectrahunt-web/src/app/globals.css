@@ -98,9 +98,7 @@ main:focus{outline:none;}
   display:inline-block;
 }
 .tabs a:hover{color:var(--ink); background:rgba(255,255,255,.06);}
-.tabs button.active{color:var(--ink); background:rgba(255,255,255,.1);}
-.tabs a:hover{color:var(--ink) !important; background:rgba(255,255,255,.06);}
-.tabs a.active{color:var(--ink) !important; background:rgba(255,255,255,.1);}
+.tabs a.active{color:var(--ink); background:rgba(255,255,255,.1);}
 .nav-menu-btn{
   display:none; align-items:center; justify-content:center; flex-shrink:0;
   width:38px; height:38px; border:0; border-radius:10px; background:transparent; color:var(--ink); cursor:pointer;
