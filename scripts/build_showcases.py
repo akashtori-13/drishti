@@ -27,6 +27,8 @@ def main() -> bool:
                     help="Cutout size in deg (0.05 = 3 arcmin, fast)")
     ap.add_argument("--timeout", type=int, default=60,
                     help="Per-epoch network budget in seconds")
+    ap.add_argument("--limit", type=int, default=25,
+                    help="TAP row cap per discovery query (small = fast on deep fields)")
     args = ap.parse_args()
 
     from backend.cutouts import cutout_png_name, fetch_ibe, mask_bad_pixels, parse_fits, render_png
@@ -52,14 +54,19 @@ def main() -> bool:
             label = ep.get("label", "epoch")
             print(f"[{doc['id']}] {label} TAP+IBE…", flush=True)
             try:
-                hits = discover_epochs(ra, dec, band=band, size_deg=size)
+                if idx == 0:
+                    hits = discover_epochs(ra, dec, band=band, size_deg=size,
+                                           limit=args.limit)
+                else:
+                    hits = discover_epochs(ra, dec, band=band, size_deg=size,
+                                           limit=5, newest=True)
                 hits = [h for h in hits if h.get("cutout_url")]
                 if not hits:
                     print(f"[{doc['id']}] no covering image ({bandpass_name(band)})")
                     continue
-                # First epoch takes the oldest image, later epochs the newest,
+                # First epoch takes the oldest visit, later epochs the newest,
                 # so same-coordinate pairs blink two different visits.
-                url = hits[0]["cutout_url"] if idx == 0 and len(hits) > 1 else hits[-1]["cutout_url"]
+                url = hits[0]["cutout_url"] if idx == 0 else hits[-1]["cutout_url"]
                 tmp = out_img / f"_{doc['id']}_tmp.fits"
                 asyncio.run(fetch_ibe(url, tmp, timeout=args.timeout))
                 try:

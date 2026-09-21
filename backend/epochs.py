@@ -22,7 +22,7 @@ def bandpass_name(band: int) -> str:
 
 def tap_cutout_urls(ra: float, dec: float, band: int = 3, size_deg: float = 0.05,
                     limit: int = 50, collection: Optional[str] = None,
-                    timeout: int = 60) -> List[Dict[str, Any]]:
+                    timeout: int = 60, newest: bool = False) -> List[Dict[str, Any]]:
     """Query TAP for covering images. Returns [{cutout_url, mjd, bandpass}]."""
     import threading
 
@@ -36,7 +36,7 @@ def tap_cutout_urls(ra: float, dec: float, band: int = 3, size_deg: float = 0.05
         "FROM spherex.artifact a JOIN spherex.plane p ON a.planeid = p.planeid "
         f"WHERE 1 = CONTAINS(POINT('ICRS', {float(ra)}, {float(dec)}), p.poly) "
         f"AND p.energy_bandpassname = '{bp}' "
-        "ORDER BY p.time_bounds_lower"
+        f"ORDER BY p.time_bounds_lower {'DESC' if newest else 'ASC'}"
     )
     # Daemon thread: join() bounds the wait, and a hung query can never
     # wedge the process (ThreadPoolExecutor.__exit__ would wait forever).
@@ -100,10 +100,12 @@ def sia2_cutout_urls(ra: float, dec: float, radius_deg: float = 0.5,
 
 
 def discover_epochs(ra: float, dec: float, band: int = 3, size_deg: float = 0.05,
-                    collection: Optional[str] = None) -> List[Dict[str, Any]]:
+                    collection: Optional[str] = None, limit: int = 50,
+                    timeout: int = 60, newest: bool = False) -> List[Dict[str, Any]]:
     """TAP first, SIA2 fallback. Never raises: returns [] when IRSA is unreachable."""
     try:
-        hits = tap_cutout_urls(ra, dec, band=band, size_deg=size_deg)
+        hits = tap_cutout_urls(ra, dec, band=band, size_deg=size_deg,
+                               limit=limit, timeout=timeout, newest=newest)
         if hits:
             return hits
     except Exception as e:
