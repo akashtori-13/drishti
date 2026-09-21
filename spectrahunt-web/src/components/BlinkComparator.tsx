@@ -92,17 +92,25 @@ export default function BlinkComparator({
   const [palQ, setPalQ] = useState('');
   type Pop = null | 'tune' | 'bands' | 'data' | 'export' | 'keys';
   const [dock, setDock] = useState<Pop>(null);
-  const [anchor, setAnchor] = useState<{ x: number; y: number } | null>(null);
+  const [anchor, setAnchor] = useState<{
+    x: number; top?: number; bottom?: number; maxH: number;
+  } | null>(null);
   const openPop = (d: Exclude<Pop, null>) => (e: React.MouseEvent<HTMLButtonElement>) => {
     const r = e.currentTarget.getBoundingClientRect();
-    setAnchor({
-      x: Math.max(8, Math.min(r.left, window.innerWidth - 456)),
-      y: Math.min(r.bottom + 8, window.innerHeight - 120),
-    });
+    const panelW = Math.min(440, window.innerWidth - 16);
+    const x = Math.max(8, Math.min(r.left, window.innerWidth - panelW - 8));
+    const spaceBelow = window.innerHeight - r.bottom - 8;
+    const spaceAbove = r.top - 8;
+    // open where space is: below by default, above when cramped there
+    if (spaceBelow >= 200 || spaceBelow >= spaceAbove) {
+      setAnchor({ x, top: r.bottom + 8, maxH: Math.max(160, Math.floor(spaceBelow)) });
+    } else {
+      setAnchor({ x, bottom: window.innerHeight - r.top + 8, maxH: Math.max(160, Math.floor(spaceAbove)) });
+    }
     setDock((cur) => (cur === d ? null : d));
   };
   const popStyle: React.CSSProperties | undefined = anchor
-    ? { left: anchor.x, top: anchor.y }
+    ? { left: anchor.x, top: anchor.top, bottom: anchor.bottom, maxHeight: anchor.maxH }
     : undefined;
   const [stretch, setStretch] = useState<Stretch>('asinh');
   const [cmap, setCmap] = useState<Colormap>('cividis');
@@ -213,16 +221,19 @@ export default function BlinkComparator({
   // non-passive wheel zoom + resize redraw
   useEffect(() => {
     const stage = stageRef.current;
-    if (!stage) return;
-    const onWheel = (e: WheelEvent) => {
+    if (!stage) return;    const onWheel = (e: WheelEvent) => {
       e.preventDefault();
       setZoom((z) => Math.min(6, Math.max(0.6, z * (e.deltaY > 0 ? 0.92 : 1.09))));
     };
     stage.addEventListener('wheel', onWheel, { passive: false });
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     const ro = new ResizeObserver(() => setSizeTick((t) => t + 1));
     ro.observe(stage);
+    const onRs = () => setDock(null);
+    window.addEventListener('resize', onRs);
     return () => {
       stage.removeEventListener('wheel', onWheel);
+      window.removeEventListener('resize', onRs);
       ro.disconnect();
     };
   }, []);
