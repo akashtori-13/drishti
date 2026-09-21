@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useAppStore, type View } from '@/lib/store';
 import Header from '@/components/Header';
+import Tutorial from '@/components/Tutorial';
 import HomePage from '@/components/HomePage';
 import BlinkPage from '@/components/BlinkPage';
 import SkyPage from '@/components/SkyPage';
@@ -32,7 +33,11 @@ export default function Home() {
       const seg = raw.split(/[?/]/)[0];
       const s = useAppStore.getState();
       if (seg.startsWith('blink/')) {
-        openShowcase(seg.replace('blink/', '').split('?')[0] || '3i-atlas');
+        const id = seg.replace('blink/', '').split('?')[0] || '3i-atlas';
+        if (s.showcaseId !== id || s.currentView !== 'blink') {
+          // avoid clobbering epoch/mode state on hash-replace from permalink sync
+          useAppStore.setState({ showcaseId: id, currentView: 'blink' });
+        }
       } else if (seg === 'blink') {
         s.setCurrentView('blink');
       } else if (seg === 'sky') {
@@ -64,6 +69,7 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       <a className="skip" href="#main">Skip to content</a>
       <Header />
+      <Tutorial />
       <main id="main" tabIndex={-1} className="flex-1">
         <div className={`view${currentView === 'home' ? ' active' : ''}`}>
           {currentView === 'home' && <HomePage />}

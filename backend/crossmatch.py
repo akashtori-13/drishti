@@ -5,7 +5,7 @@ Network calls are lazy and cached in the local SQLite scratch DB.
 """
 
 import re
-from typing Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from backend.config import API_TIMEOUT_SECONDS, DATABASE_PATH, SKYBOT_URL, USER_AGENT
 
@@ -67,8 +67,24 @@ async def query_skybot(ra: float, dec: float, mjd: float, radius_arcsec: float,
 
 
 async def resolve_name(name: str) -> Optional[Dict[str, Any]]:
-    """Resolve a fixed-target name via CDS Sesame. Returns {ra, dec} or None."""
+    """Resolve a fixed-target name. SIMBAD ASCII first, CDS Sesame fallback."""
     import httpx
+    # 1) SIMBAD script output (stable ASCII format)
+    try:
+        async with httpx.AsyncClient(timeout=API_TIMEOUT_SECONDS, follow_redirects=True) as client:
+            r = await client.get("https://simbad.cds.unistra.fr/simbad/sim-id",
+                                 params={"output.format": "ASCII", "Ident": name},
+                                 headers={"User-Agent": USER_AGENT})
+            if r.status_code == 200:
+                m = re.search(r"Coordinates\(ICRS[^:]*:\s*(\d+)\s+(\d+)\s+([\d.]+)\s+([+-])(\d+)\s+(\d+)\s+([\d.]+)", r.text)
+                if m:
+                    ra = (int(m.group(1)) + int(m.group(2)) / 60 + float(m.group(3)) / 3600) * 15.0
+                    sign = -1 if m.group(4) == "-" else 1
+                    dec = sign * (int(m.group(5)) + int(m.group(6)) / 60 + float(m.group(7)) / 3600)
+                    return {"ra": ra, "dec": dec, "frame": "ICRS", "source": name}
+    except Exception as e:
+        print(f"SIMBAD failed for '{name}': {e}")
+    # 2) CDS Sesame fallback
     url = f"https://cdsweb.u-strasbg.fr/cgi-bin/nph-sesame/-oI/{name}"
     try:
         async with httpx.AsyncClient(timeout=API_TIMEOUT_SECONDS) as client:

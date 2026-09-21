@@ -17,8 +17,8 @@ cache of it. See `ARCHITECTURE.md` §1 for the layer contract.
 |---|---|---|
 | Home | `#/` | Hero sky (clickable canvas), object/coordinate search, showcase chips, live stats, how-it-works |
 | Sky map | `#/sky` | Equirectangular coverage canvas (tiles = measured TAP tallies, dark = unmeasured), hover readout, click inspector with epochs/bands/survey + blink entry |
-| Blink | `#/blink/<id>` | Epoch comparator: autoplay transport, speed, step, difference mode, 6-band row, epoch chips, keyboard (Space/←/→), Aladin-free canvas, metadata + SkyBoT + provenance aside |
-| Candidates | `#/candidates` | Showcase-derived cards with real PNG thumbs (or honest pending tile), known/unknown badges, σ scores, all/unknown/known filters |
+| Blink | `#/blink/<id>?band=&epoch=&mode=` | Canvas epoch comparator: timeline slider with date ticks, autoplay transport + speed + step, **blink / side-by-side / swipe / difference** modes (synced pan/zoom), motion-color composite, stretch (linear/log/sqrt/asinh) + black/white + presets + invert + colormaps (cividis default), 6 detectors × 102 channels, RGB picker, click-for-spectrum, PNG/WebM export, metadata + motion + light curve + SkyBoT/MPC/Horizons/SIMBAD + provenance aside |
+| Candidates | `#/candidates` | Showcase-derived cards with real PNG thumbs (or honest pending tile), known/unknown badges, σ scores, measured motion ″/day, all/unknown/known filters, CSV/JSON export |
 | About | `#/about` | Mission, LVF same-band rule, band table, detection method, QR2 citation, sources |
 
 Three clicks to first blink: Home → chip → drag. Works offline once built; works on a phone.
@@ -49,12 +49,13 @@ cd spectrahunt-web && npm run build
 ## Repository
 
 ```
-backend/            # dev-only FastAPI: epoch discovery, cutout proxy, resolve, SkyBoT
+backend/            # dev-only FastAPI: epoch discovery, cutout proxy, resolve, SkyBoT, detect
   app.py            # /health /api/showcases /api/showcase/{id} /api/epochs
-                    # /api/cutout.png /api/resolve /api/skybot /api/citation
+                    # /api/cutout.png /api/resolve /api/skybot /api/citation /api/detect
   epochs.py         # TAP first (daemon-thread bounded), SIA2 fallback, never raises
   cutouts.py        # lazy astropy: parse/mask/render, LVF wavelength gate
   crossmatch.py     # SkyBoT / Sesame / Horizons, SQLite-cached
+  detect.py         # source extraction (SEP→photutils→scipy→numpy) + cross-epoch matching
   cache.py          # git-ignored scratch (WAL)
 scripts/
   build_showcases.py  # showcase PNG indexer (oldest+newest pairing for same-spot epochs)
@@ -63,8 +64,12 @@ spectrahunt-web/
   public/showcases/   # 3i-atlas, ecliptic-mover, nep-deep (real coords/epochs, png fills in)
   public/cutouts/     # rendered PNGs, ≤100KB, immutable cache
   public/coverage.json# measured cells {epochs, images, bands, span}
+  src/lib/astro.ts    # coordinates, 88 constellations, 102 channels, stretch/colormaps, permalinks
+  src/lib/catalogs.ts # Sesame resolve, SkyBoT/MPC/Horizons/SIMBAD links, tours, glossary
   src/                # Home, Blink, Sky, Candidates, About + canvas engine + store
 ARCHITECTURE.md       # full system plan, contracts, workflows, roadmap
+DEMO.md               # 90-second walkthrough script
+LICENSE               # MIT + required SPHEREx/IRSA attribution
 ```
 
 ## Data & science rules
@@ -82,7 +87,7 @@ ARCHITECTURE.md       # full system plan, contracts, workflows, roadmap
 ## Checks
 
 ```bash
-.venv/bin/python -m pytest backend/tests/ -q   # 5 passed
+.venv/bin/python -m pytest backend/tests/ -q   # 9 passed
 cd spectrahunt-web && npx eslint src            # 0 errors
 cd spectrahunt-web && npm run build             # static export to out/
 ```

@@ -12,7 +12,7 @@ const NAV: Array<{ id: View; label: string }> = [
 ];
 
 export default function Header() {
-  const { currentView, setCurrentView } = useAppStore();
+  const { currentView, setCurrentView, advanced, setAdvanced } = useAppStore();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -48,6 +48,13 @@ export default function Header() {
           <Icon name="menu" className="icon nav-menu-ic" />
           <Icon name="x" className="icon nav-close-ic" />
         </button>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#aab0c8' }}>
+          <span id="navMode">{advanced ? 'Advanced' : 'Beginner'}</span>
+          <span className="switch" role="switch" aria-checked={advanced} aria-labelledby="navMode" tabIndex={0}
+            onClick={() => setAdvanced(!advanced)}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setAdvanced(!advanced); } }}
+            style={{ cursor: 'pointer' }} />
+        </label>
       </div>
     </header>
   );
