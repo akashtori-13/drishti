@@ -423,6 +423,12 @@ body[data-view="sky"] .site-foot{display:none;}
 .bw-toggles{display:flex; align-items:center; gap:8px; font-size:.75rem; color:var(--ink-2); margin-left:auto;}
 .bw-status{padding:14px 18px; border-radius:14px; background:var(--space-2); border:1px solid var(--line); color:var(--ink-2); font-size:.875rem;}
 .bw-status.error{border-color:rgba(232,93,74,.5); color:#f0a295;}
+.waitgame{border-radius:20px; padding:16px 18px; display:flex; flex-direction:column; gap:10px;}
+.waitgame canvas{width:100%; border-radius:12px; display:block; touch-action:none; cursor:none;}
+.waitgame-head{display:flex; justify-content:space-between; gap:12px; font-size:.75rem; color:var(--ink-2); flex-wrap:wrap;}
+.waitgame-score{color:var(--unknown);}
+.waitgame-foot{display:flex; justify-content:space-between; align-items:center; gap:12px; font-size:.75rem; color:var(--ink-3); flex-wrap:wrap;}
+.waitgame-foot a{text-decoration:none;}
 .bw-status a{color:var(--focus);}
 @media(min-width:961px){
   .blink-workspace{height:100dvh; overflow:hidden;}
