@@ -42,7 +42,7 @@ def main() -> bool:
     for path in files:
         doc = json.loads(path.read_text())
         changed = False
-        for ep in doc.get("epochs", []):
+        for idx, ep in enumerate(doc.get("epochs", [])):
             if ep.get("png"):
                 continue
             ra = ep.get("ra", doc["ra"])
@@ -57,7 +57,9 @@ def main() -> bool:
                 if not hits:
                     print(f"[{doc['id']}] no covering image ({bandpass_name(band)})")
                     continue
-                url = hits[-1]["cutout_url"]
+                # First epoch takes the oldest image, later epochs the newest,
+                # so same-coordinate pairs blink two different visits.
+                url = hits[0]["cutout_url"] if idx == 0 and len(hits) > 1 else hits[-1]["cutout_url"]
                 tmp = out_img / f"_{doc['id']}_tmp.fits"
                 asyncio.run(fetch_ibe(url, tmp, timeout=args.timeout))
                 try:
