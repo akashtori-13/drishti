@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';import BlinkComparator from '@/components/BlinkComparator';
+import { useEffect, useMemo, useRef, useState } from 'react';import BlinkComparator from '@/components/BlinkComparator';
 import Icon from '@/components/Icon';
 import WaitGame from '@/components/WaitGame';
 import SpectrumPlot, { LightCurve } from '@/components/Plots';
@@ -16,6 +16,44 @@ import { arcsecPerDay, mjdToDate, toCSV } from '@/lib/astro';
 import { horizonsURL, irsaViewerURL, mpcCheckerURL, simbadURL, skybotURL } from '@/lib/catalogs';
 
 type RailTab = 'overview' | 'epochs' | 'catalogs' | 'share';
+
+/** Live frame histogram for the Overview tab: reads the displayed canvas. */
+function RailHistogram({ watch }: { watch: unknown }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const hc = ref.current;
+    if (!hc) return;
+    const draw = () => {
+      const src = document.getElementById('blinkCanvas') as HTMLCanvasElement | null;
+      const hctx = hc.getContext('2d');
+      if (!src || !hctx || !src.width) return;
+      hc.width = 260;
+      hc.height = 52;
+      let data: Uint8ClampedArray;
+      try {
+        data = hctx && src.getContext('2d', { willReadFrequently: true })?.getImageData(
+          0, 0, src.width, src.height)?.data as Uint8ClampedArray;
+      } catch { return; }
+      if (!data) return;
+      const bins = new Array<number>(48).fill(0);
+      for (let i = 0; i < data.length; i += 32) {
+        const lum = (data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114) / 255;
+        bins[Math.min(47, Math.floor(lum * 48))]++;
+      }
+      hctx.clearRect(0, 0, hc.width, hc.height);
+      const mx = Math.max(1, ...bins);
+      hctx.fillStyle = '#7c83fd';
+      bins.forEach((v, bi) => {
+        const bh = Math.max(1, (v / mx) * (hc.height - 4));
+        hctx.fillRect((bi / bins.length) * hc.width, hc.height - bh, hc.width / bins.length - 0.5, bh);
+      });
+    };
+    const t = requestAnimationFrame(() => setTimeout(draw, 60));
+    return () => cancelAnimationFrame(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watch]);
+  return <canvas ref={ref} className="hist" style={{ width: '100%' }} aria-label="Live frame brightness histogram" />;
+}
 
 /** DSS2 + 2MASS context cutouts (land async via fetch_compare.py). */
 function OtherEyes({ id }: { id: string }) {
@@ -116,6 +154,7 @@ export default function BlinkPage({ id }: { id: string }) {
     movers: number; variables: number; top_sigma: number; span_days: number | null;
     variable_flag: boolean; known: { name: string; kind: string } | null; detail: string;
   } | null>(null);
+  const [detStats, setDetStats] = useState<{ movers: number; variables: number; ready: boolean } | null>(null);
   const viewing = data && data.id === id ? data : null;
 
   // load showcase (static JSON or live IRSA frames)
@@ -318,6 +357,7 @@ export default function BlinkPage({ id }: { id: string }) {
               onToggleMarkers={() => setShowMarkers(!showMarkers)}
               onSample={setSample}
               center={{ ra: viewing.ra, dec: viewing.dec }}
+              onStats={setDetStats}
               bandPngs={Object.fromEntries(
                 Object.entries(viewing.bands ?? {}).map(([k, b]) => [Number(k), b.png ?? null]),
               )}
@@ -349,6 +389,15 @@ export default function BlinkPage({ id }: { id: string }) {
                     )}
                   </div>
                   <p className="story">{viewing.story}</p>
+                  <h3>Frame</h3>
+                  <RailHistogram watch={[epochIdx, compareMode, band, viewing.id]} />
+                  <p className="fine">
+                    {detStats
+                      ? detStats.movers + detStats.variables > 0
+                        ? `${detStats.movers} mover${detStats.movers === 1 ? '' : 's'}, ${detStats.variables} variable${detStats.variables === 1 ? '' : 's'} ≥5σ in this pair.`
+                        : 'No movers above 5σ between these epochs — quiet field.'
+                      : 'Scanning pixels for movers…'}
+                  </p>
                   <dl className="meta-grid">
                     <dt>RA / Dec</dt><dd className="mono">{fmtRa(viewing.ra)} / {fmtDec(viewing.dec)}</dd>
                     <dt>Epochs</dt><dd className="mono">{epochs.length}</dd>
