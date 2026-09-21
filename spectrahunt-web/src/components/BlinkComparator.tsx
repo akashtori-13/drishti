@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import Icon from '@/components/Icon';
 import { BANDS } from '@/lib/sky';
 import { CHANNELS, applyStretch, colormap, type Colormap, type Stretch } from '@/lib/astro';
@@ -74,7 +75,7 @@ const selStyle: React.CSSProperties = { background: '#151929', border: '1px soli
 
 export default function BlinkComparator({
   frames, band, onBandChange, title, mode, onModeChange, epochIdx, onEpochChange,
-  showMarkers, onToggleMarkers, fovArcmin = 10, onSample, center,
+  showMarkers, onToggleMarkers, fovArcmin = 10, onSample, center, tweakSlot,
 }: {
   frames: BlinkFrame[]; band: number; onBandChange: (b: number) => void; title: string;
   mode: CompareMode; onModeChange: (m: CompareMode) => void;
@@ -82,6 +83,8 @@ export default function BlinkComparator({
   showMarkers: boolean; onToggleMarkers?: () => void; fovArcmin?: number;
   onSample?: (args: { x: number; y: number; values: number[] }) => void;
   center?: { ra: number; dec: number };
+  /** Rail-bottom slot (in the page's data rail): tweak panels render here, never over the image. */
+  tweakSlot: HTMLElement | null;
 }) {
   const n = frames.length;
   const idx = Math.min(epochIdx, n - 1);
@@ -92,26 +95,9 @@ export default function BlinkComparator({
   const [palQ, setPalQ] = useState('');
   type Pop = null | 'tune' | 'bands' | 'data' | 'export' | 'keys';
   const [dock, setDock] = useState<Pop>(null);
-  const [anchor, setAnchor] = useState<{
-    x: number; top?: number; bottom?: number; maxH: number;
-  } | null>(null);
-  const openPop = (d: Exclude<Pop, null>) => (e: React.MouseEvent<HTMLButtonElement>) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    const panelW = Math.min(440, window.innerWidth - 16);
-    const x = Math.max(8, Math.min(r.left, window.innerWidth - panelW - 8));
-    const spaceBelow = window.innerHeight - r.bottom - 8;
-    const spaceAbove = r.top - 8;
-    // open where space is: below by default, above when cramped there
-    if (spaceBelow >= 200 || spaceBelow >= spaceAbove) {
-      setAnchor({ x, top: r.bottom + 8, maxH: Math.max(160, Math.floor(spaceBelow)) });
-    } else {
-      setAnchor({ x, bottom: window.innerHeight - r.top + 8, maxH: Math.max(160, Math.floor(spaceAbove)) });
-    }
+  const openPop = (d: Exclude<Pop, null>) => () => {
     setDock((cur) => (cur === d ? null : d));
   };
-  const popStyle: React.CSSProperties | undefined = anchor
-    ? { left: anchor.x, top: anchor.top, bottom: anchor.bottom, maxHeight: anchor.maxH }
-    : undefined;
   const [stretch, setStretch] = useState<Stretch>('asinh');
   const [cmap, setCmap] = useState<Colormap>('cividis');
   const [invert, setInvert] = useState(false);
@@ -681,10 +667,10 @@ export default function BlinkComparator({
             </label>
           )}
         </div>
-{dock && <div className="pop-veil" onMouseDown={() => setDock(null)} />}
+        {tweakSlot && dock && createPortal(<>
         {dock === 'tune' && (
-          <div className="popover glass" style={popStyle} role="dialog" aria-label="Adjust">
-            <div className="pop-head"><span>Adjust</span><button type="button" className="icon-btn sm" aria-label="Close Adjust panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
+          <div className="tweak-panel glass" role="dialog" aria-label="Adjust">
+            <div className="tweak-head"><span>Adjust</span><button type="button" className="icon-btn sm" aria-label="Close Adjust panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
             <div style={rowStyle}>
               <label style={{ fontSize: 13 }}>Stretch{' '}
                 <select value={stretch} onChange={(e) => setStretch(e.target.value as Stretch)} style={selStyle}>
@@ -717,8 +703,8 @@ export default function BlinkComparator({
           </div>
         )}
 {dock === 'bands' && (
-          <div className="popover glass" style={popStyle} role="dialog" aria-label="Bands">
-            <div className="pop-head"><span>Bands</span><button type="button" className="icon-btn sm" aria-label="Close Bands panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
+          <div className="tweak-panel glass" role="dialog" aria-label="Bands">
+            <div className="tweak-head"><span>Bands</span><button type="button" className="icon-btn sm" aria-label="Close Bands panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
             <div className="band-row" style={{ padding: 0, background: 'transparent' }}>
               {BANDS.map((b) => (
                 <button key={b.id} type="button" className="band" style={{ ['--band-color' as string]: b.color }}
@@ -747,8 +733,8 @@ export default function BlinkComparator({
           </div>
         )}
 {dock === 'data' && (
-          <div className="popover glass" style={popStyle} role="dialog" aria-label="Measure">
-            <div className="pop-head"><span>Measure</span><button type="button" className="icon-btn sm" aria-label="Close Measure panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
+          <div className="tweak-panel glass" role="dialog" aria-label="Measure">
+            <div className="tweak-head"><span>Measure</span><button type="button" className="icon-btn sm" aria-label="Close Measure panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
             <div className="mono probe-line">
               {probe
                 ? <>px {probe.lum}{Number.isFinite(probe.ra) ? <> · {probe.ra.toFixed(3)}°, {probe.dec >= 0 ? '+' : ''}{probe.dec.toFixed(3)}°</> : ' · hover'}</>
@@ -784,8 +770,8 @@ export default function BlinkComparator({
           </div>
         )}
 {dock === 'export' && (
-          <div className="popover glass" style={popStyle} role="dialog" aria-label="Save">
-            <div className="pop-head"><span>Save</span><button type="button" className="icon-btn sm" aria-label="Close Save panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
+          <div className="tweak-panel glass" role="dialog" aria-label="Save">
+            <div className="tweak-head"><span>Save</span><button type="button" className="icon-btn sm" aria-label="Close Save panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
             <div style={rowStyle}>
               <button type="button" className="epoch-chip" onClick={() => downloadPNG()}>PNG</button>
               <button type="button" className="epoch-chip" onClick={() => void recordWebM()} disabled={recording || n < 2}>
@@ -797,8 +783,8 @@ export default function BlinkComparator({
           </div>
         )}
 {dock === 'keys' && (
-          <div className="popover glass" style={popStyle} role="dialog" aria-label="Guide">
-            <div className="pop-head"><span>Guide</span><button type="button" className="icon-btn sm" aria-label="Close Guide panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
+          <div className="tweak-panel glass" role="dialog" aria-label="Guide">
+            <div className="tweak-head"><span>Guide</span><button type="button" className="icon-btn sm" aria-label="Close Guide panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
             <div className="keys-grid">
               <span><kbd>Space</kbd> play / pause</span>
               <span><kbd>←</kbd><kbd>→</kbd> step epoch</span>
@@ -807,6 +793,7 @@ export default function BlinkComparator({
             <button type="button" className="epoch-chip" onClick={() => setPalette(true)}>Command palette (Ctrl+K)</button>
           </div>
         )}
+        </>, tweakSlot)}
         </div>
 
           <div className="filmstrip" role="group" aria-label="Epoch filmstrip">

@@ -1,8 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
-import BlinkComparator from '@/components/BlinkComparator';
+import { useEffect, useMemo, useState } from 'react';import BlinkComparator from '@/components/BlinkComparator';
 import Icon from '@/components/Icon';
 import SpectrumPlot, { LightCurve } from '@/components/Plots';
 import {
@@ -29,6 +28,7 @@ export default function BlinkPage({ id }: { id: string }) {
   const [flags, setFlags] = useState<Array<{ x: number; note: string }>>([]);
   const [liveSpec, setLiveSpec] = useState<Array<{ wavelength_um: number; flux: number }> | null>(null);
   const [liveLc, setLiveLc] = useState<Array<{ mjd?: number; flux: number }> | null>(null);
+  const [tweakSlot, setTweakSlot] = useState<HTMLDivElement | null>(null);
   const viewing = data && data.id === id ? data : null;
 
   // load showcase (static JSON or live IRSA frames)
@@ -233,6 +233,7 @@ export default function BlinkPage({ id }: { id: string }) {
               onToggleMarkers={() => setShowMarkers(!showMarkers)}
               onSample={setSample}
               center={{ ra: viewing.ra, dec: viewing.dec }}
+              tweakSlot={tweakSlot}
             />
           </section>
 
@@ -339,6 +340,7 @@ export default function BlinkPage({ id }: { id: string }) {
                 </>
               )}
             </div>
+            <div ref={setTweakSlot} className="rail-tweaks" aria-label="Viewer tweaks" />
           </aside>
         </div>
       )}
