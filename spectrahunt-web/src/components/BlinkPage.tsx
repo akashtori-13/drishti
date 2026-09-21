@@ -10,6 +10,7 @@ import {
 } from '@/lib/showcases';
 import { blinkURL, useAppStore } from '@/lib/store';
 import { fmtDec, fmtRa } from '@/lib/sky';
+import { BANDS } from '@/lib/sky';
 import { arcsecPerDay, mjdToDate, toCSV } from '@/lib/astro';
 import { horizonsURL, irsaViewerURL, mpcCheckerURL, simbadURL, skybotURL } from '@/lib/catalogs';
 
@@ -28,7 +29,6 @@ export default function BlinkPage({ id }: { id: string }) {
   const [flags, setFlags] = useState<Array<{ x: number; note: string }>>([]);
   const [liveSpec, setLiveSpec] = useState<Array<{ wavelength_um: number; flux: number }> | null>(null);
   const [liveLc, setLiveLc] = useState<Array<{ mjd?: number; flux: number }> | null>(null);
-  const [tweakSlot, setTweakSlot] = useState<HTMLDivElement | null>(null);
   const viewing = data && data.id === id ? data : null;
 
   // load showcase (static JSON or live IRSA frames)
@@ -206,7 +206,7 @@ export default function BlinkPage({ id }: { id: string }) {
           <section className="bw-viewer" aria-label="Epoch comparator">
             <div className="bw-title">
               <h1>{viewing.title}</h1>
-              <p className="mono">RA {fmtRa(viewing.ra)} · Dec {fmtDec(viewing.dec)} · D{band}</p>
+              <p className="mono">{BANDS[band - 1]?.range ?? ''} · {epochs.length} epoch{epochs.length === 1 ? '' : 's'}</p>
             </div>
             <BlinkComparator
               key={viewing.id}
@@ -224,7 +224,6 @@ export default function BlinkPage({ id }: { id: string }) {
               onToggleMarkers={() => setShowMarkers(!showMarkers)}
               onSample={setSample}
               center={{ ra: viewing.ra, dec: viewing.dec }}
-              tweakSlot={tweakSlot}
             />
           </section>
 
@@ -242,7 +241,6 @@ export default function BlinkPage({ id }: { id: string }) {
                 <>
                   <div className="verdict-row">
                     <span className="badge unknown"><span className="dot" /> Unidentified, needs review</span>
-                    {motion !== null && <span className="mono motion">{motion.toFixed(1)} ″/day</span>}
                   </div>
                   <p className="story">{viewing.story}</p>
                   <dl className="meta-grid">
@@ -255,11 +253,18 @@ export default function BlinkPage({ id }: { id: string }) {
                     <dt>Motion</dt><dd className="mono">{motion === null ? 'needs 2 dated epochs' : `${motion.toFixed(1)} ″/day`}</dd>
                   </dl>
                   <h3>Brightness vs time</h3>
-                  <LightCurve
-                    mjds={liveLc ? liveLc.map((p) => p.mjd) : epochs.map((e) => e.mjd)}
-                    values={liveLc ? liveLc.map((p) => p.flux) : sample?.values.length ? sample.values : epochs.map((_, i) => (i === epochIdx ? 90 : 60))}
-                  />
-                  {liveLc && <p className="fine">Real pipeline aperture photometry.</p>}
+                  {liveLc?.length || sample?.values.length ? (
+                    <>
+                      <LightCurve
+                        mjds={liveLc ? liveLc.map((p) => p.mjd) : epochs.map((e) => e.mjd)}
+                        values={liveLc ? liveLc.map((p) => p.flux) : (sample?.values ?? [])}
+                        real={!!liveLc}
+                      />
+                      {liveLc && <p className="fine">Real pipeline aperture photometry.</p>}
+                    </>
+                  ) : (
+                    <p className="fine">No brightness samples yet — arm Measure on the image and click a spot, or wait for live pipeline photometry.</p>
+                  )}
                 </>
               )}
               {tab === 'epochs' && (
@@ -316,6 +321,16 @@ export default function BlinkPage({ id }: { id: string }) {
                     <button type="button" className="epoch-chip" onClick={exportCSV}>CSV</button>
                     <button type="button" className="epoch-chip" onClick={exportJSON}>JSON</button>
                   </div>
+                  <div className="btn-row">
+                    <button type="button" className="epoch-chip"
+                      onClick={() => window.dispatchEvent(new CustomEvent('spectrahunt:export', { detail: { kind: 'figure' } }))}>
+                      Figure PNG
+                    </button>
+                    <button type="button" className="epoch-chip"
+                      onClick={() => window.dispatchEvent(new CustomEvent('spectrahunt:export', { detail: { kind: 'webm' } }))}>
+                      Animation
+                    </button>
+                  </div>
                   <h3>Community flags ({flags.length})</h3>
                   <p className="fine">Stored in this browser only. Click the image, then flag the spot.</p>
                   <div className="btn-row">
@@ -331,14 +346,8 @@ export default function BlinkPage({ id }: { id: string }) {
                 </>
               )}
             </div>
-            <div ref={setTweakSlot} className="rail-tweaks" aria-label="Viewer tweaks" />
           </aside>
         </div>
-      )}
-      {viewing && (
-        <p className="bw-more">
-          New here? Take a <Link href="/about">guided tour</Link> or look up a term in the <Link href="/about">glossary</Link>.
-        </p>
       )}
     </div>
   );

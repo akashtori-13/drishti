@@ -21,8 +21,11 @@ const TITLES: Record<string, string> = {
 export default function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
+  const helpRef = useRef<HTMLDivElement>(null);
+  const onBlink = pathname.startsWith('/blink/');
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
@@ -61,6 +64,21 @@ export default function Header() {
     document.title = TITLES[pathname] ?? (pathname.startsWith('/blink/') ? 'Blink — SpectraHunt' : 'SpectraHunt');
   }, [pathname]);
 
+  // help menu: outside-click + Escape close
+  useEffect(() => {
+    if (!helpOpen) return;
+    const onDown = (e: MouseEvent) => {
+      if (helpRef.current && !helpRef.current.contains(e.target as Node)) setHelpOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setHelpOpen(false); };
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [helpOpen]);
+
   const isActive = (href: string) => pathname === href;
 
   return (
@@ -82,6 +100,43 @@ export default function Header() {
           ))}
           <Link href="/sky" className="btn-primary-sm">Open sky map</Link>
         </nav>
+        <div className="nav-actions">
+          {onBlink && (
+            <button
+              type="button" className="nav-iconbtn" title="Save current view as PNG"
+              aria-label="Save current view as PNG"
+              onClick={() => window.dispatchEvent(new CustomEvent('spectrahunt:export', { detail: { kind: 'png' } }))}
+            >
+              <Icon name="save" className="icon" />
+            </button>
+          )}
+          <div className="help-wrap" ref={helpRef}>
+            <button
+              type="button" className="nav-iconbtn" title="Help" aria-label="Help"
+              aria-expanded={helpOpen} aria-haspopup="menu"
+              onClick={() => setHelpOpen((o) => !o)}
+            >
+              <Icon name="help" className="icon" />
+            </button>
+            {helpOpen && (
+              <div className="help-menu glass" role="menu" aria-label="Help">
+                <Link href="/about" role="menuitem" onClick={() => setHelpOpen(false)}>Guided tours</Link>
+                <Link href="/about" role="menuitem" onClick={() => setHelpOpen(false)}>Glossary</Link>
+                <span className="help-sep" aria-hidden="true" />
+                <span className="help-keys" aria-label="Keyboard shortcuts">
+                  <span><kbd>Space</kbd> play / pause</span>
+                  <span><kbd>←</kbd><kbd>→</kbd> step epoch</span>
+                  <span><kbd>Ctrl/⌘ K</kbd> commands</span>
+                </span>
+                <button
+                  type="button" role="menuitem" className="epoch-chip"
+                  onClick={() => { setHelpOpen(false); window.dispatchEvent(new Event('spectrahunt:palette')); }}
+                >
+                  Open command palette
+                </button>
+              </div>
+            )}
+          </div>
         <button
           ref={btnRef}
           type="button" className="nav-menu-btn" aria-expanded={open}

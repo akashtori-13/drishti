@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 import Icon from '@/components/Icon';
 import { BANDS } from '@/lib/sky';
 import { CHANNELS, applyStretch, colormap, type Colormap, type Stretch } from '@/lib/astro';
@@ -75,7 +74,7 @@ const selStyle: React.CSSProperties = { background: '#151929', border: '1px soli
 
 export default function BlinkComparator({
   frames, band, onBandChange, title, mode, onModeChange, epochIdx, onEpochChange,
-  showMarkers, onToggleMarkers, fovArcmin = 10, onSample, center, tweakSlot,
+  showMarkers, onToggleMarkers, fovArcmin = 10, onSample, center,
 }: {
   frames: BlinkFrame[]; band: number; onBandChange: (b: number) => void; title: string;
   mode: CompareMode; onModeChange: (m: CompareMode) => void;
@@ -83,8 +82,6 @@ export default function BlinkComparator({
   showMarkers: boolean; onToggleMarkers?: () => void; fovArcmin?: number;
   onSample?: (args: { x: number; y: number; values: number[] }) => void;
   center?: { ra: number; dec: number };
-  /** Rail-bottom slot (in the page's data rail): tweak panels render here, never over the image. */
-  tweakSlot: HTMLElement | null;
 }) {
   const n = frames.length;
   const idx = Math.min(epochIdx, n - 1);
@@ -93,13 +90,13 @@ export default function BlinkComparator({
   const [speed, setSpeed] = useState(550);
   const [palette, setPalette] = useState(false);
   const [palQ, setPalQ] = useState('');
-  type Pop = null | 'tune' | 'bands' | 'data' | 'export' | 'keys';
+  type Pop = null | 'display' | 'data';
   const [dock, setDock] = useState<Pop>(null);
   const openPop = (d: Exclude<Pop, null>) => () => {
     setDock((cur) => (cur === d ? null : d));
   };
   const [stretch, setStretch] = useState<Stretch>('asinh');
-  const [cmap, setCmap] = useState<Colormap>('cividis');
+  const [cmap, setCmap] = useState<Colormap>('grayscale');
   const [invert, setInvert] = useState(false);
   const [vmin, setVmin] = useState(0.05);
   const [vmax, setVmax] = useState(0.98);
@@ -116,6 +113,8 @@ export default function BlinkComparator({
   const [loaded, setLoaded] = useState<Record<string, HTMLImageElement>>({});
   const [recording, setRecording] = useState(false);
   const [probe, setProbe] = useState<{ sx: number; sy: number; lum: number; ra: number; dec: number } | null>(null);
+  const [measureChip, setMeasureChip] = useState<{ x: number; y: number; lum: number; label: string } | null>(null);
+  const measureArmed = dock === 'data';
 
   const mainRef = useRef<HTMLCanvasElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -191,6 +190,7 @@ export default function BlinkComparator({
       }
       if (e.key === 'Escape') {
         if (palette) setPalette(false);
+        else if (dock) { setDock(null); setMeasureChip(null); }
         return;
       }
       if (mod || e.altKey) return;
@@ -453,6 +453,24 @@ export default function BlinkComparator({
     }
   }, [mode, prevImg, curImg, pan, zoom, stretch, vmin, vmax, invert, cmap, diffScale]);
 
+  // external triggers: header Save button + Help palette shortcut
+  useEffect(() => {
+    const onExport = (e: Event) => {
+      const kind = (e as CustomEvent).detail?.kind;
+      if (kind === 'webm') void recordWebM();
+      else if (kind === 'figure') exportFigure();
+      else downloadPNG();
+    };
+    const onPal = () => setPalette(true);
+    window.addEventListener('spectrahunt:export', onExport);
+    window.addEventListener('spectrahunt:palette', onPal);
+    return () => {
+      window.removeEventListener('spectrahunt:export', onExport);
+      window.removeEventListener('spectrahunt:palette', onPal);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, n]);
+
   const onPointerDown = (e: React.PointerEvent) => {
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
     drag.current = { x: e.clientX, y: e.clientY, pan: { ...pan }, moved: false };
@@ -497,7 +515,8 @@ export default function BlinkComparator({
   };
   const onPointerUp = () => { drag.current = null; };
   const onClickSample = (e: React.MouseEvent) => {
-    if (!onSample || drag.current?.moved) return;
+    if (drag.current?.moved) return;
+    if (!measureArmed) return; // measurement is an explicit tool, not a passive click
     const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const x = (e.clientX - r.left) / r.width;
     const y = (e.clientY - r.top) / r.height;
@@ -514,7 +533,8 @@ export default function BlinkComparator({
         return Math.round((d[0] * 0.299 + d[1] * 0.587 + d[2] * 0.114) * 10) / 10;
       } catch { return 0; }
     });
-    onSample({ x, y, values });
+    if (onSample) onSample({ x, y, values });
+    setMeasureChip({ x, y, lum: values[idx] ?? 0, label: cur?.label ?? '' });
   };
 
   /** Publication figure: epoch A | epoch B with labels, scale bar, citation. For posters and the 240-second video. */
@@ -660,7 +680,7 @@ export default function BlinkComparator({
                   id="blinkCanvas"
                   role="img"
                   aria-label={`${title} — ${cur?.label ?? 'no frame'}`}
-                  style={{ width: '100%', height: '100%', display: 'block', cursor: onSample ? 'crosshair' : 'grab' }}
+                  style={{ width: '100%', height: '100%', display: 'block', cursor: measureArmed ? 'crosshair' : 'grab' }}
                   onPointerDown={onPointerDown}
                   onPointerMove={onPointerMove}
                   onPointerUp={onPointerUp}
@@ -668,6 +688,14 @@ export default function BlinkComparator({
                 />
                 <span className="viewer-tag mono">{modeLabel}</span>
                 <span className="viewer-tag epoch mono">{cur?.label ?? '—'}</span>
+                {measureChip && (
+                  <div className="measure-chip mono"
+                    style={{ left: `${measureChip.x * 100}%`, top: `${measureChip.y * 100}%` }}>
+                    <button type="button" aria-label="Dismiss measurement"
+                      onClick={(e) => { e.stopPropagation(); setMeasureChip(null); }}>×</button>
+                    <span>px {measureChip.lum} · {measureChip.label}</span>
+                  </div>
+                )}
               </>
             )}
           </div>
@@ -687,7 +715,6 @@ export default function BlinkComparator({
               onChange={(e) => { setPlaying(false); onEpochChange(Number(e.target.value)); }}
               aria-label="Timeline scrub" aria-valuetext={cur?.label ?? ''} />
             <span className="mono epoch-name">{cur?.label ?? '—'}</span>
-            <button type="button" className="epoch-chip" onClick={() => setPalette(true)} title="Command palette (Ctrl+K)">⌘K</button>
           </div>
 
         <div className="vtoolbar glass" role="toolbar" aria-label="View controls">
@@ -702,12 +729,8 @@ export default function BlinkComparator({
               onClick={() => setShowRgb((v) => !v)} title="False-color: epoch B red, epoch A green">Color</button>
           </div>
           <span className="vsep" aria-hidden="true" />
-          <button type="button" className={`toolbtn${dock === 'tune' ? ' active' : ''}`} aria-expanded={dock === 'tune'} onClick={openPop('tune')}>Adjust</button>
-          <button type="button" className={`toolbtn${dock === 'bands' ? ' active' : ''}`} aria-expanded={dock === 'bands'} onClick={openPop('bands')}>Bands</button>
-          <button type="button" className={`toolbtn${dock === 'data' ? ' active' : ''}`} aria-expanded={dock === 'data'} onClick={openPop('data')}>Measure</button>
-          <span className="vsep" aria-hidden="true" />
-          <button type="button" className={`toolbtn${dock === 'export' ? ' active' : ''}`} aria-expanded={dock === 'export'} onClick={openPop('export')} title="Save and export">Save</button>
-          <button type="button" className={`toolbtn${dock === 'keys' ? ' active' : ''}`} aria-expanded={dock === 'keys'} onClick={openPop('keys')} title="Shortcuts and guide">?</button>
+          <button type="button" className={`toolbtn${dock === 'display' ? ' active' : ''}`} aria-expanded={dock === 'display'} onClick={openPop('display')}>Display</button>
+          <button type="button" className={`toolbtn${dock === 'data' ? ' active' : ''}`} aria-expanded={dock === 'data'} onClick={openPop('data')} title="Measure spots on the image">Measure</button>
           {mode === 'diff' && (
             <label className="mini-slider"><span>Gain</span>
               <input type="range" min={1} max={8} step={0.5} value={diffScale} onChange={(e) => setDiffScale(Number(e.target.value))} aria-label="Difference gain" />
@@ -719,10 +742,10 @@ export default function BlinkComparator({
             </label>
           )}
         </div>
-        {tweakSlot && dock && createPortal(<>
-        {dock === 'tune' && (
-          <div className="tweak-panel glass" role="dialog" aria-label="Adjust">
-            <div className="tweak-head"><span>Adjust</span><button type="button" className="icon-btn sm" aria-label="Close Adjust panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
+        {dock === 'display' && (
+          <div className="popover glass" role="dialog" aria-label="Display">
+            <div className="pop-head"><span>Display</span><button type="button" className="icon-btn sm" aria-label="Close Display panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
+            <div className="pop-group-label">Stretch · color · levels</div>
             <div style={rowStyle}>
               <label style={{ fontSize: 13 }}>Stretch{' '}
                 <select value={stretch} onChange={(e) => setStretch(e.target.value as Stretch)} style={selStyle}>
@@ -734,8 +757,8 @@ export default function BlinkComparator({
               </label>
               <label style={{ fontSize: 13 }}>Colors{' '}
                 <select value={cmap} onChange={(e) => setCmap(e.target.value as Colormap)} style={selStyle}>
-                  <option value="cividis">cividis ✓ colorblind-safe</option>
                   <option value="grayscale">grayscale</option>
+                  <option value="cividis">cividis ✓ colorblind-safe</option>
                   <option value="viridis">viridis</option>
                   <option value="inferno">inferno</option>
                 </select>
@@ -752,11 +775,7 @@ export default function BlinkComparator({
             <label className="speed"><span>White {Math.round(vmax * 100)}%</span>
               <input type="range" min={50} max={100} value={Math.round(vmax * 100)} onChange={(e) => setVmax(Number(e.target.value) / 100)} />
             </label>
-          </div>
-        )}
-{dock === 'bands' && (
-          <div className="tweak-panel glass" role="dialog" aria-label="Bands">
-            <div className="tweak-head"><span>Bands</span><button type="button" className="icon-btn sm" aria-label="Close Bands panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
+            <div className="pop-group-label">Band · channel · RGB</div>
             <div className="band-row" style={{ padding: 0, background: 'transparent' }}>
               {BANDS.map((b) => (
                 <button key={b.id} type="button" className="band" style={{ ['--band-color' as string]: b.color }}
@@ -784,14 +803,14 @@ export default function BlinkComparator({
             </div>
           </div>
         )}
-{dock === 'data' && (
-          <div className="tweak-panel glass" role="dialog" aria-label="Measure">
-            <div className="tweak-head"><span>Measure</span><button type="button" className="icon-btn sm" aria-label="Close Measure panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
+        {dock === 'data' && (
+          <div className="popover glass" role="dialog" aria-label="Measure">
+            <div className="pop-head"><span>Measure</span><button type="button" className="icon-btn sm" aria-label="Close Measure panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
+            <p style={{ fontSize: 12, color: '#8a90ab' }}>Click the image to measure that spot — a chip shows the value, and the spectrum feeds the data rail.</p>
             <div className="mono probe-line">
               {probe
                 ? <>px {probe.lum}{Number.isFinite(probe.ra) ? <> · {probe.ra.toFixed(3)}°, {probe.dec >= 0 ? '+' : ''}{probe.dec.toFixed(3)}°</> : ' · hover'}</>
                 : 'Hover the image to probe pixels'}
-              {onSample ? ' · click for spectrum' : ''}
             </div>
             <canvas ref={histRef} className="hist" aria-label="Brightness histogram of the displayed frame" />
             <div style={{ fontSize: 12, color: '#8a90ab' }}>
@@ -821,36 +840,6 @@ export default function BlinkComparator({
             )}
           </div>
         )}
-{dock === 'export' && (
-          <div className="tweak-panel glass" role="dialog" aria-label="Save">
-            <div className="tweak-head"><span>Save</span><button type="button" className="icon-btn sm" aria-label="Close Save panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
-            <div style={rowStyle}>
-              <button type="button" className="epoch-chip" onClick={() => downloadPNG()}>PNG</button>
-              <button type="button" className="epoch-chip" onClick={() => exportFigure()}
-                title="Publication figure: A|B with labels, scale bar and citation — made for posters and the demo video"
-                disabled={!prevImg || !curImg}>
-                Figure
-              </button>
-              <button type="button" className="epoch-chip" onClick={() => void recordWebM()} disabled={recording || n < 2}>
-                {recording ? 'Recording…' : 'WebM'}
-              </button>
-              <button type="button" className="epoch-chip" onClick={() => { setPan({ x: 0, y: 0 }); setZoom(1); }}>Reset view</button>
-              <button type="button" className="epoch-chip" onClick={() => copyLink()}>Copy link</button>
-            </div>
-          </div>
-        )}
-{dock === 'keys' && (
-          <div className="tweak-panel glass" role="dialog" aria-label="Guide">
-            <div className="tweak-head"><span>Guide</span><button type="button" className="icon-btn sm" aria-label="Close Guide panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
-            <div className="keys-grid">
-              <span><kbd>Space</kbd> play / pause</span>
-              <span><kbd>←</kbd><kbd>→</kbd> step epoch</span>
-              <span>drag pan · scroll zoom</span>
-            </div>
-            <button type="button" className="epoch-chip" onClick={() => setPalette(true)}>Command palette (Ctrl+K)</button>
-          </div>
-        )}
-        </>, tweakSlot)}
         </div>
 
           <div className="filmstrip" role="group" aria-label="Epoch filmstrip">
