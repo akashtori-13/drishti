@@ -1,0 +1,40 @@
+# SpectraHunt Backend Requirements
+# Install with: pip install -r requirements.txt
+
+# Web framework
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+
+# HTTP client
+httpx>=0.26.0
+
+# Data validation
+pydantic>=2.5.0
+
+# Astronomy / FITS
+astropy>=6.0.0
+astroquery>=0.4.7
+pyvo>=1.5.0
+
+# Image processing
+numpy>=1.26.0
+scipy>=1.12.0
+reproject>=0.13.0
+sep>=1.2.0
+photutils>=1.10.0
+Pillow>=10.0.0
+
+# AWS S3 (optional, for direct S3 access)
+boto3>=1.34.0
+s3fs>=2024.2.0
+fsspec>=2024.2.0
+
+# Database
+# SQLite is built-in; for Postgres use: psycopg2-binary>=2.9.0
+
+# Testing
+pytest>=8.0.0
+pytest-asyncio>=0.23.0
+
+# Scheduling (for daily ingest)
+apscheduler>=3.10.0
