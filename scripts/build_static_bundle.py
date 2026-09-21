@@ -179,10 +179,18 @@ async def build_bundle(
     
     conn.close()
     
-    # Copy database to output for reference
+    # Copy database to output for reference (only if different path)
     import shutil
-    shutil.copy(db_path, output_path / "spectrahunt.db")
-    print(f"  ✓ spectrahunt.db (copy)")
+    db_dest = output_path / "spectrahunt.db"
+    db_src = Path(db_path).resolve()
+    if db_src != db_dest.resolve():
+        try:
+            shutil.copy(db_path, db_dest)
+            print(f"  ✓ spectrahunt.db (copy)")
+        except Exception as e:
+            print(f"  ⚠ Could not copy database: {e}")
+    else:
+        print(f"  ✓ spectrahunt.db (already in output dir)")
     
     print("\n" + "=" * 60)
     print("Bundle complete!")
@@ -192,10 +200,23 @@ async def build_bundle(
         size = f.stat().st_size
         print(f"  {f.name}: {size:,} bytes")
     
+    # Copy index.html to output directory for static hosting
+    index_src = Path(__file__).parent.parent / "index.html"
+    index_dest = output_path / "index.html"
+    if index_src.exists():
+        import shutil
+        try:
+            shutil.copy(index_src, index_dest)
+            print(f"  ✓ index.html (copied for static hosting)")
+        except Exception as e:
+            print(f"  ⚠ Could not copy index.html: {e}")
+    else:
+        print(f"  ⚠ index.html not found at {index_src}")
+    
     print("\nTo host on GitHub Pages / Netlify:")
-    print("  1. Copy index.html to the same directory as data/")
-    print("  2. Or configure your host to serve /data from this folder")
-    print("  3. Update index.html CONFIG.dataMode to 'static'")
+    print(f"  1. Set your publish directory to: {output_path.absolute()}")
+    print("  2. Or copy all files from this directory to your web root")
+    print("  3. The site will use static JSON data (no backend needed)")
     
     return True
 
