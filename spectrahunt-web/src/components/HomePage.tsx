@@ -133,7 +133,6 @@ export default function HomePage() {
         <div className="hero-scrim" />
 
         <div className="hero-core">
-          <p className="hero-kicker">NASA Space Apps 2026 · SPHEREx</p>
           <h1>Hunt what moves in the infrared sky</h1>
           <p className="hero-sub">
             SPHEREx re-images the whole sky every six months. SpectraHunt shows what changed.

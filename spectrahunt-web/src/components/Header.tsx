@@ -5,7 +5,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Icon from '@/components/Icon';
 import SurpriseButton from '@/components/SurpriseButton';
-import { useLive } from '@/lib/showcases';
 import { blinkURL } from '@/lib/store';
 
 const NAV = [
@@ -70,10 +69,6 @@ export default function Header() {
           )}
         </nav>
         <div className="nav-right">
-          <span className="status-pill" title={useLive ? 'Connected to the live IRSA-backed API' : 'Running from the offline static bundle'}>
-            <span className="live-dot" aria-hidden="true" />
-            {useLive ? 'Live' : 'Offline-ready'}
-          </span>
           <SurpriseButton
             compact
             className="nav-dice"
