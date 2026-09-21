@@ -146,6 +146,7 @@ export default function StellariumView({
   const hostRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const view = useRef({ ra: initial.ra, dec: initial.dec, fov: 45, survey: SURVEYS[0].id, showLines: true, showGrid: true });
+  const drag = useRef<{ x: number; y: number; ra: number; dec: number; moved: boolean } | null>(null);
   const pointers = useRef(new Map<number, { x: number; y: number }>());
   const pinch = useRef<{ dist: number; fov: number } | null>(null);
 
@@ -436,6 +437,21 @@ export default function StellariumView({
   const move = (e: React.PointerEvent) => {
     const host = hostRef.current;
     if (!host) return;
+    if (pointers.current.has(e.pointerId)) {
+      pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    }
+    // pinch zoom with two fingers
+    if (pointers.current.size >= 2) {
+      const pts = [...pointers.current.values()];
+      const dist = Math.max(20, Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y));
+      if (pinch.current) {
+        const ratio = dist / Math.max(20, pinch.current.dist);
+        setFov(Math.min(90, Math.max(0.5, pinch.current.fov / ratio)));
+      } else {
+        pinch.current = { dist, fov };
+      }
+      return;
+    }
     const r = host.getBoundingClientRect();
     const scale = (r.width / 2) / Math.tan((view.current.fov / 2) * D2R);
     const x = -((e.clientX - r.left - r.width / 2) / scale);
@@ -456,6 +472,15 @@ export default function StellariumView({
     setDec(Math.max(-88, Math.min(88, drag.current.dec + dy * degPerPx)));
   };
   const up = (e: React.PointerEvent) => {
+    pointers.current.delete(e.pointerId);
+    if (pointers.current.size < 2) pinch.current = null;
+    if (pointers.current.size === 1) {
+      // drop back to single-finger pan from the remaining finger
+      const [id, pt] = [...pointers.current.entries()][0];
+      void id;
+      drag.current = { x: pt.x, y: pt.y, ra, dec, moved: true };
+      return;
+    }
     const wasDrag = drag.current?.moved;
     drag.current = null;
     if (wasDrag) return;
@@ -483,7 +508,8 @@ export default function StellariumView({
       )}
       <canvas ref={canvasRef} role="img"
         aria-label={`Observer sky view centered RA ${ra.toFixed(1)}, Dec ${dec.toFixed(1)}, field ${fov.toFixed(0)} degrees. Drag to look, scroll to zoom, click to inspect.`}
-        onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerLeave={() => { drag.current = null; setCursor(null); }}
+        onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}
+        onPointerLeave={() => { pointers.current.clear(); pinch.current = null; drag.current = null; setCursor(null); }}
       />
       {loading && !img && <div className="stel-load">Loading real sky…</div>}
       {loading && img && <div className="stel-sync" aria-hidden="true"><span /></div>}
