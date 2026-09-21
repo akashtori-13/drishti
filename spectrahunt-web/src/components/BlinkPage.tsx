@@ -16,6 +16,61 @@ import { horizonsURL, irsaViewerURL, mpcCheckerURL, simbadURL, skybotURL } from 
 
 type RailTab = 'overview' | 'epochs' | 'catalogs' | 'share';
 
+/** Real mini-spectrum: center brightness of each detector-band cutout. */
+function BandSpectrum({ viewing, sample, liveSpec, band }: {
+  viewing: Showcase;
+  sample: { x: number; y: number; values: number[] } | null;
+  liveSpec: Array<{ wavelength_um: number; flux: number }> | null;
+  band: number;
+}) {
+  const [pts, setPts] = useState<{ wave: number; flux: number }[] | null>(null);
+  useEffect(() => {
+    let alive = true;
+    const entries = Object.entries(viewing.bands ?? {})
+      .filter(([, b]) => b.png)
+      .map(([k, b]) => ({ det: Number(k), png: b.png as string, wave: b.wavelength_um ?? 0 }));
+    if (!entries.length) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setPts(null); return;
+    }
+    void Promise.all(entries.map(({ det, png, wave }) => new Promise<{ wave: number; flux: number } | null>((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        try {
+          const c = document.createElement('canvas');
+          c.width = 24; c.height = 24;
+          const ctx = c.getContext('2d');
+          if (!ctx) return resolve(null);
+          ctx.drawImage(img, 0, 0, 24, 24);
+          const d = ctx.getImageData(10, 10, 4, 4).data;
+          let s = 0;
+          for (let i = 0; i < d.length; i += 4) s += d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114;
+          resolve({ wave, flux: Math.round((s / 16) * 10) / 10 });
+        } catch { resolve(null); }
+      };
+      img.onerror = () => resolve(null);
+      img.src = png;
+    }))).then((arr) => {
+      if (!alive) return;
+      const good = arr.filter((p): p is { wave: number; flux: number } => p !== null)
+        .sort((a, b) => a.wave - b.wave);
+      setPts(good.length >= 2 ? good : null);
+    });
+    return () => { alive = false; };
+  }, [viewing]);
+  if (liveSpec?.length) {
+    return <SpectrumPlot values={liveSpec.map((p) => p.flux)} band={band} waves={liveSpec.map((p) => p.wavelength_um)} />;
+  }
+  if (pts) {
+    return <SpectrumPlot values={pts.map((p) => p.flux)} band={band} waves={pts.map((p) => p.wave)} />;
+  }
+  if (sample) {
+    return <SpectrumPlot values={sample.values} band={band} />;
+  }
+  return <p className="fine">Band images still indexing — click the image for an epoch proxy, or wait for live pipeline spectra.</p>;
+}
+
 /** Blink workspace: fixed-viewport viewer + tabbed data rail. No page scroll on desktop. */
 export default function BlinkPage({ id }: { id: string }) {
   const { compareMode, setCompareMode, epochIdx, setEpochIdx, band, setBand, showMarkers, setShowMarkers } = useAppStore();
@@ -232,6 +287,9 @@ export default function BlinkPage({ id }: { id: string }) {
               onToggleMarkers={() => setShowMarkers(!showMarkers)}
               onSample={setSample}
               center={{ ra: viewing.ra, dec: viewing.dec }}
+              bandPngs={Object.fromEntries(
+                Object.entries(viewing.bands ?? {}).map(([k, b]) => [Number(k), b.png ?? null]),
+              )}
             />
           </section>
 
@@ -296,14 +354,7 @@ export default function BlinkPage({ id }: { id: string }) {
                     ))}
                   </div>
                   <h3>Spectrum at click</h3>
-                  {sample ? (
-                    <SpectrumPlot values={liveSpec ? liveSpec.map((p) => p.flux) : sample.values} band={band} />
-                  ) : (
-                    <p className="fine">Click the image to sample this spot{liveSpec ? '' : ' (proxy until live spectra load)'}. {liveSpec ? 'Real 6-band pipeline fluxes below.' : ''}</p>
-                  )}
-                  {liveSpec && !sample && (
-                    <SpectrumPlot values={liveSpec.map((p) => p.flux)} band={band} />
-                  )}
+                  <BandSpectrum viewing={viewing} sample={sample} liveSpec={liveSpec} band={band} />
                 </>
               )}
               {tab === 'catalogs' && (

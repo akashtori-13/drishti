@@ -22,6 +22,13 @@ export interface ShowcaseEpoch {
   skybot_match?: string | null;
 }
 
+export interface ShowcaseBand {
+  png?: string | null;
+  cutout_url?: string;
+  mjd?: number;
+  wavelength_um?: number;
+}
+
 export interface Showcase {
   id: string;
   title: string;
@@ -29,6 +36,7 @@ export interface Showcase {
   dec: number;
   story: string;
   epochs: ShowcaseEpoch[];
+  bands?: Record<string, ShowcaseBand>;
   tap?: { collection: string; bandpass: string; endpoint: string };
   links?: Record<string, string>;
   citation?: { doi: string; text: string };
