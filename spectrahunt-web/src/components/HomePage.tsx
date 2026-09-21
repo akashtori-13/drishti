@@ -149,7 +149,7 @@ export default function HomePage() {
             <button type="button" className="chip" onClick={() => pick({ label: '433 Eros', ra: 210.32, dec: 9.11 })}>433 Eros</button>
             <button type="button" className="chip" onClick={() => pick({ label: 'Orion Complex', ra: 83.82, dec: -5.39 })}>Orion Complex</button>
             <span className="quick-sep" aria-hidden="true">·</span>
-            <SurpriseButton onPick={pick} className="surprise-quiet" />
+            <SurpriseButton onPick={pick} />
           </div>
 
           {ecliptic && eclPngs.length >= 2 && (
