@@ -609,6 +609,7 @@ export default function BlinkComparator({
                 <span className="viewer-tag epoch mono">{cur?.label ?? '—'}</span>
               </>
             )}
+          </div>
         <div className="controls-zone">
           <div className="transport-row glass" role="group" aria-label="Blink transport">
             <button type="button" className="icon-btn" onClick={() => step(-1)} aria-label="Previous epoch">
@@ -781,8 +782,7 @@ export default function BlinkComparator({
             </div>
             <button type="button" className="epoch-chip" onClick={() => setPalette(true)}>Command palette (Ctrl+K)</button>
           </div>
-        )}          </div>
-
+        )}
         </div>
 
           <div className="filmstrip" role="group" aria-label="Epoch filmstrip">
