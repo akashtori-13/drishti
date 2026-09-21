@@ -35,11 +35,28 @@ export interface Showcase {
 
 export const SHOWCASE_IDS = ['3i-atlas', 'ecliptic-mover', 'nep-deep'] as const;
 
+export interface RealCell {
+  showcase: string; ra: number; dec: number;
+  images: number; images_capped: boolean;
+  epochs: number; bands: number;
+  span_mjd: [number, number] | null;
+  per_band: Record<string, number>;
+}
+
+export interface Coverage {
+  grid: { w: number; h: number };
+  cells: Record<string, RealCell>;
+  generated_at: string;
+  source: string;
+}
+
 async function fetchJSON<T>(url: string): Promise<T> {
   const r = await fetch(url);
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   return r.json() as Promise<T>;
 }
+
+export const getCoverage = () => fetchJSON<Coverage>('/coverage.json').catch((): Coverage | null => null);
 
 export const getShowcase = (id: string) => fetchJSON<Showcase>(`/showcases/${id}.json`);
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useAppStore } from '@/lib/store';
-import { SHOWCASE_IDS } from '@/lib/showcases';
+import { SHOWCASE_IDS, getCoverage, type RealCell } from '@/lib/showcases';
 import { buildGrid, pinCells, GRID_H, GRID_W } from '@/lib/sky';
 import HeroSky from '@/components/HeroSky';
 import SearchBox, { type SearchTarget } from '@/components/SearchBox';
@@ -24,9 +24,20 @@ function nearestShowcase(ra: number, dec: number): string | null {
   return best;
 }
 
-function fieldFromRaDec(ra: number, dec: number, grid: number[][]): InspectorField {
+function fieldFromRaDec(ra: number, dec: number, grid: number[][], real?: Map<string, RealCell>): InspectorField {
   const i = Math.min(GRID_W - 1, Math.max(0, Math.floor((ra / 360) * GRID_W)));
   const j = Math.min(GRID_H - 1, Math.max(0, Math.floor(((90 - dec) / 180) * GRID_H)));
+  const hit = real?.get(`${i},${j}`);
+  if (hit) {
+    return {
+      ra, dec, epochs: hit.epochs,
+      bands: hit.bands,
+      survey: hit.showcase === 'nep-deep' ? 'Deep' : 'Wide',
+      hasCandidate: hit.showcase === '3i-atlas',
+      planning: 'QR2 · weekly releases',
+      detector: 1 + (i + j) % 6,
+    };
+  }
   const n = grid[j][i];
   const seed = 500 + i * 100 + j;
   return {
@@ -48,6 +59,22 @@ export default function HomePage() {
   }, []);
   const [coverage, setCoverage] = useState(false);
   const [field, setField] = useState<InspectorField | null>(null);
+  const [real, setReal] = useState<Map<string, RealCell> | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    void getCoverage().then((c) => {
+      if (!alive || !c) return;
+      const m = new Map<string, RealCell>();
+      for (const [k, v] of Object.entries(c.cells)) {
+        m.set(k, v);
+        const [i, j] = k.split(',').map(Number);
+        if (Number.isInteger(i) && Number.isInteger(j)) grid[j][i] = Math.min(v.epochs, 5);
+      }
+      setReal(m);
+    });
+    return () => { alive = false; };
+  }, [grid]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -59,13 +86,13 @@ export default function HomePage() {
 
   const pick = (t: SearchTarget) => {
     if (t.showcaseId) { openShowcase(t.showcaseId); return; }
-    setField(fieldFromRaDec(t.ra, t.dec, grid));
+    setField(fieldFromRaDec(t.ra, t.dec, grid, real ?? undefined));
   };
 
   return (
     <div>
       <section className="hero" id="hero">
-        <HeroSky grid={grid} coverage={coverage} onInspect={(ra, dec) => setField(fieldFromRaDec(ra, dec, grid))} />
+        <HeroSky grid={grid} coverage={coverage} onInspect={(ra, dec) => setField(fieldFromRaDec(ra, dec, grid, real ?? undefined))} />
         <div className="hero-scrim" />
 
         <div className="hero-core">

@@ -1,9 +1,10 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAppStore } from '@/lib/store';
 import { LEVEL_COLORS } from '@/lib/sky';
 import { buildGrid, pinCells, GRID_H, GRID_W } from '@/lib/sky';
+import { getCoverage, type RealCell } from '@/lib/showcases';
 import CoverageMap, { type MapSelection } from '@/components/CoverageMap';
 import SearchBox, { type SearchTarget } from '@/components/SearchBox';
 import Inspector, { type InspectorField } from '@/components/Inspector';
@@ -26,8 +27,20 @@ function nearestShowcase(ra: number, dec: number): string | null {
   return best;
 }
 
-function fieldFromRaDec(ra: number, dec: number, grid: number[][]): InspectorField {  const i = Math.min(GRID_W - 1, Math.max(0, Math.floor((ra / 360) * GRID_W)));
+function fieldFromRaDec(ra: number, dec: number, grid: number[][], real?: Map<string, RealCell>): InspectorField {
+  const i = Math.min(GRID_W - 1, Math.max(0, Math.floor((ra / 360) * GRID_W)));
   const j = Math.min(GRID_H - 1, Math.max(0, Math.floor(((90 - dec) / 180) * GRID_H)));
+  const hit = real?.get(`${i},${j}`);
+  if (hit) {
+    return {
+      ra, dec, epochs: hit.epochs,
+      bands: hit.bands,
+      survey: hit.showcase === 'nep-deep' ? 'Deep' : 'Wide',
+      hasCandidate: hit.showcase === '3i-atlas',
+      planning: 'QR2 · weekly releases',
+      detector: 1 + (i + j) % 6,
+    };
+  }
   const n = grid[j][i];
   const seed = 500 + i * 100 + j;
   return {
@@ -41,7 +54,8 @@ function fieldFromRaDec(ra: number, dec: number, grid: number[][]): InspectorFie
 }
 
 /** Full-page sky map view: search tools, coverage canvas, legend, inspector. */
-export default function SkyPage() {  const { openShowcase } = useAppStore();
+export default function SkyPage() {
+  const { openShowcase } = useAppStore();
   const grid = useMemo(() => {
     const g = buildGrid();
     pinCells(g, [
@@ -55,10 +69,26 @@ export default function SkyPage() {  const { openShowcase } = useAppStore();
   const [hover, setHover] = useState<SkyHover | null>(null);
   const [sel, setSel] = useState<MapSelection | null>(null);
   const [field, setField] = useState<InspectorField | null>(null);
+  const [real, setReal] = useState<Map<string, RealCell> | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    void getCoverage().then((c) => {
+      if (!alive || !c) return;
+      const m = new Map<string, RealCell>();
+      for (const [k, v] of Object.entries(c.cells)) {
+        m.set(k, v);
+        const [i, j] = k.split(',').map(Number);
+        if (Number.isInteger(i) && Number.isInteger(j)) grid[j][i] = Math.min(v.epochs, 5);
+      }
+      setReal(m);
+    });
+    return () => { alive = false; };
+  }, [grid]);
 
   const inspect = (ra: number, dec: number) => {
     setSel({ nx: ra / 360, ny: (90 - dec) / 180, ra, dec });
-    setField(fieldFromRaDec(ra, dec, grid));
+    setField(fieldFromRaDec(ra, dec, grid, real ?? undefined));
   };
 
   const pick = (t: SearchTarget) => {
