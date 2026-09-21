@@ -137,6 +137,7 @@ export default function Header() {
               </div>
             )}
           </div>
+        </div>
         <button
           ref={btnRef}
           type="button" className="nav-menu-btn" aria-expanded={open}
