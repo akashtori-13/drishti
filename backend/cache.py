@@ -26,6 +26,11 @@ CREATE TABLE IF NOT EXISTS skybot_cache (
     queried_at TEXT NOT NULL,
     PRIMARY KEY (ra, dec, mjd, radius_arcsec)
 );
+CREATE TABLE IF NOT EXISTS api_cache (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
 """
 
 
@@ -114,6 +119,43 @@ def get_cached_skybot(db_path: str, ra: float, dec: float, mjd: float, radius: f
         return json.loads(row["result"])
     except (json.JSONDecodeError, TypeError):
         return None
+
+
+def _api_age_s(updated_at: str) -> float:
+    try:
+        dt = datetime.fromisoformat(updated_at)
+        return (datetime.now(timezone.utc) - dt).total_seconds()
+    except Exception:
+        return float("inf")
+
+
+def api_cache_get(db_path: str, key: str, max_age_s: int) -> Optional[Any]:
+    """TTL cache for expensive pipeline products (discovery, photometry, gaia)."""
+    conn = get_connection(db_path)
+    try:
+        row = conn.execute("SELECT value, updated_at FROM api_cache WHERE key=?", (key,)).fetchone()
+    finally:
+        conn.close()
+    if not row or _api_age_s(row["updated_at"]) > max_age_s:
+        return None
+    try:
+        return json.loads(row["value"])
+    except (json.JSONDecodeError, TypeError):
+        return None
+
+
+def api_cache_set(db_path: str, key: str, value: Any) -> None:
+    now = datetime.now(timezone.utc).isoformat()
+    conn = get_connection(db_path)
+    try:
+        conn.execute(
+            "INSERT INTO api_cache (key, value, updated_at) VALUES (?, ?, ?) "
+            "ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_at=excluded.updated_at",
+            (key, json.dumps(value, default=float), now),
+        )
+        conn.commit()
+    finally:
+        conn.close()
 
 
 if __name__ == "__main__":

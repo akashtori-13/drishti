@@ -6,10 +6,12 @@ import { LEVEL_COLORS } from '@/lib/sky';
 import { buildGrid, GRID_H, GRID_W } from '@/lib/sky';
 import { getCoverage, type RealCell } from '@/lib/showcases';
 import CoverageMap, { type MapSelection } from '@/components/CoverageMap';
+import StellariumView, { type StelFocus } from '@/components/StellariumView';
 import SearchBox, { type SearchTarget } from '@/components/SearchBox';
 import Inspector, { type InspectorField } from '@/components/Inspector';
 import type { SkyHover } from '@/components/HeroSky';
 import { fmtDec, fmtRa } from '@/lib/sky';
+import { useLive } from '@/lib/showcases';
 
 const SHOWCASE_POINTS = [
   { id: '3i-atlas', ra: 252.6633, dec: -17.4904 },
@@ -69,9 +71,11 @@ export default function SkyPage() {
     return g;
   }, []);
   const [coverage, setCoverage] = useState(true);
+  const [observer, setObserver] = useState(true);
   const [hover, setHover] = useState<SkyHover | null>(null);
   const [sel, setSel] = useState<MapSelection | null>(null);
   const [field, setField] = useState<InspectorField | null>(null);
+  const [focus, setFocus] = useState<StelFocus | null>(null);
   const [real, setReal] = useState<Map<string, RealCell> | null>(null);
 
   useEffect(() => {
@@ -96,52 +100,78 @@ export default function SkyPage() {
 
   const pick = (t: SearchTarget) => {
     if (t.showcaseId) { openShowcase(t.showcaseId); return; }
+    if (observer) setFocus({ ra: t.ra, dec: t.dec, key: Date.now() });
     inspect(t.ra, t.dec);
   };
 
   return (
     <div id="view-sky">
       <h1 className="sr-only">Sky map</h1>
-      <CoverageMap
-        grid={grid} coverage={coverage} selected={sel}
-        onHover={setHover}
-        onInspect={inspect}
-      />
-      {/* compass + FOV indicator overlays */}
-      <div aria-hidden="true" style={{ position: 'absolute', top: 'calc(var(--nav-total) + 170px)', right: 18, zIndex: 5, width: 56, height: 56, borderRadius: '50%', background: 'rgba(5,6,12,.78)', border: '1px solid var(--line)', display: 'grid', placeItems: 'center', fontSize: 12, color: '#eef0f8', fontFamily: 'monospace' }}>
-        <span>N ↑<br />E ←</span>
-      </div>
-      <div className="glass mono" style={{ position: 'absolute', top: 'calc(var(--nav-total) + 236px)', right: 18, zIndex: 5, fontSize: 11, padding: '4px 10px', borderRadius: 999, color: '#aab0c8' }}>
-        FOV 10′ · cell 5°×5°
-      </div>
+      {observer ? (
+        <StellariumView
+          focus={focus}
+          onInspect={inspect}
+          initial={{ ra: 83.8, dec: -5.4 }}
+          liveStars={useLive}
+        />
+      ) : (
+        <CoverageMap
+          grid={grid} coverage={coverage} selected={sel}
+          onHover={setHover}
+          onInspect={inspect}
+        />
+      )}
+      {!observer && (
+        <>
+          {/* compass + FOV indicator overlays */}
+          <div aria-hidden="true" style={{ position: 'absolute', top: 'calc(var(--nav-total) + 170px)', right: 18, zIndex: 5, width: 56, height: 56, borderRadius: '50%', background: 'rgba(5,6,12,.78)', border: '1px solid var(--line)', display: 'grid', placeItems: 'center', fontSize: 12, color: '#eef0f8', fontFamily: 'monospace' }}>
+            <span>N ↑<br />E ←</span>
+          </div>
+          <div className="glass mono" style={{ position: 'absolute', top: 'calc(var(--nav-total) + 236px)', right: 18, zIndex: 5, fontSize: 11, padding: '4px 10px', borderRadius: 999, color: '#aab0c8' }}>
+            FOV 10′ · cell 5°×5°
+          </div>
+        </>
+      )}
 
       <div className="map-tools glass">
         <SearchBox id="ms" placeholder="Object or RA, Dec" compact onPick={pick} />
         <div className="tool-row">
-          <span id="covLabel">Coverage overlay</span>
-          <button
-            type="button" className="switch" role="switch" aria-checked={coverage}
-            aria-labelledby="covLabel" onClick={() => setCoverage((c) => !c)}
-          />
+          <div className="segment" role="group" aria-label="Sky view">
+            <button type="button" aria-pressed={observer} onClick={() => setObserver(true)}>Observer</button>
+            <button type="button" aria-pressed={!observer} onClick={() => setObserver(false)}>All-sky map</button>
+          </div>
         </div>
-        <p className="map-help">Click any field to see how many times SPHEREx has visited it and whether anything moved.</p>
+        {!observer && (
+          <div className="tool-row">
+            <span id="covLabel">Coverage overlay</span>
+            <button
+              type="button" className="switch" role="switch" aria-checked={coverage}
+              aria-labelledby="covLabel" onClick={() => setCoverage((c) => !c)}
+            />
+          </div>
+        )}
+        <p className="map-help">{observer
+          ? 'Drag to look around, scroll to zoom. Click any point to inspect its SPHEREx visits.'
+          : 'Click any field to see how many times SPHEREx has visited it and whether anything moved.'}</p>
       </div>
 
-      <div className="map-bar glass">
-        <div className="legend">
-          <span>Epochs observed</span>
-          <span className="strip" aria-hidden="true">
-            {LEVEL_COLORS.slice(1).map((c) => (
-              <i key={c as string} style={{ background: c as string }} />
-            ))}
+      {!observer && (
+        <div className="map-bar glass">
+          <div className="legend">
+            <span>Epochs observed</span>
+            <span className="strip" aria-hidden="true">
+              {LEVEL_COLORS.slice(1).map((c) => (
+                <i key={c as string} style={{ background: c as string }} />
+              ))}
+            </span>
+            <span>1 to 5+</span>
+          </div>
+          <span className="sep" aria-hidden="true" />
+          <span className="mono" id="skyReadout" aria-hidden="true">
+            {hover ? `RA ${fmtRa(hover.ra)}  Dec ${fmtDec(hover.dec)}  ${hover.n} ${hover.n === 1 ? 'epoch' : 'epochs'}` : 'RA —, Dec —'}
           </span>
-          <span>1 to 5+</span>
         </div>
-        <span className="sep" aria-hidden="true" />
-        <span className="mono" id="skyReadout" aria-hidden="true">
-          {hover ? `RA ${fmtRa(hover.ra)}  Dec ${fmtDec(hover.dec)}  ${hover.n} ${hover.n === 1 ? 'epoch' : 'epochs'}` : 'RA —, Dec —'}
-        </span>
-      </div>
+      )}
 
       <Inspector
         field={field} blinkId={field ? nearestShowcase(field.ra, field.dec) : null}

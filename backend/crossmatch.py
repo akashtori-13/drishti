@@ -112,3 +112,105 @@ async def query_horizons(object_name: str, mjd: float) -> Optional[Dict[str, Any
     except Exception as e:
         print(f"Horizons failed for '{object_name}': {e}")
         return None
+
+
+GAIA_TAP_URL = "https://gea.esac.esa.int/tap-server/tap"
+
+
+def query_gaia_cone(ra: float, dec: float, radius_deg: float, mag_limit: float = 16.0,
+                    top: int = 2000, timeout: int = 30,
+                    db_path: str = DATABASE_PATH) -> List[Dict[str, Any]]:
+    """Gaia DR3 cone for star overlays (static sky: cached 30d). Never raises."""
+    from backend.cache import api_cache_get, api_cache_set
+    key = f"gaia-cone:{round(ra, 2)}:{round(dec, 2)}:{round(radius_deg, 2)}:{mag_limit}:{top}"
+    try:
+        hit = api_cache_get(db_path, key, 30 * 86400)
+        if isinstance(hit, list):
+            return hit
+    except Exception:
+        pass
+    import threading
+    box: Dict[str, Any] = {}
+
+    def target() -> None:
+        try:
+            import pyvo
+            svc = pyvo.dal.TAPService(GAIA_TAP_URL)
+            q = (
+                "SELECT TOP %d source_id, ra, dec, phot_g_mean_mag "
+                "FROM gaiadr3.gaia_source "
+                "WHERE 1=CONTAINS(POINT('ICRS', ra, dec), CIRCLE('ICRS', %f, %f, %f)) "
+                "AND phot_g_mean_mag < %f "
+                "ORDER BY phot_g_mean_mag" % (top, float(ra), float(dec), float(radius_deg), float(mag_limit))
+            )
+            box["rows"] = svc.search(q, maxrec=top)
+        except Exception as e:  # noqa: BLE001
+            box["error"] = e
+
+    w = threading.Thread(target=target, daemon=True)
+    w.start()
+    w.join(timeout=timeout)
+    if w.is_alive() or "error" in box:
+        return []
+    out = []
+    for r in box.get("rows", []):
+        try:
+            out.append({"ra": float(r["ra"]), "dec": float(r["dec"]),
+                        "g_mag": float(r["phot_g_mean_mag"]) if r["phot_g_mean_mag"] is not None else None})
+        except Exception:
+            continue
+    try:
+        api_cache_set(db_path, key, out)
+    except Exception:
+        pass
+    return out
+
+
+def query_gaia(ra: float, dec: float, radius_arcsec: float = 8.0,
+               timeout: int = 25, db_path: str = DATABASE_PATH) -> List[Dict[str, Any]]:
+    """Nearest Gaia DR3 sources (stars). Cached 30d. Never raises."""
+    from backend.cache import api_cache_get, api_cache_set
+    key = f"gaia:{round(ra, 4)}:{round(dec, 4)}:{radius_arcsec}"
+    try:
+        hit = api_cache_get(db_path, key, 30 * 86400)
+        if hit is not None:
+            return hit
+    except Exception:
+        pass
+    import threading
+    box: Dict[str, Any] = {}
+
+    def target() -> None:
+        try:
+            import pyvo
+            svc = pyvo.dal.TAPService(GAIA_TAP_URL)
+            q = (
+                "SELECT TOP 5 source_id, ra, dec, phot_g_mean_mag, "
+                f"DISTANCE(POINT('ICRS', ra, dec), POINT('ICRS', {float(ra)}, {float(dec)}))*3600 AS sep "
+                "FROM gaiadr3.gaia_source "
+                f"WHERE 1=CONTAINS(POINT('ICRS', ra, dec), CIRCLE('ICRS', {float(ra)}, {float(dec)}, {float(radius_arcsec) / 3600.0})) "
+                "ORDER BY sep"
+            )
+            box["rows"] = svc.search(q, maxrec=5)
+        except Exception as e:  # noqa: BLE001
+            box["error"] = e
+
+    w = threading.Thread(target=target, daemon=True)
+    w.start()
+    w.join(timeout=timeout)
+    if w.is_alive() or "error" in box:
+        return []
+    out = []
+    for r in box.get("rows", []):
+        try:
+            out.append({"source_id": int(r["source_id"]), "ra": float(r["ra"]),
+                        "dec": float(r["dec"]),
+                        "g_mag": float(r["phot_g_mean_mag"]) if r["phot_g_mean_mag"] is not None else None,
+                        "separation_arcsec": float(r["sep"]), "catalog": "gaia-dr3"})
+        except Exception:
+            continue
+    try:
+        api_cache_set(db_path, key, out)
+    except Exception:
+        pass
+    return out

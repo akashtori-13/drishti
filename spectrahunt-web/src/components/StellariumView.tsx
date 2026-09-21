@@ -1,12 +1,14 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { API_BASE } from '@/lib/showcases';
 
 export interface Observer { lat: number; lon: number; name: string }
 export interface StelFocus { ra: number; dec: number; key: number }
 
 const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
+const TAU = Math.PI * 2;
 
 const SURVEYS = [
   { id: 'CDS/P/DSS2/color', label: 'DSS color' },
@@ -68,17 +70,55 @@ function unproject(x: number, y: number, ra0: number, dec0: number): { ra: numbe
 
 const normRa = (ra: number) => ((ra % 360) + 360) % 360;
 
+/** Low-precision Sun position (~0.01°). */
+export function sunRaDec(date: Date): { ra: number; dec: number } {
+  const d = date.getTime() / 86400000 - 10957.5;
+  const g = (357.529 + 0.98560028 * d) * D2R;
+  const q = 280.459 + 0.98564736 * d;
+  const L = (q + 1.915 * Math.sin(g) + 0.02 * Math.sin(2 * g)) * D2R;
+  const e = (23.439 - 0.00000036 * d) * D2R;
+  const ra = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L)) * R2D;
+  const dec = Math.asin(Math.sin(e) * Math.sin(L)) * R2D;
+  return { ra: normRa(ra), dec };
+}
+
+/** Truncated lunar theory (~0.2°): enough for a sky marker. */
+export function moonRaDec(date: Date): { ra: number; dec: number; illum: number } {
+  const d = date.getTime() / 86400000 - 10957.5;
+  const L0 = normRa(218.316 + 13.176396 * d);
+  const Mm = normRa(134.963 + 13.064993 * d) * D2R;
+  const Ms = normRa(357.529 + 0.98560028 * d) * D2R;
+  const D = normRa(297.85 + 12.190749 * d) * D2R;
+  const F = normRa(93.272 + 13.229350 * d) * D2R;
+  const lon = L0 + 6.289 * Math.sin(Mm)
+    + 1.274 * Math.sin(2 * D - Mm) + 0.658 * Math.sin(2 * D)
+    - 0.186 * Math.sin(Ms) - 0.114 * Math.sin(2 * F);
+  const lat = 5.128 * Math.sin(F)
+    + 0.281 * Math.sin(Mm + F) + 0.278 * Math.sin(Mm - F)
+    + 0.173 * Math.sin(2 * D - F);
+  const e = (23.439 - 0.00000036 * d) * D2R;
+  const lo = lon * D2R;
+  const la = lat * D2R;
+  const ra = Math.atan2(Math.sin(lo) * Math.cos(e) - Math.tan(la) * Math.sin(e), Math.cos(lo)) * R2D;
+  const dec = Math.asin(Math.sin(la) * Math.cos(e) + Math.cos(la) * Math.sin(e) * Math.sin(lo)) * R2D;
+  const sun = sunRaDec(date);
+  let elong = Math.abs(normRa(sun.ra) - normRa(ra));
+  if (elong > 180) elong = 360 - elong;
+  return { ra: normRa(ra), dec, illum: (1 - Math.cos(elong * D2R)) / 2 };
+}
+
 /**
  * Stellarium-style observer view: real HiPS sky (SIN projection) + constellation
  * lines + equatorial grid + cardinal points from observer lat/lon + live clock.
  * Drag to look around, scroll to zoom, click to inspect.
  */
 export default function StellariumView({
-  focus, onInspect, initial,
+  focus, onInspect, initial, liveStars,
 }: {
   focus: StelFocus | null;
   onInspect: (ra: number, dec: number) => void;
   initial: { ra: number; dec: number };
+  liveStars: boolean;
 }) {
   const [ra, setRa] = useState(initial.ra);
   const [dec, setDec] = useState(initial.dec);
@@ -86,12 +126,18 @@ export default function StellariumView({
   const [survey, setSurvey] = useState(SURVEYS[0].id);
   const [showLines, setShowLines] = useState(true);
   const [showGrid, setShowGrid] = useState(true);
+  const [showStars, setShowStars] = useState(true);
   const [obs, setObs] = useState<Observer>({ lat: 23.81, lon: 90.41, name: 'Dhaka (default)' });
   const [now, setNow] = useState(() => new Date());
+  const [offH, setOffH] = useState(0);
   const [img, setImg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [cursor, setCursor] = useState<{ ra: number; dec: number; alt: number; az: number } | null>(null);
   const [lines, setLines] = useState<ConLines | null>(null);
+  const [stars, setStars] = useState<Array<{ ra: number; dec: number; g_mag: number | null }>>([]);
+  const t = new Date(now.getTime() + offH * 3600e3);
+  const tMin = Math.floor(t.getTime() / 60000);
+  const tNow = useMemo(() => new Date(tMin * 60000), [tMin]);
 
   const hostRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -121,6 +167,22 @@ export default function StellariumView({
     void loadLines().then((l) => { if (alive) setLines(l); });
     return () => { alive = false; };
   }, []);
+
+  // Gaia catalog stars for this view (debounced; cached server-side 30d)
+  useEffect(() => {
+    if (!liveStars || !API_BASE) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (fov > 60) { setStars([]); return; }
+    const t = setTimeout(() => {
+      const url = `${API_BASE}/api/stars?ra=${ra.toFixed(2)}&dec=${dec.toFixed(2)}&fov_deg=${fov.toFixed(1)}`;
+      let alive = true;
+      void fetch(url).then((r) => (r.ok ? r.json() : null)).then((j) => {
+        if (alive && j && Array.isArray(j.stars)) setStars(j.stars);
+      }).catch(() => undefined);
+      return () => { alive = false; };
+    }, 800);
+    return () => clearTimeout(t);
+  }, [ra, dec, fov, liveStars]);
 
   // geolocation on demand
   const locate = useCallback(() => {
@@ -240,12 +302,58 @@ export default function StellariumView({
           if (s && s.x > 0 && s.x < w && s.y > 0 && s.y < h) ctx.fillText(f.id, s.x + 5, s.y - 5);
         }
       }
+      // Gaia catalog stars (real positions, size by G mag)
+      if (showStars && stars.length) {
+        for (const s of stars) {
+          const p = toXY(normRa(s.ra), s.dec);
+          if (!p || p.x < -10 || p.x > w + 10 || p.y < -10 || p.y > h + 10) continue;
+          const g = s.g_mag ?? 14;
+          const r = Math.min(3.2, Math.max(0.7, 3.4 - (g - 6) * 0.32));
+          if (g < 9) {
+            const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 3);
+            glow.addColorStop(0, 'rgba(200,220,255,.5)');
+            glow.addColorStop(1, 'rgba(200,220,255,0)');
+            ctx.fillStyle = glow;
+            ctx.beginPath(); ctx.arc(p.x, p.y, r * 3, 0, TAU); ctx.fill();
+          }
+          ctx.fillStyle = g < 11 ? '#e8efff' : 'rgba(220,228,245,.85)';
+          ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, TAU); ctx.fill();
+        }
+      }
+
+      // Sun + Moon markers (computed locally, real positions)
+      try {
+        const sun = sunRaDec(tNow);
+        const sp = toXY(sun.ra, sun.dec);
+        if (sp && sp.x > 0 && sp.x < w && sp.y > 0 && sp.y < h) {
+          const glow = ctx.createRadialGradient(sp.x, sp.y, 0, sp.x, sp.y, 26);
+          glow.addColorStop(0, 'rgba(255,210,90,.85)');
+          glow.addColorStop(1, 'rgba(255,210,90,0)');
+          ctx.fillStyle = glow;
+          ctx.beginPath(); ctx.arc(sp.x, sp.y, 26, 0, TAU); ctx.fill();
+          ctx.fillStyle = '#ffe9a8';
+          ctx.beginPath(); ctx.arc(sp.x, sp.y, 6, 0, TAU); ctx.fill();
+          ctx.font = '11px system-ui';
+          ctx.fillText('Sun', sp.x + 10, sp.y + 4);
+        }
+        const moon = moonRaDec(tNow);
+        const mp = toXY(moon.ra, moon.dec);
+        if (mp && mp.x > 0 && mp.x < w && mp.y > 0 && mp.y < h) {
+          ctx.fillStyle = '#dfe6f2';
+          ctx.beginPath(); ctx.arc(mp.x, mp.y, 5.5, 0, TAU); ctx.fill();
+          ctx.fillStyle = 'rgba(4,5,10,.55)';
+          ctx.beginPath(); ctx.arc(mp.x + 5.5 * (1 - moon.illum * 2) * 0.9, mp.y, 5, 0, TAU); ctx.fill();
+          ctx.font = '11px system-ui';
+          ctx.fillStyle = 'rgba(223,230,242,.9)';
+          ctx.fillText(`Moon ${Math.round(moon.illum * 100)}%`, mp.x + 10, mp.y + 4);
+        }
+      } catch { /* markers are best-effort */ }
     };
     draw();
     const ro = new ResizeObserver(draw);
     ro.observe(host);
     return () => ro.disconnect();
-  }, [ra, dec, fov, lines, showGrid, showLines]);
+  }, [ra, dec, fov, lines, showGrid, showLines, stars, showStars, tNow]);
 
   // non-passive wheel zoom
   useEffect(() => {
@@ -259,7 +367,7 @@ export default function StellariumView({
     return () => canvas.removeEventListener('wheel', onWheel);
   }, []);
 
-  const centerAltAz = altAz(ra, dec, obs.lat, obs.lon, now);
+  const centerAltAz = altAz(ra, dec, obs.lat, obs.lon, t);
 
   const down = (e: React.PointerEvent) => {
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
@@ -274,7 +382,7 @@ export default function StellariumView({
     const y = -((e.clientY - r.top - r.height / 2) / scale);
     const p = unproject(x, y, view.current.ra, view.current.dec);
     if (p.dec >= -90 && p.dec <= 90) {
-      const a = altAz(p.ra, p.dec, obs.lat, obs.lon, now);
+      const a = altAz(p.ra, p.dec, obs.lat, obs.lon, t);
       setCursor({ ...p, ...a });
     }
     if (!drag.current) return;
@@ -339,7 +447,12 @@ export default function StellariumView({
       {/* HUD */}
       <div className="stel-hud">
         <button type="button" className="epoch-chip" onClick={locate} title="Use device location">📍 {obs.name}</button>
-        <span className="mono">{now.toLocaleDateString()} {now.toLocaleTimeString()}</span>
+        <span className="mono">{t.toLocaleDateString()} {t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+        <span role="group" aria-label="Time step" style={{ display: 'flex', gap: 4 }}>
+          <button type="button" className="epoch-chip" onClick={() => setOffH((h) => h - 1)} title="Back 1 hour">−1h</button>
+          <button type="button" className="epoch-chip" onClick={() => setOffH((h) => h + 1)} title="Forward 1 hour">+1h</button>
+          {offH !== 0 && <button type="button" className="epoch-chip" onClick={() => setOffH(0)}>Now</button>}
+        </span>
         <span className="mono">Alt {centerAltAz.alt.toFixed(1)}° Az {centerAltAz.az.toFixed(1)}°</span>
         <span className="mono">FOV {fov < 10 ? fov.toFixed(1) : fov.toFixed(0)}°</span>
         {cursor && <span className="mono">→ RA {cursor.ra.toFixed(2)}° Dec {cursor.dec.toFixed(2)}°</span>}
@@ -347,6 +460,7 @@ export default function StellariumView({
           style={{ background: '#151929', border: '1px solid var(--line)', borderRadius: 8, padding: '3px 6px', fontSize: 12 }}>
           {SURVEYS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
         </select>
+        <button type="button" className="epoch-chip" aria-pressed={showStars} onClick={() => setShowStars((v) => !v)} title="Gaia catalog stars">Stars</button>
         <button type="button" className="epoch-chip" aria-pressed={showLines} onClick={() => setShowLines((v) => !v)}>Figures</button>
         <button type="button" className="epoch-chip" aria-pressed={showGrid} onClick={() => setShowGrid((v) => !v)}>Grid</button>
       </div>

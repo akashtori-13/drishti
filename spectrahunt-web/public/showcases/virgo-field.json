@@ -12,7 +12,8 @@
       "ra": 200.0,
       "dec": 0.0,
       "size_deg": 0.15,
-      "png": null
+      "png": "/cutouts/virgo-field_Survey-1.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2025W23_2B/l2b-v20-2025-252/3/level2_2025W23_2B_0661_1D3_spx_l2b-v20-2025-252.fits?center=200.0,0.0&size=0.15"
     },
     {
       "label": "Survey 2 \u00b7 D3",

@@ -21,7 +21,8 @@
       "ra": 83.82,
       "dec": -5.39,
       "size_deg": 0.15,
-      "png": null
+      "png": "/cutouts/orion-field_Survey-2.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W10_2B/l2b-v24-2026-094/3/level2_2026W10_2B_0315_4D3_spx_l2b-v24-2026-094.fits?center=83.82,-5.39&size=0.15"
     }
   ],
   "tap": {

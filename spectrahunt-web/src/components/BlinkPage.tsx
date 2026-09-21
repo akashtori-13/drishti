@@ -12,7 +12,7 @@ import { GLOSSARY, TOURS, horizonsURL, irsaViewerURL, mpcCheckerURL, simbadURL, 
 
 /** Blink view: player + aside (metadata, epochs, cross-match, provenance, export). */
 export default function BlinkPage() {
-  const { showcaseId, openShowcase, setCurrentView, compareMode, setCompareMode, epochIdx, setEpochIdx, band, setBand, advanced, setAdvanced, showMarkers, setShowMarkers } = useAppStore();
+  const { showcaseId, openShowcase, setCurrentView, compareMode, setCompareMode, epochIdx, setEpochIdx, band, setBand, showMarkers, setShowMarkers } = useAppStore();
   const [data, setData] = useState<Showcase | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [skybot, setSkybot] = useState<Array<{ name: string }> | null>(null);
@@ -138,8 +138,6 @@ export default function BlinkPage() {
           ))}
         </div>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center', fontSize: 13, color: '#aab0c8' }}>
-          <span id="modeLabel">{advanced ? 'Advanced' : 'Beginner'}</span>
-          <button type="button" className="switch" role="switch" aria-checked={advanced} aria-labelledby="modeLabel" onClick={() => setAdvanced(!advanced)} />
           <span id="markLabel">Movers</span>
           <button type="button" className="switch" role="switch" aria-checked={showMarkers} aria-labelledby="markLabel" onClick={() => setShowMarkers(!showMarkers)} />
         </div>
@@ -173,9 +171,9 @@ export default function BlinkPage() {
                 epochIdx={epochIdx}
                 onEpochChange={setEpochIdx}
                 showMarkers={showMarkers}
-                onSample={advanced ? setSample : undefined}
+                onSample={setSample}
               />
-              {advanced && sample && (
+              {sample && (
                 <div className="aside" style={{ marginTop: 16 }}>
                   <section>
                     <h2>Spectrum at click ({(sample.x * 100).toFixed(0)}%, {(sample.y * 100).toFixed(0)}%)</h2>
@@ -202,14 +200,14 @@ export default function BlinkPage() {
                   <dt>Pixel scale</dt><dd>6.2″/px</dd>
                   <dt>Motion</dt><dd>{motion === null ? '— (needs 2 dated epochs)' : `${motion.toFixed(1)} ″/day`}</dd>
                 </dl>
-                {advanced && (
+                {(
                   <div className="ext-links">
                     {epochs[epochIdx]?.cutout_url && <a href={epochs[epochIdx]?.cutout_url} target="_blank" rel="noreferrer">Original FITS at IRSA <Icon name="ext" /></a>}
                     <a href={irsaViewerURL(viewing.ra, viewing.dec)} target="_blank" rel="noreferrer">Open in IRSA Viewer <Icon name="ext" /></a>
                   </div>
                 )}
               </section>
-              {advanced && (
+              {(
                 <section>
                   <h2>Candidate light curve</h2>
                   <LightCurve mjds={epochs.map((e) => e.mjd)} values={sample?.values.length ? sample.values : epochs.map((_, i) => (i === epochIdx ? 90 : 60))} />
@@ -226,7 +224,7 @@ export default function BlinkPage() {
                       : 'No cataloged object within the search radius — possibly an artifact or uncatalogued.'}
                 </p>
                 {viewing.epochs[0]?.note && <p style={{ marginTop: 8 }}>{viewing.epochs[0]?.note}</p>}
-                {advanced && (
+                {(
                   <div className="ext-links">
                     <a href={skybotURL(viewing.ra, viewing.dec, epochs[0]?.mjd ?? 60888)} target="_blank" rel="noreferrer">SkyBoT cone search <Icon name="ext" /></a>
                     <a href={mpcCheckerURL(viewing.ra, viewing.dec, epochs[0]?.mjd ?? 60888)} target="_blank" rel="noreferrer">Minor Planet Center checker <Icon name="ext" /></a>
@@ -243,7 +241,7 @@ export default function BlinkPage() {
                   <button type="button" className="epoch-chip" onClick={exportJSON}>Candidates JSON</button>
                 </div>
               </section>
-              {advanced && (
+              {(
                 <section>
                   <h2>Community flags ({flags.length})</h2>
                   <p>Mark “something’s moving here”. Stored in this browser only.</p>

@@ -1,6 +1,7 @@
 // Showcase + cross-match client. Static-first: /showcases/*.json, no backend needed.
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
+export { API_BASE };
 const DATA_MODE = process.env.NEXT_PUBLIC_DATA_MODE || 'static';
 export const useLive = Boolean(API_BASE) && DATA_MODE === 'live';
 

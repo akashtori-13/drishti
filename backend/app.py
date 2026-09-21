@@ -165,34 +165,127 @@ async def api_citation():
 async def api_detect(ra: float = Query(...), dec: float = Query(...),
                      band: int = Query(3, ge=1, le=6),
                      size_deg: float = Query(CUTOUT_SIZE_DEG, gt=0, le=0.5)):
-    """Cross-epoch mover/variable detection for one sky position (bounded, never 500)."""
-    from backend.cutouts import fetch_ibe, mask_bad_pixels, parse_fits
-    from backend.detect import arcsec_per_day, detect_sources, match_epochs
-    from backend.epochs import discover_epochs
-    import tempfile
-
+    """Aligned difference detection: WCS reproject, significance dipoles, Gaia labels."""
+    from backend.pipeline import detect_field
     try:
-        hits = [h for h in discover_epochs(ra, dec, band=band, size_deg=size_deg) if h.get("cutout_url")]
-        if len(hits) < 2:
-            return {"candidates": [], "matched": 0, "detail": "need-2-epochs"}
-        first, last = hits[0], hits[-1]
-        srcs = []
-        for h in (first, last):
-            with tempfile.NamedTemporaryFile(suffix=".fits", delete=True) as tmp:
-                await fetch_ibe(h["cutout_url"], Path(tmp.name))
-                parsed = parse_fits(Path(tmp.name))
-                if parsed["image"] is None:
-                    return {"candidates": [], "matched": 0, "detail": "empty-image"}
-                masked, _ = mask_bad_pixels(parsed["image"], parsed.get("flags"), parsed.get("variance"))
-                srcs.append(detect_sources(masked))
-        m = match_epochs(srcs[0], srcs[1])
-        cands = [{"kind": c["kind"], "x": c["x"], "y": c["y"]} for c in (m["movers"] + m["variables"])[:50]]
-        motion = arcsec_per_day(ra, dec, ra, dec, (last.get("mjd") or 0) - (first.get("mjd") or 0))
-        return {"candidates": cands, "matched": m["matched"],
-                "movers": len(m["movers"]), "variables": len(m["variables"]),
-                "motion_arcsec_day": motion,
-                "mjd_a": first.get("mjd"), "mjd_b": last.get("mjd"),
-                "detail": "ok"}
+        return detect_field(ra, dec, band=band, size_deg=size_deg, db_path=DATABASE_PATH)
     except Exception as e:
         print(f"detect failed: {e}")
         return {"candidates": [], "matched": 0, "detail": "error"}
+
+
+@app.get("/api/lightcurve")
+async def api_lightcurve(ra: float = Query(...), dec: float = Query(...),
+                         band: int = Query(3, ge=1, le=6),
+                         size_deg: float = Query(CUTOUT_SIZE_DEG, gt=0, le=0.5)):
+    """Aperture photometry at one position across ≤5 epochs (cached 6h)."""
+    import asyncio
+    from backend.pipeline import lightcurve_for
+    try:
+        return await asyncio.wait_for(
+            lightcurve_for(ra, dec, band=band, size_deg=size_deg, db_path=DATABASE_PATH),
+            timeout=280)
+    except Exception as e:
+        print(f"lightcurve failed: {e}")
+        return {"points": [], "detail": "error"}
+
+
+@app.get("/api/spectrum")
+async def api_spectrum(ra: float = Query(...), dec: float = Query(...),
+                       size_deg: float = Query(CUTOUT_SIZE_DEG, gt=0, le=0.5)):
+    """Newest-epoch aperture flux in all 6 bands: a real mini-spectrum (cached 6h)."""
+    import asyncio
+    from backend.pipeline import spectrum_for
+    try:
+        return await asyncio.wait_for(
+            spectrum_for(ra, dec, size_deg=size_deg, db_path=DATABASE_PATH),
+            timeout=280)
+    except Exception as e:
+        print(f"spectrum failed: {e}")
+        return {"points": [], "detail": "error"}
+
+
+@app.get("/api/stars")
+async def api_stars(ra: float = Query(...), dec: float = Query(...),
+                    fov_deg: float = Query(10.0, gt=0, le=120.0)):
+    """Gaia DR3 stars in the current view (cached 30d). Powers the observer overlay."""
+    from backend.crossmatch import query_gaia_cone
+    mag_limit = 16.0 if fov_deg < 5 else 13.0 if fov_deg < 20 else 10.5
+    try:
+        stars = query_gaia_cone(ra, dec, fov_deg * 0.75, mag_limit=mag_limit,
+                                top=2000, db_path=DATABASE_PATH)
+        return {"stars": stars, "detail": "ok"}
+    except Exception as e:
+        print(f"stars failed: {e}")
+        return {"stars": [], "detail": "error"}
+
+
+async def _render_frame_png(cutout_url: str):
+    """Fetch IBE cutout, render PNG to the file cache. Returns Path or None."""
+    import hashlib
+    from backend.cutouts import fetch_ibe, mask_bad_pixels, parse_fits, render_png
+    key = hashlib.md5(cutout_url.encode()).hexdigest()[:16]
+    png = Path(PNG_CACHE_DIR) / f"frame_{key}.png"
+    if png.exists():
+        return png
+    tmp = Path(PNG_CACHE_DIR) / f"_frame_{key}.fits"
+    try:
+        await fetch_ibe(cutout_url, tmp)
+    except Exception as e:
+        print(f"frame fetch failed: {e}")
+        return None
+    try:
+        parsed = parse_fits(tmp)
+        if parsed["image"] is None:
+            return None
+        masked, _ = mask_bad_pixels(parsed["image"], parsed.get("flags"), parsed.get("variance"))
+        return render_png(masked, png)
+    finally:
+        try:
+            tmp.unlink(missing_ok=True)
+        except Exception:
+            pass
+
+
+@app.get("/api/frames")
+async def api_frames(ra: float = Query(...), dec: float = Query(...),
+                     band: int = Query(3, ge=1, le=6),
+                     size_deg: float = Query(CUTOUT_SIZE_DEG, gt=0, le=0.5)):
+    """Epoch list for ANY sky position: makes every visited field blinkable (live mode)."""
+    from backend.pipeline import _sample_hits, discover_cached
+    try:
+        hits = discover_cached(ra, dec, band, size_deg, DATABASE_PATH)
+        if len(hits) < 2:
+            return {"epochs": [], "detail": "need-2-epochs"}
+        picks = _sample_hits(hits, 8)
+        base = f"/api/frame.png?ra={ra}&dec={dec}&band={band}&size_deg={size_deg}"
+        idx_of = {id(h): i for i, h in enumerate(hits)}
+        return {"epochs": [
+            {"epoch": idx_of[id(h)], "mjd": h.get("mjd"), "bandpass": h.get("bandpass"),
+             "png": f"{base}&epoch={idx_of[id(h)]}"} for h in picks],
+            "detail": "ok", "count": len(hits)}
+    except Exception as e:
+        print(f"frames failed: {e}")
+        return {"epochs": [], "detail": "error"}
+
+
+@app.get("/api/frame.png")
+async def api_frame(ra: float = Query(...), dec: float = Query(...),
+                    band: int = Query(3, ge=1, le=6),
+                    size_deg: float = Query(CUTOUT_SIZE_DEG, gt=0, le=0.5),
+                    epoch: int = Query(0, ge=0)):
+    """Render one covering epoch as PNG (file-cached). Backs /api/frames."""
+    from backend.pipeline import discover_cached
+    try:
+        hits = discover_cached(ra, dec, band, size_deg, DATABASE_PATH)
+        if epoch >= len(hits) or not hits[epoch].get("cutout_url"):
+            raise HTTPException(status_code=404, detail="No such epoch")
+        out = await _render_frame_png(hits[epoch]["cutout_url"])
+        if not out:
+            raise HTTPException(status_code=502, detail="Render failed")
+        return FileResponse(str(out), media_type="image/png")
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"frame failed: {e}")
+        raise HTTPException(status_code=500, detail="Frame error")

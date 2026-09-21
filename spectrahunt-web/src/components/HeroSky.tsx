@@ -1,14 +1,14 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
-  GRID_H, GRID_W, LEVEL_COLORS, STAR_FILL, TAU, cellOf, drawBracket,
-  fmtDec, fmtRa, genStars, type Star,
+  GRID_H, GRID_W, LEVEL_COLORS, cellOf, drawBracket,
+  fmtDec, fmtRa,
 } from '@/lib/sky';
 
 export interface SkyHover { i: number; j: number; ra: number; dec: number; n: number; x: number; y: number }
 
-/** Full-page interactive hero sky: twinkle, nebula wash, orbiting mover demo, click-to-inspect. */
+/** Full-page hero sky: REAL 2MASS infrared all-sky image + coverage tint + click-to-inspect. */
 export default function HeroSky({
   grid, coverage, onInspect,
 }: {
@@ -17,19 +17,34 @@ export default function HeroSky({
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const hostRef = useRef<HTMLDivElement>(null);
+  const [skyReady, setSkyReady] = useState(false);
   const state = useRef<{
-    w: number; h: number; stars: Star[]; blobs: { x: number; y: number; r: number; hue: number }[];
-    mover: { cx: number; cy: number; step: number } | null;
+    w: number; h: number;
     hover: (SkyHover & { nx: number; ny: number }) | null;
     selected: { nx: number; ny: number } | null;
     grid: number[][]; coverage: boolean;
-  }>({ w: 0, h: 0, stars: [], blobs: [], mover: null, hover: null, selected: null, grid, coverage });
+    img: HTMLImageElement | null;
+  }>({ w: 0, h: 0, hover: null, selected: null, grid, coverage, img: null });
   const cb = useRef(onInspect);
   useEffect(() => {
     cb.current = onInspect;
     state.current.grid = grid;
     state.current.coverage = coverage;
   });
+
+  // real infrared sky (2MASS all-sky, cached by the CDN)
+  useEffect(() => {
+    let alive = true;
+    const im = new Image();
+    im.crossOrigin = 'anonymous';
+    im.onload = () => {
+      if (!alive) return;
+      state.current.img = im;
+      setSkyReady(true);
+    };
+    im.src = 'https://alasky.cds.unistra.fr/2MASS/Color/Norder3/Allsky.jpg';
+    return () => { alive = false; };
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -50,87 +65,28 @@ export default function HeroSky({
       canvas.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       st.w = w; st.h = h;
-      st.stars = genStars(1337, Math.min(1400, Math.floor((w * h) / 2500)));
-      st.blobs = [235, 205, 20, 265, 300].map((hue, k) => {
-        const l = ((k * 0.37 + 0.11) % 1 + 1) % 1;
-        return { x: (k * 0.23 + 0.07) % 1, y: (l * 0.8 + 0.1) % 1, r: 0.14 + ((k * 0.13) % 0.2), hue };
-      });
-      // Park the mover demo in free space beside the text stack.
-      const core = host.querySelector('.hero-core') as HTMLElement | null;
-      const navH = 60;
-      const step = Math.max(26, Math.min(w, h) * 0.05);
-      st.mover = null;
-      if (core) {
-        const top = core.offsetTop;
-        const right = core.offsetLeft + core.offsetWidth;
-        if (w - right >= 170 + step) {
-          st.mover = { cx: right + (w - right) / 2, cy: top + core.offsetHeight * 0.16, step };
-        } else if (top - navH >= step * 2.6 + 24) {
-          st.mover = { cx: w * 0.76, cy: navH + (top - navH) / 2, step };
-        }
-      }
     };
 
-    const drawMover = (t: number) => {
-      const m = st.mover;
-      if (!m) return;
-      const pts = [0, 1, 2].map((i) => ({ x: m.cx + (i - 1) * m.step, y: m.cy - (i - 1) * m.step * 0.62 }));
-      const idx = reduce.matches ? 1 : Math.floor(t / 1500) % 3;
-      const narrow = pts[2].x + 21 + 92 > st.w - 8;
-      ctx.save();
-      ctx.setLineDash([3, 5]);
-      ctx.strokeStyle = 'rgba(238,240,248,.3)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      pts.forEach((p, i) => { if (i) ctx.lineTo(p.x, p.y); else ctx.moveTo(p.x, p.y); });
-      ctx.stroke();
-      ctx.setLineDash([]);
-      pts.forEach((p, i) => {
-        if (i === idx) return;
-        ctx.beginPath(); ctx.arc(p.x, p.y, 3.5, 0, TAU);
-        ctx.strokeStyle = 'rgba(238,240,248,.42)'; ctx.stroke();
-      });
-      const a = pts[idx];
-      const g = ctx.createRadialGradient(a.x, a.y, 0, a.x, a.y, 24);
-      g.addColorStop(0, 'rgba(240,138,75,.6)');
-      g.addColorStop(1, 'rgba(240,138,75,0)');
-      ctx.fillStyle = g;
-      ctx.beginPath(); ctx.arc(a.x, a.y, 24, 0, TAU); ctx.fill();
-      ctx.fillStyle = '#fff';
-      ctx.beginPath(); ctx.arc(a.x, a.y, 3.3, 0, TAU); ctx.fill();
-      ctx.strokeStyle = 'rgba(238,240,248,.92)';
-      ctx.lineWidth = 1.25;
-      drawBracket(ctx, a.x, a.y, 13, 5);
-      ctx.font = '500 11px "Geist Mono", ui-monospace, monospace';
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = 'rgba(238,240,248,.8)';
-      ctx.textAlign = narrow ? 'right' : 'left';
-      ctx.fillText(`2026W${10 + idx * 3}_2B`, a.x + (narrow ? -21 : 21), a.y);
-      ctx.restore();
-    };
-
-    const draw = (t: number) => {
+    const draw = () => {
       const { w, h } = st;
       if (!w || !h) return;
-      const bg = ctx.createLinearGradient(0, 0, 0, h);
-      bg.addColorStop(0, '#070915');
-      bg.addColorStop(1, '#04050a');
-      ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, w, h);
-
-      ctx.globalCompositeOperation = 'lighter';
-      const m = Math.max(w, h);
-      for (const b of st.blobs) {
-        const x = b.x * w;
-        const y = b.y * h;
-        const r = b.r * m;
-        const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-        g.addColorStop(0, `hsla(${b.hue},62%,46%,.06)`);
-        g.addColorStop(1, `hsla(${b.hue},62%,46%,0)`);
-        ctx.fillStyle = g;
-        ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill();
+      if (st.img && st.img.complete && st.img.naturalWidth) {
+        // cover: equirectangular image maps RA 0..360 -> x, Dec +90..-90 -> y
+        const iw = st.img.naturalWidth;
+        const ih = st.img.naturalHeight;
+        const scale = Math.max(w / iw, h / ih);
+        const dw = iw * scale;
+        const dh = ih * scale;
+        ctx.fillStyle = '#04050a';
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(st.img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+        // dim slightly so text stays readable
+        ctx.fillStyle = 'rgba(4,5,10,.28)';
+        ctx.fillRect(0, 0, w, h);
+      } else {
+        ctx.fillStyle = '#04050a';
+        ctx.fillRect(0, 0, w, h);
       }
-      ctx.globalCompositeOperation = 'source-over';
 
       if (st.coverage) {
         const cw = w / GRID_W;
@@ -151,18 +107,6 @@ export default function HeroSky({
         }
         ctx.globalAlpha = 1;
       }
-
-      const tw = t * 0.0011;
-      st.stars.forEach((s, i) => {
-        const dx = (s.x - 0.5) / 0.4;
-        const dy = (s.y - 0.5) / 0.3;
-        const d = Math.min(1, Math.hypot(dx, dy));
-        const att = 0.14 + 0.86 * (d * d * (3 - 2 * d));
-        ctx.globalAlpha = Math.min(1, s.b * att * (0.86 + 0.14 * Math.sin(tw + i * 12.9898)));
-        ctx.fillStyle = STAR_FILL[s.ci];
-        ctx.beginPath(); ctx.arc(s.x * w, s.y * h, s.r, 0, TAU); ctx.fill();
-      });
-      ctx.globalAlpha = 1;
 
       if (st.hover) {
         const hv = st.hover;
@@ -192,13 +136,11 @@ export default function HeroSky({
         ctx.lineWidth = 1.5;
         drawBracket(ctx, st.selected.nx * w, st.selected.ny * h, 14, 6);
       }
-      drawMover(t);
     };
 
-    const tick = (t: number) => {
+    const tick = () => {
       raf = 0;
-      draw(t);
-      if (!reduce.matches && !document.hidden) raf = requestAnimationFrame(tick);
+      draw();
     };
     const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
     const onVis = () => kick();
@@ -243,7 +185,7 @@ export default function HeroSky({
       canvas.removeEventListener('click', click);
       ro.disconnect();
     };
-  }, []);
+  }, [skyReady]);
 
   return (
     <div ref={hostRef} style={{ position: 'absolute', inset: 0 }}>
