@@ -1,11 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Icon from '@/components/Icon';
-import SurpriseButton from '@/components/SurpriseButton';
-import { blinkURL } from '@/lib/store';
 
 const NAV = [
   { href: '/sky', label: 'Sky map', blurb: 'Observer and all-sky views' },
@@ -16,7 +14,6 @@ const NAV = [
 
 export default function Header() {
   const pathname = usePathname();
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -69,15 +66,6 @@ export default function Header() {
           )}
         </nav>
         <div className="nav-right">
-          <SurpriseButton
-            compact
-            className="nav-dice"
-            onPick={(t) => {
-              setOpen(false);
-              if (t.showcaseId) router.push(blinkURL(t.showcaseId));
-              else router.push(`/sky`);
-            }}
-          />
           <button
             type="button" className="nav-menu-btn" aria-expanded={open}
             aria-controls="navTabs" aria-label={open ? 'Close menu' : 'Open menu'}
