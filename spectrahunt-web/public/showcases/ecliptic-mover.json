@@ -1,0 +1,14 @@
+{
+  "id": "ecliptic-mover",
+  "title": "Ecliptic plane — asteroid hunting ground",
+  "ra": 180.0,
+  "dec": 0.0,
+  "story": "Main-belt asteroids drift ~arcmin/day against stars. SPHEREx revisits every ~6 months at a new LVF wavelength — blink same-band (D3) epochs to catch movers.",
+  "epochs": [
+    {"label": "Survey 1 · D3", "band": 3, "wavelength_um": 2.02, "ra": 180.0, "dec": 0.0, "size_deg": 0.15, "png": null},
+    {"label": "Survey 2 · D3", "band": 3, "wavelength_um": 2.02, "ra": 180.0, "dec": 0.0, "size_deg": 0.15, "png": null}
+  ],
+  "tap": {"collection": "spherex_qr2", "bandpass": "SPHEREx-D3", "endpoint": "https://irsa.ipac.caltech.edu/TAP"},
+  "links": {"irsa_viewer": "https://irsa.ipac.caltech.edu/irsaviewer/", "mpc_checker": "https://minorplanetcenter.net/cgi-bin/checkmp.cgi"},
+  "citation": {"doi": "10.26131/IRSA652", "text": "SPHEREx QR2 via IRSA."}
+}

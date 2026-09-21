@@ -8,6 +8,7 @@ import MapPage from '@/components/MapPage';
 import FieldPage from '@/components/FieldPage';
 import CandidatesPage from '@/components/CandidatesPage';
 import AboutPage from '@/components/AboutPage';
+import BlinkPage from '@/components/BlinkPage';
 
 export default function Home() {
   const { 
@@ -39,6 +40,8 @@ export default function Home() {
         setSelectedField(ra, dec);
       } else if (hash === '#/candidates') {
         useAppStore.getState().setCurrentView('candidates');
+      } else if (hash.startsWith('#/blink')) {
+        useAppStore.getState().setCurrentView('blink');
       } else if (hash === '#/about') {
         useAppStore.getState().setCurrentView('about');
       }
@@ -62,6 +65,8 @@ export default function Home() {
         return <FieldPage />;
       case 'candidates':
         return <CandidatesPage />;
+      case 'blink':
+        return <BlinkPage />;
       case 'about':
         return <AboutPage />;
       default:
