@@ -517,8 +517,59 @@ export default function BlinkComparator({
     onSample({ x, y, values });
   };
 
-  const recordWebM = async () => {
-    const canvas = mode === 'side' ? rightRef.current : mainRef.current;
+  /** Publication figure: epoch A | epoch B with labels, scale bar, citation. For posters and the 240-second video. */
+  const exportFigure = () => {
+    if (!prevImg || !curImg) return;
+    const PW = 640;
+    const PH = 640;
+    const HEAD = 92;
+    const FOOT = 64;
+    const c = document.createElement('canvas');
+    c.width = PW * 2 + 24;
+    c.height = HEAD + PH + FOOT;
+    const ctx = c.getContext('2d');
+    if (!ctx) return;
+    ctx.fillStyle = '#04050a';
+    ctx.fillRect(0, 0, c.width, c.height);
+    // panels (same cover geometry + processing as the viewer)
+    const panels: Array<{ img: HTMLImageElement; x: number; label: string }> = [
+      { img: prevImg, x: 0, label: prev?.label ?? 'A' },
+      { img: curImg, x: PW + 24, label: cur?.label ?? 'B' },
+    ];
+    for (const p of panels) {
+      const off = document.createElement('canvas');
+      off.width = PW; off.height = PH;
+      const octx = off.getContext('2d', { willReadFrequently: true });
+      if (!octx) continue;
+      drawCover(octx, p.img, PW, PH, { x: 0, y: 0 }, 1);
+      ctx.drawImage(off, p.x, HEAD, PW, PH);
+      ctx.font = '600 15px ui-monospace, monospace';
+      const label = p.label.slice(0, 34);
+      ctx.fillStyle = 'rgba(5,6,12,.78)';
+      ctx.fillRect(p.x + 10, HEAD + 10, ctx.measureText(label).width + 20, 26);
+      ctx.fillStyle = '#eef0f8';
+      ctx.fillText(label, p.x + 18, HEAD + 28);
+    }
+    // header + footer
+    ctx.fillStyle = '#eef0f8';
+    ctx.font = '650 24px system-ui, sans-serif';
+    ctx.fillText(title.slice(0, 60), 16, 34);
+    ctx.fillStyle = '#aab0c8';
+    ctx.font = '15px ui-monospace, monospace';
+    ctx.fillText(`SPHEREx · same-band blink · ${bandMeta.label} (${bandMeta.range})`, 16, 60);
+    ctx.fillStyle = 'rgba(238,240,248,.9)';
+    ctx.fillRect(16, HEAD + PH + 22, 90, 3);
+    ctx.font = '12px ui-monospace, monospace';
+    ctx.fillText('1′', 110, HEAD + PH + 28);
+    ctx.fillStyle = '#8a90ab';
+    ctx.fillText('NASA/JPL–Caltech SPHEREx via IRSA (IPAC) · DOI 10.26131/IRSA652 · SpectraHunt', 16, HEAD + PH + 48);
+    const a = document.createElement('a');
+    a.href = c.toDataURL('image/png');
+    a.download = 'spectrahunt-figure.png';
+    a.click();
+  };
+
+  const recordWebM = async () => {    const canvas = mode === 'side' ? rightRef.current : mainRef.current;
     if (!canvas || !canvas.width || n < 2 || recording) return;
     const stream = canvas.captureStream(30);
     const rec = new MediaRecorder(stream, { mimeType: 'video/webm' });
@@ -578,6 +629,7 @@ export default function BlinkComparator({
       ...BANDS.map((b) => ({ name: `Band ${b.label} (${b.range})`, hint: '', run: () => setBandAndChannel(b.id) })),
       { name: 'Reset view', hint: '', run: () => { setPan({ x: 0, y: 0 }); setZoom(1); } },
       { name: 'Download PNG', hint: '', run: () => downloadPNG() },
+      { name: 'Export figure PNG', hint: '', run: () => exportFigure() },
       { name: 'Record WebM', hint: '', run: () => void recordWebM() },
       { name: 'Copy share link', hint: '', run: () => copyLink() },
       ...(onToggleMarkers ? [{ name: 'Toggle mover markers', hint: '', run: onToggleMarkers }] : []),
@@ -774,6 +826,11 @@ export default function BlinkComparator({
             <div className="tweak-head"><span>Save</span><button type="button" className="icon-btn sm" aria-label="Close Save panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
             <div style={rowStyle}>
               <button type="button" className="epoch-chip" onClick={() => downloadPNG()}>PNG</button>
+              <button type="button" className="epoch-chip" onClick={() => exportFigure()}
+                title="Publication figure: A|B with labels, scale bar and citation — made for posters and the demo video"
+                disabled={!prevImg || !curImg}>
+                Figure
+              </button>
               <button type="button" className="epoch-chip" onClick={() => void recordWebM()} disabled={recording || n < 2}>
                 {recording ? 'Recording…' : 'WebM'}
               </button>
