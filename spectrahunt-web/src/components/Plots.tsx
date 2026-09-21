@@ -37,30 +37,48 @@ export default function SpectrumPlot({ values, band }: { values: number[]; band:
   );
 }
 
-/** Brightness-vs-time light curve for the flagged candidate. */
-export function LightCurve({ mjds, values }: { mjds: Array<number | undefined>; values: number[] }) {
+/** Brightness-vs-time light curve for the flagged candidate.
+ *  Axes labeled honestly: x = visit date, y = aperture flux (arbitrary units).
+ *  With two visits the "curve" is a segment — it deepens as more epochs land. */
+export function LightCurve({ mjds, values, real }: {
+  mjds: Array<number | undefined>; values: number[]; real?: boolean;
+}) {
   const W = 280;
-  const H = 110;
+  const H = 124;
   const max = Math.max(1, ...values);
   const min = Math.min(0, ...values);
   const span = Math.max(1e-6, max - min);
+  const fmtDate = (mjd?: number) => {
+    if (mjd === undefined) return '';
+    const d = new Date((mjd - 40587) * 86400000);
+    return `${String(d.getUTCMonth() + 1).padStart(2, '0')}/${String(d.getUTCFullYear()).slice(2)}`;
+  };
   const pts = values.map((v, i) => ({
-    x: (i / Math.max(1, values.length - 1)) * (W - 40) + 30,
-    y: H - 16 - ((v - min) / span) * (H - 36),
+    x: values.length > 1 ? (i / (values.length - 1)) * (W - 52) + 36 : W / 2,
+    y: H - 26 - ((v - min) / span) * (H - 52),
     mjd: mjds[i],
   }));
   return (
     <div>
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Light curve: brightness vs time" style={{ width: '100%', background: '#04050a', borderRadius: 10 }}>
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Light curve: aperture flux versus visit date, ${values.length} visits`} style={{ width: '100%', background: '#04050a', borderRadius: 10 }}>
+        {[0.25, 0.5, 0.75].map((f) => (
+          <line key={f} x1={36} x2={W - 8} y1={H * f} y2={H * f} stroke="rgba(255,255,255,.08)" strokeWidth={1} />
+        ))}
         <polyline points={pts.map((p) => `${p.x},${p.y}`).join(' ')} fill="none" stroke="#e8c34a" strokeWidth={2} />
         {pts.map((p, i) => (
           <g key={i}>
             <circle cx={p.x} cy={p.y} r={3.5} fill="#fff" />
-            <text x={p.x} y={H - 3} fontSize={8} fill="#8a90ab" textAnchor="middle">{p.mjd ? String(Math.round(p.mjd)).slice(2) : `E${i + 1}`}</text>
+            <text x={p.x} y={H - 11} fontSize={8} fill="#8a90ab" textAnchor="middle">{p.mjd !== undefined ? fmtDate(p.mjd) : `E${i + 1}`}</text>
           </g>
         ))}
+        <text x={6} y={14} fontSize={9} fill="#8a90ab">flux</text>
+        <text x={W - 8} y={H - 11} fontSize={9} fill="#8a90ab" textAnchor="end">date →</text>
       </svg>
-      <p style={{ fontSize: 11, color: '#8a90ab', marginTop: 6 }}>Brightness vs time at the candidate position.</p>
+      <p style={{ fontSize: 11, color: '#8a90ab', marginTop: 6 }}>
+        {real
+          ? `Aperture flux (arbitrary units) across ${values.length} visits.`
+          : `Sampled image brightness across ${values.length} visit${values.length === 1 ? '' : 's'} — a proxy until live pipeline photometry loads.`}
+      </p>
     </div>
   );
 }
