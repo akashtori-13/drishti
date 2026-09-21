@@ -330,6 +330,10 @@ export default function BlinkPage({ id }: { id: string }) {
                       onClick={() => window.dispatchEvent(new CustomEvent('spectrahunt:export', { detail: { kind: 'webm' } }))}>
                       Animation
                     </button>
+                    <button type="button" className="epoch-chip"
+                      onClick={() => window.dispatchEvent(new Event('spectrahunt:palette'))}>
+                      Commands ⌘K
+                    </button>
                   </div>
                   <h3>Community flags ({flags.length})</h3>
                   <p className="fine">Stored in this browser only. Click the image, then flag the spot.</p>

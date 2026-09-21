@@ -2,7 +2,7 @@
 
 export type IconName =
   | 'logo' | 'search' | 'back' | 'fwd' | 'down' | 'x'
-  | 'play' | 'pause' | 'ext' | 'menu' | 'dice' | 'save' | 'help';
+  | 'play' | 'pause' | 'ext' | 'menu' | 'dice';
 
 /** Single-copy SVG sprite (render once in layout). */
 export function Sprite() {
@@ -28,8 +28,6 @@ export function Sprite() {
         <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6.5" y="5" width="4" height="14" rx="1.2" fill="currentColor" /><rect x="13.5" y="5" width="4" height="14" rx="1.2" fill="currentColor" /></symbol>
         <symbol id="i-ext" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></symbol>
         <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></symbol>
-        <symbol id="i-save" viewBox="0 0 24 24"><path d="M12 4v11M7.5 11.5L12 16l4.5-4.5M5 19.5h14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></symbol>
-        <symbol id="i-help" viewBox="0 0 24 24"><path d="M9.2 9a2.9 2.9 0 0 1 5.6.9c0 1.9-2.8 2.3-2.8 3.9" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /><circle cx="12" cy="17.2" r="1.2" fill="currentColor" /></symbol>
         <symbol id="i-dice" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4" fill="none" stroke="currentColor" strokeWidth="1.8" /><circle cx="8.3" cy="8.3" r="1.4" fill="currentColor" /><circle cx="15.7" cy="15.7" r="1.4" fill="currentColor" /><circle cx="15.7" cy="8.3" r="1.4" fill="currentColor" /><circle cx="8.3" cy="15.7" r="1.4" fill="currentColor" /></symbol>
       </defs>
     </svg>
