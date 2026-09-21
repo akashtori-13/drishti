@@ -127,19 +127,24 @@ export default function BlinkComparator({
   const probeSrc = useRef<{ img: HTMLImageElement; w: number; h: number } | null>(null);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // preload frames progressively (each arrival re-renders; no blank wait)
+  // preload frames progressively (each arrival re-renders; no blank wait).
+  // The cache is NEVER cleared: cached URLs stay instantly available and only
+  // genuinely new frames show a loading state (no placeholder flash).
+  const startedLoads = useRef(new Set<string>());
   useEffect(() => {
     let alive = true;
     const urls = [...new Set(frames.map((f) => f.png).filter((u): u is string => !!u))];
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLoaded({});
-    setSpecVals(null);
-    setMeasureChip(null);
     for (const u of urls) {
+      if (startedLoads.current.has(u)) continue;
+      startedLoads.current.add(u);
       void loadImage(u).then((img) => {
         if (alive) setLoaded((m) => (m[u] ? m : { ...m, [u]: img }));
       }).catch(() => undefined);
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSpecVals(null);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMeasureChip(null);
     return () => { alive = false; };
   }, [frames]);
 
@@ -411,6 +416,19 @@ export default function BlinkComparator({
     } else if (curImg) {
       drawCover(ctx, curImg, w, h, pan, zoom);
       stylize(canvas, stretch, vmin, vmax, invert, cmap, false, diffScale);
+    } else if (cur?.png) {
+      // frame exists but is still decoding: hold the last loaded frame dimmed
+      // with a small loading tag (never flash the pending message for real data)
+      const hold = prevImg ?? Object.values(loaded)[0];
+      if (hold) {
+        ctx.globalAlpha = 0.45;
+        drawCover(ctx, hold, w, h, pan, zoom);
+        ctx.globalAlpha = 1;
+      }
+      ctx.fillStyle = 'rgba(238,240,248,.85)';
+      ctx.font = '12px ui-monospace, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('loading frame…', w / 2, h - 30);
     } else {
       ctx.fillStyle = '#aab0c8';
       ctx.font = '13px system-ui';
