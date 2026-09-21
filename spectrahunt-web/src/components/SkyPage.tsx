@@ -85,6 +85,21 @@ export default function SkyPage() {
   const [focus, setFocus] = useState<StelFocus | null>(null);
   const [real, setReal] = useState<Map<string, RealCell> | null>(null);
 
+  // cross-page jump target (from the command bar): focus + inspect on arrival
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('sh-target');
+      if (!raw) return;
+      sessionStorage.removeItem('sh-target');
+      const t = JSON.parse(raw) as { ra: number; dec: number };
+      if (Number.isFinite(t.ra) && Number.isFinite(t.dec)) {
+        setFocus({ ra: t.ra, dec: t.dec, key: Date.now() });
+        inspect(t.ra, t.dec);
+      }
+    } catch { /* noop */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     let alive = true;
     void getCoverage().then((c) => {
