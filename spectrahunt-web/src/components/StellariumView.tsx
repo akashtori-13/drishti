@@ -146,7 +146,8 @@ export default function StellariumView({
   const hostRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const view = useRef({ ra: initial.ra, dec: initial.dec, fov: 45, survey: SURVEYS[0].id, showLines: true, showGrid: true });
-  const drag = useRef<{ x: number; y: number; ra: number; dec: number; moved: boolean } | null>(null);
+  const pointers = useRef(new Map<number, { x: number; y: number }>());
+  const pinch = useRef<{ dist: number; fov: number } | null>(null);
 
   // mirror latest view for canvas callbacks (synced in an effect, never during render)
   useEffect(() => {
@@ -403,23 +404,34 @@ export default function StellariumView({
     return () => ro.disconnect();
   }, [ra, dec, fov, lines, showGrid, showLines, stars, showStars, tNow]);
 
-  // non-passive wheel zoom
+  // non-passive wheel zoom at VIEW level: every wheel over the sky zooms,
+  // except inside real controls (search/tools/inspector/selects keep native scroll)
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const host = hostRef.current;
+    if (!host) return;
     const onWheel = (e: WheelEvent) => {
+      const el = e.target as HTMLElement;
+      if (el.closest?.('.map-tools, .inspector, select, button, input, a')) return;
       e.preventDefault();
+      e.stopPropagation();
       setFov((f) => Math.min(90, Math.max(0.5, f * (e.deltaY > 0 ? 1.15 : 0.87))));
     };
-    canvas.addEventListener('wheel', onWheel, { passive: false });
-    return () => canvas.removeEventListener('wheel', onWheel);
+    host.addEventListener('wheel', onWheel, { passive: false });
+    return () => host.removeEventListener('wheel', onWheel);
   }, []);
 
   const centerAltAz = altAz(ra, dec, obs.lat, obs.lon, t);
 
   const down = (e: React.PointerEvent) => {
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
-    drag.current = { x: e.clientX, y: e.clientY, ra, dec, moved: false };
+    pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pointers.current.size === 1) {
+      drag.current = { x: e.clientX, y: e.clientY, ra, dec, moved: false };
+    } else {
+      drag.current = null; // multi-touch: pinch takes over, pan pauses
+      const pts = [...pointers.current.values()];
+      pinch.current = { dist: Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y), fov };
+    }
   };
   const move = (e: React.PointerEvent) => {
     const host = hostRef.current;
