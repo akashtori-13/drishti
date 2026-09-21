@@ -70,15 +70,24 @@ Global: real multipage routes with per-page titles (hash router retired);
 ## 3. Backend (dev-only; never on the CDN)
 
 `app.py`: `/health /api/showcases /api/showcase/{id} /api/epochs /api/cutout.png
-/api/resolve /api/skybot /api/citation /api/detect` — read-only, graceful 404s, never 500.
-`epochs.py`: TAP first (daemon-thread 60s bound — a hung query can never wedge the
-process), SIA2 fallback, returns `[]` when IRSA is unreachable.
+/api/frame.png /api/frames /api/resolve /api/skybot /api/stars /api/detect
+/api/lightcurve /api/spectrum /api/citation` — read-only, graceful 404s, never 500.
+`epochs.py`: TAP first (daemon-thread bound), SIA2 fallback, `newest` ordering,
+`limit` caps; returns `[]` when IRSA is unreachable.
 `cutouts.py`: lazy astropy — parse IMAGE/FLAGS/VARIANCE/WCS-WAVE, median-fill mask,
 zscale+asinh PNG; `wavelengths_match()` enforces the LVF gate.
-`crossmatch.py`: SkyBoT (exposure MJD, float-rounded cache keys), Sesame, Horizons.
-`detect.py`: source extraction (SEP → photutils → scipy → numpy fallback) +
-cross-epoch `match_epochs()` (movers vs variables) + `arcsec_per_day()`.
-`cache.py`: SQLite scratch, WAL, status KV + SkyBoT table.
+`align.py`: WCS `reproject_interp` of B onto A's grid; FFT phase-correlation
+fallback; `sky_to_pixel` with array-center fallback.
+`photometry.py`: circular aperture + annulus background with variance-aware
+errors; MAD/variance significance maps; dipole pairing (mover = adjacent +/−
+pair above threshold, else variable) with per-epoch fluxes.
+`pipeline.py`: orchestration with TTL caches (discovery 1 h, products 6 h);
+`detect_field` (awaited, never `asyncio.run` in request scope), `lightcurve_for`
+(≤5 sampled epochs), `spectrum_for` (newest of all 6 bands), `field_report`.
+`crossmatch.py`: SkyBoT (exposure MJD, float-rounded cache keys), SIMBAD-ASCII
+first + Sesame fallback resolve, Horizons on demand, Gaia DR3 cone + per-view
+cone (30 d cache).
+`cache.py`: SQLite scratch, WAL, status KV + SkyBoT table + `api_cache` TTL table.
 
 ## 4. Data contracts
 

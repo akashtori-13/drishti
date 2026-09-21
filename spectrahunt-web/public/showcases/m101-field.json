@@ -22,7 +22,8 @@
       "ra": 210.8,
       "dec": 54.35,
       "size_deg": 0.15,
-      "png": null
+      "png": "/cutouts/m101-field_Survey-2.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W25_1A/l2b-v25-2026-172/3/level2_2026W25_1A_0641_1D3_spx_l2b-v25-2026-172.fits?center=210.8,54.35&size=0.15"
     }
   ],
   "tap": {

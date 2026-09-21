@@ -48,6 +48,7 @@ async def _fetch_frame(cutout_url: str):
         await fetch_ibe(cutout_url, tmp)
         parsed = parse_fits(tmp)
         if parsed["image"] is None:
+            print(f"frame empty IMAGE: {cutout_url[:120]}")
             return None
         masked, _ = mask_bad_pixels(parsed["image"], parsed.get("flags"), parsed.get("variance"))
         return {"image": masked, "variance": parsed.get("variance"), "wcs": parsed.get("wcs"),
@@ -55,7 +56,7 @@ async def _fetch_frame(cutout_url: str):
                 "bandwidth_um": parsed.get("bandwidth_um"),
                 "pixel_scale_arcsec": parsed.get("pixel_scale_arcsec")}
     except Exception as e:  # noqa: BLE001
-        print(f"frame fetch failed: {e}")
+        print(f"frame fetch failed ({cutout_url[:120]}): {e or type(e).__name__}")
         return None
     finally:
         try:
@@ -81,9 +82,19 @@ async def _detect_async(ra, dec, band, size_deg, db_path) -> Dict[str, Any]:
     if len(hits) < 2:
         return {"candidates": [], "matched": 0, "detail": "need-2-epochs",
                 "mjd_a": None, "mjd_b": None}
-    first, last = hits[0], hits[-1]
-    fa = await _fetch_frame(first["cutout_url"])
-    fb = await _fetch_frame(last["cutout_url"])
+    # some covering frames 422 on IBE despite TAP footprints: walk inward
+    fa = fb = None
+    first = last = None
+    for h in hits[:4]:
+        fa = await _fetch_frame(h["cutout_url"])
+        if fa is not None:
+            first = h
+            break
+    for h in hits[-4:][::-1]:
+        fb = await _fetch_frame(h["cutout_url"])
+        if fb is not None:
+            last = h
+            break
     if fa is None or fb is None:
         return {"candidates": [], "matched": 0, "detail": "fetch-failed",
                 "mjd_a": first.get("mjd"), "mjd_b": last.get("mjd")}
