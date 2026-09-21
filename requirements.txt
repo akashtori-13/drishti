@@ -13,6 +13,7 @@ scipy>=1.12.0
 reproject>=0.13.0
 photutils>=1.10.0
 Pillow>=10.0.0
+matplotlib>=3.8.0
 
 # Tests
 pytest>=8.0.0
