@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Icon from '@/components/Icon';
 import { BANDS } from '@/lib/sky';
 import { CHANNELS, applyStretch, colormap, type Colormap, type Stretch } from '@/lib/astro';
+import { detectMotion, sampleGray, type MotionCandidate } from '@/lib/motion';
 
 export interface BlinkFrame {
   label: string;
@@ -112,6 +113,7 @@ export default function BlinkComparator({
 
   const mainRef = useRef<HTMLCanvasElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+  const [sizeTick, setSizeTick] = useState(0);
   const leftRef = useRef<HTMLCanvasElement>(null);
   const rightRef = useRef<HTMLCanvasElement>(null);
   const histRef = useRef<HTMLCanvasElement>(null);
@@ -197,7 +199,7 @@ export default function BlinkComparator({
     return () => document.removeEventListener('keydown', onKey);
   }, [step, n, palette, dock]);
 
-  // non-passive wheel zoom
+  // non-passive wheel zoom + resize redraw
   useEffect(() => {
     const stage = stageRef.current;
     if (!stage) return;
@@ -206,11 +208,29 @@ export default function BlinkComparator({
       setZoom((z) => Math.min(6, Math.max(0.6, z * (e.deltaY > 0 ? 0.92 : 1.09))));
     };
     stage.addEventListener('wheel', onWheel, { passive: false });
-    return () => stage.removeEventListener('wheel', onWheel);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    const ro = new ResizeObserver(() => setSizeTick((t) => t + 1));
+    ro.observe(stage);
+    return () => {
+      stage.removeEventListener('wheel', onWheel);
+      ro.disconnect();
+    };
   }, []);
 
   const curImg = cur?.png ? loaded[cur.png] : undefined;
   const prevImg = prev?.png ? loaded[prev.png] : undefined;
+  // real motion candidates from the actual pixels (recomputed when frames arrive)
+  const candidates: MotionCandidate[] = useMemo(() => {
+    if (!curImg || !prevImg) return [];
+    try {
+      const a = sampleGray(prevImg);
+      const b = sampleGray(curImg);
+      if (!a || !b) return [];
+      return detectMotion(a, b);
+    } catch {
+      return [];
+    }
+  }, [curImg, prevImg]);
   const bandMeta = BANDS[band - 1];
   const detChannels = useMemo(() => CHANNELS.filter((c) => c.detector === band), [band]);
 
@@ -234,7 +254,7 @@ export default function BlinkComparator({
     const host = canvas.parentElement;
     if (!host) return;
     const w = host.clientWidth;
-    const h = host.clientWidth;
+    const h = host.clientHeight || host.clientWidth;
     if (!w || !h) return;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = Math.round(w * dpr);
@@ -320,22 +340,40 @@ export default function BlinkComparator({
       ctx.fillText('Cutout pending — story + metadata below work offline.', w / 2, h / 2);
     }
 
-    if (showMarkers) {
-      const cx = w / 2 + pan.x;
-      const cy = h / 2 + pan.y;
-      ctx.strokeStyle = '#f0bb52';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([5, 4]);
-      ctx.beginPath(); ctx.moveTo(cx - 26 * zoom, cy + 18 * zoom); ctx.lineTo(cx + 26 * zoom, cy - 18 * zoom); ctx.stroke();
-      ctx.setLineDash([]);
-      for (const [px, py, label] of [[cx - 26 * zoom, cy + 18 * zoom, 'A'], [cx + 26 * zoom, cy - 18 * zoom, 'B']] as const) {
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 1.5;
-        ctx.strokeRect(px - 6, py - 6, 12, 12);
-        ctx.fillStyle = '#fff';
-        ctx.font = '11px ui-monospace, monospace';
-        ctx.fillText(label, px + 10, py - 8);
-      }
+    // REAL mover/variable markers from pixel differencing (not demo positions)
+    if (showMarkers && candidates.length && curImg) {
+      const iw = curImg.naturalWidth || curImg.width;
+      const ih = curImg.naturalHeight || curImg.height;
+      const sc = Math.max(w / iw, h / ih) * zoom;
+      const dw = iw * sc;
+      const dh = ih * sc;
+      const ox = (w - dw) / 2 + pan.x;
+      const oy = (h - dh) / 2 + pan.y;
+      candidates.forEach((c, i) => {
+        const X = ox + c.x * dw;
+        const Y = oy + c.y * dh;
+        if (X < -20 || X > w + 20 || Y < -20 || Y > h + 20) return;
+        const isMover = c.kind === 'mover';
+        ctx.strokeStyle = isMover ? '#f0bb52' : '#5aa9e6';
+        ctx.fillStyle = isMover ? '#f0bb52' : '#5aa9e6';
+        ctx.lineWidth = 1.8;
+        ctx.strokeRect(X - 8, Y - 8, 16, 16);
+        if (isMover) {
+          const x0 = X - (c.dx * dw) / 2;
+          const y0 = Y - (c.dy * dh) / 2;
+          const x1 = X + (c.dx * dw) / 2;
+          const y1 = Y + (c.dy * dh) / 2;
+          ctx.beginPath();
+          ctx.moveTo(x0, y0);
+          ctx.lineTo(x1, y1);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(x1, y1, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.font = '600 10px ui-monospace, monospace';
+        ctx.fillText(`${isMover ? 'M' : 'V'}${i + 1} ${c.sigma.toFixed(0)}σ`, X + 11, Y - 9);
+      });
     }
     ctx.fillStyle = 'rgba(238,240,248,.85)';
     ctx.font = '600 12px ui-monospace, monospace';
