@@ -15,6 +15,12 @@ const SHOWCASE_POINTS = [
   { id: '3i-atlas', ra: 252.6633, dec: -17.4904 },
   { id: 'ecliptic-mover', ra: 180, dec: 0 },
   { id: 'nep-deep', ra: 270, dec: 66.5 },
+  { id: 'orion-field', ra: 83.82, dec: -5.39 },
+  { id: 'galactic-center', ra: 266.42, dec: -29.01 },
+  { id: 'm31-field', ra: 10.68, dec: 41.27 },
+  { id: 'lmc-field', ra: 80.89, dec: -69.76 },
+  { id: 'virgo-field', ra: 200, dec: 0 },
+  { id: 'eros-field', ra: 210.32, dec: 9.11 },
 ];
 
 function nearestShowcase(ra: number, dec: number): string | null {

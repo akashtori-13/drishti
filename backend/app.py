@@ -31,7 +31,8 @@ from backend.config import (
 ROOT = Path(__file__).parent.parent
 SHOWCASE_DIR = ROOT / "spectrahunt-web" / "public" / "showcases"
 
-SHOWCASE_IDS = ["3i-atlas", "ecliptic-mover", "nep-deep"]
+SHOWCASE_IDS = ["3i-atlas", "ecliptic-mover", "nep-deep", "orion-field",
+                "galactic-center", "m31-field", "lmc-field", "virgo-field", "eros-field"]
 
 
 @asynccontextmanager

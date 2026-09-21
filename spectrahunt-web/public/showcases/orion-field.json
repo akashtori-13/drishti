@@ -1,0 +1,39 @@
+{
+  "id": "orion-field",
+  "title": "Orion Complex \u2014 star factory",
+  "ra": 83.82,
+  "dec": -5.39,
+  "story": "A stellar nursery full of young, flickering stars. SPHEREx revisits every ~6 months \u2014 blink two same-band (D3) visits and watch for variables.",
+  "epochs": [
+    {
+      "label": "Survey 1 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": 2.02,
+      "ra": 83.82,
+      "dec": -5.39,
+      "size_deg": 0.15,
+      "png": null
+    },
+    {
+      "label": "Survey 2 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": 2.02,
+      "ra": 83.82,
+      "dec": -5.39,
+      "size_deg": 0.15,
+      "png": null
+    }
+  ],
+  "tap": {
+    "collection": "spherex_qr2",
+    "bandpass": "SPHEREx-D3",
+    "endpoint": "https://irsa.ipac.caltech.edu/TAP"
+  },
+  "links": {
+    "irsa_viewer": "https://irsa.ipac.caltech.edu/irsaviewer/"
+  },
+  "citation": {
+    "doi": "10.26131/IRSA652",
+    "text": "SPHEREx QR2 via IRSA."
+  }
+}

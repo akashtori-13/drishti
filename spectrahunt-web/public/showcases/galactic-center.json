@@ -1,0 +1,39 @@
+{
+  "id": "galactic-center",
+  "title": "Galactic Center \u2014 crowded and dusty",
+  "ra": 266.42,
+  "dec": -29.01,
+  "story": "The densest, dustiest sightline in the sky. Thousands of stars per frame \u2014 differencing two visits (D3) is the only way to spot what changed.",
+  "epochs": [
+    {
+      "label": "Survey 1 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": 2.02,
+      "ra": 266.42,
+      "dec": -29.01,
+      "size_deg": 0.15,
+      "png": null
+    },
+    {
+      "label": "Survey 2 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": 2.02,
+      "ra": 266.42,
+      "dec": -29.01,
+      "size_deg": 0.15,
+      "png": null
+    }
+  ],
+  "tap": {
+    "collection": "spherex_qr2",
+    "bandpass": "SPHEREx-D3",
+    "endpoint": "https://irsa.ipac.caltech.edu/TAP"
+  },
+  "links": {
+    "irsa_viewer": "https://irsa.ipac.caltech.edu/irsaviewer/"
+  },
+  "citation": {
+    "doi": "10.26131/IRSA652",
+    "text": "SPHEREx QR2 via IRSA."
+  }
+}

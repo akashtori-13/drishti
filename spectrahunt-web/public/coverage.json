@@ -4,70 +4,6055 @@
     "h": 36
   },
   "cells": {
-    "50,21": {
-      "showcase": "3i-atlas",
-      "ra": 252.6633,
-      "dec": -17.4904,
-      "images": 329,
+    "3,31": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": -67.5,
+      "images": 334,
+      "images_capped": false,
+      "epochs": 5,
+      "bands": 6,
+      "span_mjd": [
+        60790.798271,
+        61214.283666
+      ],
+      "per_band": {
+        "SPHEREx-D1": 57,
+        "SPHEREx-D2": 61,
+        "SPHEREx-D4": 61,
+        "SPHEREx-D5": 52,
+        "SPHEREx-D3": 52,
+        "SPHEREx-D6": 51
+      }
+    },
+    "1,31": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": -67.5,
+      "images": 322,
+      "images_capped": false,
+      "epochs": 5,
+      "bands": 6,
+      "span_mjd": [
+        60790.940941,
+        61211.773995
+      ],
+      "per_band": {
+        "SPHEREx-D1": 52,
+        "SPHEREx-D2": 67,
+        "SPHEREx-D3": 45,
+        "SPHEREx-D4": 50,
+        "SPHEREx-D5": 64,
+        "SPHEREx-D6": 44
+      }
+    },
+    "1,30": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": -62.5,
+      "images": 380,
       "images_capped": false,
       "epochs": 4,
       "bands": 6,
       "span_mjd": [
-        60888.33344,
-        61261.305759
+        60793.861742,
+        61214.21687
       ],
       "per_band": {
-        "SPHEREx-D1": 36,
-        "SPHEREx-D2": 57,
-        "SPHEREx-D3": 72,
-        "SPHEREx-D4": 36,
-        "SPHEREx-D5": 56,
-        "SPHEREx-D6": 72
+        "SPHEREx-D1": 56,
+        "SPHEREx-D4": 51,
+        "SPHEREx-D2": 62,
+        "SPHEREx-D3": 78,
+        "SPHEREx-D5": 59,
+        "SPHEREx-D6": 74
       }
     },
-    "36,18": {
-      "showcase": "ecliptic-mover",
-      "ra": 180.0,
-      "dec": 0.0,
-      "images": 341,
+    "2,31": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": -67.5,
+      "images": 351,
+      "images_capped": false,
+      "epochs": 6,
+      "bands": 6,
+      "span_mjd": [
+        60789.781051,
+        61210.953806
+      ],
+      "per_band": {
+        "SPHEREx-D1": 55,
+        "SPHEREx-D2": 63,
+        "SPHEREx-D4": 57,
+        "SPHEREx-D5": 55,
+        "SPHEREx-D6": 60,
+        "SPHEREx-D3": 61
+      }
+    },
+    "5,31": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": -67.5,
+      "images": 334,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60792.567195,
+        61214.962482
+      ],
+      "per_band": {
+        "SPHEREx-D1": 44,
+        "SPHEREx-D2": 73,
+        "SPHEREx-D4": 41,
+        "SPHEREx-D5": 66,
+        "SPHEREx-D3": 58,
+        "SPHEREx-D6": 52
+      }
+    },
+    "3,32": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": -72.5,
+      "images": 270,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60789.848895,
+        61180.479188
+      ],
+      "per_band": {
+        "SPHEREx-D1": 50,
+        "SPHEREx-D2": 41,
+        "SPHEREx-D3": 47,
+        "SPHEREx-D4": 49,
+        "SPHEREx-D5": 39,
+        "SPHEREx-D6": 44
+      }
+    },
+    "5,32": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": -72.5,
+      "images": 270,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60790.25287,
+        61177.833473
+      ],
+      "per_band": {
+        "SPHEREx-D1": 46,
+        "SPHEREx-D2": 35,
+        "SPHEREx-D3": 55,
+        "SPHEREx-D4": 44,
+        "SPHEREx-D5": 34,
+        "SPHEREx-D6": 56
+      }
+    },
+    "0,30": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": -62.5,
+      "images": 346,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60791.956401,
+        61211.844575
+      ],
+      "per_band": {
+        "SPHEREx-D1": 57,
+        "SPHEREx-D2": 60,
+        "SPHEREx-D4": 58,
+        "SPHEREx-D5": 52,
+        "SPHEREx-D3": 60,
+        "SPHEREx-D6": 59
+      }
+    },
+    "4,31": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": -67.5,
+      "images": 322,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60789.848895,
+        61214.351013
+      ],
+      "per_band": {
+        "SPHEREx-D1": 53,
+        "SPHEREx-D2": 52,
+        "SPHEREx-D4": 50,
+        "SPHEREx-D5": 48,
+        "SPHEREx-D3": 60,
+        "SPHEREx-D6": 59
+      }
+    },
+    "2,30": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": -62.5,
+      "images": 390,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60798.750222,
+        61214.21687
+      ],
+      "per_band": {
+        "SPHEREx-D1": 62,
+        "SPHEREx-D4": 61,
+        "SPHEREx-D2": 70,
+        "SPHEREx-D3": 66,
+        "SPHEREx-D5": 67,
+        "SPHEREx-D6": 64
+      }
+    },
+    "4,30": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": -62.5,
+      "images": 428,
       "images_capped": false,
       "epochs": 3,
       "bands": 6,
       "span_mjd": [
-        60811.905839,
-        61216.433721
+        60800.923724,
+        61211.571635
       ],
       "per_band": {
-        "SPHEREx-D1": 55,
-        "SPHEREx-D2": 59,
-        "SPHEREx-D3": 57,
-        "SPHEREx-D4": 55,
-        "SPHEREx-D5": 59,
+        "SPHEREx-D1": 79,
+        "SPHEREx-D4": 77,
+        "SPHEREx-D2": 65,
+        "SPHEREx-D3": 73,
+        "SPHEREx-D5": 63,
+        "SPHEREx-D6": 71
+      }
+    },
+    "3,30": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": -62.5,
+      "images": 394,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60800.928201,
+        61213.944978
+      ],
+      "per_band": {
+        "SPHEREx-D1": 53,
+        "SPHEREx-D4": 53,
+        "SPHEREx-D2": 79,
+        "SPHEREx-D3": 67,
+        "SPHEREx-D5": 75,
+        "SPHEREx-D6": 67
+      }
+    },
+    "0,31": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": -67.5,
+      "images": 295,
+      "images_capped": false,
+      "epochs": 5,
+      "bands": 6,
+      "span_mjd": [
+        60789.982203,
+        61211.841591
+      ],
+      "per_band": {
+        "SPHEREx-D1": 53,
+        "SPHEREx-D2": 41,
+        "SPHEREx-D3": 56,
+        "SPHEREx-D4": 50,
+        "SPHEREx-D5": 39,
         "SPHEREx-D6": 56
       }
     },
-    "54,4": {
-      "showcase": "nep-deep",
-      "ra": 270.0,
-      "dec": 66.5,
-      "images": 12000,
-      "images_capped": true,
-      "epochs": 1,
+    "5,30": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": -62.5,
+      "images": 400,
+      "images_capped": false,
+      "epochs": 3,
       "bands": 6,
       "span_mjd": [
-        60789.879611,
-        61060.338777
+        60803.165959,
+        61214.283666
       ],
       "per_band": {
-        "SPHEREx-D1": 2000,
-        "SPHEREx-D2": 2000,
-        "SPHEREx-D3": 2000,
-        "SPHEREx-D4": 2000,
-        "SPHEREx-D5": 2000,
-        "SPHEREx-D6": 2000
+        "SPHEREx-D1": 61,
+        "SPHEREx-D4": 65,
+        "SPHEREx-D2": 74,
+        "SPHEREx-D5": 69,
+        "SPHEREx-D3": 65,
+        "SPHEREx-D6": 66
+      }
+    },
+    "2,32": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": -72.5,
+      "images": 249,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60790.799763,
+        61172.877516
+      ],
+      "per_band": {
+        "SPHEREx-D2": 57,
+        "SPHEREx-D3": 34,
+        "SPHEREx-D5": 56,
+        "SPHEREx-D6": 35,
+        "SPHEREx-D1": 34,
+        "SPHEREx-D4": 33
+      }
+    },
+    "0,32": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": -72.5,
+      "images": 287,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60790.937956,
+        61172.74197
+      ],
+      "per_band": {
+        "SPHEREx-D2": 57,
+        "SPHEREx-D3": 52,
+        "SPHEREx-D5": 52,
+        "SPHEREx-D6": 52,
+        "SPHEREx-D1": 37,
+        "SPHEREx-D4": 37
+      }
+    },
+    "4,32": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": -72.5,
+      "images": 257,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60795.013211,
+        61212.179036
+      ],
+      "per_band": {
+        "SPHEREx-D2": 40,
+        "SPHEREx-D3": 48,
+        "SPHEREx-D5": 42,
+        "SPHEREx-D6": 45,
+        "SPHEREx-D1": 42,
+        "SPHEREx-D4": 40
+      }
+    },
+    "4,33": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": -77.5,
+      "images": 194,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60790.25287,
+        61174.098341
+      ],
+      "per_band": {
+        "SPHEREx-D2": 21,
+        "SPHEREx-D3": 39,
+        "SPHEREx-D5": 21,
+        "SPHEREx-D6": 39,
+        "SPHEREx-D1": 37,
+        "SPHEREx-D4": 37
+      }
+    },
+    "1,32": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": -72.5,
+      "images": 252,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60789.781051,
+        61179.257297
+      ],
+      "per_band": {
+        "SPHEREx-D2": 48,
+        "SPHEREx-D3": 33,
+        "SPHEREx-D5": 46,
+        "SPHEREx-D6": 34,
+        "SPHEREx-D1": 48,
+        "SPHEREx-D4": 43
+      }
+    },
+    "5,33": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": -77.5,
+      "images": 254,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60790.25287,
+        61172.943442
+      ],
+      "per_band": {
+        "SPHEREx-D2": 50,
+        "SPHEREx-D3": 35,
+        "SPHEREx-D5": 48,
+        "SPHEREx-D6": 36,
+        "SPHEREx-D1": 43,
+        "SPHEREx-D4": 42
+      }
+    },
+    "3,33": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": -77.5,
+      "images": 186,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60790.596941,
+        61173.010984
+      ],
+      "per_band": {
+        "SPHEREx-D2": 24,
+        "SPHEREx-D3": 30,
+        "SPHEREx-D6": 32,
+        "SPHEREx-D5": 23,
+        "SPHEREx-D1": 39,
+        "SPHEREx-D4": 38
+      }
+    },
+    "2,33": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": -77.5,
+      "images": 187,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60789.848895,
+        61174.166647
+      ],
+      "per_band": {
+        "SPHEREx-D2": 19,
+        "SPHEREx-D3": 37,
+        "SPHEREx-D5": 20,
+        "SPHEREx-D6": 33,
+        "SPHEREx-D1": 38,
+        "SPHEREx-D4": 40
+      }
+    },
+    "1,33": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": -77.5,
+      "images": 199,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60789.853372,
+        61174.166647
+      ],
+      "per_band": {
+        "SPHEREx-D3": 44,
+        "SPHEREx-D6": 42,
+        "SPHEREx-D2": 23,
+        "SPHEREx-D5": 24,
+        "SPHEREx-D4": 33,
+        "SPHEREx-D1": 33
+      }
+    },
+    "0,33": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": -77.5,
+      "images": 209,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60795.284215,
+        61174.369949
+      ],
+      "per_band": {
+        "SPHEREx-D3": 31,
+        "SPHEREx-D6": 29,
+        "SPHEREx-D2": 40,
+        "SPHEREx-D5": 38,
+        "SPHEREx-D1": 37,
+        "SPHEREx-D4": 34
+      }
+    },
+    "0,35": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": -87.5,
+      "images": 30,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60912.325325,
+        61168.53088
+      ],
+      "per_band": {
+        "SPHEREx-D3": 6,
+        "SPHEREx-D6": 5,
+        "SPHEREx-D2": 6,
+        "SPHEREx-D5": 7,
+        "SPHEREx-D1": 3,
+        "SPHEREx-D4": 3
+      }
+    },
+    "1,35": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": -87.5,
+      "images": 27,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60912.326818,
+        61167.102703
+      ],
+      "per_band": {
+        "SPHEREx-D3": 3,
+        "SPHEREx-D6": 3,
+        "SPHEREx-D2": 6,
+        "SPHEREx-D5": 5,
+        "SPHEREx-D1": 5,
+        "SPHEREx-D4": 5
+      }
+    },
+    "2,35": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": -87.5,
+      "images": 28,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60912.328328,
+        61167.101211
+      ],
+      "per_band": {
+        "SPHEREx-D3": 5,
+        "SPHEREx-D6": 5,
+        "SPHEREx-D5": 6,
+        "SPHEREx-D1": 4,
+        "SPHEREx-D2": 5,
+        "SPHEREx-D4": 3
+      }
+    },
+    "3,35": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": -87.5,
+      "images": 29,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60912.32982,
+        61167.098226
+      ],
+      "per_band": {
+        "SPHEREx-D3": 3,
+        "SPHEREx-D6": 3,
+        "SPHEREx-D2": 8,
+        "SPHEREx-D5": 8,
+        "SPHEREx-D4": 4,
+        "SPHEREx-D1": 3
+      }
+    },
+    "4,35": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": -87.5,
+      "images": 30,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60914.296363,
+        61165.951659
+      ],
+      "per_band": {
+        "SPHEREx-D3": 6,
+        "SPHEREx-D6": 6,
+        "SPHEREx-D2": 7,
+        "SPHEREx-D5": 7,
+        "SPHEREx-D1": 2,
+        "SPHEREx-D4": 2
+      }
+    },
+    "5,35": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": -87.5,
+      "images": 26,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60914.637947,
+        61165.339195
+      ],
+      "per_band": {
+        "SPHEREx-D3": 3,
+        "SPHEREx-D6": 4,
+        "SPHEREx-D2": 6,
+        "SPHEREx-D5": 6,
+        "SPHEREx-D1": 3,
+        "SPHEREx-D4": 4
+      }
+    },
+    "0,34": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": -82.5,
+      "images": 108,
+      "images_capped": false,
+      "epochs": 2,
+      "bands": 6,
+      "span_mjd": [
+        60917.897014,
+        61173.691488
+      ],
+      "per_band": {
+        "SPHEREx-D3": 19,
+        "SPHEREx-D6": 21,
+        "SPHEREx-D2": 13,
+        "SPHEREx-D5": 13,
+        "SPHEREx-D1": 21,
+        "SPHEREx-D4": 21
+      }
+    },
+    "1,34": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": -82.5,
+      "images": 123,
+      "images_capped": false,
+      "epochs": 2,
+      "bands": 6,
+      "span_mjd": [
+        60918.982434,
+        61173.691488
+      ],
+      "per_band": {
+        "SPHEREx-D3": 20,
+        "SPHEREx-D6": 18,
+        "SPHEREx-D2": 22,
+        "SPHEREx-D5": 21,
+        "SPHEREx-D1": 21,
+        "SPHEREx-D4": 21
+      }
+    },
+    "2,34": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": -82.5,
+      "images": 133,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60918.985418,
+        61173.554751
+      ],
+      "per_band": {
+        "SPHEREx-D3": 21,
+        "SPHEREx-D6": 20,
+        "SPHEREx-D5": 26,
+        "SPHEREx-D2": 26,
+        "SPHEREx-D1": 20,
+        "SPHEREx-D4": 20
+      }
+    },
+    "3,34": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": -82.5,
+      "images": 130,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60919.868336,
+        61171.247601
+      ],
+      "per_band": {
+        "SPHEREx-D3": 17,
+        "SPHEREx-D6": 19,
+        "SPHEREx-D2": 28,
+        "SPHEREx-D5": 28,
+        "SPHEREx-D1": 18,
+        "SPHEREx-D4": 20
+      }
+    },
+    "4,34": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": -82.5,
+      "images": 109,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60919.87132,
+        61166.90235
+      ],
+      "per_band": {
+        "SPHEREx-D3": 20,
+        "SPHEREx-D6": 16,
+        "SPHEREx-D2": 20,
+        "SPHEREx-D5": 20,
+        "SPHEREx-D1": 19,
+        "SPHEREx-D4": 14
+      }
+    },
+    "5,34": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": -82.5,
+      "images": 120,
+      "images_capped": false,
+      "epochs": 2,
+      "bands": 6,
+      "span_mjd": [
+        60921.024957,
+        61174.098341
+      ],
+      "per_band": {
+        "SPHEREx-D3": 19,
+        "SPHEREx-D6": 19,
+        "SPHEREx-D2": 19,
+        "SPHEREx-D5": 19,
+        "SPHEREx-D1": 21,
+        "SPHEREx-D4": 23
+      }
+    },
+    "0,29": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": -57.5,
+      "images": 421,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60800.314583,
+        61215.166282
+      ],
+      "per_band": {
+        "SPHEREx-D1": 60,
+        "SPHEREx-D4": 59,
+        "SPHEREx-D2": 76,
+        "SPHEREx-D3": 76,
+        "SPHEREx-D5": 76,
+        "SPHEREx-D6": 74
+      }
+    },
+    "1,29": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": -57.5,
+      "images": 450,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60802.284641,
+        61215.166282
+      ],
+      "per_band": {
+        "SPHEREx-D1": 80,
+        "SPHEREx-D4": 74,
+        "SPHEREx-D2": 77,
+        "SPHEREx-D5": 68,
+        "SPHEREx-D3": 77,
+        "SPHEREx-D6": 74
+      }
+    },
+    "2,29": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": -57.5,
+      "images": 442,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60805.611567,
+        61211.908352
+      ],
+      "per_band": {
+        "SPHEREx-D1": 73,
+        "SPHEREx-D2": 68,
+        "SPHEREx-D4": 70,
+        "SPHEREx-D5": 63,
+        "SPHEREx-D3": 83,
+        "SPHEREx-D6": 85
+      }
+    },
+    "0,28": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": -52.5,
+      "images": 470,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60807.379923,
+        61214.084415
+      ],
+      "per_band": {
+        "SPHEREx-D1": 69,
+        "SPHEREx-D2": 97,
+        "SPHEREx-D3": 78,
+        "SPHEREx-D4": 67,
+        "SPHEREx-D5": 87,
+        "SPHEREx-D6": 72
+      }
+    },
+    "0,27": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": -47.5,
+      "images": 505,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60809.552075,
+        61215.91598
+      ],
+      "per_band": {
+        "SPHEREx-D1": 85,
+        "SPHEREx-D4": 86,
+        "SPHEREx-D2": 85,
+        "SPHEREx-D3": 84,
+        "SPHEREx-D5": 81,
+        "SPHEREx-D6": 84
+      }
+    },
+    "4,29": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": -57.5,
+      "images": 456,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60809.618925,
+        61228.952356
+      ],
+      "per_band": {
+        "SPHEREx-D1": 81,
+        "SPHEREx-D4": 77,
+        "SPHEREx-D2": 80,
+        "SPHEREx-D3": 73,
+        "SPHEREx-D5": 75,
+        "SPHEREx-D6": 70
+      }
+    },
+    "3,29": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": -57.5,
+      "images": 464,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60809.755306,
+        61229.156653
+      ],
+      "per_band": {
+        "SPHEREx-D1": 74,
+        "SPHEREx-D2": 88,
+        "SPHEREx-D4": 70,
+        "SPHEREx-D5": 86,
+        "SPHEREx-D3": 76,
+        "SPHEREx-D6": 70
+      }
+    },
+    "1,28": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": -52.5,
+      "images": 498,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60810.030343,
+        61214.084415
+      ],
+      "per_band": {
+        "SPHEREx-D1": 90,
+        "SPHEREx-D2": 82,
+        "SPHEREx-D4": 83,
+        "SPHEREx-D5": 74,
+        "SPHEREx-D3": 86,
+        "SPHEREx-D6": 83
+      }
+    },
+    "2,28": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": -52.5,
+      "images": 515,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60812.887599,
+        61215.166282
+      ],
+      "per_band": {
+        "SPHEREx-D1": 90,
+        "SPHEREx-D4": 83,
+        "SPHEREx-D2": 99,
+        "SPHEREx-D3": 80,
+        "SPHEREx-D5": 85,
+        "SPHEREx-D6": 78
+      }
+    },
+    "5,29": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": -57.5,
+      "images": 434,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60812.947094,
+        61230.106633
+      ],
+      "per_band": {
+        "SPHEREx-D1": 70,
+        "SPHEREx-D4": 66,
+        "SPHEREx-D2": 81,
+        "SPHEREx-D3": 77,
+        "SPHEREx-D5": 67,
+        "SPHEREx-D6": 73
+      }
+    },
+    "1,27": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": -47.5,
+      "images": 531,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60813.698284,
+        61199.013208
+      ],
+      "per_band": {
+        "SPHEREx-D1": 90,
+        "SPHEREx-D4": 89,
+        "SPHEREx-D2": 93,
+        "SPHEREx-D3": 86,
+        "SPHEREx-D5": 87,
+        "SPHEREx-D6": 86
+      }
+    },
+    "0,26": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": -42.5,
+      "images": 594,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60815.603518,
+        61229.226717
+      ],
+      "per_band": {
+        "SPHEREx-D1": 102,
+        "SPHEREx-D4": 100,
+        "SPHEREx-D2": 104,
+        "SPHEREx-D3": 96,
+        "SPHEREx-D5": 98,
+        "SPHEREx-D6": 94
+      }
+    },
+    "2,27": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": -47.5,
+      "images": 516,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60816.894015,
+        61201.863575
+      ],
+      "per_band": {
+        "SPHEREx-D1": 85,
+        "SPHEREx-D4": 82,
+        "SPHEREx-D2": 92,
+        "SPHEREx-D3": 90,
+        "SPHEREx-D5": 81,
+        "SPHEREx-D6": 86
+      }
+    },
+    "4,28": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": -52.5,
+      "images": 503,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60817.839624,
+        61229.156653
+      ],
+      "per_band": {
+        "SPHEREx-D1": 85,
+        "SPHEREx-D2": 102,
+        "SPHEREx-D4": 86,
+        "SPHEREx-D5": 86,
+        "SPHEREx-D3": 76,
+        "SPHEREx-D6": 68
+      }
+    },
+    "3,28": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": -52.5,
+      "images": 494,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60818.044632,
+        61230.039819
+      ],
+      "per_band": {
+        "SPHEREx-D1": 75,
+        "SPHEREx-D2": 94,
+        "SPHEREx-D3": 91,
+        "SPHEREx-D4": 73,
+        "SPHEREx-D5": 80,
+        "SPHEREx-D6": 81
+      }
+    },
+    "1,26": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": -42.5,
+      "images": 568,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60819.539408,
+        61229.226717
+      ],
+      "per_band": {
+        "SPHEREx-D1": 98,
+        "SPHEREx-D2": 100,
+        "SPHEREx-D4": 98,
+        "SPHEREx-D5": 89,
+        "SPHEREx-D3": 93,
+        "SPHEREx-D6": 90
+      }
+    },
+    "3,27": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": -47.5,
+      "images": 528,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60820.289691,
+        61206.342845
+      ],
+      "per_band": {
+        "SPHEREx-D1": 95,
+        "SPHEREx-D2": 91,
+        "SPHEREx-D4": 90,
+        "SPHEREx-D5": 82,
+        "SPHEREx-D3": 87,
+        "SPHEREx-D6": 83
+      }
+    },
+    "0,25": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": -37.5,
+      "images": 603,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60820.97007,
+        61229.023433
+      ],
+      "per_band": {
+        "SPHEREx-D1": 100,
+        "SPHEREx-D2": 96,
+        "SPHEREx-D3": 112,
+        "SPHEREx-D4": 99,
+        "SPHEREx-D5": 85,
+        "SPHEREx-D6": 111
+      }
+    },
+    "5,28": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": -52.5,
+      "images": 467,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60821.43965,
+        61229.156653
+      ],
+      "per_band": {
+        "SPHEREx-D1": 83,
+        "SPHEREx-D2": 80,
+        "SPHEREx-D4": 86,
+        "SPHEREx-D5": 67,
+        "SPHEREx-D3": 77,
+        "SPHEREx-D6": 74
+      }
+    },
+    "0,24": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": -32.5,
+      "images": 656,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60822.804743,
+        61229.837689
+      ],
+      "per_band": {
+        "SPHEREx-D1": 107,
+        "SPHEREx-D2": 128,
+        "SPHEREx-D4": 106,
+        "SPHEREx-D5": 124,
+        "SPHEREx-D3": 95,
+        "SPHEREx-D6": 96
+      }
+    },
+    "2,26": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": -42.5,
+      "images": 568,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60822.942794,
+        61202.811778
+      ],
+      "per_band": {
+        "SPHEREx-D1": 100,
+        "SPHEREx-D2": 103,
+        "SPHEREx-D4": 97,
+        "SPHEREx-D5": 100,
+        "SPHEREx-D3": 86,
+        "SPHEREx-D6": 82
+      }
+    },
+    "4,27": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": -47.5,
+      "images": 525,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60824.837316,
+        61230.039819
+      ],
+      "per_band": {
+        "SPHEREx-D1": 92,
+        "SPHEREx-D4": 88,
+        "SPHEREx-D2": 93,
+        "SPHEREx-D3": 83,
+        "SPHEREx-D5": 88,
+        "SPHEREx-D6": 81
+      }
+    },
+    "1,25": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": -37.5,
+      "images": 612,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60824.980253,
+        61204.921507
+      ],
+      "per_band": {
+        "SPHEREx-D1": 92,
+        "SPHEREx-D2": 115,
+        "SPHEREx-D4": 94,
+        "SPHEREx-D5": 112,
+        "SPHEREx-D3": 97,
+        "SPHEREx-D6": 102
+      }
+    },
+    "1,24": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": -32.5,
+      "images": 621,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60826.539657,
+        61229.161076
+      ],
+      "per_band": {
+        "SPHEREx-D1": 115,
+        "SPHEREx-D4": 119,
+        "SPHEREx-D2": 93,
+        "SPHEREx-D3": 103,
+        "SPHEREx-D5": 90,
+        "SPHEREx-D6": 101
+      }
+    },
+    "3,26": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": -42.5,
+      "images": 546,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60826.674973,
+        61209.058536
+      ],
+      "per_band": {
+        "SPHEREx-D1": 93,
+        "SPHEREx-D4": 89,
+        "SPHEREx-D2": 100,
+        "SPHEREx-D3": 86,
+        "SPHEREx-D5": 97,
+        "SPHEREx-D6": 81
+      }
+    },
+    "5,27": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": -47.5,
+      "images": 558,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60828.780134,
+        61243.752434
+      ],
+      "per_band": {
+        "SPHEREx-D1": 104,
+        "SPHEREx-D4": 94,
+        "SPHEREx-D2": 89,
+        "SPHEREx-D5": 81,
+        "SPHEREx-D3": 97,
+        "SPHEREx-D6": 93
+      }
+    },
+    "2,25": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": -37.5,
+      "images": 650,
+      "images_capped": false,
+      "epochs": 5,
+      "bands": 6,
+      "span_mjd": [
+        60828.783669,
+        61229.226717
+      ],
+      "per_band": {
+        "SPHEREx-D1": 110,
+        "SPHEREx-D4": 109,
+        "SPHEREx-D2": 113,
+        "SPHEREx-D3": 106,
+        "SPHEREx-D5": 107,
+        "SPHEREx-D6": 105
+      }
+    },
+    "2,24": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": -32.5,
+      "images": 622,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60836.733702,
+        61230.110985
+      ],
+      "per_band": {
+        "SPHEREx-D1": 106,
+        "SPHEREx-D2": 102,
+        "SPHEREx-D3": 103,
+        "SPHEREx-D4": 107,
+        "SPHEREx-D5": 101,
+        "SPHEREx-D6": 103
+      }
+    },
+    "4,26": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": -42.5,
+      "images": 581,
+      "images_capped": false,
+      "epochs": 5,
+      "bands": 6,
+      "span_mjd": [
+        60837.003445,
+        61243.820421
+      ],
+      "per_band": {
+        "SPHEREx-D1": 100,
+        "SPHEREx-D2": 95,
+        "SPHEREx-D4": 97,
+        "SPHEREx-D5": 91,
+        "SPHEREx-D3": 101,
+        "SPHEREx-D6": 97
+      }
+    },
+    "3,25": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": -37.5,
+      "images": 628,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60838.299165,
+        61243.889224
+      ],
+      "per_band": {
+        "SPHEREx-D1": 108,
+        "SPHEREx-D2": 108,
+        "SPHEREx-D3": 101,
+        "SPHEREx-D4": 111,
+        "SPHEREx-D5": 104,
+        "SPHEREx-D6": 96
+      }
+    },
+    "3,24": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": -32.5,
+      "images": 645,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60839.65454,
+        61230.110985
+      ],
+      "per_band": {
+        "SPHEREx-D1": 102,
+        "SPHEREx-D2": 116,
+        "SPHEREx-D4": 105,
+        "SPHEREx-D5": 117,
+        "SPHEREx-D3": 104,
+        "SPHEREx-D6": 101
+      }
+    },
+    "5,26": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": -42.5,
+      "images": 580,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60840.534667,
+        61243.956909
+      ],
+      "per_band": {
+        "SPHEREx-D1": 96,
+        "SPHEREx-D2": 99,
+        "SPHEREx-D4": 97,
+        "SPHEREx-D5": 96,
+        "SPHEREx-D3": 95,
+        "SPHEREx-D6": 97
+      }
+    },
+    "4,25": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": -37.5,
+      "images": 596,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60842.027347,
+        61243.889224
+      ],
+      "per_band": {
+        "SPHEREx-D1": 102,
+        "SPHEREx-D2": 104,
+        "SPHEREx-D4": 101,
+        "SPHEREx-D5": 99,
+        "SPHEREx-D3": 95,
+        "SPHEREx-D6": 95
+      }
+    },
+    "4,24": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": -32.5,
+      "images": 664,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60843.463393,
+        61224.066677
+      ],
+      "per_band": {
+        "SPHEREx-D1": 112,
+        "SPHEREx-D4": 113,
+        "SPHEREx-D2": 114,
+        "SPHEREx-D3": 107,
+        "SPHEREx-D5": 113,
+        "SPHEREx-D6": 105
+      }
+    },
+    "5,25": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": -37.5,
+      "images": 593,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60844.952306,
+        61243.956909
+      ],
+      "per_band": {
+        "SPHEREx-D1": 102,
+        "SPHEREx-D4": 104,
+        "SPHEREx-D2": 101,
+        "SPHEREx-D3": 94,
+        "SPHEREx-D5": 98,
+        "SPHEREx-D6": 94
+      }
+    },
+    "5,24": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": -32.5,
+      "images": 647,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60846.650029,
+        61227.052005
+      ],
+      "per_band": {
+        "SPHEREx-D1": 109,
+        "SPHEREx-D2": 111,
+        "SPHEREx-D3": 105,
+        "SPHEREx-D4": 109,
+        "SPHEREx-D5": 110,
+        "SPHEREx-D6": 103
+      }
+    },
+    "0,23": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": -27.5,
+      "images": 689,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60827.226343,
+        61229.907683
+      ],
+      "per_band": {
+        "SPHEREx-D1": 109,
+        "SPHEREx-D2": 124,
+        "SPHEREx-D4": 110,
+        "SPHEREx-D5": 119,
+        "SPHEREx-D3": 117,
+        "SPHEREx-D6": 110
+      }
+    },
+    "0,22": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": -22.5,
+      "images": 604,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60827.837403,
+        61230.044349
+      ],
+      "per_band": {
+        "SPHEREx-D1": 110,
+        "SPHEREx-D4": 110,
+        "SPHEREx-D2": 91,
+        "SPHEREx-D3": 104,
+        "SPHEREx-D5": 91,
+        "SPHEREx-D6": 98
+      }
+    },
+    "1,23": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": -27.5,
+      "images": 706,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60830.758294,
+        61229.298186
+      ],
+      "per_band": {
+        "SPHEREx-D1": 123,
+        "SPHEREx-D4": 122,
+        "SPHEREx-D2": 124,
+        "SPHEREx-D3": 106,
+        "SPHEREx-D5": 122,
+        "SPHEREx-D6": 109
+      }
+    },
+    "0,21": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": -17.5,
+      "images": 770,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60834.970836,
+        61229.841615
+      ],
+      "per_band": {
+        "SPHEREx-D1": 131,
+        "SPHEREx-D2": 133,
+        "SPHEREx-D3": 126,
+        "SPHEREx-D4": 131,
+        "SPHEREx-D5": 134,
+        "SPHEREx-D6": 115
+      }
+    },
+    "0,20": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": -12.5,
+      "images": 673,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60835.99024,
+        61230.250298
+      ],
+      "per_band": {
+        "SPHEREx-D1": 106,
+        "SPHEREx-D2": 112,
+        "SPHEREx-D4": 105,
+        "SPHEREx-D5": 112,
+        "SPHEREx-D3": 123,
+        "SPHEREx-D6": 115
+      }
+    },
+    "2,23": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": -27.5,
+      "images": 624,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60838.025052,
+        61229.161076
+      ],
+      "per_band": {
+        "SPHEREx-D1": 108,
+        "SPHEREx-D2": 107,
+        "SPHEREx-D4": 108,
+        "SPHEREx-D5": 103,
+        "SPHEREx-D3": 97,
+        "SPHEREx-D6": 101
+      }
+    },
+    "0,19": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": -7.5,
+      "images": 686,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60838.84414,
+        61229.707064
+      ],
+      "per_band": {
+        "SPHEREx-D1": 120,
+        "SPHEREx-D2": 118,
+        "SPHEREx-D4": 120,
+        "SPHEREx-D5": 117,
+        "SPHEREx-D3": 106,
+        "SPHEREx-D6": 105
+      }
+    },
+    "1,22": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": -22.5,
+      "images": 664,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60838.909319,
+        61230.112957
+      ],
+      "per_band": {
+        "SPHEREx-D1": 102,
+        "SPHEREx-D2": 115,
+        "SPHEREx-D3": 112,
+        "SPHEREx-D4": 108,
+        "SPHEREx-D5": 118,
+        "SPHEREx-D6": 109
+      }
+    },
+    "1,21": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": -17.5,
+      "images": 642,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60838.978123,
+        61229.909637
+      ],
+      "per_band": {
+        "SPHEREx-D1": 118,
+        "SPHEREx-D2": 103,
+        "SPHEREx-D4": 119,
+        "SPHEREx-D5": 104,
+        "SPHEREx-D3": 105,
+        "SPHEREx-D6": 93
+      }
+    },
+    "1,20": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": -12.5,
+      "images": 780,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60839.388386,
+        61230.114947
+      ],
+      "per_band": {
+        "SPHEREx-D1": 134,
+        "SPHEREx-D2": 138,
+        "SPHEREx-D4": 129,
+        "SPHEREx-D5": 137,
+        "SPHEREx-D3": 130,
+        "SPHEREx-D6": 112
+      }
+    },
+    "3,23": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": -27.5,
+      "images": 663,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60840.270805,
+        61230.110985
+      ],
+      "per_band": {
+        "SPHEREx-D1": 109,
+        "SPHEREx-D4": 113,
+        "SPHEREx-D2": 103,
+        "SPHEREx-D3": 119,
+        "SPHEREx-D5": 103,
+        "SPHEREx-D6": 116
+      }
+    },
+    "0,18": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": -2.5,
+      "images": 782,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60840.272972,
+        61230.519632
+      ],
+      "per_band": {
+        "SPHEREx-D1": 123,
+        "SPHEREx-D4": 125,
+        "SPHEREx-D2": 139,
+        "SPHEREx-D3": 131,
+        "SPHEREx-D5": 139,
+        "SPHEREx-D6": 125
+      }
+    },
+    "2,22": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": -22.5,
+      "images": 757,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60842.033903,
+        61230.112957
+      ],
+      "per_band": {
+        "SPHEREx-D1": 126,
+        "SPHEREx-D2": 131,
+        "SPHEREx-D4": 127,
+        "SPHEREx-D5": 133,
+        "SPHEREx-D3": 122,
+        "SPHEREx-D6": 118
+      }
+    },
+    "2,20": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": -12.5,
+      "images": 663,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60842.783671,
+        61226.17518
+      ],
+      "per_band": {
+        "SPHEREx-D1": 119,
+        "SPHEREx-D4": 121,
+        "SPHEREx-D2": 108,
+        "SPHEREx-D3": 106,
+        "SPHEREx-D5": 106,
+        "SPHEREx-D6": 103
+      }
+    },
+    "2,21": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": -17.5,
+      "images": 681,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60842.85466,
+        61229.909637
+      ],
+      "per_band": {
+        "SPHEREx-D1": 106,
+        "SPHEREx-D4": 104,
+        "SPHEREx-D2": 118,
+        "SPHEREx-D3": 121,
+        "SPHEREx-D5": 115,
+        "SPHEREx-D6": 117
+      }
+    },
+    "3,22": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": -22.5,
+      "images": 653,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60843.532587,
+        61224.878499
+      ],
+      "per_band": {
+        "SPHEREx-D1": 112,
+        "SPHEREx-D4": 115,
+        "SPHEREx-D2": 111,
+        "SPHEREx-D3": 103,
+        "SPHEREx-D5": 111,
+        "SPHEREx-D6": 101
+      }
+    },
+    "1,19": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": -7.5,
+      "images": 664,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60841.358924,
+        61230.250298
+      ],
+      "per_band": {
+        "SPHEREx-D4": 111,
+        "SPHEREx-D1": 109,
+        "SPHEREx-D2": 108,
+        "SPHEREx-D3": 119,
+        "SPHEREx-D5": 108,
+        "SPHEREx-D6": 109
+      }
+    },
+    "3,21": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": -17.5,
+      "images": 781,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60847.266578,
+        61258.621529
+      ],
+      "per_band": {
+        "SPHEREx-D1": 129,
+        "SPHEREx-D2": 134,
+        "SPHEREx-D3": 129,
+        "SPHEREx-D4": 130,
+        "SPHEREx-D5": 131,
+        "SPHEREx-D6": 128
+      }
+    },
+    "1,18": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": -2.5,
+      "images": 710,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60847.336892,
+        61230.726363
+      ],
+      "per_band": {
+        "SPHEREx-D1": 126,
+        "SPHEREx-D2": 121,
+        "SPHEREx-D3": 111,
+        "SPHEREx-D4": 126,
+        "SPHEREx-D5": 121,
+        "SPHEREx-D6": 105
+      }
+    },
+    "4,23": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": -27.5,
+      "images": 671,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60848.012918,
+        61228.550904
+      ],
+      "per_band": {
+        "SPHEREx-D1": 107,
+        "SPHEREx-D2": 118,
+        "SPHEREx-D3": 112,
+        "SPHEREx-D4": 106,
+        "SPHEREx-D5": 117,
+        "SPHEREx-D6": 111
+      }
+    },
+    "3,19": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": -7.5,
+      "images": 667,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60849.781363,
+        61237.102129
+      ],
+      "per_band": {
+        "SPHEREx-D1": 121,
+        "SPHEREx-D2": 106,
+        "SPHEREx-D4": 119,
+        "SPHEREx-D5": 106,
+        "SPHEREx-D3": 109,
+        "SPHEREx-D6": 106
+      }
+    },
+    "2,18": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": -2.5,
+      "images": 644,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60849.850717,
+        61233.505403
+      ],
+      "per_band": {
+        "SPHEREx-D1": 102,
+        "SPHEREx-D2": 104,
+        "SPHEREx-D3": 116,
+        "SPHEREx-D4": 105,
+        "SPHEREx-D5": 104,
+        "SPHEREx-D6": 113
+      }
+    },
+    "4,22": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": -22.5,
+      "images": 704,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60849.913942,
+        61228.618659
+      ],
+      "per_band": {
+        "SPHEREx-D1": 118,
+        "SPHEREx-D2": 107,
+        "SPHEREx-D3": 126,
+        "SPHEREx-D4": 120,
+        "SPHEREx-D5": 107,
+        "SPHEREx-D6": 126
+      }
+    },
+    "5,23": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": -27.5,
+      "images": 692,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60849.977416,
+        61258.485006
+      ],
+      "per_band": {
+        "SPHEREx-D1": 115,
+        "SPHEREx-D2": 115,
+        "SPHEREx-D3": 116,
+        "SPHEREx-D4": 117,
+        "SPHEREx-D5": 115,
+        "SPHEREx-D6": 114
+      }
+    },
+    "3,20": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": -12.5,
+      "images": 709,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60850.255775,
+        61231.669717
+      ],
+      "per_band": {
+        "SPHEREx-D1": 115,
+        "SPHEREx-D2": 117,
+        "SPHEREx-D3": 127,
+        "SPHEREx-D4": 114,
+        "SPHEREx-D5": 116,
+        "SPHEREx-D6": 120
+      }
+    },
+    "2,19": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": -7.5,
+      "images": 806,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60850.392991,
+        61232.622752
+      ],
+      "per_band": {
+        "SPHEREx-D1": 136,
+        "SPHEREx-D2": 141,
+        "SPHEREx-D3": 130,
+        "SPHEREx-D4": 134,
+        "SPHEREx-D5": 140,
+        "SPHEREx-D6": 125
+      }
+    },
+    "4,21": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": -17.5,
+      "images": 677,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60851.003252,
+        61258.621529
+      ],
+      "per_band": {
+        "SPHEREx-D1": 116,
+        "SPHEREx-D2": 114,
+        "SPHEREx-D4": 117,
+        "SPHEREx-D5": 112,
+        "SPHEREx-D3": 109,
+        "SPHEREx-D6": 109
+      }
+    },
+    "4,20": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": -12.5,
+      "images": 748,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60854.059991,
+        61259.708957
+      ],
+      "per_band": {
+        "SPHEREx-D1": 122,
+        "SPHEREx-D2": 131,
+        "SPHEREx-D4": 125,
+        "SPHEREx-D5": 131,
+        "SPHEREx-D3": 121,
+        "SPHEREx-D6": 118
+      }
+    },
+    "5,22": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": -22.5,
+      "images": 717,
+      "images_capped": false,
+      "epochs": 5,
+      "bands": 6,
+      "span_mjd": [
+        60854.122275,
+        61259.706914
+      ],
+      "per_band": {
+        "SPHEREx-D1": 111,
+        "SPHEREx-D2": 123,
+        "SPHEREx-D4": 112,
+        "SPHEREx-D5": 123,
+        "SPHEREx-D3": 125,
+        "SPHEREx-D6": 123
+      }
+    },
+    "3,18": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": -2.5,
+      "images": 810,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60854.401309,
+        61236.35673
+      ],
+      "per_band": {
+        "SPHEREx-D1": 135,
+        "SPHEREx-D2": 142,
+        "SPHEREx-D4": 134,
+        "SPHEREx-D5": 140,
+        "SPHEREx-D3": 132,
+        "SPHEREx-D6": 127
+      }
+    },
+    "4,19": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": -7.5,
+      "images": 746,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60856.978999,
+        61258.759812
+      ],
+      "per_band": {
+        "SPHEREx-D1": 116,
+        "SPHEREx-D4": 115,
+        "SPHEREx-D2": 129,
+        "SPHEREx-D3": 131,
+        "SPHEREx-D5": 129,
+        "SPHEREx-D6": 126
+      }
+    },
+    "5,21": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": -17.5,
+      "images": 694,
+      "images_capped": false,
+      "epochs": 5,
+      "bands": 6,
+      "span_mjd": [
+        60857.187897,
+        61258.621529
+      ],
+      "per_band": {
+        "SPHEREx-D1": 112,
+        "SPHEREx-D4": 113,
+        "SPHEREx-D2": 119,
+        "SPHEREx-D3": 116,
+        "SPHEREx-D5": 118,
+        "SPHEREx-D6": 116
+      }
+    },
+    "4,18": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": -2.5,
+      "images": 635,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60859.088709,
+        61258.82874
+      ],
+      "per_band": {
+        "SPHEREx-D1": 113,
+        "SPHEREx-D4": 114,
+        "SPHEREx-D2": 99,
+        "SPHEREx-D3": 108,
+        "SPHEREx-D5": 98,
+        "SPHEREx-D6": 103
+      }
+    },
+    "5,20": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": -12.5,
+      "images": 694,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60859.496983,
+        61259.708957
+      ],
+      "per_band": {
+        "SPHEREx-D1": 118,
+        "SPHEREx-D4": 122,
+        "SPHEREx-D2": 110,
+        "SPHEREx-D3": 117,
+        "SPHEREx-D5": 108,
+        "SPHEREx-D6": 119
+      }
+    },
+    "5,19": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": -7.5,
+      "images": 762,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60864.183231,
+        61259.8458
+      ],
+      "per_band": {
+        "SPHEREx-D1": 126,
+        "SPHEREx-D2": 133,
+        "SPHEREx-D3": 123,
+        "SPHEREx-D4": 127,
+        "SPHEREx-D5": 135,
+        "SPHEREx-D6": 118
+      }
+    },
+    "5,18": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": -2.5,
+      "images": 763,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60865.678328,
+        61259.710893
+      ],
+      "per_band": {
+        "SPHEREx-D1": 118,
+        "SPHEREx-D2": 136,
+        "SPHEREx-D3": 132,
+        "SPHEREx-D4": 119,
+        "SPHEREx-D5": 133,
+        "SPHEREx-D6": 125
+      }
+    },
+    "0,16": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": 7.5,
+      "images": 806,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60848.086554,
+        61223.802193
+      ],
+      "per_band": {
+        "SPHEREx-D1": 136,
+        "SPHEREx-D2": 139,
+        "SPHEREx-D3": 129,
+        "SPHEREx-D4": 135,
+        "SPHEREx-D5": 138,
+        "SPHEREx-D6": 129
+      }
+    },
+    "0,14": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": 17.5,
+      "images": 685,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60848.160438,
+        61225.295976
+      ],
+      "per_band": {
+        "SPHEREx-D1": 121,
+        "SPHEREx-D2": 116,
+        "SPHEREx-D3": 105,
+        "SPHEREx-D4": 120,
+        "SPHEREx-D5": 118,
+        "SPHEREx-D6": 105
+      }
+    },
+    "0,17": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": 2.5,
+      "images": 601,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60848.560522,
+        61230.048381
+      ],
+      "per_band": {
+        "SPHEREx-D1": 110,
+        "SPHEREx-D2": 89,
+        "SPHEREx-D3": 102,
+        "SPHEREx-D4": 110,
+        "SPHEREx-D5": 89,
+        "SPHEREx-D6": 101
+      }
+    },
+    "0,15": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": 12.5,
+      "images": 680,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60849.24655,
+        61258.693282
+      ],
+      "per_band": {
+        "SPHEREx-D1": 105,
+        "SPHEREx-D2": 113,
+        "SPHEREx-D3": 123,
+        "SPHEREx-D4": 105,
+        "SPHEREx-D5": 113,
+        "SPHEREx-D6": 121
+      }
+    },
+    "0,12": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": 27.5,
+      "images": 605,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60849.720109,
+        61230.796055
+      ],
+      "per_band": {
+        "SPHEREx-D1": 113,
+        "SPHEREx-D2": 89,
+        "SPHEREx-D4": 114,
+        "SPHEREx-D5": 89,
+        "SPHEREx-D3": 102,
+        "SPHEREx-D6": 98
+      }
+    },
+    "0,13": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": 22.5,
+      "images": 761,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60850.126375,
+        61257.743657
+      ],
+      "per_band": {
+        "SPHEREx-D1": 121,
+        "SPHEREx-D2": 133,
+        "SPHEREx-D3": 128,
+        "SPHEREx-D4": 121,
+        "SPHEREx-D5": 133,
+        "SPHEREx-D6": 125
+      }
+    },
+    "2,17": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": 2.5,
+      "images": 714,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60850.195214,
+        61258.557682
+      ],
+      "per_band": {
+        "SPHEREx-D1": 124,
+        "SPHEREx-D2": 120,
+        "SPHEREx-D4": 123,
+        "SPHEREx-D5": 120,
+        "SPHEREx-D3": 114,
+        "SPHEREx-D6": 113
+      }
+    },
+    "1,16": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": 7.5,
+      "images": 623,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60850.598922,
+        61236.289401
+      ],
+      "per_band": {
+        "SPHEREx-D1": 113,
+        "SPHEREx-D2": 93,
+        "SPHEREx-D4": 111,
+        "SPHEREx-D5": 94,
+        "SPHEREx-D3": 106,
+        "SPHEREx-D6": 106
+      }
+    },
+    "1,15": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": 12.5,
+      "images": 807,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60851.143702,
+        61258.489678
+      ],
+      "per_band": {
+        "SPHEREx-D1": 133,
+        "SPHEREx-D2": 137,
+        "SPHEREx-D4": 133,
+        "SPHEREx-D5": 139,
+        "SPHEREx-D3": 133,
+        "SPHEREx-D6": 132
+      }
+    },
+    "1,14": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": 17.5,
+      "images": 631,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60851.283725,
+        61258.693282
+      ],
+      "per_band": {
+        "SPHEREx-D1": 104,
+        "SPHEREx-D2": 99,
+        "SPHEREx-D4": 107,
+        "SPHEREx-D5": 97,
+        "SPHEREx-D3": 113,
+        "SPHEREx-D6": 111
+      }
+    },
+    "1,17": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": 2.5,
+      "images": 748,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60850.463163,
+        61233.237242
+      ],
+      "per_band": {
+        "SPHEREx-D1": 117,
+        "SPHEREx-D2": 131,
+        "SPHEREx-D3": 126,
+        "SPHEREx-D4": 119,
+        "SPHEREx-D5": 129,
+        "SPHEREx-D6": 126
+      }
+    },
+    "1,13": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": 22.5,
+      "images": 705,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60853.999253,
+        61236.293167
+      ],
+      "per_band": {
+        "SPHEREx-D1": 120,
+        "SPHEREx-D2": 128,
+        "SPHEREx-D4": 120,
+        "SPHEREx-D5": 128,
+        "SPHEREx-D3": 107,
+        "SPHEREx-D6": 102
+      }
+    },
+    "1,12": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": 27.5,
+      "images": 649,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60857.058533,
+        61235.822876
+      ],
+      "per_band": {
+        "SPHEREx-D1": 103,
+        "SPHEREx-D4": 103,
+        "SPHEREx-D2": 104,
+        "SPHEREx-D3": 118,
+        "SPHEREx-D5": 104,
+        "SPHEREx-D6": 117
+      }
+    },
+    "2,16": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": 7.5,
+      "images": 721,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60857.12119,
+        61239.072812
+      ],
+      "per_band": {
+        "SPHEREx-D1": 116,
+        "SPHEREx-D4": 116,
+        "SPHEREx-D2": 125,
+        "SPHEREx-D3": 122,
+        "SPHEREx-D5": 122,
+        "SPHEREx-D6": 120
+      }
+    },
+    "2,15": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": 12.5,
+      "images": 637,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60857.802137,
+        61258.489678
+      ],
+      "per_band": {
+        "SPHEREx-D1": 115,
+        "SPHEREx-D4": 114,
+        "SPHEREx-D2": 103,
+        "SPHEREx-D3": 101,
+        "SPHEREx-D5": 103,
+        "SPHEREx-D6": 101
+      }
+    },
+    "3,17": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": 2.5,
+      "images": 615,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60859.431661,
+        61239.681918
+      ],
+      "per_band": {
+        "SPHEREx-D1": 99,
+        "SPHEREx-D4": 98,
+        "SPHEREx-D2": 96,
+        "SPHEREx-D3": 113,
+        "SPHEREx-D5": 96,
+        "SPHEREx-D6": 113
+      }
+    },
+    "2,13": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": 22.5,
+      "images": 584,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60859.569286,
+        61241.92881
+      ],
+      "per_band": {
+        "SPHEREx-D1": 106,
+        "SPHEREx-D2": 86,
+        "SPHEREx-D3": 105,
+        "SPHEREx-D4": 104,
+        "SPHEREx-D5": 84,
+        "SPHEREx-D6": 99
+      }
+    },
+    "2,14": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": 17.5,
+      "images": 802,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60860.044036,
+        61258.695254
+      ],
+      "per_band": {
+        "SPHEREx-D1": 127,
+        "SPHEREx-D2": 139,
+        "SPHEREx-D3": 133,
+        "SPHEREx-D4": 129,
+        "SPHEREx-D5": 140,
+        "SPHEREx-D6": 134
+      }
+    },
+    "2,12": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": 27.5,
+      "images": 751,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60860.522428,
+        61258.965423
+      ],
+      "per_band": {
+        "SPHEREx-D1": 121,
+        "SPHEREx-D2": 136,
+        "SPHEREx-D3": 118,
+        "SPHEREx-D4": 120,
+        "SPHEREx-D5": 138,
+        "SPHEREx-D6": 118
+      }
+    },
+    "3,16": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": 7.5,
+      "images": 739,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60862.080182,
+        61258.557682
+      ],
+      "per_band": {
+        "SPHEREx-D1": 126,
+        "SPHEREx-D2": 128,
+        "SPHEREx-D3": 118,
+        "SPHEREx-D4": 125,
+        "SPHEREx-D5": 127,
+        "SPHEREx-D6": 115
+      }
+    },
+    "3,14": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": 17.5,
+      "images": 639,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60863.304577,
+        61258.695254
+      ],
+      "per_band": {
+        "SPHEREx-D1": 114,
+        "SPHEREx-D2": 105,
+        "SPHEREx-D3": 101,
+        "SPHEREx-D4": 115,
+        "SPHEREx-D5": 103,
+        "SPHEREx-D6": 101
+      }
+    },
+    "4,17": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": 2.5,
+      "images": 836,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60863.912724,
+        61242.127333
+      ],
+      "per_band": {
+        "SPHEREx-D1": 134,
+        "SPHEREx-D2": 150,
+        "SPHEREx-D3": 137,
+        "SPHEREx-D4": 131,
+        "SPHEREx-D5": 149,
+        "SPHEREx-D6": 135
+      }
+    },
+    "3,12": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": 27.5,
+      "images": 605,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60864.189982,
+        61245.663426
+      ],
+      "per_band": {
+        "SPHEREx-D1": 112,
+        "SPHEREx-D2": 96,
+        "SPHEREx-D4": 111,
+        "SPHEREx-D5": 94,
+        "SPHEREx-D3": 96,
+        "SPHEREx-D6": 96
+      }
+    },
+    "5,17": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": 2.5,
+      "images": 617,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60864.524513,
+        61258.82874
+      ],
+      "per_band": {
+        "SPHEREx-D1": 114,
+        "SPHEREx-D2": 93,
+        "SPHEREx-D4": 114,
+        "SPHEREx-D5": 94,
+        "SPHEREx-D3": 101,
+        "SPHEREx-D6": 101
+      }
+    },
+    "3,15": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": 12.5,
+      "images": 706,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60864.597883,
+        61243.824755
+      ],
+      "per_band": {
+        "SPHEREx-D1": 112,
+        "SPHEREx-D2": 119,
+        "SPHEREx-D3": 122,
+        "SPHEREx-D4": 111,
+        "SPHEREx-D5": 122,
+        "SPHEREx-D6": 120
+      }
+    },
+    "3,13": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": 22.5,
+      "images": 719,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60865.278457,
+        61245.594747
+      ],
+      "per_band": {
+        "SPHEREx-D1": 109,
+        "SPHEREx-D2": 128,
+        "SPHEREx-D3": 124,
+        "SPHEREx-D4": 109,
+        "SPHEREx-D5": 128,
+        "SPHEREx-D6": 121
+      }
+    },
+    "4,15": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": 12.5,
+      "images": 797,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60866.836798,
+        61245.52319
+      ],
+      "per_band": {
+        "SPHEREx-D1": 133,
+        "SPHEREx-D2": 140,
+        "SPHEREx-D3": 126,
+        "SPHEREx-D4": 133,
+        "SPHEREx-D5": 140,
+        "SPHEREx-D6": 125
+      }
+    },
+    "4,16": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": 7.5,
+      "images": 573,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60867.041521,
+        61245.724236
+      ],
+      "per_band": {
+        "SPHEREx-D1": 99,
+        "SPHEREx-D2": 86,
+        "SPHEREx-D4": 99,
+        "SPHEREx-D5": 86,
+        "SPHEREx-D3": 103,
+        "SPHEREx-D6": 100
+      }
+    },
+    "5,16": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": 7.5,
+      "images": 823,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60868.26199,
+        61248.099444
+      ],
+      "per_band": {
+        "SPHEREx-D1": 129,
+        "SPHEREx-D4": 129,
+        "SPHEREx-D2": 148,
+        "SPHEREx-D3": 135,
+        "SPHEREx-D5": 148,
+        "SPHEREx-D6": 134
+      }
+    },
+    "4,13": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": 22.5,
+      "images": 744,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60868.536565,
+        61248.986909
+      ],
+      "per_band": {
+        "SPHEREx-D1": 131,
+        "SPHEREx-D2": 127,
+        "SPHEREx-D4": 131,
+        "SPHEREx-D5": 127,
+        "SPHEREx-D3": 114,
+        "SPHEREx-D6": 114
+      }
+    },
+    "4,14": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": 17.5,
+      "images": 636,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60868.943489,
+        61248.9191
+      ],
+      "per_band": {
+        "SPHEREx-D1": 100,
+        "SPHEREx-D4": 100,
+        "SPHEREx-D2": 102,
+        "SPHEREx-D3": 117,
+        "SPHEREx-D5": 101,
+        "SPHEREx-D6": 116
+      }
+    },
+    "5,15": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": 12.5,
+      "images": 577,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60870.778536,
+        61249.867286
+      ],
+      "per_band": {
+        "SPHEREx-D1": 103,
+        "SPHEREx-D4": 105,
+        "SPHEREx-D2": 84,
+        "SPHEREx-D3": 102,
+        "SPHEREx-D5": 85,
+        "SPHEREx-D6": 98
+      }
+    },
+    "4,12": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": 27.5,
+      "images": 581,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60871.458738,
+        61259.644364
+      ],
+      "per_band": {
+        "SPHEREx-D1": 96,
+        "SPHEREx-D4": 96,
+        "SPHEREx-D2": 85,
+        "SPHEREx-D3": 112,
+        "SPHEREx-D5": 83,
+        "SPHEREx-D6": 109
+      }
+    },
+    "5,14": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": 17.5,
+      "images": 788,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60876.551857,
+        61250.883334
+      ],
+      "per_band": {
+        "SPHEREx-D1": 128,
+        "SPHEREx-D2": 138,
+        "SPHEREx-D3": 129,
+        "SPHEREx-D4": 128,
+        "SPHEREx-D5": 137,
+        "SPHEREx-D6": 128
+      }
+    },
+    "5,13": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": 22.5,
+      "images": 563,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60876.556351,
+        61253.602934
+      ],
+      "per_band": {
+        "SPHEREx-D1": 99,
+        "SPHEREx-D2": 84,
+        "SPHEREx-D3": 99,
+        "SPHEREx-D4": 99,
+        "SPHEREx-D5": 84,
+        "SPHEREx-D6": 98
+      }
+    },
+    "5,12": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": 27.5,
+      "images": 756,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60876.689606,
+        61259.644364
+      ],
+      "per_band": {
+        "SPHEREx-D1": 112,
+        "SPHEREx-D2": 147,
+        "SPHEREx-D3": 121,
+        "SPHEREx-D4": 111,
+        "SPHEREx-D5": 144,
+        "SPHEREx-D6": 121
+      }
+    },
+    "0,11": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": 32.5,
+      "images": 724,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60853.457334,
+        61234.259579
+      ],
+      "per_band": {
+        "SPHEREx-D1": 116,
+        "SPHEREx-D2": 134,
+        "SPHEREx-D4": 115,
+        "SPHEREx-D5": 132,
+        "SPHEREx-D3": 113,
+        "SPHEREx-D6": 114
+      }
+    },
+    "0,10": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": 37.5,
+      "images": 582,
+      "images_capped": false,
+      "epochs": 5,
+      "bands": 6,
+      "span_mjd": [
+        60854.481055,
+        61257.813758
+      ],
+      "per_band": {
+        "SPHEREx-D1": 105,
+        "SPHEREx-D4": 105,
+        "SPHEREx-D2": 88,
+        "SPHEREx-D3": 102,
+        "SPHEREx-D5": 83,
+        "SPHEREx-D6": 99
+      }
+    },
+    "1,11": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": 32.5,
+      "images": 645,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60857.262705,
+        61259.650297
+      ],
+      "per_band": {
+        "SPHEREx-D1": 117,
+        "SPHEREx-D4": 117,
+        "SPHEREx-D2": 106,
+        "SPHEREx-D3": 101,
+        "SPHEREx-D5": 106,
+        "SPHEREx-D6": 98
+      }
+    },
+    "0,9": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": 42.5,
+      "images": 614,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60857.943013,
+        61258.762281
+      ],
+      "per_band": {
+        "SPHEREx-D1": 99,
+        "SPHEREx-D4": 99,
+        "SPHEREx-D2": 109,
+        "SPHEREx-D3": 101,
+        "SPHEREx-D5": 107,
+        "SPHEREx-D6": 99
+      }
+    },
+    "2,11": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": 32.5,
+      "images": 560,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60860.863391,
+        61258.831049
+      ],
+      "per_band": {
+        "SPHEREx-D1": 99,
+        "SPHEREx-D2": 83,
+        "SPHEREx-D3": 98,
+        "SPHEREx-D4": 101,
+        "SPHEREx-D5": 83,
+        "SPHEREx-D6": 96
+      }
+    },
+    "1,10": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": 37.5,
+      "images": 590,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60861.339402,
+        61258.625935
+      ],
+      "per_band": {
+        "SPHEREx-D1": 96,
+        "SPHEREx-D2": 90,
+        "SPHEREx-D3": 112,
+        "SPHEREx-D4": 97,
+        "SPHEREx-D5": 89,
+        "SPHEREx-D6": 106
+      }
+    },
+    "1,9": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": 42.5,
+      "images": 627,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60862.019106,
+        61258.762281
+      ],
+      "per_band": {
+        "SPHEREx-D1": 102,
+        "SPHEREx-D2": 112,
+        "SPHEREx-D3": 101,
+        "SPHEREx-D4": 102,
+        "SPHEREx-D5": 110,
+        "SPHEREx-D6": 100
+      }
+    },
+    "0,8": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": 47.5,
+      "images": 547,
+      "images_capped": false,
+      "epochs": 5,
+      "bands": 6,
+      "span_mjd": [
+        60862.703145,
+        61258.491899
+      ],
+      "per_band": {
+        "SPHEREx-D1": 94,
+        "SPHEREx-D2": 88,
+        "SPHEREx-D3": 95,
+        "SPHEREx-D4": 94,
+        "SPHEREx-D5": 87,
+        "SPHEREx-D6": 89
+      }
+    },
+    "0,7": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": 52.5,
+      "images": 475,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60863.789755,
+        61259.584762
+      ],
+      "per_band": {
+        "SPHEREx-D1": 81,
+        "SPHEREx-D2": 80,
+        "SPHEREx-D4": 80,
+        "SPHEREx-D5": 81,
+        "SPHEREx-D3": 77,
+        "SPHEREx-D6": 76
+      }
+    },
+    "2,10": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": 37.5,
+      "images": 670,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60865.074001,
+        61259.650297
+      ],
+      "per_band": {
+        "SPHEREx-D1": 102,
+        "SPHEREx-D2": 124,
+        "SPHEREx-D3": 108,
+        "SPHEREx-D4": 102,
+        "SPHEREx-D5": 127,
+        "SPHEREx-D6": 107
+      }
+    },
+    "2,9": {
+      "showcase": "m31-field",
+      "ra": 10.68,
+      "dec": 41.27,
+      "images": 590,
+      "images_capped": false,
+      "epochs": 5,
+      "bands": 6,
+      "span_mjd": [
+        60865.960063,
+        61259.305711
+      ],
+      "per_band": {
+        "SPHEREx-D1": 111,
+        "SPHEREx-D2": 90,
+        "SPHEREx-D4": 110,
+        "SPHEREx-D5": 88,
+        "SPHEREx-D3": 97,
+        "SPHEREx-D6": 94
+      }
+    },
+    "1,8": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": 47.5,
+      "images": 535,
+      "images_capped": false,
+      "epochs": 5,
+      "bands": 6,
+      "span_mjd": [
+        60866.707203,
+        61258.086911
+      ],
+      "per_band": {
+        "SPHEREx-D1": 93,
+        "SPHEREx-D2": 85,
+        "SPHEREx-D4": 93,
+        "SPHEREx-D5": 84,
+        "SPHEREx-D3": 91,
+        "SPHEREx-D6": 89
+      }
+    },
+    "1,7": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": 52.5,
+      "images": 517,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60867.390495,
+        61259.584762
+      ],
+      "per_band": {
+        "SPHEREx-D1": 82,
+        "SPHEREx-D2": 91,
+        "SPHEREx-D4": 82,
+        "SPHEREx-D5": 92,
+        "SPHEREx-D3": 85,
+        "SPHEREx-D6": 85
+      }
+    },
+    "3,11": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": 32.5,
+      "images": 647,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60868.198694,
+        61259.511251
+      ],
+      "per_band": {
+        "SPHEREx-D1": 100,
+        "SPHEREx-D2": 104,
+        "SPHEREx-D4": 100,
+        "SPHEREx-D5": 103,
+        "SPHEREx-D3": 122,
+        "SPHEREx-D6": 118
+      }
+    },
+    "3,10": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": 37.5,
+      "images": 668,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60868.883337,
+        61259.650297
+      ],
+      "per_band": {
+        "SPHEREx-D1": 115,
+        "SPHEREx-D2": 116,
+        "SPHEREx-D4": 118,
+        "SPHEREx-D5": 112,
+        "SPHEREx-D3": 106,
+        "SPHEREx-D6": 101
+      }
+    },
+    "0,6": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": 57.5,
+      "images": 443,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60869.018244,
+        61258.360616
+      ],
+      "per_band": {
+        "SPHEREx-D1": 77,
+        "SPHEREx-D4": 77,
+        "SPHEREx-D2": 73,
+        "SPHEREx-D3": 72,
+        "SPHEREx-D5": 73,
+        "SPHEREx-D6": 71
+      }
+    },
+    "2,8": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": 47.5,
+      "images": 573,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60870.375236,
+        61258.086911
+      ],
+      "per_band": {
+        "SPHEREx-D1": 89,
+        "SPHEREx-D4": 88,
+        "SPHEREx-D2": 98,
+        "SPHEREx-D3": 100,
+        "SPHEREx-D5": 98,
+        "SPHEREx-D6": 100
+      }
+    },
+    "3,9": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": 42.5,
+      "images": 535,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60871.191979,
+        61259.305711
+      ],
+      "per_band": {
+        "SPHEREx-D1": 92,
+        "SPHEREx-D4": 90,
+        "SPHEREx-D2": 87,
+        "SPHEREx-D3": 91,
+        "SPHEREx-D5": 86,
+        "SPHEREx-D6": 89
+      }
+    },
+    "2,7": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": 52.5,
+      "images": 507,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60871.530526,
+        61259.239305
+      ],
+      "per_band": {
+        "SPHEREx-D1": 84,
+        "SPHEREx-D4": 84,
+        "SPHEREx-D2": 82,
+        "SPHEREx-D3": 88,
+        "SPHEREx-D5": 82,
+        "SPHEREx-D6": 87
+      }
+    },
+    "4,11": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": 32.5,
+      "images": 733,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60871.934412,
+        61259.578793
+      ],
+      "per_band": {
+        "SPHEREx-D1": 117,
+        "SPHEREx-D4": 116,
+        "SPHEREx-D2": 141,
+        "SPHEREx-D3": 108,
+        "SPHEREx-D5": 141,
+        "SPHEREx-D6": 110
+      }
+    },
+    "4,10": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": 37.5,
+      "images": 557,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60872.546538,
+        61259.576963
+      ],
+      "per_band": {
+        "SPHEREx-D1": 95,
+        "SPHEREx-D4": 96,
+        "SPHEREx-D2": 92,
+        "SPHEREx-D3": 94,
+        "SPHEREx-D5": 92,
+        "SPHEREx-D6": 88
+      }
+    },
+    "1,6": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": 57.5,
+      "images": 445,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60873.090341,
+        61258.291759
+      ],
+      "per_band": {
+        "SPHEREx-D1": 75,
+        "SPHEREx-D4": 73,
+        "SPHEREx-D2": 73,
+        "SPHEREx-D3": 75,
+        "SPHEREx-D5": 74,
+        "SPHEREx-D6": 75
+      }
+    },
+    "3,8": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": 47.5,
+      "images": 551,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60874.175725,
+        61258.287939
+      ],
+      "per_band": {
+        "SPHEREx-D1": 90,
+        "SPHEREx-D2": 87,
+        "SPHEREx-D3": 100,
+        "SPHEREx-D4": 90,
+        "SPHEREx-D5": 88,
+        "SPHEREx-D6": 96
+      }
+    },
+    "2,6": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": 57.5,
+      "images": 451,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60874.250942,
+        61258.289929
+      ],
+      "per_band": {
+        "SPHEREx-D1": 74,
+        "SPHEREx-D2": 83,
+        "SPHEREx-D3": 69,
+        "SPHEREx-D4": 72,
+        "SPHEREx-D5": 83,
+        "SPHEREx-D6": 70
+      }
+    },
+    "3,7": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": 52.5,
+      "images": 539,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60874.991687,
+        61259.239305
+      ],
+      "per_band": {
+        "SPHEREx-D1": 84,
+        "SPHEREx-D2": 103,
+        "SPHEREx-D4": 83,
+        "SPHEREx-D5": 102,
+        "SPHEREx-D3": 83,
+        "SPHEREx-D6": 84
+      }
+    },
+    "5,11": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": 32.5,
+      "images": 582,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60876.351646,
+        61259.644364
+      ],
+      "per_band": {
+        "SPHEREx-D1": 112,
+        "SPHEREx-D2": 85,
+        "SPHEREx-D3": 97,
+        "SPHEREx-D4": 111,
+        "SPHEREx-D5": 83,
+        "SPHEREx-D6": 94
+      }
+    },
+    "4,9": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": 42.5,
+      "images": 549,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60876.419508,
+        61259.305711
+      ],
+      "per_band": {
+        "SPHEREx-D1": 90,
+        "SPHEREx-D2": 83,
+        "SPHEREx-D3": 102,
+        "SPHEREx-D4": 91,
+        "SPHEREx-D5": 82,
+        "SPHEREx-D6": 101
+      }
+    },
+    "3,6": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": 57.5,
+      "images": 407,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60877.512567,
+        61260.875687
+      ],
+      "per_band": {
+        "SPHEREx-D1": 69,
+        "SPHEREx-D2": 68,
+        "SPHEREx-D4": 67,
+        "SPHEREx-D5": 68,
+        "SPHEREx-D3": 68,
+        "SPHEREx-D6": 67
+      }
+    },
+    "4,8": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": 47.5,
+      "images": 589,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60878.187208,
+        61259.033765
+      ],
+      "per_band": {
+        "SPHEREx-D1": 89,
+        "SPHEREx-D2": 112,
+        "SPHEREx-D3": 97,
+        "SPHEREx-D4": 87,
+        "SPHEREx-D5": 108,
+        "SPHEREx-D6": 96
+      }
+    },
+    "4,7": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": 52.5,
+      "images": 474,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60879.206774,
+        61259.035719
+      ],
+      "per_band": {
+        "SPHEREx-D1": 85,
+        "SPHEREx-D4": 85,
+        "SPHEREx-D2": 75,
+        "SPHEREx-D3": 76,
+        "SPHEREx-D5": 76,
+        "SPHEREx-D6": 77
+      }
+    },
+    "5,10": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": 37.5,
+      "images": 546,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60879.815098,
+        61260.052726
+      ],
+      "per_band": {
+        "SPHEREx-D1": 95,
+        "SPHEREx-D2": 81,
+        "SPHEREx-D3": 97,
+        "SPHEREx-D4": 96,
+        "SPHEREx-D5": 80,
+        "SPHEREx-D6": 97
+      }
+    },
+    "5,9": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": 42.5,
+      "images": 647,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60880.359594,
+        61259.984935
+      ],
+      "per_band": {
+        "SPHEREx-D1": 98,
+        "SPHEREx-D2": 122,
+        "SPHEREx-D4": 98,
+        "SPHEREx-D5": 118,
+        "SPHEREx-D3": 107,
+        "SPHEREx-D6": 104
+      }
+    },
+    "4,6": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": 57.5,
+      "images": 455,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60881.992476,
+        61261.349425
+      ],
+      "per_band": {
+        "SPHEREx-D1": 79,
+        "SPHEREx-D4": 77,
+        "SPHEREx-D2": 74,
+        "SPHEREx-D3": 76,
+        "SPHEREx-D5": 75,
+        "SPHEREx-D6": 74
+      }
+    },
+    "5,8": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": 47.5,
+      "images": 556,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60882.193415,
+        61260.260843
+      ],
+      "per_band": {
+        "SPHEREx-D1": 90,
+        "SPHEREx-D2": 104,
+        "SPHEREx-D4": 90,
+        "SPHEREx-D5": 104,
+        "SPHEREx-D3": 84,
+        "SPHEREx-D6": 84
+      }
+    },
+    "5,7": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": 52.5,
+      "images": 515,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60883.825622,
+        61261.958638
+      ],
+      "per_band": {
+        "SPHEREx-D1": 94,
+        "SPHEREx-D4": 92,
+        "SPHEREx-D2": 86,
+        "SPHEREx-D3": 81,
+        "SPHEREx-D5": 85,
+        "SPHEREx-D6": 77
+      }
+    },
+    "5,6": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": 57.5,
+      "images": 357,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60886.54435,
+        61261.349425
+      ],
+      "per_band": {
+        "SPHEREx-D1": 67,
+        "SPHEREx-D4": 65,
+        "SPHEREx-D2": 70,
+        "SPHEREx-D3": 43,
+        "SPHEREx-D5": 70,
+        "SPHEREx-D6": 42
+      }
+    },
+    "0,5": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": 62.5,
+      "images": 379,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60870.038129,
+        61258.224661
+      ],
+      "per_band": {
+        "SPHEREx-D1": 59,
+        "SPHEREx-D4": 60,
+        "SPHEREx-D2": 65,
+        "SPHEREx-D3": 64,
+        "SPHEREx-D5": 66,
+        "SPHEREx-D6": 65
+      }
+    },
+    "1,5": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": 62.5,
+      "images": 352,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60875.267167,
+        61259.377357
+      ],
+      "per_band": {
+        "SPHEREx-D1": 66,
+        "SPHEREx-D2": 54,
+        "SPHEREx-D4": 65,
+        "SPHEREx-D5": 52,
+        "SPHEREx-D3": 58,
+        "SPHEREx-D6": 57
+      }
+    },
+    "0,4": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": 67.5,
+      "images": 298,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60876.966046,
+        61259.311378
+      ],
+      "per_band": {
+        "SPHEREx-D1": 57,
+        "SPHEREx-D2": 46,
+        "SPHEREx-D4": 58,
+        "SPHEREx-D5": 44,
+        "SPHEREx-D3": 46,
+        "SPHEREx-D6": 47
+      }
+    },
+    "2,5": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": 62.5,
+      "images": 362,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60878.663202,
+        61261.554308
+      ],
+      "per_band": {
+        "SPHEREx-D1": 66,
+        "SPHEREx-D2": 49,
+        "SPHEREx-D4": 64,
+        "SPHEREx-D5": 50,
+        "SPHEREx-D3": 66,
+        "SPHEREx-D6": 67
+      }
+    },
+    "1,4": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": 67.5,
+      "images": 309,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60879.889498,
+        61259.309885
+      ],
+      "per_band": {
+        "SPHEREx-D1": 42,
+        "SPHEREx-D4": 41,
+        "SPHEREx-D2": 69,
+        "SPHEREx-D3": 45,
+        "SPHEREx-D5": 67,
+        "SPHEREx-D6": 45
+      }
+    },
+    "0,3": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": 72.5,
+      "images": 227,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60882.607356,
+        61260.671284
+      ],
+      "per_band": {
+        "SPHEREx-D1": 37,
+        "SPHEREx-D4": 35,
+        "SPHEREx-D2": 54,
+        "SPHEREx-D3": 24,
+        "SPHEREx-D5": 53,
+        "SPHEREx-D6": 24
+      }
+    },
+    "2,4": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": 67.5,
+      "images": 290,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60882.807283,
+        61260.736161
+      ],
+      "per_band": {
+        "SPHEREx-D1": 57,
+        "SPHEREx-D4": 55,
+        "SPHEREx-D2": 55,
+        "SPHEREx-D3": 34,
+        "SPHEREx-D5": 55,
+        "SPHEREx-D6": 34
+      }
+    },
+    "3,5": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": 62.5,
+      "images": 375,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60883.489154,
+        61261.690334
+      ],
+      "per_band": {
+        "SPHEREx-D1": 68,
+        "SPHEREx-D4": 65,
+        "SPHEREx-D2": 71,
+        "SPHEREx-D3": 51,
+        "SPHEREx-D5": 70,
+        "SPHEREx-D6": 50
+      }
+    },
+    "1,3": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": 72.5,
+      "images": 229,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60884.915554,
+        61260.807807
+      ],
+      "per_band": {
+        "SPHEREx-D1": 54,
+        "SPHEREx-D4": 55,
+        "SPHEREx-D2": 24,
+        "SPHEREx-D5": 24,
+        "SPHEREx-D3": 36,
+        "SPHEREx-D6": 36
+      }
+    },
+    "3,4": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": 67.5,
+      "images": 268,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60885.186772,
+        61261.217378
+      ],
+      "per_band": {
+        "SPHEREx-D1": 61,
+        "SPHEREx-D4": 61,
+        "SPHEREx-D2": 33,
+        "SPHEREx-D3": 40,
+        "SPHEREx-D5": 33,
+        "SPHEREx-D6": 40
+      }
+    },
+    "4,5": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": 62.5,
+      "images": 331,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60886.615854,
+        61261.690334
+      ],
+      "per_band": {
+        "SPHEREx-D1": 61,
+        "SPHEREx-D4": 59,
+        "SPHEREx-D2": 65,
+        "SPHEREx-D3": 41,
+        "SPHEREx-D5": 64,
+        "SPHEREx-D6": 41
+      }
+    },
+    "0,2": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": 77.5,
+      "images": 150,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60888.521055,
+        61258.089167
+      ],
+      "per_band": {
+        "SPHEREx-D1": 31,
+        "SPHEREx-D2": 22,
+        "SPHEREx-D4": 32,
+        "SPHEREx-D5": 23,
+        "SPHEREx-D3": 22,
+        "SPHEREx-D6": 20
+      }
+    },
+    "5,5": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": 62.5,
+      "images": 324,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60888.583339,
+        61261.283339
+      ],
+      "per_band": {
+        "SPHEREx-D1": 60,
+        "SPHEREx-D2": 66,
+        "SPHEREx-D3": 38,
+        "SPHEREx-D4": 60,
+        "SPHEREx-D5": 62,
+        "SPHEREx-D6": 38
+      }
+    },
+    "4,4": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": 67.5,
+      "images": 279,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60890.282076,
+        61261.690334
+      ],
+      "per_band": {
+        "SPHEREx-D1": 55,
+        "SPHEREx-D2": 52,
+        "SPHEREx-D3": 33,
+        "SPHEREx-D4": 55,
+        "SPHEREx-D5": 51,
+        "SPHEREx-D6": 33
+      }
+    },
+    "2,3": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": 72.5,
+      "images": 198,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60891.166983,
+        61257.007229
+      ],
+      "per_band": {
+        "SPHEREx-D1": 40,
+        "SPHEREx-D2": 30,
+        "SPHEREx-D4": 38,
+        "SPHEREx-D5": 29,
+        "SPHEREx-D3": 31,
+        "SPHEREx-D6": 30
+      }
+    },
+    "3,3": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": 72.5,
+      "images": 185,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60891.368686,
+        61257.072373
+      ],
+      "per_band": {
+        "SPHEREx-D1": 32,
+        "SPHEREx-D2": 37,
+        "SPHEREx-D4": 31,
+        "SPHEREx-D5": 39,
+        "SPHEREx-D3": 23,
+        "SPHEREx-D6": 23
+      }
+    },
+    "5,4": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": 67.5,
+      "images": 237,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60892.861313,
+        61261.217378
+      ],
+      "per_band": {
+        "SPHEREx-D1": 50,
+        "SPHEREx-D2": 39,
+        "SPHEREx-D4": 48,
+        "SPHEREx-D5": 40,
+        "SPHEREx-D3": 30,
+        "SPHEREx-D6": 30
+      }
+    },
+    "4,3": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": 72.5,
+      "images": 195,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60893.40739,
+        61259.311378
+      ],
+      "per_band": {
+        "SPHEREx-D1": 45,
+        "SPHEREx-D2": 23,
+        "SPHEREx-D4": 45,
+        "SPHEREx-D5": 22,
+        "SPHEREx-D3": 30,
+        "SPHEREx-D6": 30
+      }
+    },
+    "1,2": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": 77.5,
+      "images": 119,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60894.359004,
+        61260.672776
+      ],
+      "per_band": {
+        "SPHEREx-D1": 21,
+        "SPHEREx-D2": 25,
+        "SPHEREx-D4": 20,
+        "SPHEREx-D5": 24,
+        "SPHEREx-D3": 15,
+        "SPHEREx-D6": 14
+      }
+    },
+    "2,2": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": 77.5,
+      "images": 149,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60894.631021,
+        61260.742788
+      ],
+      "per_band": {
+        "SPHEREx-D1": 31,
+        "SPHEREx-D2": 22,
+        "SPHEREx-D4": 31,
+        "SPHEREx-D5": 24,
+        "SPHEREx-D3": 21,
+        "SPHEREx-D6": 20
+      }
+    },
+    "3,2": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": 77.5,
+      "images": 124,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60894.903109,
+        61260.807807
+      ],
+      "per_band": {
+        "SPHEREx-D1": 24,
+        "SPHEREx-D4": 23,
+        "SPHEREx-D2": 18,
+        "SPHEREx-D3": 22,
+        "SPHEREx-D5": 15,
+        "SPHEREx-D6": 22
+      }
+    },
+    "5,3": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": 72.5,
+      "images": 170,
+      "images_capped": false,
+      "epochs": 2,
+      "bands": 6,
+      "span_mjd": [
+        60897.141367,
+        61085.332996
+      ],
+      "per_band": {
+        "SPHEREx-D1": 29,
+        "SPHEREx-D4": 28,
+        "SPHEREx-D2": 27,
+        "SPHEREx-D3": 30,
+        "SPHEREx-D5": 26,
+        "SPHEREx-D6": 30
+      }
+    },
+    "4,2": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": 77.5,
+      "images": 138,
+      "images_capped": false,
+      "epochs": 2,
+      "bands": 6,
+      "span_mjd": [
+        60897.281301,
+        61090.693158
+      ],
+      "per_band": {
+        "SPHEREx-D1": 23,
+        "SPHEREx-D4": 24,
+        "SPHEREx-D2": 21,
+        "SPHEREx-D3": 26,
+        "SPHEREx-D5": 20,
+        "SPHEREx-D6": 24
+      }
+    },
+    "0,1": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": 82.5,
+      "images": 81,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60898.36752,
+        61100.812049
+      ],
+      "per_band": {
+        "SPHEREx-D1": 16,
+        "SPHEREx-D4": 16,
+        "SPHEREx-D2": 6,
+        "SPHEREx-D5": 6,
+        "SPHEREx-D3": 18,
+        "SPHEREx-D6": 19
+      }
+    },
+    "1,1": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": 82.5,
+      "images": 72,
+      "images_capped": false,
+      "epochs": 2,
+      "bands": 6,
+      "span_mjd": [
+        60899.051808,
+        61103.456715
+      ],
+      "per_band": {
+        "SPHEREx-D1": 15,
+        "SPHEREx-D4": 14,
+        "SPHEREx-D2": 8,
+        "SPHEREx-D5": 8,
+        "SPHEREx-D3": 14,
+        "SPHEREx-D6": 13
+      }
+    },
+    "5,2": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": 77.5,
+      "images": 114,
+      "images_capped": false,
+      "epochs": 2,
+      "bands": 6,
+      "span_mjd": [
+        60901.626854,
+        61092.868084
+      ],
+      "per_band": {
+        "SPHEREx-D1": 18,
+        "SPHEREx-D2": 21,
+        "SPHEREx-D3": 18,
+        "SPHEREx-D4": 18,
+        "SPHEREx-D5": 21,
+        "SPHEREx-D6": 18
+      }
+    },
+    "2,1": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": 82.5,
+      "images": 59,
+      "images_capped": false,
+      "epochs": 2,
+      "bands": 6,
+      "span_mjd": [
+        60905.567419,
+        61101.554392
+      ],
+      "per_band": {
+        "SPHEREx-D1": 10,
+        "SPHEREx-D2": 8,
+        "SPHEREx-D4": 11,
+        "SPHEREx-D5": 8,
+        "SPHEREx-D3": 11,
+        "SPHEREx-D6": 11
+      }
+    },
+    "3,1": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": 82.5,
+      "images": 87,
+      "images_capped": false,
+      "epochs": 2,
+      "bands": 6,
+      "span_mjd": [
+        60905.771751,
+        61096.672499
+      ],
+      "per_band": {
+        "SPHEREx-D1": 14,
+        "SPHEREx-D2": 17,
+        "SPHEREx-D4": 14,
+        "SPHEREx-D5": 17,
+        "SPHEREx-D3": 13,
+        "SPHEREx-D6": 12
+      }
+    },
+    "4,1": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": 82.5,
+      "images": 67,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60906.042933,
+        61097.826598
+      ],
+      "per_band": {
+        "SPHEREx-D1": 9,
+        "SPHEREx-D2": 16,
+        "SPHEREx-D4": 8,
+        "SPHEREx-D5": 16,
+        "SPHEREx-D3": 9,
+        "SPHEREx-D6": 9
+      }
+    },
+    "5,1": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": 82.5,
+      "images": 84,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60906.721429,
+        61099.995768
+      ],
+      "per_band": {
+        "SPHEREx-D1": 9,
+        "SPHEREx-D2": 16,
+        "SPHEREx-D4": 11,
+        "SPHEREx-D5": 16,
+        "SPHEREx-D3": 16,
+        "SPHEREx-D6": 16
+      }
+    },
+    "1,0": {
+      "showcase": "",
+      "ra": 7.5,
+      "dec": 87.5,
+      "images": 27,
+      "images_capped": false,
+      "epochs": 2,
+      "bands": 6,
+      "span_mjd": [
+        60911.953807,
+        61109.83923
+      ],
+      "per_band": {
+        "SPHEREx-D1": 3,
+        "SPHEREx-D4": 4,
+        "SPHEREx-D2": 6,
+        "SPHEREx-D5": 7,
+        "SPHEREx-D3": 4,
+        "SPHEREx-D6": 3
+      }
+    },
+    "0,0": {
+      "showcase": "",
+      "ra": 2.5,
+      "dec": 87.5,
+      "images": 29,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60911.956792,
+        61109.837737
+      ],
+      "per_band": {
+        "SPHEREx-D1": 3,
+        "SPHEREx-D4": 3,
+        "SPHEREx-D2": 8,
+        "SPHEREx-D5": 7,
+        "SPHEREx-D3": 3,
+        "SPHEREx-D6": 5
+      }
+    },
+    "5,0": {
+      "showcase": "",
+      "ra": 27.5,
+      "dec": 87.5,
+      "images": 30,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60912.427634,
+        61103.456715
+      ],
+      "per_band": {
+        "SPHEREx-D1": 5,
+        "SPHEREx-D4": 5,
+        "SPHEREx-D2": 6,
+        "SPHEREx-D5": 4,
+        "SPHEREx-D3": 5,
+        "SPHEREx-D6": 5
+      }
+    },
+    "4,0": {
+      "showcase": "",
+      "ra": 22.5,
+      "dec": 87.5,
+      "images": 27,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60912.429126,
+        61111.059219
+      ],
+      "per_band": {
+        "SPHEREx-D1": 5,
+        "SPHEREx-D4": 5,
+        "SPHEREx-D2": 3,
+        "SPHEREx-D5": 5,
+        "SPHEREx-D3": 5,
+        "SPHEREx-D6": 4
+      }
+    },
+    "3,0": {
+      "showcase": "",
+      "ra": 17.5,
+      "dec": 87.5,
+      "images": 25,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60912.766251,
+        61109.842214
+      ],
+      "per_band": {
+        "SPHEREx-D1": 5,
+        "SPHEREx-D4": 5,
+        "SPHEREx-D2": 3,
+        "SPHEREx-D5": 3,
+        "SPHEREx-D6": 5,
+        "SPHEREx-D3": 4
+      }
+    },
+    "2,0": {
+      "showcase": "",
+      "ra": 12.5,
+      "dec": 87.5,
+      "images": 28,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60912.769236,
+        61109.840722
+      ],
+      "per_band": {
+        "SPHEREx-D1": 3,
+        "SPHEREx-D4": 3,
+        "SPHEREx-D2": 7,
+        "SPHEREx-D5": 7,
+        "SPHEREx-D3": 4,
+        "SPHEREx-D6": 4
+      }
+    },
+    "8,31": {
+      "showcase": "",
+      "ra": 42.5,
+      "dec": -67.5,
+      "images": 388,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60794.196202,
+        61211.638253
+      ],
+      "per_band": {
+        "SPHEREx-D1": 71,
+        "SPHEREx-D2": 55,
+        "SPHEREx-D4": 69,
+        "SPHEREx-D5": 53,
+        "SPHEREx-D3": 70,
+        "SPHEREx-D6": 70
+      }
+    },
+    "9,32": {
+      "showcase": "",
+      "ra": 47.5,
+      "dec": -72.5,
+      "images": 323,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60789.916917,
+        61189.779453
+      ],
+      "per_band": {
+        "SPHEREx-D1": 61,
+        "SPHEREx-D2": 49,
+        "SPHEREx-D4": 62,
+        "SPHEREx-D5": 48,
+        "SPHEREx-D3": 51,
+        "SPHEREx-D6": 52
+      }
+    },
+    "11,31": {
+      "showcase": "",
+      "ra": 57.5,
+      "dec": -67.5,
+      "images": 399,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60791.683212,
+        61223.043896
+      ],
+      "per_band": {
+        "SPHEREx-D1": 66,
+        "SPHEREx-D4": 63,
+        "SPHEREx-D2": 72,
+        "SPHEREx-D3": 65,
+        "SPHEREx-D5": 70,
+        "SPHEREx-D6": 63
+      }
+    },
+    "6,31": {
+      "showcase": "",
+      "ra": 32.5,
+      "dec": -67.5,
+      "images": 344,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60791.615386,
+        61212.31579
+      ],
+      "per_band": {
+        "SPHEREx-D1": 62,
+        "SPHEREx-D2": 47,
+        "SPHEREx-D4": 60,
+        "SPHEREx-D5": 43,
+        "SPHEREx-D3": 66,
+        "SPHEREx-D6": 66
+      }
+    },
+    "7,31": {
+      "showcase": "",
+      "ra": 37.5,
+      "dec": -67.5,
+      "images": 310,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60798.816556,
+        61214.62271
+      ],
+      "per_band": {
+        "SPHEREx-D1": 39,
+        "SPHEREx-D2": 69,
+        "SPHEREx-D4": 38,
+        "SPHEREx-D5": 60,
+        "SPHEREx-D3": 53,
+        "SPHEREx-D6": 51
+      }
+    },
+    "10,31": {
+      "showcase": "",
+      "ra": 52.5,
+      "dec": -67.5,
+      "images": 442,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60789.913933,
+        61207.157367
+      ],
+      "per_band": {
+        "SPHEREx-D1": 68,
+        "SPHEREx-D4": 66,
+        "SPHEREx-D2": 62,
+        "SPHEREx-D5": 59,
+        "SPHEREx-D3": 95,
+        "SPHEREx-D6": 92
+      }
+    },
+    "9,31": {
+      "showcase": "",
+      "ra": 47.5,
+      "dec": -67.5,
+      "images": 353,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60789.913933,
+        61211.635269
+      ],
+      "per_band": {
+        "SPHEREx-D1": 33,
+        "SPHEREx-D4": 36,
+        "SPHEREx-D2": 87,
+        "SPHEREx-D5": 80,
+        "SPHEREx-D3": 60,
+        "SPHEREx-D6": 57
+      }
+    },
+    "8,32": {
+      "showcase": "",
+      "ra": 42.5,
+      "dec": -72.5,
+      "images": 267,
+      "images_capped": false,
+      "epochs": 5,
+      "bands": 6,
+      "span_mjd": [
+        60790.527,
+        61211.638253
+      ],
+      "per_band": {
+        "SPHEREx-D1": 41,
+        "SPHEREx-D2": 49,
+        "SPHEREx-D4": 40,
+        "SPHEREx-D5": 45,
+        "SPHEREx-D3": 46,
+        "SPHEREx-D6": 46
+      }
+    },
+    "7,32": {
+      "showcase": "",
+      "ra": 37.5,
+      "dec": -72.5,
+      "images": 299,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60790.528492,
+        61179.729276
+      ],
+      "per_band": {
+        "SPHEREx-D1": 54,
+        "SPHEREx-D2": 49,
+        "SPHEREx-D3": 51,
+        "SPHEREx-D4": 51,
+        "SPHEREx-D5": 45,
+        "SPHEREx-D6": 49
+      }
+    },
+    "11,32": {
+      "showcase": "",
+      "ra": 57.5,
+      "dec": -72.5,
+      "images": 342,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60792.907393,
+        61217.000885
+      ],
+      "per_band": {
+        "SPHEREx-D2": 57,
+        "SPHEREx-D3": 59,
+        "SPHEREx-D5": 55,
+        "SPHEREx-D6": 57,
+        "SPHEREx-D4": 55,
+        "SPHEREx-D1": 59
+      }
+    },
+    "6,32": {
+      "showcase": "",
+      "ra": 32.5,
+      "dec": -72.5,
+      "images": 245,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60798.816556,
+        61179.730769
+      ],
+      "per_band": {
+        "SPHEREx-D2": 49,
+        "SPHEREx-D3": 42,
+        "SPHEREx-D5": 45,
+        "SPHEREx-D6": 39,
+        "SPHEREx-D1": 36,
+        "SPHEREx-D4": 34
+      }
+    },
+    "10,32": {
+      "showcase": "",
+      "ra": 52.5,
+      "dec": -72.5,
+      "images": 327,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60789.913933,
+        61189.776469
+      ],
+      "per_band": {
+        "SPHEREx-D2": 51,
+        "SPHEREx-D5": 51,
+        "SPHEREx-D3": 54,
+        "SPHEREx-D6": 53,
+        "SPHEREx-D1": 58,
+        "SPHEREx-D4": 60
+      }
+    },
+    "7,33": {
+      "showcase": "",
+      "ra": 37.5,
+      "dec": -77.5,
+      "images": 229,
+      "images_capped": false,
+      "epochs": 5,
+      "bands": 6,
+      "span_mjd": [
+        60790.527,
+        61172.808038
+      ],
+      "per_band": {
+        "SPHEREx-D3": 42,
+        "SPHEREx-D6": 45,
+        "SPHEREx-D2": 33,
+        "SPHEREx-D5": 31,
+        "SPHEREx-D1": 37,
+        "SPHEREx-D4": 41
+      }
+    },
+    "9,33": {
+      "showcase": "",
+      "ra": 47.5,
+      "dec": -77.5,
+      "images": 236,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60791.546973,
+        61170.836911
+      ],
+      "per_band": {
+        "SPHEREx-D3": 35,
+        "SPHEREx-D6": 33,
+        "SPHEREx-D2": 43,
+        "SPHEREx-D5": 43,
+        "SPHEREx-D1": 41,
+        "SPHEREx-D4": 41
+      }
+    },
+    "10,33": {
+      "showcase": "",
+      "ra": 52.5,
+      "dec": -77.5,
+      "images": 199,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60789.913933,
+        61172.739909
+      ],
+      "per_band": {
+        "SPHEREx-D3": 27,
+        "SPHEREx-D6": 26,
+        "SPHEREx-D2": 44,
+        "SPHEREx-D5": 44,
+        "SPHEREx-D1": 29,
+        "SPHEREx-D4": 29
+      }
+    },
+    "8,33": {
+      "showcase": "",
+      "ra": 42.5,
+      "dec": -77.5,
+      "images": 237,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60790.527,
+        61172.808038
+      ],
+      "per_band": {
+        "SPHEREx-D3": 36,
+        "SPHEREx-D6": 28,
+        "SPHEREx-D2": 39,
+        "SPHEREx-D5": 41,
+        "SPHEREx-D1": 46,
+        "SPHEREx-D4": 47
+      }
+    },
+    "6,33": {
+      "showcase": "",
+      "ra": 32.5,
+      "dec": -77.5,
+      "images": 228,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60792.771012,
+        61172.806101
+      ],
+      "per_band": {
+        "SPHEREx-D3": 31,
+        "SPHEREx-D6": 29,
+        "SPHEREx-D2": 40,
+        "SPHEREx-D5": 35,
+        "SPHEREx-D1": 48,
+        "SPHEREx-D4": 45
+      }
+    },
+    "11,33": {
+      "showcase": "",
+      "ra": 57.5,
+      "dec": -77.5,
+      "images": 241,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60792.976801,
+        61172.875509
+      ],
+      "per_band": {
+        "SPHEREx-D3": 38,
+        "SPHEREx-D6": 37,
+        "SPHEREx-D2": 43,
+        "SPHEREx-D5": 41,
+        "SPHEREx-D1": 41,
+        "SPHEREx-D4": 41
+      }
+    },
+    "7,30": {
+      "showcase": "",
+      "ra": 37.5,
+      "dec": -62.5,
+      "images": 404,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60806.493844,
+        61214.962482
+      ],
+      "per_band": {
+        "SPHEREx-D1": 71,
+        "SPHEREx-D4": 69,
+        "SPHEREx-D5": 54,
+        "SPHEREx-D2": 57,
+        "SPHEREx-D3": 79,
+        "SPHEREx-D6": 74
+      }
+    },
+    "6,30": {
+      "showcase": "",
+      "ra": 32.5,
+      "dec": -62.5,
+      "images": 396,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60807.241907,
+        61214.962482
+      ],
+      "per_band": {
+        "SPHEREx-D1": 58,
+        "SPHEREx-D2": 83,
+        "SPHEREx-D4": 55,
+        "SPHEREx-D5": 75,
+        "SPHEREx-D3": 64,
+        "SPHEREx-D6": 61
+      }
+    },
+    "9,30": {
+      "showcase": "",
+      "ra": 47.5,
+      "dec": -62.5,
+      "images": 482,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60809.416973,
+        61219.582237
+      ],
+      "per_band": {
+        "SPHEREx-D1": 83,
+        "SPHEREx-D4": 82,
+        "SPHEREx-D2": 65,
+        "SPHEREx-D5": 59,
+        "SPHEREx-D3": 100,
+        "SPHEREx-D6": 93
+      }
+    },
+    "8,30": {
+      "showcase": "",
+      "ra": 42.5,
+      "dec": -62.5,
+      "images": 427,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60811.248359,
+        61214.62271
+      ],
+      "per_band": {
+        "SPHEREx-D1": 60,
+        "SPHEREx-D4": 57,
+        "SPHEREx-D2": 104,
+        "SPHEREx-D5": 95,
+        "SPHEREx-D3": 57,
+        "SPHEREx-D6": 54
+      }
+    },
+    "11,30": {
+      "showcase": "",
+      "ra": 57.5,
+      "dec": -62.5,
+      "images": 500,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60814.644674,
+        61228.742214
+      ],
+      "per_band": {
+        "SPHEREx-D1": 86,
+        "SPHEREx-D4": 85,
+        "SPHEREx-D2": 61,
+        "SPHEREx-D5": 59,
+        "SPHEREx-D3": 105,
+        "SPHEREx-D6": 104
+      }
+    },
+    "10,30": {
+      "showcase": "",
+      "ra": 52.5,
+      "dec": -62.5,
+      "images": 425,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60814.850907,
+        61222.909025
+      ],
+      "per_band": {
+        "SPHEREx-D1": 63,
+        "SPHEREx-D4": 61,
+        "SPHEREx-D2": 98,
+        "SPHEREx-D5": 88,
+        "SPHEREx-D3": 58,
+        "SPHEREx-D6": 57
+      }
+    },
+    "10,35": {
+      "showcase": "",
+      "ra": 52.5,
+      "dec": -87.5,
+      "images": 36,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60908.589537,
+        61167.036564
+      ],
+      "per_band": {
+        "SPHEREx-D3": 10,
+        "SPHEREx-D6": 8,
+        "SPHEREx-D2": 2,
+        "SPHEREx-D5": 4,
+        "SPHEREx-D1": 6,
+        "SPHEREx-D4": 6
+      }
+    },
+    "11,35": {
+      "showcase": "",
+      "ra": 57.5,
+      "dec": -87.5,
+      "images": 43,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60908.591029,
+        61165.272115
+      ],
+      "per_band": {
+        "SPHEREx-D3": 9,
+        "SPHEREx-D6": 9,
+        "SPHEREx-D2": 4,
+        "SPHEREx-D5": 3,
+        "SPHEREx-D1": 9,
+        "SPHEREx-D4": 9
+      }
+    },
+    "6,35": {
+      "showcase": "",
+      "ra": 32.5,
+      "dec": -87.5,
+      "images": 30,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60914.639439,
+        61159.771557
+      ],
+      "per_band": {
+        "SPHEREx-D3": 6,
+        "SPHEREx-D6": 6,
+        "SPHEREx-D2": 7,
+        "SPHEREx-D5": 6,
+        "SPHEREx-D1": 3,
+        "SPHEREx-D4": 2
+      }
+    },
+    "7,35": {
+      "showcase": "",
+      "ra": 37.5,
+      "dec": -87.5,
+      "images": 39,
+      "images_capped": false,
+      "epochs": 2,
+      "bands": 6,
+      "span_mjd": [
+        60914.773742,
+        61159.770065
+      ],
+      "per_band": {
+        "SPHEREx-D3": 5,
+        "SPHEREx-D6": 4,
+        "SPHEREx-D2": 7,
+        "SPHEREx-D5": 9,
+        "SPHEREx-D1": 7,
+        "SPHEREx-D4": 7
+      }
+    },
+    "8,35": {
+      "showcase": "",
+      "ra": 42.5,
+      "dec": -87.5,
+      "images": 42,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60914.776727,
+        61167.715345
+      ],
+      "per_band": {
+        "SPHEREx-D3": 8,
+        "SPHEREx-D6": 8,
+        "SPHEREx-D2": 7,
+        "SPHEREx-D5": 6,
+        "SPHEREx-D1": 7,
+        "SPHEREx-D4": 6
+      }
+    },
+    "9,35": {
+      "showcase": "",
+      "ra": 47.5,
+      "dec": -87.5,
+      "images": 23,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60919.869828,
+        61167.17259
+      ],
+      "per_band": {
+        "SPHEREx-D2": 5,
+        "SPHEREx-D5": 4,
+        "SPHEREx-D1": 4,
+        "SPHEREx-D4": 4,
+        "SPHEREx-D6": 4,
+        "SPHEREx-D3": 2
+      }
+    },
+    "6,34": {
+      "showcase": "",
+      "ra": 32.5,
+      "dec": -82.5,
+      "images": 116,
+      "images_capped": false,
+      "epochs": 2,
+      "bands": 6,
+      "span_mjd": [
+        60916.061967,
+        61172.806101
+      ],
+      "per_band": {
+        "SPHEREx-D3": 24,
+        "SPHEREx-D6": 22,
+        "SPHEREx-D2": 12,
+        "SPHEREx-D5": 12,
+        "SPHEREx-D1": 23,
+        "SPHEREx-D4": 23
+      }
+    },
+    "7,34": {
+      "showcase": "",
+      "ra": 37.5,
+      "dec": -82.5,
+      "images": 129,
+      "images_capped": false,
+      "epochs": 2,
+      "bands": 6,
+      "span_mjd": [
+        60916.064951,
+        61172.535772
+      ],
+      "per_band": {
+        "SPHEREx-D3": 28,
+        "SPHEREx-D6": 27,
+        "SPHEREx-D2": 16,
+        "SPHEREx-D5": 16,
+        "SPHEREx-D1": 22,
+        "SPHEREx-D4": 20
+      }
+    },
+    "8,34": {
+      "showcase": "",
+      "ra": 42.5,
+      "dec": -82.5,
+      "images": 130,
+      "images_capped": false,
+      "epochs": 2,
+      "bands": 6,
+      "span_mjd": [
+        60917.558503,
+        61171.17949
+      ],
+      "per_band": {
+        "SPHEREx-D3": 27,
+        "SPHEREx-D6": 28,
+        "SPHEREx-D2": 14,
+        "SPHEREx-D5": 16,
+        "SPHEREx-D1": 23,
+        "SPHEREx-D4": 22
+      }
+    },
+    "9,34": {
+      "showcase": "",
+      "ra": 47.5,
+      "dec": -82.5,
+      "images": 126,
+      "images_capped": false,
+      "epochs": 2,
+      "bands": 6,
+      "span_mjd": [
+        60919.053707,
+        61170.767912
+      ],
+      "per_band": {
+        "SPHEREx-D3": 23,
+        "SPHEREx-D6": 20,
+        "SPHEREx-D2": 24,
+        "SPHEREx-D5": 22,
+        "SPHEREx-D1": 18,
+        "SPHEREx-D4": 19
+      }
+    },
+    "10,34": {
+      "showcase": "",
+      "ra": 52.5,
+      "dec": -82.5,
+      "images": 156,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60919.121444,
+        61170.76642
+      ],
+      "per_band": {
+        "SPHEREx-D3": 27,
+        "SPHEREx-D6": 27,
+        "SPHEREx-D2": 24,
+        "SPHEREx-D5": 22,
+        "SPHEREx-D1": 28,
+        "SPHEREx-D4": 28
+      }
+    },
+    "11,34": {
+      "showcase": "",
+      "ra": 57.5,
+      "dec": -82.5,
+      "images": 107,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60923.672199,
+        61171.857631
+      ],
+      "per_band": {
+        "SPHEREx-D5": 32,
+        "SPHEREx-D2": 35,
+        "SPHEREx-D1": 10,
+        "SPHEREx-D4": 10,
+        "SPHEREx-D3": 10,
+        "SPHEREx-D6": 10
+      }
+    },
+    "7,29": {
+      "showcase": "",
+      "ra": 37.5,
+      "dec": -57.5,
+      "images": 469,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60815.938476,
+        61229.698608
+      ],
+      "per_band": {
+        "SPHEREx-D1": 81,
+        "SPHEREx-D4": 75,
+        "SPHEREx-D2": 83,
+        "SPHEREx-D5": 73,
+        "SPHEREx-D3": 80,
+        "SPHEREx-D6": 77
+      }
+    },
+    "6,29": {
+      "showcase": "",
+      "ra": 32.5,
+      "dec": -57.5,
+      "images": 452,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60816.548701,
+        61208.244422
+      ],
+      "per_band": {
+        "SPHEREx-D1": 67,
+        "SPHEREx-D4": 72,
+        "SPHEREx-D2": 95,
+        "SPHEREx-D5": 81,
+        "SPHEREx-D3": 66,
+        "SPHEREx-D6": 71
+      }
+    },
+    "8,29": {
+      "showcase": "",
+      "ra": 42.5,
+      "dec": -57.5,
+      "images": 467,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60820.827151,
+        61235.129457
+      ],
+      "per_band": {
+        "SPHEREx-D1": 90,
+        "SPHEREx-D4": 84,
+        "SPHEREx-D2": 62,
+        "SPHEREx-D5": 53,
+        "SPHEREx-D3": 89,
+        "SPHEREx-D6": 89
+      }
+    },
+    "10,29": {
+      "showcase": "",
+      "ra": 52.5,
+      "dec": -57.5,
+      "images": 524,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60825.109137,
+        61234.105201
+      ],
+      "per_band": {
+        "SPHEREx-D1": 96,
+        "SPHEREx-D4": 89,
+        "SPHEREx-D2": 77,
+        "SPHEREx-D3": 97,
+        "SPHEREx-D5": 72,
+        "SPHEREx-D6": 93
+      }
+    },
+    "6,28": {
+      "showcase": "",
+      "ra": 32.5,
+      "dec": -52.5,
+      "images": 501,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60825.720091,
+        61230.106633
+      ],
+      "per_band": {
+        "SPHEREx-D1": 89,
+        "SPHEREx-D4": 88,
+        "SPHEREx-D2": 92,
+        "SPHEREx-D5": 84,
+        "SPHEREx-D3": 71,
+        "SPHEREx-D6": 77
+      }
+    },
+    "9,29": {
+      "showcase": "",
+      "ra": 47.5,
+      "dec": -57.5,
+      "images": 470,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60828.708737,
+        61225.758948
+      ],
+      "per_band": {
+        "SPHEREx-D1": 76,
+        "SPHEREx-D4": 70,
+        "SPHEREx-D2": 98,
+        "SPHEREx-D5": 85,
+        "SPHEREx-D3": 72,
+        "SPHEREx-D6": 69
+      }
+    },
+    "8,28": {
+      "showcase": "",
+      "ra": 42.5,
+      "dec": -52.5,
+      "images": 506,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60830.685564,
+        61233.093239
+      ],
+      "per_band": {
+        "SPHEREx-D1": 82,
+        "SPHEREx-D4": 80,
+        "SPHEREx-D2": 95,
+        "SPHEREx-D3": 85,
+        "SPHEREx-D5": 84,
+        "SPHEREx-D6": 80
+      }
+    },
+    "7,28": {
+      "showcase": "",
+      "ra": 37.5,
+      "dec": -52.5,
+      "images": 503,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60830.954756,
+        61233.093239
+      ],
+      "per_band": {
+        "SPHEREx-D1": 84,
+        "SPHEREx-D4": 78,
+        "SPHEREx-D2": 91,
+        "SPHEREx-D5": 85,
+        "SPHEREx-D3": 84,
+        "SPHEREx-D6": 81
+      }
+    },
+    "6,27": {
+      "showcase": "",
+      "ra": 32.5,
+      "dec": -47.5,
+      "images": 530,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60838.835382,
+        61220.867762
+      ],
+      "per_band": {
+        "SPHEREx-D1": 91,
+        "SPHEREx-D2": 98,
+        "SPHEREx-D4": 87,
+        "SPHEREx-D5": 92,
+        "SPHEREx-D3": 84,
+        "SPHEREx-D6": 78
+      }
+    },
+    "11,29": {
+      "showcase": "",
+      "ra": 57.5,
+      "dec": -57.5,
+      "images": 480,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60840.872094,
+        61241.982123
+      ],
+      "per_band": {
+        "SPHEREx-D1": 79,
+        "SPHEREx-D4": 79,
+        "SPHEREx-D2": 82,
+        "SPHEREx-D5": 80,
+        "SPHEREx-D3": 80,
+        "SPHEREx-D6": 80
+      }
+    },
+    "9,28": {
+      "showcase": "",
+      "ra": 47.5,
+      "dec": -52.5,
+      "images": 534,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60841.551265,
+        61235.129457
+      ],
+      "per_band": {
+        "SPHEREx-D1": 102,
+        "SPHEREx-D4": 97,
+        "SPHEREx-D2": 78,
+        "SPHEREx-D3": 94,
+        "SPHEREx-D5": 73,
+        "SPHEREx-D6": 90
+      }
+    },
+    "7,27": {
+      "showcase": "",
+      "ra": 37.5,
+      "dec": -47.5,
+      "images": 549,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60842.843468,
+        61224.604262
+      ],
+      "per_band": {
+        "SPHEREx-D1": 98,
+        "SPHEREx-D4": 99,
+        "SPHEREx-D2": 94,
+        "SPHEREx-D3": 84,
+        "SPHEREx-D5": 91,
+        "SPHEREx-D6": 83
+      }
+    },
+    "6,26": {
+      "showcase": "",
+      "ra": 32.5,
+      "dec": -42.5,
+      "images": 569,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60844.403708,
+        61243.820421
+      ],
+      "per_band": {
+        "SPHEREx-D1": 99,
+        "SPHEREx-D4": 99,
+        "SPHEREx-D2": 97,
+        "SPHEREx-D3": 90,
+        "SPHEREx-D5": 97,
+        "SPHEREx-D6": 87
+      }
+    },
+    "9,27": {
+      "showcase": "",
+      "ra": 47.5,
+      "dec": -47.5,
+      "images": 589,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60846.038595,
+        61258.277476
+      ],
+      "per_band": {
+        "SPHEREx-D1": 90,
+        "SPHEREx-D2": 102,
+        "SPHEREx-D4": 89,
+        "SPHEREx-D5": 103,
+        "SPHEREx-D3": 104,
+        "SPHEREx-D6": 101
+      }
+    },
+    "10,28": {
+      "showcase": "",
+      "ra": 52.5,
+      "dec": -52.5,
+      "images": 502,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60846.100862,
+        61257.801749
+      ],
+      "per_band": {
+        "SPHEREx-D1": 87,
+        "SPHEREx-D2": 99,
+        "SPHEREx-D4": 84,
+        "SPHEREx-D5": 98,
+        "SPHEREx-D3": 68,
+        "SPHEREx-D6": 66
+      }
+    },
+    "8,27": {
+      "showcase": "",
+      "ra": 42.5,
+      "dec": -47.5,
+      "images": 546,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60846.040088,
+        61229.626091
+      ],
+      "per_band": {
+        "SPHEREx-D1": 90,
+        "SPHEREx-D2": 93,
+        "SPHEREx-D3": 91,
+        "SPHEREx-D4": 91,
+        "SPHEREx-D5": 92,
+        "SPHEREx-D6": 89
+      }
+    },
+    "7,26": {
+      "showcase": "",
+      "ra": 37.5,
+      "dec": -42.5,
+      "images": 615,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60847.124565,
+        61258.550061
+      ],
+      "per_band": {
+        "SPHEREx-D1": 103,
+        "SPHEREx-D2": 96,
+        "SPHEREx-D4": 102,
+        "SPHEREx-D5": 96,
+        "SPHEREx-D3": 108,
+        "SPHEREx-D6": 110
+      }
+    },
+    "11,28": {
+      "showcase": "",
+      "ra": 57.5,
+      "dec": -52.5,
+      "images": 538,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60847.804731,
+        61244.904029
+      ],
+      "per_band": {
+        "SPHEREx-D1": 86,
+        "SPHEREx-D4": 85,
+        "SPHEREx-D2": 101,
+        "SPHEREx-D3": 86,
+        "SPHEREx-D5": 96,
+        "SPHEREx-D6": 84
+      }
+    },
+    "6,25": {
+      "showcase": "",
+      "ra": 32.5,
+      "dec": -37.5,
+      "images": 636,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60848.618808,
+        61243.956909
+      ],
+      "per_band": {
+        "SPHEREx-D1": 108,
+        "SPHEREx-D2": 108,
+        "SPHEREx-D4": 109,
+        "SPHEREx-D5": 104,
+        "SPHEREx-D3": 103,
+        "SPHEREx-D6": 104
+      }
+    },
+    "6,24": {
+      "showcase": "",
+      "ra": 32.5,
+      "dec": -32.5,
+      "images": 651,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60850.046096,
+        61234.107386
+      ],
+      "per_band": {
+        "SPHEREx-D1": 108,
+        "SPHEREx-D2": 110,
+        "SPHEREx-D4": 109,
+        "SPHEREx-D5": 108,
+        "SPHEREx-D3": 110,
+        "SPHEREx-D6": 106
+      }
+    },
+    "8,26": {
+      "showcase": "",
+      "ra": 42.5,
+      "dec": -42.5,
+      "images": 596,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60850.658843,
+        61259.636067
+      ],
+      "per_band": {
+        "SPHEREx-D1": 98,
+        "SPHEREx-D2": 106,
+        "SPHEREx-D4": 99,
+        "SPHEREx-D5": 107,
+        "SPHEREx-D3": 92,
+        "SPHEREx-D6": 94
+      }
+    },
+    "7,25": {
+      "showcase": "",
+      "ra": 37.5,
+      "dec": -37.5,
+      "images": 616,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60850.724716,
+        61234.92333
+      ],
+      "per_band": {
+        "SPHEREx-D1": 101,
+        "SPHEREx-D2": 104,
+        "SPHEREx-D4": 106,
+        "SPHEREx-D5": 103,
+        "SPHEREx-D3": 100,
+        "SPHEREx-D6": 102
+      }
+    },
+    "10,27": {
+      "showcase": "",
+      "ra": 52.5,
+      "dec": -47.5,
+      "images": 548,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60853.577656,
+        61258.277476
+      ],
+      "per_band": {
+        "SPHEREx-D1": 89,
+        "SPHEREx-D4": 89,
+        "SPHEREx-D2": 103,
+        "SPHEREx-D3": 83,
+        "SPHEREx-D5": 103,
+        "SPHEREx-D6": 81
+      }
+    },
+    "7,24": {
+      "showcase": "",
+      "ra": 37.5,
+      "dec": -32.5,
+      "images": 671,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60855.213255,
+        61259.638075
+      ],
+      "per_band": {
+        "SPHEREx-D1": 111,
+        "SPHEREx-D4": 111,
+        "SPHEREx-D2": 108,
+        "SPHEREx-D3": 118,
+        "SPHEREx-D5": 108,
+        "SPHEREx-D6": 115
+      }
+    },
+    "8,25": {
+      "showcase": "",
+      "ra": 42.5,
+      "dec": -37.5,
+      "images": 664,
+      "images_capped": false,
+      "epochs": 4,
+      "bands": 6,
+      "span_mjd": [
+        60855.959026,
+        61259.636067
+      ],
+      "per_band": {
+        "SPHEREx-D1": 107,
+        "SPHEREx-D4": 106,
+        "SPHEREx-D2": 115,
+        "SPHEREx-D3": 110,
+        "SPHEREx-D5": 116,
+        "SPHEREx-D6": 110
+      }
+    },
+    "9,26": {
+      "showcase": "",
+      "ra": 47.5,
+      "dec": -42.5,
+      "images": 627,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60856.90849,
+        61259.907445
+      ],
+      "per_band": {
+        "SPHEREx-D1": 103,
+        "SPHEREx-D4": 102,
+        "SPHEREx-D2": 96,
+        "SPHEREx-D3": 116,
+        "SPHEREx-D5": 95,
+        "SPHEREx-D6": 115
+      }
+    },
+    "11,27": {
+      "showcase": "",
+      "ra": 57.5,
+      "dec": -47.5,
+      "images": 600,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60858.67102,
+        61257.801749
+      ],
+      "per_band": {
+        "SPHEREx-D1": 113,
+        "SPHEREx-D4": 113,
+        "SPHEREx-D2": 73,
+        "SPHEREx-D5": 73,
+        "SPHEREx-D3": 114,
+        "SPHEREx-D6": 114
+      }
+    },
+    "10,26": {
+      "showcase": "",
+      "ra": 52.5,
+      "dec": -42.5,
+      "images": 606,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60859.693712,
+        61259.907445
+      ],
+      "per_band": {
+        "SPHEREx-D1": 96,
+        "SPHEREx-D2": 123,
+        "SPHEREx-D4": 94,
+        "SPHEREx-D5": 123,
+        "SPHEREx-D3": 85,
+        "SPHEREx-D6": 85
+      }
+    },
+    "8,24": {
+      "showcase": "",
+      "ra": 42.5,
+      "dec": -32.5,
+      "images": 693,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60859.897547,
+        61259.501196
+      ],
+      "per_band": {
+        "SPHEREx-D1": 106,
+        "SPHEREx-D2": 119,
+        "SPHEREx-D3": 120,
+        "SPHEREx-D4": 109,
+        "SPHEREx-D5": 117,
+        "SPHEREx-D6": 122
+      }
+    },
+    "9,25": {
+      "showcase": "",
+      "ra": 47.5,
+      "dec": -37.5,
+      "images": 654,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60860.643283,
+        61259.636067
+      ],
+      "per_band": {
+        "SPHEREx-D1": 113,
+        "SPHEREx-D2": 97,
+        "SPHEREx-D3": 121,
+        "SPHEREx-D4": 108,
+        "SPHEREx-D5": 99,
+        "SPHEREx-D6": 116
+      }
+    },
+    "11,26": {
+      "showcase": "",
+      "ra": 57.5,
+      "dec": -42.5,
+      "images": 639,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60864.718311,
+        61259.975076
+      ],
+      "per_band": {
+        "SPHEREx-D1": 120,
+        "SPHEREx-D4": 116,
+        "SPHEREx-D2": 81,
+        "SPHEREx-D3": 118,
+        "SPHEREx-D5": 80,
+        "SPHEREx-D6": 124
+      }
+    },
+    "9,24": {
+      "showcase": "",
+      "ra": 47.5,
+      "dec": -32.5,
+      "images": 688,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60864.992442,
+        61258.279501
+      ],
+      "per_band": {
+        "SPHEREx-D1": 121,
+        "SPHEREx-D2": 112,
+        "SPHEREx-D4": 119,
+        "SPHEREx-D5": 112,
+        "SPHEREx-D3": 112,
+        "SPHEREx-D6": 112
+      }
+    },
+    "10,25": {
+      "showcase": "",
+      "ra": 52.5,
+      "dec": -37.5,
+      "images": 669,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60866.62122,
+        61259.568578
+      ],
+      "per_band": {
+        "SPHEREx-D1": 112,
+        "SPHEREx-D2": 136,
+        "SPHEREx-D4": 110,
+        "SPHEREx-D5": 126,
+        "SPHEREx-D3": 91,
+        "SPHEREx-D6": 94
+      }
+    },
+    "10,24": {
+      "showcase": "",
+      "ra": 52.5,
+      "dec": -32.5,
+      "images": 693,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60870.904258,
+        61254.410208
+      ],
+      "per_band": {
+        "SPHEREx-D1": 115,
+        "SPHEREx-D4": 110,
+        "SPHEREx-D2": 137,
+        "SPHEREx-D3": 100,
+        "SPHEREx-D5": 131,
+        "SPHEREx-D6": 100
+      }
+    },
+    "11,25": {
+      "showcase": "",
+      "ra": 57.5,
+      "dec": -37.5,
+      "images": 675,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60871.514271,
+        61259.090275
+      ],
+      "per_band": {
+        "SPHEREx-D1": 122,
+        "SPHEREx-D4": 119,
+        "SPHEREx-D2": 82,
+        "SPHEREx-D3": 138,
+        "SPHEREx-D5": 80,
+        "SPHEREx-D6": 134
+      }
+    },
+    "11,24": {
+      "showcase": "",
+      "ra": 57.5,
+      "dec": -32.5,
+      "images": 683,
+      "images_capped": false,
+      "epochs": 3,
+      "bands": 6,
+      "span_mjd": [
+        60875.114389,
+        61261.537147
+      ],
+      "per_band": {
+        "SPHEREx-D1": 130,
+        "SPHEREx-D2": 84,
+        "SPHEREx-D4": 125,
+        "SPHEREx-D5": 82,
+        "SPHEREx-D3": 134,
+        "SPHEREx-D6": 128
       }
     }
   },
-  "generated_at": "2026-09-21T19:14:50.817326+00:00",
-  "source": "IRSA TAP spherex.artifact x spherex.plane; passes split on >20d gaps"
+  "generated_at": "2026-09-21T19:20:12.055612+00:00",
+  "source": "IRSA TAP spherex.obscore s_ra/s_dec boxes; passes split on >20d gaps"
 }
