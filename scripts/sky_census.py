@@ -73,12 +73,20 @@ def main():
 
     if args.merge:
         merged: dict = {"done": [], "cells": {}}
-        # shard files only (they partition all boxes; main progress is superseded)
+        # shard files only (they partition all boxes; main progress is superseded).
+        # parse-retry: workers rewrite these files; never silently drop a torn read.
+        import time as _time
         for src in sorted((ROOT / "data").glob("census_shard_*.json")):
-            try:
-                part = json.loads(Path(src).read_text())
-            except Exception:
-                continue
+            part = None
+            for _ in range(10):
+                try:
+                    part = json.loads(Path(src).read_text())
+                    break
+                except Exception:
+                    _time.sleep(3)
+            if part is None:
+                print(f"merge ABORTED: {src} unreadable; keeping published coverage", flush=True)
+                return False
             for k in part.get("done", []):
                 if k not in merged["done"]:
                     merged["done"].append(k)
