@@ -371,6 +371,8 @@ export default function BlinkPage({ id }: { id: string }) {
                   ) : (
                     <p className="fine">No brightness samples yet — arm Measure on the image and click a spot, or wait for live pipeline photometry.</p>
                   )}
+                  <h3>Spectrum</h3>
+                  <BandSpectrum viewing={viewing} sample={sample} liveSpec={liveSpec} band={band} />
                 </>
               )}
               {tab === 'epochs' && (
@@ -384,8 +386,7 @@ export default function BlinkPage({ id }: { id: string }) {
                       </button>
                     ))}
                   </div>
-                  <h3>Spectrum at click</h3>
-                  <BandSpectrum viewing={viewing} sample={sample} liveSpec={liveSpec} band={band} />
+                  <p className="fine">Tip: the spectrum for the clicked spot now lives under Overview — always visible, no tab-hopping.</p>
                 </>
               )}
               {tab === 'catalogs' && (
