@@ -6,6 +6,50 @@
   "story": "Eta Carinae and Trumpler clusters. Blink two visits (D3) for eruptive variables in the dust.",
   "epochs": [
     {
+      "label": "2026-01-12 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": null,
+      "mjd": 61052.025834,
+      "ra": 161.26,
+      "dec": -59.68,
+      "size_deg": 0.15,
+      "png": "/cutouts/carina-field_2026-01-12.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W03_1A/l2b-v23-2026-016/3/level2_2026W03_1A_0006_1D3_spx_l2b-v23-2026-016.fits?center=161.26,-59.68&size=0.15"
+    },
+    {
+      "label": "2026-01-19 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": null,
+      "mjd": 61059.019339,
+      "ra": 161.26,
+      "dec": -59.68,
+      "size_deg": 0.15,
+      "png": "/cutouts/carina-field_2026-01-19.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W04_1A/l2b-v23-2026-023/3/level2_2026W04_1A_0005_1D3_spx_l2b-v23-2026-023.fits?center=161.26,-59.68&size=0.15"
+    },
+    {
+      "label": "2026-02-19 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": null,
+      "mjd": 61090.864057,
+      "ra": 161.26,
+      "dec": -59.68,
+      "size_deg": 0.15,
+      "png": "/cutouts/carina-field_2026-02-19.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W08_2A/l2b-v24-2026-089/3/level2_2026W08_2A_0075_1D3_spx_l2b-v24-2026-089.fits?center=161.26,-59.68&size=0.15"
+    },
+    {
+      "label": "2026-06-21 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": null,
+      "mjd": 61212.238335,
+      "ra": 161.26,
+      "dec": -59.68,
+      "size_deg": 0.15,
+      "png": "/cutouts/carina-field_2026-06-21.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W25_2A/l2b-v25-2026-174/3/level2_2026W25_2A_0592_2D3_spx_l2b-v25-2026-174.fits?center=161.26,-59.68&size=0.15"
+    },
+    {
       "label": "Survey 1 \u00b7 D3",
       "band": 3,
       "wavelength_um": 2.02,
