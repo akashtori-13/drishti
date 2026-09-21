@@ -4,7 +4,7 @@ import { useRef, useState } from 'react';
 import Icon from '@/components/Icon';
 import { SHOWCASE_IDS, getShowcase, type Showcase } from '@/lib/showcases';
 import { parseCoordinates, findConstellation, CONSTELLATIONS } from '@/lib/astro';
-import { resolveViaSesame, surpriseField } from '@/lib/catalogs';
+import { resolveViaSesame } from '@/lib/catalogs';
 
 export interface SearchTarget {
   label: string;
@@ -113,24 +113,12 @@ export default function SearchBox({
     }
   };
 
-  const surprise = () => {
-    const s = surpriseField();
-    if (s.showcaseId) {
-      void getShowcase(s.showcaseId).then((d) => onPick({ label: d.title, ra: d.ra, dec: d.dec, showcaseId: s.showcaseId }))
-        .catch(() => onPick({ label: s.title, ra: s.ra, dec: s.dec }));
-    } else {
-      onPick({ label: s.title, ra: s.ra, dec: s.dec });
-    }
-  };
-
   return (
-    <div style={{ display: 'flex', gap: 8, width: '100%', alignItems: 'stretch' }}>
-      <form
-        ref={boxRef} className="search-shell" role="search" noValidate
-        style={{ flex: 1 }}
-        onSubmit={(e) => { e.preventDefault(); void submit(q); }}
-        onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setOpen(false); }}
-      >
+    <form
+      ref={boxRef} className="search-shell" role="search" noValidate
+      onSubmit={(e) => { e.preventDefault(); void submit(q); }}
+      onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setOpen(false); }}
+    >
         <Icon name="search" className="s-icon icon" />
         <input
           value={q}
@@ -173,14 +161,5 @@ export default function SearchBox({
           {!err && !opts.length && <div className="s-empty">Try “M31”, “Ori”, “10h12m +12d30m”, or 132.40, −3.20.</div>}
         </div>
       </form>
-      {!compact && (
-        <button
-          type="button" className="chip" onClick={surprise} title="Jump to a pre-curated interesting field"
-          style={{ alignSelf: 'center', whiteSpace: 'nowrap' }}
-        >
-          Surprise me
-        </button>
-      )}
-    </div>
   );
 }

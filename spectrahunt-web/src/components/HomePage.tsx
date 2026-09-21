@@ -6,6 +6,7 @@ import { SHOWCASE_IDS, getCoverage, type RealCell } from '@/lib/showcases';
 import { buildGrid, GRID_H, GRID_W } from '@/lib/sky';
 import HeroSky from '@/components/HeroSky';
 import SearchBox, { type SearchTarget } from '@/components/SearchBox';
+import SurpriseButton from '@/components/SurpriseButton';
 import Inspector, { type InspectorField } from '@/components/Inspector';
 
 const SHOWCASE_POINTS = [
@@ -119,6 +120,8 @@ export default function HomePage() {
             <button type="button" className="chip" onClick={() => pick({ label: '433 Eros', ra: 210.32, dec: 9.11 })}>433 Eros</button>
             <button type="button" className="chip" onClick={() => pick({ label: 'Orion Complex', ra: 83.82, dec: -5.39 })}>Orion Complex</button>
             <button type="button" className="chip mono" onClick={() => pick({ label: '156.09, −41.64', ra: 156.09, dec: -41.64 })}>156.09, −41.64</button>
+            <span className="quick-sep" aria-hidden="true">or</span>
+            <SurpriseButton onPick={pick} />
           </div>
           <p className="sky-hint">Or click anywhere on the sky to inspect that field.</p>
         </div>

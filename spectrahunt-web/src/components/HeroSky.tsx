@@ -3,8 +3,9 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   GRID_H, GRID_W, LEVEL_COLORS, cellOf, drawBracket,
-  fmtDec, fmtRa,
+  fmtDec, fmtRa, SKY_ALLSKY_URL,
 } from '@/lib/sky';
+import { loadCachedImage } from '@/lib/skycache';
 
 export interface SkyHover { i: number; j: number; ra: number; dec: number; n: number; x: number; y: number }
 
@@ -32,17 +33,16 @@ export default function HeroSky({
     state.current.coverage = coverage;
   });
 
-  // real infrared sky (2MASS all-sky, cached by the CDN)
+  // real infrared sky (2MASS all-sky CAR, cached on device)
   useEffect(() => {
     let alive = true;
-    const im = new Image();
-    im.crossOrigin = 'anonymous';
-    im.onload = () => {
-      if (!alive) return;
-      state.current.img = im;
-      setSkyReady(true);
-    };
-    im.src = 'https://alasky.cds.unistra.fr/2MASS/Color/Norder3/Allsky.jpg';
+    void loadCachedImage(SKY_ALLSKY_URL)
+      .then((im) => {
+        if (!alive) return;
+        state.current.img = im;
+        setSkyReady(true);
+      })
+      .catch(() => undefined);
     return () => { alive = false; };
   }, []);
 
@@ -71,7 +71,7 @@ export default function HeroSky({
       const { w, h } = st;
       if (!w || !h) return;
       if (st.img && st.img.complete && st.img.naturalWidth) {
-        // cover: equirectangular image maps RA 0..360 -> x, Dec +90..-90 -> y
+        // cover with horizontal mirror: image RA runs LEFT, overlay math runs RIGHT
         const iw = st.img.naturalWidth;
         const ih = st.img.naturalHeight;
         const scale = Math.max(w / iw, h / ih);
@@ -79,7 +79,11 @@ export default function HeroSky({
         const dh = ih * scale;
         ctx.fillStyle = '#04050a';
         ctx.fillRect(0, 0, w, h);
+        ctx.save();
+        ctx.translate(w, 0);
+        ctx.scale(-1, 1);
         ctx.drawImage(st.img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+        ctx.restore();
         // dim slightly so text stays readable
         ctx.fillStyle = 'rgba(4,5,10,.28)';
         ctx.fillRect(0, 0, w, h);

@@ -59,6 +59,12 @@ export function hashStr(s: string): number {
 
 export const STAR_FILL = ['#e6e8f2', '#ffe6c4', '#c9dcff'];
 
+// Real infrared all-sky (2MASS, equirectangular CAR, log stretch).
+// Verified: RA increases LEFT (x=0 <-> RA 360, x=W <-> RA 0), Dec +90 top.
+// Equirect views MUST mirror X when drawing so overlay math (RA right) matches.
+export const SKY_ALLSKY_URL =
+  'https://alasky.cds.unistra.fr/hips-image-services/hips2fits?hips=CDS%2FP%2F2MASS%2Fcolor&ra=180&dec=0&fov=360&width=1440&height=720&projection=CAR&coordsys=icrs&rotation=0&format=jpg&stretch=log';
+
 export const fmtRa = (v: number) => `${Number(v).toFixed(2)}°`;
 export const fmtDec = (v: number) => `${v < 0 ? '−' : ''}${Math.abs(Number(v)).toFixed(2)}°`;
 
