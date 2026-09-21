@@ -1,0 +1,50 @@
+{
+  "id": "3i-atlas",
+  "title": "3I/ATLAS — interstellar comet, Aug vs Dec 2025",
+  "ra": 252.6633,
+  "dec": -17.4904,
+  "story": "SPHEREx pointed at interstellar comet 3I/ATLAS twice: quiet in August 2025 (CO2 coma only) and erupting in December 2025 (H2O 40x up, organics, dust tail). Same sky, 4 months apart — drag the slider.",
+  "epochs": [
+    {
+      "label": "2025-08-01 · pre-perihelion",
+      "obs_id": "2025W31_2A_0156_1",
+      "detector": "D3",
+      "band": 3,
+      "wavelength_um": 2.02,
+      "mjd": 60888.33,
+      "ra": 252.6633,
+      "dec": -17.4904,
+      "size_deg": 0.1,
+      "png": null,
+      "note": "CO2 coma ~3 arcmin, H2O/CO undetected. Lisse et al. RNAAS 9:242."
+    },
+    {
+      "label": "2025-12-14 · post-perihelion",
+      "obs_id": "2025W50_2A_0741_1",
+      "detector": "D3",
+      "band": 3,
+      "wavelength_um": 2.02,
+      "mjd": 61023.46,
+      "ra": 166.9781,
+      "dec": 5.2264,
+      "size_deg": 0.1,
+      "png": null,
+      "note": "Fully active: H2O, CO, CN, organics C-H, dust tail. Lisse et al. RNAAS 2026."
+    }
+  ],
+  "tap": {
+    "collection": "spherex_qr2",
+    "bandpass": "SPHEREx-D3",
+    "endpoint": "https://irsa.ipac.caltech.edu/TAP"
+  },
+  "links": {
+    "irsa_viewer": "https://irsa.ipac.caltech.edu/irsaviewer/",
+    "obscore_table": "https://irsa.ipac.caltech.edu/data/SPHEREx/docs/comet3iatlas/obscore_3I_Atlas.vot",
+    "paper_aug": "https://ui.adsabs.harvard.edu/abs/2025RNAAS...9..242L/abstract",
+    "paper_dec": "https://ui.adsabs.harvard.edu/abs/2026arXiv260106759L/abstract"
+  },
+  "citation": {
+    "doi": "10.26131/IRSA652",
+    "text": "This publication makes use of data products from SPHEREx (JPL/Caltech, NASA)."
+  }
+}

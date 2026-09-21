@@ -2,13 +2,16 @@
 
 import Link from 'next/link';
 import { useAppStore } from '@/lib/store';
-import { Search, Map as MapIcon, List, Info } from 'lucide-react';
+import { Search, Map as MapIcon, List, Info, Zap } from 'lucide-react';
 
 export default function Header() {
   const { currentView, setCurrentView } = useAppStore();
 
-  const navItems = [
+  type ViewId = 'home' | 'map' | 'field' | 'candidates' | 'about' | 'blink';
+
+  const navItems: Array<{ id: ViewId; label: string; icon: typeof Search; hash: string }> = [
     { id: 'home', label: 'Home', icon: Search, hash: '#/' },
+    { id: 'blink', label: 'Blink', icon: Zap, hash: '#/blink' },
     { id: 'map', label: 'Sky Map', icon: MapIcon, hash: '#/map' },
     { id: 'candidates', label: 'Candidates', icon: List, hash: '#/candidates' },
     { id: 'about', label: 'About', icon: Info, hash: '#/about' },
@@ -38,7 +41,7 @@ export default function Header() {
               return (
                 <button
                   key={item.id}
-                  onClick={() => setCurrentView(item.id as any)}
+                  onClick={() => setCurrentView(item.id)}
                   className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
                     isActive
                       ? 'bg-slate-800 text-white'

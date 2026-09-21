@@ -18,15 +18,15 @@ interface AppState {
   errorCandidates: string | null;
   
   // UI State
-  currentView: 'home' | 'map' | 'field' | 'candidates' | 'about';
+  currentView: 'home' | 'map' | 'field' | 'candidates' | 'about' | 'blink';
   selectedField: { ra: number; dec: number } | null;
   searchQuery: string;
-  
+
   // Actions
   loadStatus: () => Promise<void>;
   loadCoverage: () => Promise<void>;
   loadCandidates: (params?: { since?: string; band?: number; status?: string; limit?: number }) => Promise<void>;
-  setCurrentView: (view: 'home' | 'map' | 'field' | 'candidates' | 'about') => void;
+  setCurrentView: (view: 'home' | 'map' | 'field' | 'candidates' | 'about' | 'blink') => void;
   setSelectedField: (ra: number, dec: number) => void;
   setSearchQuery: (query: string) => void;
   clearErrors: () => void;
@@ -99,7 +99,8 @@ export const useAppStore = create<AppState>((set, get) => ({
         map: '#/map',
         field: '#/field',
         candidates: '#/candidates',
-        about: '#/about'
+        about: '#/about',
+        blink: '#/blink'
       };
       window.location.hash = hashMap[view];
     }
