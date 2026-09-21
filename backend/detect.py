@@ -3,10 +3,15 @@ Detection pipeline for SpectraHunt.
 
 Performs difference imaging on wavelength-matched epoch pairs,
 extracts sources with SEP, pairs dipoles, and scores candidates.
+
+Run as: python -m backend.detect
+Or:     python scripts/build_static_bundle.py (which calls this correctly)
 """
 
 import hashlib
 import json
+import sys
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any
@@ -16,17 +21,20 @@ from astropy.wcs import WCS
 from reproject import reproject_interp
 import sep
 
-from .config import (
+# Add parent directory to path so relative imports work when run directly
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from backend.config import (
     DETECTION_SIGMA_THRESHOLD, DIPOLE_MAX_SEPARATION_ARCSEC,
     DIPOLE_MAX_MOTION_ARCSEC_PER_DAY, SKYBOT_MATCH_RADIUS_ARCSEC,
     PIXEL_SCALE_ARCSEC
 )
-from .cutouts import (
+from backend.cutouts import (
     get_or_render_cutout_png, parse_cutout_fits, mask_bad_pixels,
     wavelengths_match, compute_wavelength_match_tolerance
 )
-from .db import get_connection, insert_candidate
-from .crossmatch import query_skybot
+from backend.db import get_connection, insert_candidate
+from backend.crossmatch import query_skybot
 
 
 def load_and_reproject_cutouts(

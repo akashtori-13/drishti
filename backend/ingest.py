@@ -3,12 +3,17 @@ Frame ingestion for SpectraHunt.
 
 Discovers SPHEREx QR2 frames via SIA2 or AWS S3 listing,
 reads headers only (via HTTP range requests), and indexes them.
+
+Run as: python -m backend.ingest --ra 180 --dec 0 --radius 2
+Or:     python scripts/build_static_bundle.py (which calls this correctly)
 """
 
 import asyncio
 import hashlib
 import json
 import re
+import sys
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import AsyncGenerator, Dict, List, Optional, Tuple, Any
@@ -18,13 +23,16 @@ from astropy.io import fits
 from astropy.wcs import WCS
 import numpy as np
 
-from .config import (
+# Add parent directory to path so relative imports work when run directly
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from backend.config import (
     IRSA_SIA2_ENDPOINT, SIA2_COLLECTION_WIDE, SIA2_COLLECTION_DEEP,
     AWS_BUCKET, AWS_REGION, AWS_PREFIX, IRSA_CUTOUT_BASE,
     MAX_CONCURRENT_IRSA_REQUESTS, INGEST_TIMEOUT_SECONDS, USER_AGENT,
     GRID_W, GRID_H, CELL_SIZE_DEG, FLAGS_BAD_BITS
 )
-from .db import init_db, get_connection, upsert_frame, insert_frame_cells, update_status
+from backend.db import init_db, get_connection, upsert_frame, insert_frame_cells, update_status
 
 
 def cell_of(ra: float, dec: float) -> Tuple[int, int]:
