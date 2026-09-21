@@ -550,9 +550,14 @@ kbd{font-family:var(--font-mono); font-size:.6875rem; border:1px solid var(--lin
 .rate{margin-left:auto; flex-shrink:0; display:flex; align-items:center; gap:8px; font-size:.75rem; color:var(--ink-3);}
 .rate input{width:110px; accent-color:#7c83fd;}
 .tweak-col{border-radius:20px; padding:6px 18px 18px; display:flex; flex-direction:column; gap:4px; min-width:0;}
-.tweak-sec{padding:12px 0; border-bottom:1px solid var(--line);}
+.tweak-sec{padding:10px 0; border-bottom:1px solid var(--line);}
 .tweak-sec:last-child{border-bottom:0; padding-bottom:4px;}
-.tweak-sec h3{font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-3); margin-bottom:10px;}
+.tweak-sec > summary{list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between; font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-2); padding:2px 0; border-radius:8px;}
+.tweak-sec > summary::-webkit-details-marker{display:none;}
+.tweak-sec > summary:hover{color:var(--ink);}
+.tweak-sec > summary::after{content:'+'; font-size:1rem; color:var(--ink-3); font-weight:400;}
+.tweak-sec[open] > summary{color:var(--ink); margin-bottom:10px;}
+.tweak-sec[open] > summary::after{content:'–';}
 .tweak-sec .speed{margin-top:8px;}
 .probe-line{font-size:.75rem; color:var(--ink-2); margin-bottom:8px;}
 .hist{width:100%; max-width:280px; height:44px; background:#04050a; border-radius:8px; border:1px solid var(--line);}

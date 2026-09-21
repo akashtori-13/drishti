@@ -28,11 +28,25 @@ def discover_cached(ra: float, dec: float, band: int, size_deg: float,
     key = _cache_key("discover", round(ra, 4), round(dec, 4), band, size_deg)
     try:
         hit = api_cache_get(db_path, key, 3600)
-        if isinstance(hit, list):
+        if isinstance(hit, list) and hit:
             return hit
     except Exception:
         pass
     hits = [h for h in discover_epochs(ra, dec, band=band, size_deg=size_deg) if h.get("cutout_url")]
+    if hits:
+        try:
+            api_cache_set(db_path, key, hits)
+        except Exception:
+            pass
+        return hits
+    # outage path: serve last-known discovery rather than nothing
+    try:
+        stale = api_cache_get(db_path, key, 3600, allow_stale=True)
+        if isinstance(stale, list) and stale:
+            print(f"discover: serving {len(stale)} stale hits for ({ra},{dec}) band {band}")
+            return stale
+    except Exception:
+        pass
     try:
         api_cache_set(db_path, key, hits)
     except Exception:
@@ -152,8 +166,9 @@ async def lightcurve_for(ra: float, dec: float, band: int = 3,
         hit = api_cache_get(db_path, key, 6 * 3600)
         if isinstance(hit, dict):
             return hit
+        stale = api_cache_get(db_path, key, 6 * 3600, allow_stale=True)
     except Exception:
-        pass
+        hit, stale = None, None
     hits = _sample_hits(discover_cached(ra, dec, band, size_deg, db_path), max_epochs)
     if not hits:
         return {"points": [], "detail": "no-epochs"}
@@ -169,10 +184,13 @@ async def lightcurve_for(ra: float, dec: float, band: int = 3,
         points.append({"mjd": h.get("mjd"), "flux": m["flux"], "flux_err": m["flux_err"],
                        "x": xy[0], "y": xy[1]})
     out = {"points": points, "band": band, "detail": "ok" if points else "fetch-failed"}
-    try:
-        api_cache_set(db_path, key, out)
-    except Exception:
-        pass
+    if not points and isinstance(stale, dict) and stale.get("points"):
+        out = {**stale, "detail": "stale"}
+    elif points:
+        try:
+            api_cache_set(db_path, key, out)
+        except Exception:
+            pass
     return out
 
 
@@ -189,8 +207,9 @@ async def spectrum_for(ra: float, dec: float,
         hit = api_cache_get(db_path, key, 6 * 3600)
         if isinstance(hit, dict):
             return hit
+        stale = api_cache_get(db_path, key, 6 * 3600, allow_stale=True)
     except Exception:
-        pass
+        hit, stale = None, None
     points = []
     for b in BANDS:
         det = b["id"]
@@ -208,10 +227,13 @@ async def spectrum_for(ra: float, dec: float,
                        "flux": m["flux"], "flux_err": m["flux_err"], "mjd": hits[-1].get("mjd")})
     out = {"points": sorted(points, key=lambda p: p["wavelength_um"]),
            "detail": "ok" if points else "fetch-failed"}
-    try:
-        api_cache_set(db_path, key, out)
-    except Exception:
-        pass
+    if not points and isinstance(stale, dict) and stale.get("points"):
+        out = {**stale, "detail": "stale"}
+    elif points:
+        try:
+            api_cache_set(db_path, key, out)
+        except Exception:
+            pass
     return out
 
 

@@ -646,8 +646,8 @@ export default function BlinkComparator({
         </div>
 
         <aside className="tweak-col glass" aria-label="Image controls">
-          <section className="tweak-sec" aria-label="Compare mode">
-            <h3>Compare</h3>
+          <details className="tweak-sec" aria-label="Compare mode" open>
+            <summary>Compare</summary>
             <div style={rowStyle} role="group" aria-label="Compare mode">
               {(['blink', 'side', 'swipe', 'diff'] as CompareMode[]).map((m) => (
                 <button key={m} type="button" className="epoch-chip" aria-pressed={mode === m}
@@ -670,10 +670,10 @@ export default function BlinkComparator({
                 <output>{Math.round(swipe * 100)}%</output>
               </label>
             )}
-          </section>
+          </details>
 
-          <section className="tweak-sec" aria-label="Enhance">
-            <h3>Enhance</h3>
+          <details className="tweak-sec" aria-label="Enhance">
+            <summary>Enhance</summary>
             <div style={rowStyle}>
               <label style={{ fontSize: 13 }}>Stretch{' '}
                 <select value={stretch} onChange={(e) => setStretch(e.target.value as Stretch)} style={selStyle}>
@@ -703,10 +703,10 @@ export default function BlinkComparator({
             <label className="speed"><span>White {Math.round(vmax * 100)}%</span>
               <input type="range" min={50} max={100} value={Math.round(vmax * 100)} onChange={(e) => setVmax(Number(e.target.value) / 100)} />
             </label>
-          </section>
+          </details>
 
-          <section className="tweak-sec" aria-label="Spectral bands">
-            <h3>Bands</h3>
+          <details className="tweak-sec" aria-label="Spectral bands">
+            <summary>Bands</summary>
             <div className="band-row" style={{ padding: 0, background: 'transparent' }}>
               {BANDS.map((b) => (
                 <button key={b.id} type="button" className="band" style={{ ['--band-color' as string]: b.color }}
@@ -732,10 +732,10 @@ export default function BlinkComparator({
                 </select>
               ))}
             </div>
-          </section>
+          </details>
 
-          <section className="tweak-sec" aria-label="Measurements">
-            <h3>Measure</h3>
+          <details className="tweak-sec" aria-label="Measurements">
+            <summary>Measure</summary>
             <div className="mono probe-line">
               {probe
                 ? <>px {probe.lum}{Number.isFinite(probe.ra) ? <> · {probe.ra.toFixed(3)}°, {probe.dec >= 0 ? '+' : ''}{probe.dec.toFixed(3)}°</> : ' · hover'}</>
@@ -768,10 +768,10 @@ export default function BlinkComparator({
                 <p style={{ fontSize: 12, color: '#8a90ab' }}>No movers above 5σ between these epochs — quiet field.</p>
               )
             )}
-          </section>
+          </details>
 
-          <section className="tweak-sec" aria-label="Export">
-            <h3>Save</h3>
+          <details className="tweak-sec" aria-label="Export">
+            <summary>Save</summary>
             <div style={rowStyle}>
               <button type="button" className="epoch-chip" onClick={() => downloadPNG()}>PNG</button>
               <button type="button" className="epoch-chip" onClick={() => void recordWebM()} disabled={recording || n < 2}>
@@ -780,17 +780,17 @@ export default function BlinkComparator({
               <button type="button" className="epoch-chip" onClick={() => { setPan({ x: 0, y: 0 }); setZoom(1); }}>Reset view</button>
               <button type="button" className="epoch-chip" onClick={() => copyLink()}>Copy link</button>
             </div>
-          </section>
+          </details>
 
-          <section className="tweak-sec" aria-label="Shortcuts">
-            <h3>Guide</h3>
+          <details className="tweak-sec" aria-label="Shortcuts">
+            <summary>Guide</summary>
             <div className="keys-grid">
               <span><kbd>Space</kbd> play / pause</span>
               <span><kbd>←</kbd><kbd>→</kbd> step epoch</span>
               <span>drag pan · scroll zoom</span>
             </div>
             <button type="button" className="epoch-chip" onClick={() => setPalette(true)}>Command palette (Ctrl+K)</button>
-          </section>
+          </details>
         </aside>
       </div>
 

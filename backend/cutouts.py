@@ -37,15 +37,35 @@ def cache_key(frame_id: str, ra: float, dec: float, size: float) -> str:
     return hashlib.md5(f"{frame_id}_{ra:.6f}_{dec:.6f}_{size:.4f}".encode()).hexdigest()[:16]
 
 
-async def fetch_ibe(cutout_url: str, dest: Path, timeout: int = API_TIMEOUT_SECONDS * 2) -> Path:
-    """Download an IBE cutout URL to dest."""
+async def fetch_ibe(cutout_url: str, dest: Path, timeout: int = API_TIMEOUT_SECONDS * 2,
+                retries: int = 2) -> Path:
+    """Download an IBE cutout URL to dest. Retries 5xx/network with backoff; 4xx fails fast."""
+    import asyncio
+
     import httpx
     dest.parent.mkdir(parents=True, exist_ok=True)
-    async with httpx.AsyncClient(timeout=timeout) as client:
-        r = await client.get(cutout_url, headers={"User-Agent": USER_AGENT})
-        r.raise_for_status()
-        dest.write_bytes(r.content)
-    return dest
+    last: Optional[Exception] = None
+    for attempt in range(retries + 1):
+        try:
+            async with httpx.AsyncClient(timeout=timeout) as client:
+                r = await client.get(cutout_url, headers={"User-Agent": USER_AGENT})
+                if r.status_code == 422:
+                    # footprint mismatch ("Arrays do not overlap"): retrying is pointless
+                    r.raise_for_status()
+                if r.status_code >= 500:
+                    raise httpx.HTTPStatusError(f"IBE {r.status_code}", request=r.request, response=r)
+                r.raise_for_status()
+                dest.write_bytes(r.content)
+            return dest
+        except httpx.HTTPStatusError as e:
+            if e.response is not None and 400 <= e.response.status_code < 500:
+                raise
+            last = e
+        except Exception as e:  # noqa: BLE001 - network flakes, backoff below
+            last = e
+        await asyncio.sleep(2 ** attempt * 2)
+    assert last is not None
+    raise last
 
 
 def parse_fits(fits_path: Path) -> Dict[str, Any]:
