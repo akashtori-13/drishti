@@ -144,9 +144,7 @@ export default function BlinkComparator({
         if (alive) setLoaded((m) => (m[u] ? m : { ...m, [u]: img }));
       }).catch(() => undefined);
     }
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSpecVals(null);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMeasureChip(null);
     return () => { alive = false; };
   }, [frames]);
