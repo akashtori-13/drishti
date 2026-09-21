@@ -266,6 +266,10 @@ same blink, in every projection.
    the bundle is the product.
 6. **Multipage real routes** — shareable, indexable, back-button-correct;
    permalinks encode showcase/band/epoch/mode.
+7. **Dead upstreams get breakers, not retries forever** — IMCCE retired the
+   legacy SkyBoT cone endpoint mid-project; after verification the client got
+   a consecutive-failure circuit breaker (24 h) plus honest UI copy, instead
+   of slow-failing on every view. Same policy applies to future retirements.
 
 ## 11. Roadmap
 

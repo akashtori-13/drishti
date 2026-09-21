@@ -24,6 +24,7 @@ RA, DEC, BAND, SIZE = 270.0, 66.5, 4, 0.15
 def main() -> bool:
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=12)
+    ap.add_argument("--timeout", type=int, default=60)
     args = ap.parse_args()
 
     import numpy as np
@@ -43,7 +44,7 @@ def main() -> bool:
     for h in picks:
         tmp = Path(tempfile.mkdtemp()) / "c.fits"
         try:
-            asyncio.run(fetch_ibe(h["cutout_url"], tmp, timeout=120))
+            asyncio.run(fetch_ibe(h["cutout_url"], tmp, timeout=args.timeout))
             parsed = parse_fits(tmp)
             if parsed["image"] is None:
                 continue
