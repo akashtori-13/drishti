@@ -29,38 +29,42 @@ dark ("not yet surveyed").
 
 ## 2. What each view shall do
 
-* **Home `#/`** — Full-viewport clickable canvas sky (twinkle, nebula wash, orbiting demo
-  pair once PNGs land), search (showcases, decimal + sexagesimal coordinates,
-  88 constellations, Sesame/SIMBAD names, `/` shortcut, full keyboard), **Surprise me**,
-  Try-chips, coverage toggle pill, real stats bar (cells surveyed · showcases live),
-  how-it-works (align → subtract → catalog) with CTA, first-visit 4-step tutorial.
-  Clicking empty sky opens the inspector; scrolling dismisses it.
-* **Sky `#/sky`** — Equirectangular coverage canvas: measured tiles in epoch blues,
-  unmeasured dark; graticule + labels; hover readout (RA/Dec/epochs, hidden on touch);
-  tools (compact search, coverage switch, help); legend; **compass (N/E) + FOV pill**;
-  inspector rail (desktop) / bottom sheet (mobile) with epochs/bands/survey/status +
-  blink entry (enabled only near a blinkable showcase). Footer hidden — fullscreen page.
-* **Blink `#/blink/<id>?band=&epoch=&mode=`** — Canvas player: timeline slider with
-  date ticks, autoplay transport, 150–1200ms speed, step, **blink / side-by-side /
-  swipe-curtain / real B−A difference** (synced pan/zoom, drag+wheel), motion-color
-  composite (R=B,G=A,B=|diff|), stretch (linear/log/sqrt/asinh) + black/white +
-  presets + invert + colormaps (cividis default), 6 detectors × **102 channels** +
-  RGB picker, click-for-spectrum, PNG/WebM export, keyboard (Space/←/→, ignored in
-  inputs), 1′ scale bar, epoch tags; PNG layers when cached, preloaded.
-  Aside: story, full metadata (RA/Dec/epochs/band/obs ID/MJD+UTC/scale/motion),
-  light curve, SkyBoT cross-match (live API or showcase notes) + MPC/Horizons/SIMBAD
-  links, share-link + CSV/JSON export, community flags (localStorage), provenance
-  links + QR2 cite box. Beginner/advanced toggle gates spectrum/catalogs/flags.
-  Tours + glossary below. Back → sky.
-* **Candidates `#/candidates`** — Cards from showcases/census with real PNG thumbs
-  (static pending tile otherwise), known (green) / unidentified (amber) badges,
-  σ scores, **measured motion ″/day**, band + date + position, all/unknown/known
-  filters with counts, **CSV/JSON export**. Click → blink.
-* **About `#/about`** — Mission, LVF same-band rule, band table, method, live-data
+* **Home `/`** — Full-viewport clickable canvas sky over the real 2MASS CAR
+  background (mirrored to overlay math): clickable blink-field markers (the bg
+  is a mini-map), spectrum-ring search (showcases, decimal + sexagesimal
+  coordinates, 88 constellations, SIMBAD/Sesame names, `/` shortcut, full
+  keyboard), Surprise-me dice chip, Try-chips, coverage toggle pill, real stats
+  bar (cells surveyed · showcases live), how-it-works (align → subtract →
+  catalog) with CTA, first-visit 4-step tutorial. Clicking empty sky opens the
+  inspector; scrolling dismisses it.
+* **Sky `/sky`** — Observer view by default (Stellarium POV: real HiPS SIN sky
+  for your location + live clock, drag-look, zoom, constellation figures, Gaia
+  stars, Sun/Moon, Alt/Az readout, GPS locate, ±1 h time steps), with an
+  all-sky-map mode: equirectangular coverage canvas over the same real
+  background (measured tiles in epoch blues, unmeasured dark; graticule +
+  labels; hover readout; legend; compass + FOV pills); inspector rail (desktop)
+  / bottom sheet (mobile) with epochs/bands/survey/status + blink entry —
+  static showcases nearby, or **live on-demand blink for any visited field**
+  (`/blink/live?ra=&dec=&band=`). Footer hidden — fullscreen page.
+* **Blink `/blink/<id>?band=&epoch=&mode=`** — Fixed-viewport workspace (no page
+  scroll on desktop): viewer tabs (View: timeline slider with date ticks,
+  autoplay transport, blink / side-by-side / swipe / real B−A difference with
+  gain, motion-color composite, synced pan/zoom, PNG/WebM export; Image:
+  stretch, colormap, invert, presets, black/white; Bands: 6 detectors × 102
+  channels + RGB picker), keyboard (Space/←/→), 1′ scale bar, epoch tags;
+  tabbed data rail (Overview: story, verdict, motion ″/day, metadata, real or
+  proxy light curve; Epochs: clickable list + click-spectrum; Catalogs:
+  SkyBoT/MPC/Horizons/SIMBAD + provenance + citation; Share: link, CSV/JSON,
+  community flags); tours + glossary in collapsibles.
+* **Candidates `/candidates`** — Cards from all showcases with real PNG thumbs
+  (honest pending tile otherwise), known (green) / unidentified (amber) badges,
+  σ scores, measured motion ″/day, all/unknown/known filters with counts,
+  CSV/JSON export. Click → real blink page.
+* **About `/about`** — Mission, LVF same-band rule, band table, method, live-data
   notice, citation block, sources (IRSA, QR overview, AWS Open Data, SkyBoT).
 
-Global: hash router with `#how` deep-link + permalink query (?band=&epoch=&mode=),
-per-view titles, skip-link, focus management, hamburger nav ≤640px,
+Global: real multipage routes with per-page titles (hash router retired);
+`blinkURL()` permalinks; skip-link, focus management, hamburger nav ≤640px,
 `prefers-reduced-motion` freezes all animation, touch targets ≥44px.
 
 ## 3. Backend (dev-only; never on the CDN)
