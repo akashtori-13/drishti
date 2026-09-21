@@ -12,7 +12,8 @@
       "ra": 247.5,
       "dec": -7.5,
       "size_deg": 0.15,
-      "png": null
+      "png": "/cutouts/ophiuchus-field_Survey-1.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2025W30_1B/l2b-v20-2025-262/3/level2_2025W30_1B_0598_1D3_spx_l2b-v20-2025-262.fits?center=247.5,-7.5&size=0.15"
     },
     {
       "label": "Survey 2 \u00b7 D3",
@@ -21,7 +22,8 @@
       "ra": 247.5,
       "dec": -7.5,
       "size_deg": 0.15,
-      "png": null
+      "png": "/cutouts/ophiuchus-field_Survey-2.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W31_1B/l2b-v27-2026-224/3/level2_2026W31_1B_0519_4D3_spx_l2b-v27-2026-224.fits?center=247.5,-7.5&size=0.15"
     }
   ],
   "census": {
