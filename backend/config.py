@@ -14,8 +14,6 @@ TAP_URL = "https://irsa.ipac.caltech.edu/TAP"
 SIA2_URL = "https://irsa.ipac.caltech.edu/SIA"
 IRSA_VIEWER_URL = "https://irsa.ipac.caltech.edu/irsaviewer/"
 COLLECTION_WIDE = "spherex_qr2"
-COLLECTION_DEEP = "spherex_qr2_deep"
-COLLECTION_CAL = "spherex_qr2_cal"
 
 # SkyBoT (IMCCE) solar-system cross-match
 SKYBOT_URL = "https://vo.imcce.fr/webservices/skybot/"

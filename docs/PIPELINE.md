@@ -13,7 +13,7 @@ Design context: `SYSTEM_DESIGN.md` §§4–6, 9. API shapes: `docs/API.md`.
 | `photometry.py` | Measurement | `aperture_flux`, `significance_map`, `find_dipoles`, `measure_field` |
 | `pipeline.py` | Orchestration | `discover_cached` (1 h + stale), `detect_field`, `lightcurve_for` / `spectrum_for` (6 h + stale), `field_report` |
 | `crossmatch.py` | Catalogs | SkyBoT (degraded — SSP migration), SIMBAD-first resolve, Horizons, `query_gaia` + `query_gaia_cone` (30 d) |
-| `cache.py` | SQLite scratch | `kv`, SkyBoT table, `api_cache` + `api_cache_age`, `allow_stale` reads |
+| `cache.py` | SQLite scratch | `kv`, SkyBoT table, `api_cache` TTL + stale reads |
 | `detect.py` | Fast path | SEP→photutils→scipy→numpy peak finder + `match_epochs` |
 
 ## Scripts (`scripts/`)

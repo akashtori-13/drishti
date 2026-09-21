@@ -457,8 +457,6 @@ body[data-view="sky"] .site-foot{display:none;}
 .btn-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;}
 .flag-input{flex:1; min-width:120px; background:#0a0c16; border:1px solid var(--line); border-radius:8px; padding:6px 10px; font-size:.8125rem;}
 .flag-list{margin-top:8px; display:flex; flex-direction:column; gap:6px; font-size:.75rem; color:var(--ink-2);}
-.bw-more{font-size:.8125rem; color:var(--ink-3);}
-.bw-more a{color:var(--focus);}
 .learn-card{border-radius:16px; background:var(--space-2); border:1px solid var(--line); padding:14px 16px; font-size:.8125rem; color:var(--ink-2);}
 .learn-card summary{cursor:pointer; font-weight:600; color:var(--ink); font-size:.875rem;}
 .learn-card ol{margin-top:8px; display:flex; flex-direction:column; gap:6px; list-style:decimal; padding-left:20px;}

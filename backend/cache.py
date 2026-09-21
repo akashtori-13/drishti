@@ -151,18 +151,6 @@ def api_cache_get(db_path: str, key: str, max_age_s: int, allow_stale: bool = Fa
         return None
 
 
-def api_cache_age(db_path: str, key: str) -> Optional[float]:
-    """Age in seconds of a cached entry, or None when absent."""
-    conn = get_connection(db_path)
-    try:
-        row = conn.execute("SELECT updated_at FROM api_cache WHERE key=?", (key,)).fetchone()
-    finally:
-        conn.close()
-    if not row:
-        return None
-    return _api_age_s(row["updated_at"])
-
-
 def api_cache_set(db_path: str, key: str, value: Any) -> None:
     now = datetime.now(timezone.utc).isoformat()
     conn = get_connection(db_path)
