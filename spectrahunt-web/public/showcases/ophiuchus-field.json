@@ -1,0 +1,44 @@
+{
+  "id": "ophiuchus-field",
+  "title": "Ophiuchus \u2014 five passes on the plane",
+  "ra": 247.5,
+  "dec": -7.5,
+  "story": "Five separate visits near the galactic plane. Crowded and dusty \u2014 exactly where difference imaging earns its keep. Blink D3 epochs.",
+  "epochs": [
+    {
+      "label": "Survey 1 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": 2.02,
+      "ra": 247.5,
+      "dec": -7.5,
+      "size_deg": 0.15,
+      "png": null
+    },
+    {
+      "label": "Survey 2 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": 2.02,
+      "ra": 247.5,
+      "dec": -7.5,
+      "size_deg": 0.15,
+      "png": null
+    }
+  ],
+  "census": {
+    "images": 883,
+    "epochs": 5,
+    "span_days": 380
+  },
+  "tap": {
+    "collection": "spherex_qr2",
+    "bandpass": "SPHEREx-D3",
+    "endpoint": "https://irsa.ipac.caltech.edu/TAP"
+  },
+  "links": {
+    "irsa_viewer": "https://irsa.ipac.caltech.edu/irsaviewer/"
+  },
+  "citation": {
+    "doi": "10.26131/IRSA652",
+    "text": "SPHEREx QR2 via IRSA."
+  }
+}

@@ -7,18 +7,38 @@ import { useRouter } from 'next/navigation';
 import { blinkURL } from '@/lib/store';
 import { arcsecPerDay, toCSV } from '@/lib/astro';
 
+interface Report {
+  id: string;
+  movers: number; variables: number; top_sigma: number;
+  span_days: number | null; variable_flag: boolean;
+  known: { name: string; kind: string } | null;
+  detail: string;
+}
+
+type Kind = 'known' | 'mover' | 'variable' | 'unidentified' | 'pending';
+
 interface Card {
   id: string; name: string; ra: number; dec: number; band: number;
-  known: string | false; score: number; date: string; png: string | null;
+  kind: Kind; knownName: string;
+  stat: string; date: string; png: string | null;
   motion: number | null; mjds: Array<number | undefined>;
 }
 
 type Filter = 'all' | 'unknown' | 'known';
 
-function cardsFrom(showcases: Showcase[]): Card[] {
-  return showcases.map((s) => {
-    const m = s.epochs[0]?.skybot_match;
-    const known = typeof m === 'string' && m ? m : false;
+async function getReport(id: string): Promise<Report | null> {
+  try {
+    const r = await fetch(`/reports/${id}.json`);
+    if (!r.ok) return null;
+    return (await r.json()) as Report;
+  } catch {
+    return null;
+  }
+}
+
+function cardsFrom(showcases: Showcase[], reports: Map<string, Report>): Card[] {
+  const cards = showcases.map((s) => {
+    const rep = reports.get(s.id);
     const mjds = s.epochs.map((e) => e.mjd);
     let motion: number | null = null;
     if (s.epochs.length >= 2 && mjds[0] !== undefined && mjds[1] !== undefined) {
@@ -28,15 +48,36 @@ function cardsFrom(showcases: Showcase[]): Card[] {
       // same-spot revisits measure registration (≈0), not a mover — show nothing
       motion = m !== null && m > 0.05 ? m : null;
     }
+    let kind: Kind = 'pending';
+    let knownName = '';
+    let stat = 'not yet measured';
+    if (rep && rep.detail === 'ok') {
+      if (rep.known) { kind = 'known'; knownName = rep.known.name; }
+      else if (rep.movers > 0) kind = 'mover';
+      else if (rep.variables > 0 || rep.variable_flag) kind = 'variable';
+      else kind = 'unidentified';
+      const bits = [`top ${rep.top_sigma.toFixed(1)}σ`];
+      if (rep.span_days !== null) bits.push(`${Math.round(rep.span_days)}d baseline`);
+      stat = bits.join(' · ');
+    } else if (!rep) {
+      kind = 'unidentified';
+    }
     return {
       id: s.id, name: s.epochs[0]?.name ?? s.title,
       ra: s.ra, dec: s.dec, band: s.epochs[0]?.band ?? 3,
-      known, score: known ? 8.5 : motion !== null && motion > 5 ? 7.4 : 6.2,
+      kind, knownName, stat,
       date: (s.epochs[0]?.mjd ? `MJD ${s.epochs[0].mjd}` : 'QR2'),
       png: s.epochs[0]?.png ?? null, motion, mjds,
     };
   });
+  const rank: Record<Kind, number> = { known: 0, mover: 1, variable: 2, unidentified: 3, pending: 4 };
+  return cards.sort((a, b) => rank[a.kind] - rank[b.kind]);
 }
+
+const KIND_LABEL: Record<Kind, string> = {
+  known: 'Known', mover: 'Mover candidate', variable: 'Variable candidate',
+  unidentified: 'Unidentified', pending: 'Queued',
+};
 
 function Thumb({ card }: { card: Card }) {
   const band = BANDS[card.band - 1];
@@ -66,22 +107,28 @@ export default function CandidatesPage() {
 
   useEffect(() => {
     let alive = true;
-    void Promise.all(SHOWCASE_IDS.map((id) => getShowcase(id).catch(() => null))).then((docs) => {
-      if (alive) setCards(cardsFrom(docs.filter((d): d is Showcase => d !== null)));
+    void Promise.all([
+      Promise.all(SHOWCASE_IDS.map((id) => getShowcase(id).catch(() => null))),
+      Promise.all(SHOWCASE_IDS.map((id) => getReport(id))),
+    ]).then(([docs, reps]) => {
+      if (!alive) return;
+      const map = new Map<string, Report>();
+      for (const r of reps) if (r) map.set(r.id, r);
+      setCards(cardsFrom(docs.filter((d): d is Showcase => d !== null), map));
     });
     return () => { alive = false; };
   }, []);
 
   const list = cards.filter((c) =>
-    filter === 'all' ? true : filter === 'known' ? !!c.known : !c.known);
+    filter === 'all' ? true : filter === 'known' ? c.kind === 'known' : c.kind !== 'known');
 
   const count = (f: Filter) => cards.filter((c) =>
-    f === 'all' ? true : f === 'known' ? !!c.known : !c.known).length;
+    f === 'all' ? true : f === 'known' ? c.kind === 'known' : c.kind !== 'known').length;
 
   const exportAll = (fmt: 'csv' | 'json') => {
     const rows = list.map((c) => ({
       id: c.id, name: c.name, ra: c.ra, dec: c.dec, band: c.band,
-      known: c.known || '', score_sigma: c.score, motion_arcsec_day: c.motion ?? '',
+      kind: c.kind, known: c.knownName || '', measurement: c.stat,
       date: c.date, png: c.png ?? '',
     }));
     const blob = fmt === 'csv'
@@ -98,9 +145,9 @@ export default function CandidatesPage() {
     <div className="page">
       <div className="page-head">
         <div>
-          <p className="hero-kicker">Nightly pipeline · human review queue</p>
-          <h1>This week&apos;s candidates</h1>
-          <p>Every field where two or more epochs disagree is differenced and searched automatically. These are the results waiting on a human look.</p>
+          <p className="hero-kicker">Measured fields · sorted by significance</p>
+          <h1>Candidate fields</h1>
+          <p>Curated SPHEREx fields, each measured by the detection pipeline (aligned difference, dipole significance, light curves). Kinds come from real numbers — or honest “unidentified”.</p>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
           <div className="segment" role="group" aria-label="Filter candidates">
@@ -125,22 +172,19 @@ export default function CandidatesPage() {
           return (
             <button
               key={c.id} type="button" className="cand"
-              aria-label={`${c.name}, ${c.known ? 'known object' : 'unidentified'}, ${c.score.toFixed(1)} sigma, ${band.label}${c.motion !== null ? `, ${c.motion.toFixed(1)} arcsec per day` : ''}`}
+              aria-label={`${c.name}, ${KIND_LABEL[c.kind]}, ${c.stat}, ${band.label}`}
               onClick={() => router.push(blinkURL(c.id))}
             >
               <div className="cand-thumb">
                 <Thumb card={c} />
-                <span className={`badge ${c.known ? 'known' : 'unknown'}`}>
-                  <span className="dot" />{c.known ? `Known · ${c.known}` : 'Unidentified'}
+                <span className={`badge ${c.kind === 'known' ? 'known' : c.kind === 'pending' ? '' : 'unknown'}`}>
+                  <span className="dot" />{c.kind === 'known' && c.knownName ? `Known · ${c.knownName}` : KIND_LABEL[c.kind]}
                 </span>
-                <span className="cand-score mono">{c.score.toFixed(1)}σ</span>
+                <span className="cand-score mono">{c.stat}</span>
               </div>
               <div className="cand-body">
                 <div className="cand-name">{c.name}</div>
-                <div className="cand-meta mono">
-                  <span>{band.label}</span>
-                  <span>{c.date}</span>
-                </div>
+                <div className="cand-meta mono"><span>{band.label}</span><span>{c.date}</span></div>
                 <div className="cand-meta mono">
                   <span>RA {c.ra.toFixed(2)} Dec {c.dec.toFixed(2)}</span>
                   <span>{c.motion === null ? 'motion —' : `${c.motion.toFixed(1)} ″/d`}</span>

@@ -237,6 +237,24 @@ async def spectrum_for(ra: float, dec: float,
     return out
 
 
+def flag_variable(points: List[Dict[str, Any]], ratio: float = 2.0, snr: float = 3.0) -> bool:
+    """True when any two light-curve points differ by >ratio at S/N > snr. Pure."""
+    try:
+        fluxes = [(p["flux"], p.get("flux_err", 0)) for p in points if p.get("flux") is not None]
+        for i in range(len(fluxes)):
+            for j in range(i + 1, len(fluxes)):
+                fa, ea = fluxes[i]
+                fb, eb = fluxes[j]
+                if min(abs(fa), abs(fb)) <= 0:
+                    continue
+                if max(abs(fa), abs(fb)) / min(abs(fa), abs(fb)) > ratio:
+                    if abs(fa - fb) > snr * max(ea, eb, 1e-9):
+                        return True
+    except Exception:
+        pass
+    return False
+
+
 def field_report(ra: float, dec: float, band: int = 3) -> Dict[str, Any]:
     """Batch entry point for scripts/process_field.py (runs its own event loop)."""
     import asyncio

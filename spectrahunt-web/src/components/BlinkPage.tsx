@@ -29,6 +29,10 @@ export default function BlinkPage({ id }: { id: string }) {
   const [flags, setFlags] = useState<Array<{ x: number; note: string }>>([]);
   const [liveSpec, setLiveSpec] = useState<Array<{ wavelength_um: number; flux: number }> | null>(null);
   const [liveLc, setLiveLc] = useState<Array<{ mjd?: number; flux: number }> | null>(null);
+  const [report, setReport] = useState<{
+    movers: number; variables: number; top_sigma: number; span_days: number | null;
+    variable_flag: boolean; known: { name: string; kind: string } | null; detail: string;
+  } | null>(null);
   const viewing = data && data.id === id ? data : null;
 
   // load showcase (static JSON or live IRSA frames)
@@ -41,6 +45,10 @@ export default function BlinkPage({ id }: { id: string }) {
     setSample(null);
     setLiveSpec(null);
     setLiveLc(null);
+    setReport(null);
+    void fetch(`/reports/${id}.json`).then((r) => (r.ok ? r.json() : null))
+      .then((j) => { if (alive && j && j.detail === 'ok') setReport(j); })
+      .catch(() => undefined);
     const done = (d: Showcase) => {
       if (!alive) return;
       setData(d);
@@ -240,7 +248,16 @@ export default function BlinkPage({ id }: { id: string }) {
               {tab === 'overview' && (
                 <>
                   <div className="verdict-row">
-                    <span className="badge unknown"><span className="dot" /> Unidentified, needs review</span>
+                    {report?.known ? (
+                      <span className="badge known"><span className="dot" /> Known · {report.known.name} ({report.known.kind})</span>
+                    ) : report ? (
+                      <span className="badge unknown"><span className="dot" />
+                        {report.movers > 0 ? `${report.movers} mover${report.movers === 1 ? '' : 's'} · top ${report.top_sigma.toFixed(1)}σ`
+                          : report.variables > 0 || report.variable_flag ? 'Variable candidate' : 'Unidentified, needs review'}
+                      </span>
+                    ) : (
+                      <span className="badge unknown"><span className="dot" /> Unidentified, needs review</span>
+                    )}
                   </div>
                   <p className="story">{viewing.story}</p>
                   <dl className="meta-grid">

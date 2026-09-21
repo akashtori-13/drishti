@@ -76,3 +76,12 @@ def test_skybot_breaker_skips_network(tmp_path):
     assert out is None
     from backend.cache import get_status
     assert float(get_status(db, "skybot:dead_until") or 0) > time.time()
+
+
+def test_flag_variable():
+    from backend.pipeline import flag_variable
+    assert flag_variable([{"flux": 100.0, "flux_err": 5.0}, {"flux": 400.0, "flux_err": 5.0}])
+    assert not flag_variable([{"flux": 100.0, "flux_err": 5.0}, {"flux": 110.0, "flux_err": 5.0}])
+    assert not flag_variable([{"flux": 100.0, "flux_err": 150.0}, {"flux": 400.0, "flux_err": 150.0}])
+    assert not flag_variable([])
+    assert not flag_variable([{"flux": None}])

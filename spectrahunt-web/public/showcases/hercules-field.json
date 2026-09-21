@@ -1,0 +1,44 @@
+{
+  "id": "hercules-field",
+  "title": "Hercules \u2014 four-epoch field",
+  "ra": 252.5,
+  "dec": 12.5,
+  "story": "Four visits high in the summer sky. Same-band (D3) blinks hunt variables and slow movers against a sparse star field.",
+  "epochs": [
+    {
+      "label": "Survey 1 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": 2.02,
+      "ra": 252.5,
+      "dec": 12.5,
+      "size_deg": 0.15,
+      "png": null
+    },
+    {
+      "label": "Survey 2 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": 2.02,
+      "ra": 252.5,
+      "dec": 12.5,
+      "size_deg": 0.15,
+      "png": null
+    }
+  ],
+  "census": {
+    "images": 866,
+    "epochs": 4,
+    "span_days": 380
+  },
+  "tap": {
+    "collection": "spherex_qr2",
+    "bandpass": "SPHEREx-D3",
+    "endpoint": "https://irsa.ipac.caltech.edu/TAP"
+  },
+  "links": {
+    "irsa_viewer": "https://irsa.ipac.caltech.edu/irsaviewer/"
+  },
+  "citation": {
+    "doi": "10.26131/IRSA652",
+    "text": "SPHEREx QR2 via IRSA."
+  }
+}
