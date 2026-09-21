@@ -19,6 +19,7 @@ spectrahunt-web/*.tsbuildinfo
 *.fits
 data/cutouts/
 data/img/
+data/reports/
 data/census_*.json
 *.db
 *.db-journal
