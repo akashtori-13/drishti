@@ -220,8 +220,20 @@ async def api_stars(ra: float = Query(...), dec: float = Query(...),
         return {"stars": [], "detail": "error"}
 
 
-async def _render_frame_png(cutout_url: str):
-    """Fetch IBE cutout, render PNG to the file cache. Returns Path or None."""
+def _prune_frames(keep: int = 500) -> None:
+    """Bound the on-demand frame cache: drop oldest beyond `keep` files."""
+    try:
+        files = sorted(Path(PNG_CACHE_DIR).glob("frame_*.png"), key=lambda p: p.stat().st_mtime)
+        for old in files[:-keep] if len(files) > keep else []:
+            try:
+                old.unlink()
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+
+async def _render_frame_png(cutout_url: str):    """Fetch IBE cutout, render PNG to the file cache. Returns Path or None."""
     import hashlib
     from backend.cutouts import fetch_ibe, mask_bad_pixels, parse_fits, render_png
     key = hashlib.md5(cutout_url.encode()).hexdigest()[:16]
@@ -239,7 +251,9 @@ async def _render_frame_png(cutout_url: str):
         if parsed["image"] is None:
             return None
         masked, _ = mask_bad_pixels(parsed["image"], parsed.get("flags"), parsed.get("variance"))
-        return render_png(masked, png)
+        out = render_png(masked, png)
+        _prune_frames()
+        return out
     finally:
         try:
             tmp.unlink(missing_ok=True)

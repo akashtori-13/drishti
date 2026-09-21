@@ -507,8 +507,8 @@ export default function BlinkComparator({
   };
 
   const recordWebM = async () => {
-    const canvas = mainRef.current;
-    if (!canvas || n < 2 || recording) return;
+    const canvas = mode === 'side' ? rightRef.current : mainRef.current;
+    if (!canvas || !canvas.width || n < 2 || recording) return;
     const stream = canvas.captureStream(30);
     const rec = new MediaRecorder(stream, { mimeType: 'video/webm' });
     const chunks: Blob[] = [];
