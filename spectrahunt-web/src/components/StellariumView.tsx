@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { API_BASE } from '@/lib/showcases';
+import { cachedImageSrc, loadCachedImage, lsGet, lsSet, prefetch } from '@/lib/skycache';
 
 export interface Observer { lat: number; lon: number; name: string }
 export interface StelFocus { ra: number; dec: number; key: number }
@@ -161,10 +162,17 @@ export default function StellariumView({
     return () => clearInterval(t);
   }, []);
 
-  // constellation lines (once)
+  // constellation lines (device cache first, network once)
   useEffect(() => {
     let alive = true;
-    void loadLines().then((l) => { if (alive) setLines(l); });
+    const cached = lsGet<ConLines>('sh-lines-v1');
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (cached) setLines(cached);
+    void loadLines().then((l) => {
+      if (!alive || !l) return;
+      setLines(l);
+      lsSet('sh-lines-v1', l, 10);
+    });
     return () => { alive = false; };
   }, []);
 
@@ -194,22 +202,33 @@ export default function StellariumView({
     );
   }, []);
 
-  // sky image (debounced)
+  // sky image: device cache first, prefetch neighbors on idle (fast pans)
+  const skyUrl = (sRa: number, sDec: number, sFov: number, w: number, h: number, surveyId: string) =>
+    `https://alasky.cds.unistra.fr/hips-image-services/hips2fits?hips=${encodeURIComponent(surveyId)}&ra=${sRa.toFixed(2)}&dec=${sDec.toFixed(2)}&fov=${sFov.toFixed(2)}&width=${w}&height=${h}&projection=SIN&coordsys=icrs&rotation=0&format=jpg`;
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return;
     setLoading(true);
+    let alive = true;
     const t = setTimeout(() => {
       const w = Math.min(1200, Math.max(320, Math.round(host.clientWidth)));
       const h = Math.min(1200, Math.max(320, Math.round(host.clientHeight)));
-      const url = `https://alasky.cds.unistra.fr/hips-image-services/hips2fits?hips=${encodeURIComponent(view.current.survey)}&ra=${view.current.ra.toFixed(3)}&dec=${view.current.dec.toFixed(3)}&fov=${view.current.fov.toFixed(2)}&width=${w}&height=${h}&projection=SIN&coordsys=icrs&rotation=0&format=jpg`;
-      const im = new Image();
-      im.crossOrigin = 'anonymous';
-      im.onload = () => { setImg(url); setLoading(false); };
-      im.onerror = () => setLoading(false);
-      im.src = url;
+      const v = view.current;
+      const url = skyUrl(v.ra, v.dec, v.fov, w, h, v.survey);
+      void loadCachedImage(url)
+        .then(() => cachedImageSrc(url))
+        .then((src) => { if (alive) { setImg(src); setLoading(false); } })
+        .catch(() => { if (alive) setLoading(false); });
+      // neighbor prefetch: N/S/E/W at half-FOV offsets
+      const off = v.fov * 0.5;
+      prefetch([
+        skyUrl(v.ra, Math.max(-85, Math.min(85, v.dec + off)), v.fov, w, h, v.survey),
+        skyUrl(v.ra, Math.max(-85, Math.min(85, v.dec - off)), v.fov, w, h, v.survey),
+        skyUrl(normRa(v.ra + off), v.dec, v.fov, w, h, v.survey),
+        skyUrl(normRa(v.ra - off), v.dec, v.fov, w, h, v.survey),
+      ]);
     }, 450);
-    return () => clearTimeout(t);
+    return () => { alive = false; clearTimeout(t); };
   }, [ra, dec, fov, survey]);
 
   // overlays
@@ -229,11 +248,13 @@ export default function StellariumView({
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, w, h);
       const v = view.current;
+      // screen mapping mirrors X: background FITS has RA increasing LEFT,
+      // overlay math uses RA increasing RIGHT — consistent in both directions
       const scale = (w / 2) / Math.tan((v.fov / 2) * D2R);
       const toXY = (pRa: number, pDec: number): { x: number; y: number } | null => {
         const p = project(normRa(pRa), pDec, v.ra, v.dec);
         if (!p) return null;
-        return { x: w / 2 + p.x * scale, y: h / 2 - p.y * scale };
+        return { x: w / 2 - p.x * scale, y: h / 2 - p.y * scale };
       };
 
       // equatorial grid
@@ -378,7 +399,7 @@ export default function StellariumView({
     if (!host) return;
     const r = host.getBoundingClientRect();
     const scale = (r.width / 2) / Math.tan((view.current.fov / 2) * D2R);
-    const x = (e.clientX - r.left - r.width / 2) / scale;
+    const x = -((e.clientX - r.left - r.width / 2) / scale);
     const y = -((e.clientY - r.top - r.height / 2) / scale);
     const p = unproject(x, y, view.current.ra, view.current.dec);
     if (p.dec >= -90 && p.dec <= 90) {
@@ -390,9 +411,9 @@ export default function StellariumView({
     const dy = e.clientY - drag.current.y;
     if (Math.hypot(dx, dy) > 5) drag.current.moved = true;
     else return;
-    // drag sky: view center moves opposite, scaled by fov
+    // drag sky with the pointer (mirrored X mapping: center moves +RA when dragged right)
     const degPerPx = view.current.fov / r.width;
-    setRa(normRa(drag.current.ra - dx * degPerPx / Math.max(0.3, Math.cos(view.current.dec * D2R))));
+    setRa(normRa(drag.current.ra + dx * degPerPx / Math.max(0.3, Math.cos(view.current.dec * D2R))));
     setDec(Math.max(-88, Math.min(88, drag.current.dec + dy * degPerPx)));
   };
   const up = (e: React.PointerEvent) => {
@@ -403,7 +424,7 @@ export default function StellariumView({
     if (!host) return;
     const r = host.getBoundingClientRect();
     const scale = (r.width / 2) / Math.tan((view.current.fov / 2) * D2R);
-    const p = unproject((e.clientX - r.left - r.width / 2) / scale, -((e.clientY - r.top - r.height / 2) / scale), view.current.ra, view.current.dec);
+    const p = unproject(-((e.clientX - r.left - r.width / 2) / scale), -((e.clientY - r.top - r.height / 2) / scale), view.current.ra, view.current.dec);
     if (p.dec >= -90 && p.dec <= 90) onInspect(p.ra, p.dec);
   };
 

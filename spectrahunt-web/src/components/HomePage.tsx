@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useAppStore } from '@/lib/store';
-import { SHOWCASE_IDS, getCoverage, type RealCell } from '@/lib/showcases';
+import { useRouter } from 'next/navigation';
+import { blinkURL } from '@/lib/store';
+import { SHOWCASE_IDS, getCoverage, useLive, type RealCell } from '@/lib/showcases';
 import { buildGrid, GRID_H, GRID_W } from '@/lib/sky';
 import HeroSky from '@/components/HeroSky';
 import SearchBox, { type SearchTarget } from '@/components/SearchBox';
@@ -59,7 +60,7 @@ function fieldFromRaDec(ra: number, dec: number, grid: number[][], real?: Map<st
 }
 
 export default function HomePage() {
-  const { openShowcase, setCurrentView } = useAppStore();
+  const router = useRouter();
   const grid = useMemo(() => {
     const g = buildGrid();
     return g;
@@ -92,14 +93,17 @@ export default function HomePage() {
   }, []);
 
   const pick = (t: SearchTarget) => {
-    if (t.showcaseId) { openShowcase(t.showcaseId); return; }
+    if (t.showcaseId) { router.push(blinkURL(t.showcaseId)); return; }
     setField(fieldFromRaDec(t.ra, t.dec, grid, real ?? undefined));
   };
 
   return (
     <div>
       <section className="hero" id="hero">
-        <HeroSky grid={grid} coverage={coverage} onInspect={(ra, dec) => setField(fieldFromRaDec(ra, dec, grid, real ?? undefined))} />
+        <HeroSky grid={grid} coverage={coverage}
+          markers={SHOWCASE_POINTS}
+          onMarker={(id) => router.push(blinkURL(id))}
+          onInspect={(ra, dec) => setField(fieldFromRaDec(ra, dec, grid, real ?? undefined))} />
         <div className="hero-scrim" />
 
         <div className="hero-core">
@@ -116,7 +120,7 @@ export default function HomePage() {
 
           <div className="quick">
             <span className="quick-label">Try</span>
-            <button type="button" className="chip" onClick={() => openShowcase('3i-atlas')}>3I/ATLAS</button>
+            <button type="button" className="chip" onClick={() => router.push(blinkURL('3i-atlas'))}>3I/ATLAS</button>
             <button type="button" className="chip" onClick={() => pick({ label: '433 Eros', ra: 210.32, dec: 9.11 })}>433 Eros</button>
             <button type="button" className="chip" onClick={() => pick({ label: 'Orion Complex', ra: 83.82, dec: -5.39 })}>Orion Complex</button>
             <button type="button" className="chip mono" onClick={() => pick({ label: '156.09, −41.64', ra: 156.09, dec: -41.64 })}>156.09, −41.64</button>
@@ -193,19 +197,20 @@ export default function HomePage() {
           </ol>
 
           <div className="how-cta">
-            <button type="button" className="btn primary" onClick={() => setCurrentView('sky')}>Open the sky map</button>
-            <button type="button" className="btn" onClick={() => setCurrentView('candidates')}>See this week&apos;s candidates</button>
+            <button type="button" className="btn primary" onClick={() => router.push('/sky')}>Open the sky map</button>
+            <button type="button" className="btn" onClick={() => router.push('/candidates')}>See this week&apos;s candidates</button>
           </div>
         </div>
       </section>
 
       <Inspector
-        field={field} blinkId={field ? nearestShowcase(field.ra, field.dec) : null}
+        field={field} blinkId={field ? (nearestShowcase(field.ra, field.dec) ?? (useLive && field.epochs >= 2 ? 'live' : null)) : null}
         onClose={() => setField(null)}
         onOpenBlink={() => {
           if (field) {
             const id = nearestShowcase(field.ra, field.dec);
-            if (id) openShowcase(id);
+            if (id) router.push(blinkURL(id));
+            else if (useLive && field.epochs >= 2) router.push(`/blink/live?ra=${field.ra.toFixed(3)}&dec=${field.dec.toFixed(3)}&band=3`);
           }
           setField(null);
         }}

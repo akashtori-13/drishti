@@ -66,7 +66,6 @@ export default function CoverageMap({
       canvas.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       s.w = w; s.h = h;
-      s.stars = genStars(2024, Math.min(1500, Math.floor((w * h) / 3200)));
     };
 
     const draw = () => {
@@ -149,10 +148,9 @@ export default function CoverageMap({
       }
     };
 
-    const tick = (t: number) => {
+    const tick = () => {
       raf = 0;
-      draw(t);
-      if (!reduce.matches && !document.hidden) raf = requestAnimationFrame(tick);
+      draw();
     };
     const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
     const onVis = () => kick();
@@ -193,7 +191,7 @@ export default function CoverageMap({
       canvas.removeEventListener('click', click);
       ro.disconnect();
     };
-  }, []);
+  }, [skyReady]);
 
-  return <canvas id="skyCanvas" ref={canvasRef} role="img" aria-label="All-sky coverage map. Use the search box to jump to a field, or click the map to inspect one." />;
+  return <canvas id="skyCanvas" ref={canvasRef} role="img" aria-label="All-sky coverage map over real infrared imagery. Use the search box to jump to a field, or click the map to inspect one." />;
 }

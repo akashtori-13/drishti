@@ -1,18 +1,19 @@
 'use client';
 
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useAppStore, type View } from '@/lib/store';
 import Icon from '@/components/Icon';
 
-const NAV: Array<{ id: View; label: string }> = [
-  { id: 'sky', label: 'Sky map' },
-  { id: 'blink', label: 'Blink' },
-  { id: 'candidates', label: 'Candidates' },
-  { id: 'about', label: 'About' },
+const NAV = [
+  { href: '/sky', label: 'Sky map' },
+  { href: '/blink/3i-atlas', label: 'Blink', match: '/blink' },
+  { href: '/candidates', label: 'Candidates' },
+  { href: '/about', label: 'About' },
 ];
 
 export default function Header() {
-  const { currentView, setCurrentView } = useAppStore();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -21,24 +22,34 @@ export default function Header() {
     return () => document.removeEventListener('keydown', onKey);
   }, []);
 
+  useEffect(() => {
+    document.body.dataset.view = pathname === '/sky' ? 'sky' : '';
+    document.title = pathname === '/'
+      ? 'SpectraHunt: hunt what moves in the infrared sky'
+      : `${NAV.find((n) => pathname === n.href || (n.match && pathname.startsWith(n.match)))?.label ?? 'SpectraHunt'} — SpectraHunt`;
+  }, [pathname]);
+
   return (
     <header className={`nav${open ? ' menu-open' : ''}`}>
       <div className="nav-inner">
-        <a className="brand" href="#/" aria-label="SpectraHunt home">
+        <Link className="brand" href="/" aria-label="SpectraHunt home">
           <Icon name="logo" className="logo icon" />
           <span className="brand-name">SpectraHunt</span>
-        </a>
+        </Link>
         <nav className="tabs" id="navTabs" aria-label="Primary">
-          {NAV.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => { setCurrentView(item.id); setOpen(false); }}
-              className={currentView === item.id || (item.id === 'blink' && currentView === 'blink') ? 'active' : ''}
-              aria-current={currentView === item.id ? 'page' : undefined}
-            >
-              {item.label}
-            </button>
-          ))}
+          {NAV.map((item) => {
+            const active = pathname === item.href || (item.match !== undefined && pathname.startsWith(item.match));
+            return (
+              <Link
+                key={item.href} href={item.href} onClick={() => setOpen(false)}
+                className={active ? 'active' : undefined}
+                aria-current={active ? 'page' : undefined}
+                style={{ textDecoration: 'none', display: 'inline-block', padding: '8px 14px', borderRadius: 999, fontSize: '.875rem', fontWeight: 500, color: 'var(--ink-2)' }}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
         <button
           type="button" className="nav-menu-btn" aria-expanded={open}
