@@ -23,6 +23,19 @@ cache of it. See `ARCHITECTURE.md` §1 for the layer contract.
 
 Three clicks to first blink: Home → chip → drag. Works offline once built; works on a phone.
 
+## Docs (for collaborators)
+
+| Doc | What |
+|---|---|
+| `SYSTEM_DESIGN.md` | Whole design: context, containers, components, data, runtime, failures, decisions, roadmap |
+| `ARCHITECTURE.md` | Short contracts: layer rule, views, backend, data shapes, workflows |
+| `CONTRIBUTING.md` | Setup, workflow, conventions, PR checklist, ops |
+| `docs/API.md` | Every endpoint: params, shapes, curl examples, caching, failure semantics |
+| `docs/FRONTEND.md` | Routes, state, sky engines, blink workspace, libs, contributor conventions |
+| `docs/PIPELINE.md` | Backend modules, scripts, caches, refresh ops, failure playbook, adding fields |
+| `docs/TROUBLESHOOTING.md` | Symptom-first fixes + live upstream status table |
+| `DEMO.md` | 90-second walkthrough script |
+
 ## Quick start
 
 ```bash
