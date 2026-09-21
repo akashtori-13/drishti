@@ -215,7 +215,7 @@ export default function BlinkPage({ id }: { id: string }) {
           <section className="bw-viewer" aria-label="Epoch comparator">
             <div className="bw-title">
               <h1>{viewing.title}</h1>
-              <p className="mono">RA {fmtRa(viewing.ra)} · Dec {fmtDec(viewing.dec)} · D{band} · {cur?.label ?? ''}</p>
+              <p className="mono">RA {fmtRa(viewing.ra)} · Dec {fmtDec(viewing.dec)} · D{band}</p>
             </div>
             <BlinkComparator
               key={viewing.id}
