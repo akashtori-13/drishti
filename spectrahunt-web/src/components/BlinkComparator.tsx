@@ -90,11 +90,6 @@ export default function BlinkComparator({
   const [speed, setSpeed] = useState(550);
   const [palette, setPalette] = useState(false);
   const [palQ, setPalQ] = useState('');
-  type Pop = null | 'display' | 'data';
-  const [dock, setDock] = useState<Pop>(null);
-  const openPop = (d: Exclude<Pop, null>) => () => {
-    setDock((cur) => (cur === d ? null : d));
-  };
   const [stretch, setStretch] = useState<Stretch>('asinh');
   const [cmap, setCmap] = useState<Colormap>('grayscale');
   const [invert, setInvert] = useState(false);
@@ -114,7 +109,6 @@ export default function BlinkComparator({
   const [recording, setRecording] = useState(false);
   const [probe, setProbe] = useState<{ sx: number; sy: number; lum: number; ra: number; dec: number } | null>(null);
   const [measureChip, setMeasureChip] = useState<{ x: number; y: number; lum: number; label: string } | null>(null);
-  const measureArmed = dock === 'data';
 
   const mainRef = useRef<HTMLCanvasElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -190,7 +184,7 @@ export default function BlinkComparator({
       }
       if (e.key === 'Escape') {
         if (palette) setPalette(false);
-        else if (dock) { setDock(null); setMeasureChip(null); }
+        else setMeasureChip(null);
         return;
       }
       if (mod || e.altKey) return;
@@ -215,11 +209,8 @@ export default function BlinkComparator({
     stage.addEventListener('wheel', onWheel, { passive: false });
     const ro = new ResizeObserver(() => setSizeTick((t) => t + 1));
     ro.observe(stage);
-    const onRs = () => setDock(null);
-    window.addEventListener('resize', onRs);
     return () => {
       stage.removeEventListener('wheel', onWheel);
-      window.removeEventListener('resize', onRs);
       ro.disconnect();
     };
   }, []);
@@ -498,7 +489,6 @@ export default function BlinkComparator({
   const onPointerUp = () => { drag.current = null; };
   const onClickSample = (e: React.MouseEvent) => {
     if (drag.current?.moved) return;
-    if (!measureArmed) return; // measurement is an explicit tool, not a passive click
     const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const x = (e.clientX - r.left) / r.width;
     const y = (e.clientY - r.top) / r.height;
@@ -685,7 +675,7 @@ export default function BlinkComparator({
                   id="blinkCanvas"
                   role="img"
                   aria-label={`${title} — ${cur?.label ?? 'no frame'}`}
-                  style={{ width: '100%', height: '100%', display: 'block', cursor: measureArmed ? 'crosshair' : 'grab' }}
+                  style={{ width: '100%', height: '100%', display: 'block', cursor: onSample ? 'crosshair' : 'grab' }}
                   onPointerDown={onPointerDown}
                   onPointerMove={onPointerMove}
                   onPointerUp={onPointerUp}
@@ -722,20 +712,37 @@ export default function BlinkComparator({
             <span className="mono epoch-name">{cur?.label ?? '—'}</span>
           </div>
 
-        <div className="vtoolbar glass" role="toolbar" aria-label="View controls">
-          <div className="seg" role="group" aria-label="Compare mode">
-            {(['blink', 'side', 'swipe', 'diff'] as CompareMode[]).map((m) => (
-              <button key={m} type="button" className={`seg-btn${mode === m ? ' active' : ''}`} aria-pressed={mode === m}
-                onClick={() => onModeChangeWrap(m)}>
-                {m === 'blink' ? 'Blink' : m === 'side' ? 'Side' : m === 'swipe' ? 'Swipe' : 'Diff'}
+          <div className="filmstrip" role="group" aria-label="Epoch filmstrip">
+            {frames.map((f, i) => (
+              <button key={f.label} type="button" onClick={() => { setPlaying(false); onEpochChange(i); }}
+                className={`film${i === idx ? ' active' : ''}`} aria-pressed={i === idx} title={f.mjd ? `${f.label} · MJD ${f.mjd}` : f.label}>
+                {f.png && loaded[f.png] ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={f.png} alt="" draggable={false} />
+                ) : (
+                  <span className="film-empty">{f.mjd ? String(Math.round(f.mjd)).slice(2) : `E${i + 1}`}</span>
+                )}
               </button>
             ))}
-            <button type="button" className={`seg-btn${showRgb ? ' active' : ''}`} aria-pressed={showRgb}
-              onClick={() => setShowRgb((v) => !v)} title="False-color: epoch B red, epoch A green">Color</button>
+            <label className="rate">Rate
+              <input type="range" min={150} max={1200} step={10} value={speed} onChange={(e) => setSpeed(Number(e.target.value))} aria-label="Blink rate" />
+            </label>
           </div>
-          <span className="vsep" aria-hidden="true" />
-          <button type="button" className={`toolbtn${dock === 'display' ? ' active' : ''}`} aria-expanded={dock === 'display'} onClick={openPop('display')}>Display</button>
-          <button type="button" className={`toolbtn${dock === 'data' ? ' active' : ''}`} aria-expanded={dock === 'data'} onClick={openPop('data')} title="Measure spots on the image">Measure</button>
+        </div>
+        </div>
+        <aside className="tweak-left glass" aria-label="Image controls">
+          <section className="tweak-sec" aria-label="View">
+            <h3>View</h3>
+            <div className="seg" role="group" aria-label="Compare mode">
+              {(['blink', 'side', 'swipe', 'diff'] as CompareMode[]).map((m) => (
+                <button key={m} type="button" className={`seg-btn${mode === m ? ' active' : ''}`} aria-pressed={mode === m}
+                  onClick={() => onModeChangeWrap(m)}>
+                  {m === 'blink' ? 'Blink' : m === 'side' ? 'Side' : m === 'swipe' ? 'Swipe' : 'Diff'}
+                </button>
+              ))}
+              <button type="button" className={`seg-btn${showRgb ? ' active' : ''}`} aria-pressed={showRgb}
+                onClick={() => setShowRgb((v) => !v)} title="False-color: epoch B red, epoch A green">Color</button>
+            </div>
           {mode === 'diff' && (
             <label className="mini-slider"><span>Gain</span>
               <input type="range" min={1} max={8} step={0.5} value={diffScale} onChange={(e) => setDiffScale(Number(e.target.value))} aria-label="Difference gain" />
@@ -746,11 +753,10 @@ export default function BlinkComparator({
               <input type="range" min={2} max={98} value={Math.round(swipe * 100)} onChange={(e) => setSwipe(Number(e.target.value) / 100)} aria-label="Swipe position" />
             </label>
           )}
-        </div>
-        {dock === 'display' && (
-          <div className="popover glass" role="dialog" aria-label="Display">
-            <div className="pop-head"><span>Display</span><button type="button" className="icon-btn sm" aria-label="Close Display panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
-            <div className="pop-group-label">Stretch · color · levels</div>
+          </section>
+          <section className="tweak-sec" aria-label="Display">
+            <h3>Display</h3>
+<div className="pop-group-label">Stretch · color · levels</div>
             <div style={rowStyle}>
               <label style={{ fontSize: 13 }}>Stretch{' '}
                 <select value={stretch} onChange={(e) => setStretch(e.target.value as Stretch)} style={selStyle}>
@@ -806,12 +812,10 @@ export default function BlinkComparator({
                 </select>
               ))}
             </div>
-          </div>
-        )}
-        {dock === 'data' && (
-          <div className="popover glass" role="dialog" aria-label="Measure">
-            <div className="pop-head"><span>Measure</span><button type="button" className="icon-btn sm" aria-label="Close Measure panel" onClick={() => setDock(null)}><Icon name="x" /></button></div>
-            <p style={{ fontSize: 12, color: '#8a90ab' }}>Click the image to measure that spot — a chip shows the value, and the spectrum feeds the data rail.</p>
+          </section>
+          <section className="tweak-sec" aria-label="Measure">
+            <h3>Measure</h3>
+<p style={{ fontSize: 12, color: '#8a90ab' }}>Click the image to measure that spot — a chip shows the value, and the spectrum feeds the data rail.</p>
             <div className="mono probe-line">
               {probe
                 ? <>px {probe.lum}{Number.isFinite(probe.ra) ? <> · {probe.ra.toFixed(3)}°, {probe.dec >= 0 ? '+' : ''}{probe.dec.toFixed(3)}°</> : ' · hover'}</>
@@ -843,27 +847,9 @@ export default function BlinkComparator({
                 <p style={{ fontSize: 12, color: '#8a90ab' }}>No movers above 5σ between these epochs — quiet field.</p>
               )
             )}
-          </div>
-        )}
-        </div>
+          </section>
+        </aside>
 
-          <div className="filmstrip" role="group" aria-label="Epoch filmstrip">
-            {frames.map((f, i) => (
-              <button key={f.label} type="button" onClick={() => { setPlaying(false); onEpochChange(i); }}
-                className={`film${i === idx ? ' active' : ''}`} aria-pressed={i === idx} title={f.mjd ? `${f.label} · MJD ${f.mjd}` : f.label}>
-                {f.png && loaded[f.png] ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={f.png} alt="" draggable={false} />
-                ) : (
-                  <span className="film-empty">{f.mjd ? String(Math.round(f.mjd)).slice(2) : `E${i + 1}`}</span>
-                )}
-              </button>
-            ))}
-            <label className="rate">Rate
-              <input type="range" min={150} max={1200} step={10} value={speed} onChange={(e) => setSpeed(Number(e.target.value))} aria-label="Blink rate" />
-            </label>
-          </div>
-        </div>
 
 
       </div>
