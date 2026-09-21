@@ -32,7 +32,9 @@ ROOT = Path(__file__).parent.parent
 SHOWCASE_DIR = ROOT / "spectrahunt-web" / "public" / "showcases"
 
 SHOWCASE_IDS = ["3i-atlas", "ecliptic-mover", "nep-deep", "orion-field",
-                "galactic-center", "m31-field", "lmc-field", "virgo-field", "eros-field"]
+                "galactic-center", "m31-field", "lmc-field", "virgo-field", "eros-field",
+                "crab-field", "omega-cen-field", "carina-field", "m51-field",
+                "m101-field", "smc-field"]
 
 
 @asynccontextmanager

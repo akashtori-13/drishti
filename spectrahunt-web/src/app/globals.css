@@ -458,3 +458,35 @@ kbd{font-family:var(--font-mono); font-size:.6875rem; border:1px solid var(--lin
   html{scroll-behavior:auto;}
   *,*::before,*::after{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important;}
 }
+
+/* ---------- viewer tabs (blink) ---------- */
+.viewer-tabs{display:flex; gap:2px; padding:8px 12px 0; background:var(--space-2); border-top:1px solid var(--line);}
+.vtab{border:0; background:transparent; color:var(--ink-3); font-size:.8125rem; font-weight:600; padding:9px 16px; border-radius:10px 10px 0 0; border:1px solid transparent; border-bottom:0;}
+.vtab:hover{color:var(--ink);}
+.vtab.active{color:var(--ink); background:var(--space-2); border-color:var(--line); background:#0d1020;}
+.tline{display:block; font-size:.75rem; color:var(--ink-3); margin-bottom:2px;}
+.ticks{display:flex; flex-wrap:wrap; gap:4px;}
+.tick{border:1px solid var(--line); background:transparent; color:var(--ink-3); font-family:var(--font-mono); font-size:.6875rem; padding:3px 8px; border-radius:7px;}
+.tick:hover{color:var(--ink); background:rgba(255,255,255,.06);}
+.tick.active{color:#fff; border-color:#7c83fd; background:rgba(124,131,253,.14);}
+
+/* ---------- rail tabs (blink aside) ---------- */
+.rtabs{display:flex; gap:2px; padding:8px 8px 0; border-bottom:1px solid var(--line); flex-wrap:wrap;}
+.rtab{border:0; background:transparent; color:var(--ink-3); font-size:.75rem; font-weight:600; padding:8px 10px; border-radius:8px 8px 0 0;}
+.rtab:hover{color:var(--ink);}
+.rtab.active{color:var(--ink); background:rgba(255,255,255,.07);}
+.meta-grid{display:grid; grid-template-columns:auto 1fr; gap:6px 12px; font-size:.75rem;}
+.meta-grid dt{color:var(--ink-3);}
+.meta-grid dd{text-align:right; color:var(--ink); overflow-wrap:anywhere;}
+.epoch-list{display:flex; flex-direction:column; gap:6px; margin-top:4px;}
+.epoch-item{display:flex; justify-content:space-between; gap:10px; width:100%; text-align:left; padding:8px 10px; border-radius:10px; border:1px solid var(--line); background:transparent; color:var(--ink-2); font-size:.75rem;}
+.epoch-item:hover{background:rgba(255,255,255,.05);}
+.epoch-item.active{border-color:#7c83fd; color:var(--ink);}
+.epoch-item .mono{color:var(--ink-3);}
+
+/* ---------- stellarium view ---------- */
+.stel{position:absolute; inset:0; overflow:hidden; background:#04050a;}
+.stel canvas{position:absolute; inset:0; width:100%; height:100%; display:block; cursor:grab; touch-action:none;}
+.stel-hud{position:absolute; left:0; right:0; bottom:0; z-index:5; display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:center; padding:8px 12px calc(10px + env(safe-area-inset-bottom,0px)); font-size:.75rem; color:var(--ink-2); background:linear-gradient(transparent, rgba(4,5,10,.85));}
+.stel-hud .mono{color:var(--ink);}
+.stel-load{position:absolute; inset:0; z-index:4; display:grid; place-items:center; color:var(--ink-3); font-size:.8125rem; background:rgba(4,5,10,.35);}
