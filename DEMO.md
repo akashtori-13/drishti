@@ -18,7 +18,7 @@ Goal: a first-time visitor finds and watches a moving object in under 60 seconds
 5. **Inspect + share (1:05–1:30)** — Read measured motion (″/day), the light
    curve, and cross-match links (SkyBoT, MPC checker, Horizons, SIMBAD).
    Click **Copy share link**: the URL encodes showcase, band, epoch, and mode
-   (`#/blink/3i-atlas?band=3&epoch=1&mode=diff`). Paste it in a fresh tab —
+   (`/blink/3i-atlas?band=3&epoch=1&mode=diff`). Paste it in a fresh tab —
    the same view restores. Export **Candidates CSV**.
 
 ## What to say

@@ -15,11 +15,11 @@ cache of it. See `ARCHITECTURE.md` §1 for the layer contract.
 
 | View | Route | Job |
 |---|---|---|
-| Home | `/` | Hero sky (clickable canvas), object/coordinate search, showcase chips, live stats, how-it-works |
-| Sky map | `/sky` | Equirectangular coverage canvas (tiles = measured TAP tallies, dark = unmeasured), hover readout, click inspector with epochs/bands/survey + blink entry |
-| Blink | `/blink/<id>?band=&epoch=&mode=` (live: `/blink/live?ra=&dec=&band=`) | Canvas epoch comparator: timeline slider with date ticks, autoplay transport + speed + step, **blink / side-by-side / swipe / difference** modes (synced pan/zoom), motion-color composite, stretch (linear/log/sqrt/asinh) + black/white + presets + invert + colormaps (cividis default), 6 detectors × 102 channels, RGB picker, click-for-spectrum, PNG/WebM export, metadata + motion + light curve + SkyBoT/MPC/Horizons/SIMBAD + provenance aside |
-| Candidates | `/candidates` | Showcase-derived cards with real PNG thumbs (or honest pending tile), known/unknown badges, σ scores, measured motion ″/day, all/unknown/known filters, CSV/JSON export |
-| About | `/about` | Mission, LVF same-band rule, band table, detection method, QR2 citation, sources |
+| Home | `/` | Real-sky hero (clickable mini-map with field markers), object/coordinate search, Try chips + dice, featured-detection carousel, field rail, numbers band, how-it-works |
+| Sky map | `/sky` | Observer view (real HiPS sky, GPS, clock, figures, Gaia stars) + all-sky coverage map toggle; hover readout, inspector with blink entry (static or live on-demand) |
+| Blink | `/blink/<id>?band=&epoch=&mode=` (live: `/blink/live?ra=&dec=&band=`) | Square stage + side control column (View/Display/Bands/Measure) + data rail; autoplay transport, timeline + filmstrip, blink/side/swipe/diff/motion-color/true-RGB, stretch + colormaps (grayscale default), 102 channels, in-browser ±5σ detection, click spectrum, PNG/WebM/figure export, ⌘K palette |
+| Candidates | `/candidates` | Measured cards (Known/Mover/Variable/Unidentified from pipeline reports — never invented), significance + baseline stats, filters with counts, CSV/JSON export |
+| About | `/about` | Mission, LVF same-band rule, band table, tours, glossary, shortcuts, method, live-data notice, citation, multi-agency sources |
 
 Three clicks to first blink: Home → chip → drag. Works offline once built; works on a phone.
 
@@ -54,8 +54,9 @@ NEXT_PUBLIC_DATA_MODE=live NEXT_PUBLIC_API_URL=http://localhost:8000 npm run dev
 Fill showcase pixels (weekly/manual, never on the CDN — bounded, resumable, offline-safe):
 
 ```bash
-python scripts/build_showcases.py --only 3i-atlas   # TAP → IBE cutout → zscale PNG
-python scripts/real_coverage.py                     # per-cell tallies → public/coverage.json
+python scripts/sky_census.py --shard 0/4 --progress data/census_shard_0.json &  # + shards 1..3
+python scripts/sky_census.py --merge                          # shards → public/coverage.json
+python scripts/build_showcases.py --only 3i-atlas             # TAP → IBE cutout → zscale PNG
 cd spectrahunt-web && npm run build
 ```
 
@@ -75,17 +76,32 @@ backend/            # FastAPI: epoch discovery, cutout proxy, resolve, SkyBoT, d
   detect.py         # fast peak-finder path (SEP→photutils→scipy→numpy)
   cache.py          # git-ignored scratch (WAL): kv, SkyBoT, api_cache TTL
 scripts/
-  build_showcases.py  # showcase PNG indexer (oldest+newest pairing for same-spot epochs)
-  real_coverage.py    # showcase-cell tallies → coverage.json
+  build_showcases.py  # showcase PNG indexer (oldest+newest pairing, sibling-frame fallback)
+  build_bandstack.py  # per-detector newest-visit PNGs (powers RGB + spectra)
+  fetch_compare.py    # DSS2 + 2MASS context cutouts per field (CDS hips2fits)
+  nep_stack.py        # median deep-stack of NEP visits → bonus epoch
+  classify_fields.py  # detection + light curves → public/reports/{id}.json
+  sky_census.py       # all-sky obscore census (sharded, resumable, mergable)
+  process_field.py    # one position → full JSON report
+  nightly.sh          # overnight loop: merge → fill → build → verify → commit
+  watch_push.sh       # commit + push whenever processed data lands
+  audit_loop.sh       # 50-pass verify loop (tests, types, lint, routes, data)
+  serve.py            # static server with no-store HTML (auto hard-refresh)
 spectrahunt-web/
-  public/showcases/   # 15 fields (3i-atlas, ecliptic-mover, nep-deep, orion, galcenter,
-                        # m31, lmc, virgo, eros, crab, omega-cen, carina, m51, m101, smc —
-                        # real coords/epochs, png fills in via indexer)
+  public/showcases/   # 20 fields (3i-atlas, ecliptic-mover, nep-deep, orion,
+                        # galcenter, m31, lmc, virgo, eros, crab, omega-cen,
+                        # carina, m51, m101, smc, dorado, draco, ophiuchus,
+                        # libra, hercules — real coords/epochs, png via indexer)
   public/cutouts/     # rendered PNGs, ≤100KB, immutable cache
+  public/compare/     # DSS2 + 2MASS context JPGs per field
+  public/reports/     # measured classifications per field (movers/σ/curves)
   public/coverage.json# measured cells {epochs, images, bands, span}
+  public/data/        # vendored constellation lines (offline-safe)
   src/lib/astro.ts    # coordinates, 88 constellations, 102 channels, stretch/colormaps, permalinks
-  src/lib/catalogs.ts # Sesame resolve, SkyBoT/MPC/Horizons/SIMBAD links, tours, glossary
-  src/                # Home, Blink, Sky, Candidates, About + canvas engine + store
+  src/lib/catalogs.ts # SIMBAD-first resolve, catalog links, tours, glossary, surprise
+  src/lib/skycache.ts # IndexedDB imagery + neighbor prefetch + JSON LRU
+  src/lib/motion.ts   # in-browser ±5σ dipole detection
+  src/                # pages + viewers (HeroSky, StellariumView, Blink deck, rail) + store
 ARCHITECTURE.md       # full system plan, contracts, workflows, roadmap
 DEMO.md               # 90-second walkthrough script
 LICENSE               # MIT + required SPHEREx/IRSA attribution
@@ -106,7 +122,7 @@ LICENSE               # MIT + required SPHEREx/IRSA attribution
 ## Checks
 
 ```bash
-.venv/bin/python -m pytest backend/tests/ -q   # 14 passed
+.venv/bin/python -m pytest backend/tests/ -q   # 16 passed
 cd spectrahunt-web && npx eslint src            # 0 errors
 cd spectrahunt-web && npm run build             # static export to out/
 ```

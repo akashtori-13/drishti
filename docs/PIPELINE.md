@@ -22,8 +22,13 @@ Design context: `SYSTEM_DESIGN.md` §§4–6, 9. API shapes: `docs/API.md`.
 |---|---|---|
 | `sky_census.py` | All-sky obscore census → `public/coverage.json` | 72 boxes; `--shard I/N --progress f` for parallel workers; `--merge` (parse-retry, abort-safe); `--publish-only` |
 | `build_showcases.py` | Showcase PNG indexer | `--only <id> --size 0.15 --timeout 120`; oldest+newest pairing; **tries ≤5 sibling frames** (IBE 422s are common); offline-safe (`png:null` preserved) |
-| `process_field.py` | One position → `data/reports/field_*.json` | `--ra --dec --band`; used to precompute static reports |
+| `build_bandstack.py` | Per-detector newest-visit PNGs → `bands` map in showcase JSON | D3 reuses epoch PNGs; sibling fallback; powers RGB + spectra |
+| `fetch_compare.py` | DSS2 + 2MASS context JPGs → `public/compare/` | Fast CDS hips2fits, no TAP; `--only <id>` |
+| `nep_stack.py` | Median deep-stack of NEP visits → bonus epoch | `--n 12`; WCS-aligned, outlier-resistant |
+| `classify_fields.py` | Detection + light curves → `public/reports/{id}.json` | `--only`, `--force`; skips fresh reports; conservative rules |
+| `process_field.py` | One position → `data/reports/field_*.json` | `--ra --dec --band`; ad-hoc analysis |
 | `serve.py` | Static server | no-store HTML (auto hard-refresh), immutable hashed assets |
+| `nightly.sh` / `watch_push.sh` / `audit_loop.sh` | Ops loops | merge → fill → build → verify → commit / commit-on-data / 50-pass verify |
 
 ## The weekly refresh (and the overnight pattern)
 
