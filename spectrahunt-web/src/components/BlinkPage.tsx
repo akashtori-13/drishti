@@ -12,7 +12,7 @@ import {
 import { blinkURL, useAppStore } from '@/lib/store';
 import { fmtDec, fmtRa } from '@/lib/sky';
 import { arcsecPerDay, mjdToDate, toCSV } from '@/lib/astro';
-import { GLOSSARY, TOURS, horizonsURL, irsaViewerURL, mpcCheckerURL, simbadURL, skybotURL } from '@/lib/catalogs';
+import { horizonsURL, irsaViewerURL, mpcCheckerURL, simbadURL, skybotURL } from '@/lib/catalogs';
 
 type RailTab = 'overview' | 'epochs' | 'catalogs' | 'share';
 
@@ -25,7 +25,6 @@ export default function BlinkPage({ id }: { id: string }) {
   const [skybot, setSkybot] = useState<Array<{ name: string }> | null>(null);
   const [sample, setSample] = useState<{ x: number; y: number; values: number[] } | null>(null);
   const [tab, setTab] = useState<RailTab>('overview');
-  const [tour, setTour] = useState(0);
   const [flag, setFlag] = useState('');
   const [flags, setFlags] = useState<Array<{ x: number; note: string }>>([]);
   const [liveSpec, setLiveSpec] = useState<Array<{ wavelength_um: number; flux: number }> | null>(null);
@@ -333,34 +332,10 @@ export default function BlinkPage({ id }: { id: string }) {
           </aside>
         </div>
       )}
-
       {viewing && (
-        <div className="bw-learn">
-          <details className="learn-card">
-            <summary>Guided tour: {TOURS[tour].title}</summary>
-            <div className="tour-btns">
-              {TOURS.map((t, i) => (
-                <button key={t.id} type="button" className="epoch-chip" aria-pressed={i === tour} onClick={() => setTour(i)}>{t.title}</button>
-              ))}
-            </div>
-            <ol>
-              {TOURS[tour].stops.map((s) => (
-                <li key={s.id}>
-                  <strong>{s.title}</strong> — {s.caption}{' '}
-                  {s.showcaseId && <Link href={blinkURL(s.showcaseId)} className="epoch-chip">Open</Link>}
-                </li>
-              ))}
-            </ol>
-          </details>
-          <details className="learn-card">
-            <summary>Glossary</summary>
-            <dl className="gloss">
-              {GLOSSARY.map((g) => (
-                <div key={g.term}><dt>{g.term}</dt><dd>{g.plain}</dd></div>
-              ))}
-            </dl>
-          </details>
-        </div>
+        <p className="bw-more">
+          New here? Take a <Link href="/about">guided tour</Link> or look up a term in the <Link href="/about">glossary</Link>.
+        </p>
       )}
     </div>
   );

@@ -1,6 +1,7 @@
 'use client';
 
 import { BANDS } from '@/lib/sky';
+import { TOURS, GLOSSARY } from '@/lib/catalogs';
 
 export default function AboutPage() {
   return (
@@ -50,6 +51,31 @@ export default function AboutPage() {
           detector pixel sees a different wavelength depending on sky position. We only
           compare epochs whose wavelengths agree within half the local bandwidth.
         </p>
+      </section>
+
+      <section>
+        <h2>Guided tours</h2>
+        <p>Short narrated paths through the app — the same fields you can blink yourself.</p>
+        {TOURS.map((t) => (
+          <div key={t.id} className="learn-card" style={{ marginTop: 12 }}>
+            <h3 style={{ fontSize: '1rem', color: 'var(--ink)', marginBottom: 6 }}>{t.title}</h3>
+            <p>{t.blurb}</p>
+            <ol style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6, listStyle: 'decimal', paddingLeft: 20 }}>
+              {t.stops.map((s) => (
+                <li key={s.id}><strong style={{ color: '#fff' }}>{s.title}</strong> — {s.caption}</li>
+              ))}
+            </ol>
+          </div>
+        ))}
+      </section>
+
+      <section>
+        <h2>Glossary</h2>
+        <dl className="gloss" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {GLOSSARY.map((g) => (
+            <div key={g.term}><dt style={{ color: '#fff', fontWeight: 600 }}>{g.term}</dt><dd style={{ color: 'var(--ink-2)' }}>{g.plain}</dd></div>
+          ))}
+        </dl>
       </section>
 
       <section>
