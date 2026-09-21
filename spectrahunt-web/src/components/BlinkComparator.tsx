@@ -208,7 +208,6 @@ export default function BlinkComparator({
       setZoom((z) => Math.min(6, Math.max(0.6, z * (e.deltaY > 0 ? 0.92 : 1.09))));
     };
     stage.addEventListener('wheel', onWheel, { passive: false });
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     const ro = new ResizeObserver(() => setSizeTick((t) => t + 1));
     ro.observe(stage);
     return () => {
@@ -418,7 +417,7 @@ export default function BlinkComparator({
           : '';
       }
     } catch { /* tainted or tiny canvas */ }
-  });
+  }, [curImg, prevImg, mode, stretch, vmin, vmax, invert, cmap, diffScale, swipe, pan, zoom, showMarkers, showRgb, fovArcmin, candidates, sizeTick]);
 
   // side-by-side render (synchronized pan/zoom)
   useEffect(() => {
@@ -767,6 +766,31 @@ export default function BlinkComparator({
                 <div style={{ marginTop: 6 }}>Change map: <span ref={diffStatRef} className="mono" style={{ color: '#e8c34a' }} /></div>
                 {mode !== 'diff' && <span className="mono">switch to Diff to quantify change</span>}
               </div>
+            </div>
+            <div>
+              <div style={{ fontSize: 12, color: '#8a90ab', marginBottom: 4 }}>
+                {candidates.length
+                  ? `${candidates.length} candidate${candidates.length === 1 ? '' : 's'} — real pixel differencing, ≥5σ`
+                  : 'Scanning pixels for movers…'}
+              </div>
+              {candidates.length > 0 ? (
+                <ul className="cand-detect-list">
+                  {candidates.slice(0, 5).map((c, i) => (
+                    <li key={i} className="mono">
+                      <span className={c.kind === 'mover' ? 'tag-mover' : 'tag-var'}>
+                        {c.kind === 'mover' ? 'MOVER' : 'VARIABLE'}
+                      </span>{' '}
+                      #{i + 1} · {c.sigma.toFixed(1)}σ
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p style={{ fontSize: 12, color: '#8a90ab' }}>
+                  {curImg && prevImg
+                    ? 'No movers above 5σ between these two epochs — quiet field (Movers toggle draws whatever is found).'
+                    : 'Needs two loaded frames to scan.'}
+                </p>
+              )}
             </div>
           </div>
         )}
