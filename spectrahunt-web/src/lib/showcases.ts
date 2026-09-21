@@ -6,6 +6,7 @@ export const useLive = Boolean(API_BASE) && DATA_MODE === 'live';
 
 export interface ShowcaseEpoch {
   label: string;
+  name?: string;
   obs_id?: string;
   detector?: string;
   band?: number;
@@ -17,6 +18,7 @@ export interface ShowcaseEpoch {
   png?: string | null;
   cutout_url?: string;
   note?: string;
+  skybot_match?: string | null;
 }
 
 export interface Showcase {
