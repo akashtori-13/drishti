@@ -34,20 +34,26 @@ def test_arcsec_per_day():
     assert arcsec_per_day(0, 0, 0, 0, -3) is None
 
 
-def test_detect_endpoint_shape():
+def test_detect_endpoint_shape(tmp_path, monkeypatch):
+    import asyncio
+    import backend.pipeline as P
+
+    async def no_epochs(*a, **k):
+        return []
+
+    # isolate: temp DB (no shared IRSA cache) + stubbed discovery (no network)
+    db = str(tmp_path / "t.db")
+    monkeypatch.setattr(P, "discover_cached", lambda *a, **k: [])
+    out = asyncio.run(P._detect_async(180, 0, 3, 0.05, db))
+    assert out["candidates"] == [] and out["detail"] == "need-2-epochs"
+
+    async def fake_detect(*a, **k):
+        return {"candidates": [], "matched": 0, "detail": "need-2-epochs"}
+    monkeypatch.setattr(P, "detect_field", fake_detect)
     from fastapi.testclient import TestClient
     from backend.app import app
     c = TestClient(app)
-    # monkeypatch discovery to avoid network: no covering images -> graceful []
-    import backend.app as appmod
-    import backend.epochs as epochsmod
-    real = epochsmod.discover_epochs
-    epochsmod.discover_epochs = lambda *a, **k: []
-    try:
-        r = c.get("/api/detect?ra=180&dec=0&band=3")
-        assert r.status_code == 200
-        body = r.json()
-        assert body["candidates"] == [] and body["matched"] == 0
-    finally:
-        epochsmod.discover_epochs = real
-        assert appmod is not None
+    r = c.get("/api/detect?ra=180&dec=0&band=3")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["candidates"] == [] and body["matched"] == 0

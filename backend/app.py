@@ -233,7 +233,8 @@ def _prune_frames(keep: int = 500) -> None:
         pass
 
 
-async def _render_frame_png(cutout_url: str):    """Fetch IBE cutout, render PNG to the file cache. Returns Path or None."""
+async def _render_frame_png(cutout_url: str):
+    """Fetch IBE cutout, render PNG to the file cache. Returns Path or None."""
     import hashlib
     from backend.cutouts import fetch_ibe, mask_bad_pixels, parse_fits, render_png
     key = hashlib.md5(cutout_url.encode()).hexdigest()[:16]
