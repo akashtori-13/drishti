@@ -1,9 +1,10 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { blinkURL } from '@/lib/store';
-import { SHOWCASE_IDS, getCoverage, useLive, type RealCell } from '@/lib/showcases';
+import { SHOWCASE_IDS, getCoverage, getShowcase, useLive, type RealCell, type Showcase } from '@/lib/showcases';
 import { buildGrid, GRID_H, GRID_W } from '@/lib/sky';
 import HeroSky from '@/components/HeroSky';
 import SearchBox, { type SearchTarget } from '@/components/SearchBox';
@@ -68,6 +69,8 @@ export default function HomePage() {
   const [coverage, setCoverage] = useState(false);
   const [field, setField] = useState<InspectorField | null>(null);
   const [real, setReal] = useState<Map<string, RealCell> | null>(null);
+  const [genAt, setGenAt] = useState<string | null>(null);
+  const [fields, setFields] = useState<Showcase[]>([]);
 
   useEffect(() => {
     let alive = true;
@@ -80,6 +83,10 @@ export default function HomePage() {
         if (Number.isInteger(i) && Number.isInteger(j)) grid[j][i] = Math.min(v.epochs, 5);
       }
       setReal(m);
+      if (c.generated_at) setGenAt(c.generated_at.slice(0, 10));
+    });
+    void Promise.all(SHOWCASE_IDS.map((id) => getShowcase(id).catch(() => null))).then((docs) => {
+      if (alive) setFields(docs.filter((d): d is Showcase => d !== null));
     });
     return () => { alive = false; };
   }, [grid]);
@@ -107,14 +114,16 @@ export default function HomePage() {
         <div className="hero-scrim" />
 
         <div className="hero-core">
+          <p className="hero-kicker">NASA Space Apps 2026 · SPHEREx Quick Release 2 · All-sky time machine</p>
           <h1>Hunt what moves in the infrared sky</h1>
           <p className="hero-sub">
-            SPHEREx scans the whole sky every six months. SpectraHunt lines up each pass
-            and flags what changed: comets, asteroids, variable stars.
+            SPHEREx photographs the entire sky every six months in 102 infrared
+            colors. SpectraHunt lines up each visit and flags what changed —
+            comets, asteroids, variable stars.
           </p>
 
           <SearchBox
-            id="hs" placeholder="Search an object or coordinates"
+            id="hs" placeholder="Search an object, field, or coordinates"
             onPick={pick}
           />
 
@@ -127,7 +136,21 @@ export default function HomePage() {
             <span className="quick-sep" aria-hidden="true">or</span>
             <SurpriseButton onPick={pick} />
           </div>
-          <p className="sky-hint">Or click anywhere on the sky to inspect that field.</p>
+          <p className="sky-hint">Or click anywhere on the real sky behind this text to inspect that field.</p>
+
+          <div className="hero-stats" aria-label="Live survey statistics">
+            <span><b>{real ? real.size.toLocaleString() : '—'}</b> cells measured</span>
+            <span className="sep" aria-hidden="true" />
+            <span><b>{SHOWCASE_IDS.length}</b> blinkable fields</span>
+            <span className="sep" aria-hidden="true" />
+            <span><b>102</b> spectral bands</span>
+            {genAt && (
+              <>
+                <span className="sep" aria-hidden="true" />
+                <span className="rel"><span className="live-dot" />updated {genAt}</span>
+              </>
+            )}
+          </div>
         </div>
 
         <div className="hero-foot">
@@ -138,18 +161,65 @@ export default function HomePage() {
               aria-labelledby="heroCovLabel" onClick={() => setCoverage((c) => !c)}
             />
           </div>
+          <a className="scroll-cue" href="#fields" aria-label="Scroll to fields">
+            <span />fields below
+          </a>
         </div>
       </section>
 
-      <div className="home-info-bar">
-        <div className="pill glass">
-          <span className="rel"><span className="live-dot" />QR2 release, updated weekly</span>
-          <span className="sep rel" aria-hidden="true" />
-          <span><b>{real ? real.size : 0}</b> cells surveyed</span>
-          <span className="sep" aria-hidden="true" />
-          <span><b>{SHOWCASE_IDS.length}</b> showcases live</span>
+      <section className="fields" id="fields" aria-labelledby="fields-h">
+        <div className="fields-inner">
+          <div className="fields-head">
+            <div>
+              <h2 id="fields-h">Fifteen fields, ready to blink</h2>
+              <p>Every card is real SPHEREx data — two or more visits, same band. Pick one and press play.</p>
+            </div>
+            <Link href="/sky" className="btn">Open the sky map</Link>
+          </div>
+          <div className="fields-rail" role="list">
+            {fields.map((f) => {
+              const png = f.epochs.find((e) => e.png)?.png ?? null;
+              return (
+                <Link key={f.id} href={blinkURL(f.id)} className="field-card" role="listitem"
+                  aria-label={`${f.title}, ${f.epochs.length} epochs`}>
+                  <span className="field-thumb">
+                    {png ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={png} alt="" loading="lazy" draggable={false} />
+                    ) : (
+                      <span className="field-pending">cutout pending</span>
+                    )}
+                    <span className="field-epochs mono">{f.epochs.length} epochs</span>
+                  </span>
+                  <span className="field-body">
+                    <span className="field-name">{f.title}</span>
+                    <span className="field-meta mono">D{f.epochs[0]?.band ?? 3} · {f.epochs[0]?.wavelength_um?.toFixed(2) ?? '—'} µm</span>
+                  </span>
+                </Link>
+              );
+            })}
+            {!fields.length && (
+              <p className="empty">Loading fields…</p>
+            )}
+          </div>
         </div>
-      </div>
+      </section>
+
+      <section className="nums" aria-label="By the numbers">
+        <div className="nums-inner">
+          {[
+            ['2,590', 'sky cells measured'],
+            ['30', 'epoch cutouts rendered'],
+            ['102', 'spectral bands, 0.75–5 µm'],
+            ['6', 'detectors, same-band blinks'],
+          ].map(([n, label]) => (
+            <div key={label} className="num">
+              <span className="num-n">{n}</span>
+              <span className="num-l">{label}</span>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <section className="how" id="how" aria-labelledby="how-h">
         <div className="how-inner">
@@ -192,7 +262,7 @@ export default function HomePage() {
                 </svg>
               </figure>
               <div className="step-head"><span className="step-n">3</span><h3>Check the catalogs</h3></div>
-              <p>Every candidate is cross-matched against SkyBoT&apos;s known solar-system objects. Anything without a match goes to a person for review.</p>
+              <p>Every candidate is cross-matched against Gaia stars and known solar-system objects. Anything without a match goes to a person for review.</p>
             </li>
           </ol>
 
