@@ -163,7 +163,8 @@ main:focus{outline:none;}
 .feat-k{font-family:var(--font-mono); font-size:.6875rem; letter-spacing:.12em; text-transform:uppercase; color:var(--unknown);}
 .feat-t{font-weight:650; font-size:1rem; letter-spacing:-.01em; color:var(--ink);}
 .feat-s{font-size:.8125rem; color:var(--ink-2);}
-.hero-core{width:min(100%,640px); display:flex; flex-direction:column; align-items:center; gap:22px; text-align:center;}
+.hero-core{width:min(100%,900px); display:flex; flex-direction:column; align-items:center; gap:22px; text-align:center;}
+.hero .search-shell{max-width:720px;}
 .hero-core h1{
   font-family:var(--font-display); font-weight:650; font-size:clamp(2.7rem,7.2vw,5.4rem);
   line-height:.98; letter-spacing:-.042em; text-wrap:balance;
