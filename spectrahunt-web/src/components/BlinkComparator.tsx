@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Icon from '@/components/Icon';
+import SpectrumPlot from '@/components/Plots';
 import { BANDS } from '@/lib/sky';
 import { CHANNELS, applyStretch, colormap, type Colormap, type Stretch } from '@/lib/astro';
 import { detectMotion, sampleGray, type MotionCandidate } from '@/lib/motion';
@@ -111,6 +112,7 @@ export default function BlinkComparator({
   const [loadedBand, setLoadedBand] = useState<Record<string, HTMLImageElement>>({});
   const [recording, setRecording] = useState(false);
   const [probe, setProbe] = useState<{ sx: number; sy: number; lum: number; ra: number; dec: number } | null>(null);
+  const [specVals, setSpecVals] = useState<number[] | null>(null);
   const [measureChip, setMeasureChip] = useState<{ x: number; y: number; lum: number; label: string } | null>(null);
 
   const mainRef = useRef<HTMLCanvasElement>(null);
@@ -130,6 +132,8 @@ export default function BlinkComparator({
     const urls = [...new Set(frames.map((f) => f.png).filter((u): u is string => !!u))];
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoaded({});
+    setSpecVals(null);
+    setMeasureChip(null);
     for (const u of urls) {
       void loadImage(u).then((img) => {
         if (alive) setLoaded((m) => (m[u] ? m : { ...m, [u]: img }));
@@ -569,6 +573,7 @@ export default function BlinkComparator({
       } catch { return 0; }
     });
     if (onSample) onSample({ x, y, values });
+    setSpecVals(values);
     setMeasureChip({ x, y, lum: values[idx] ?? 0, label: cur?.label ?? '' });
   };
 
@@ -794,9 +799,9 @@ export default function BlinkComparator({
         </div>
         </div>
         <aside className="tweak-left glass" aria-label="Image controls">
-          <section className="tweak-sec" aria-label="View">
-            <h3>View</h3>
-            <div className="seg" role="group" aria-label="Compare mode">
+          <section className="ws-sec" aria-label="View">
+            <h3 className="ws-title">View</h3>
+            <div className="seg seg-full" role="group" aria-label="Compare mode">
               {(['blink', 'side', 'swipe', 'diff'] as CompareMode[]).map((m) => (
                 <button key={m} type="button" className={`seg-btn${mode === m ? ' active' : ''}`} aria-pressed={mode === m}
                   onClick={() => onModeChangeWrap(m)}>
@@ -806,105 +811,130 @@ export default function BlinkComparator({
               <button type="button" className={`seg-btn${showRgb ? ' active' : ''}`} aria-pressed={showRgb}
                 onClick={() => setShowRgb((v) => !v)} title="False-color: epoch B red, epoch A green">Color</button>
             </div>
-          {mode === 'diff' && (
-            <label className="mini-slider"><span>Gain</span>
-              <input type="range" min={1} max={8} step={0.5} value={diffScale} onChange={(e) => setDiffScale(Number(e.target.value))} aria-label="Difference gain" />
-            </label>
-          )}
-          {mode === 'swipe' && (
-            <label className="mini-slider"><span>Curtain</span>
-              <input type="range" min={2} max={98} value={Math.round(swipe * 100)} onChange={(e) => setSwipe(Number(e.target.value) / 100)} aria-label="Swipe position" />
-            </label>
-          )}
+            {mode === 'diff' && (
+              <label className="ws-level"><span>Gain</span>
+                <input type="range" min={1} max={8} step={0.5} value={diffScale} onChange={(e) => setDiffScale(Number(e.target.value))} aria-label="Difference gain" />
+                <output>{diffScale.toFixed(1)}×</output>
+              </label>
+            )}
+            {mode === 'swipe' && (
+              <label className="ws-level"><span>Curtain</span>
+                <input type="range" min={2} max={98} value={Math.round(swipe * 100)} onChange={(e) => setSwipe(Number(e.target.value) / 100)} aria-label="Swipe position" />
+                <output>{Math.round(swipe * 100)}%</output>
+              </label>
+            )}
           </section>
-          <section className="tweak-sec" aria-label="Display">
-            <h3>Display</h3>
-<div className="pop-group-label">Stretch · color · levels</div>
-            <div style={rowStyle}>
-              <label style={{ fontSize: 13 }}>Stretch{' '}
-                <select value={stretch} onChange={(e) => setStretch(e.target.value as Stretch)} style={selStyle}>
+
+          <section className="ws-sec" aria-label="Display">
+            <h3 className="ws-title">Display</h3>
+            <div className="ws-row">
+              <label className="ws-field">Stretch
+                <select value={stretch} onChange={(e) => setStretch(e.target.value as Stretch)} aria-label="Stretch method">
                   <option value="linear">linear</option>
                   <option value="log">log</option>
                   <option value="sqrt">sqrt</option>
                   <option value="asinh">asinh</option>
                 </select>
               </label>
-              <label style={{ fontSize: 13 }}>Colors{' '}
-                <select value={cmap} onChange={(e) => setCmap(e.target.value as Colormap)} style={selStyle}>
+              <label className="ws-field">Color
+                <select value={cmap} onChange={(e) => setCmap(e.target.value as Colormap)} aria-label="Color mode">
                   <option value="grayscale">grayscale</option>
                   <option value="cividis">cividis ✓ colorblind-safe</option>
                   <option value="viridis">viridis</option>
                   <option value="inferno">inferno</option>
                 </select>
               </label>
-              <button type="button" className="epoch-chip" aria-pressed={invert} onClick={() => setInvert((v) => !v)}
-                style={invert ? { color: '#fff', borderColor: '#7c83fd' } : undefined}>Invert</button>
+              <button type="button" className={`ws-btn${invert ? ' active' : ''}`} aria-pressed={invert} onClick={() => setInvert((v) => !v)}>Invert</button>
+            </div>
+            <div className="ws-sub">Presets</div>
+            <div className="ws-row" role="group" aria-label="Brightness presets">
               {(['faint', 'balanced', 'bright'] as const).map((pp) => (
-                <button key={pp} type="button" className="epoch-chip" onClick={() => setPreset(pp)}>{pp}</button>
+                <button key={pp} type="button" className="ws-btn" onClick={() => setPreset(pp)}>{pp}</button>
               ))}
             </div>
-            <label className="speed"><span>Black {Math.round(vmin * 100)}%</span>
-              <input type="range" min={0} max={50} value={Math.round(vmin * 100)} onChange={(e) => setVmin(Number(e.target.value) / 100)} />
+            <div className="ws-sub">Levels</div>
+            <label className="ws-level"><span>Black</span>
+              <input type="range" min={0} max={50} value={Math.round(vmin * 100)} onChange={(e) => setVmin(Number(e.target.value) / 100)} aria-label="Black point" />
+              <output>{Math.round(vmin * 100)}%</output>
             </label>
-            <label className="speed"><span>White {Math.round(vmax * 100)}%</span>
-              <input type="range" min={50} max={100} value={Math.round(vmax * 100)} onChange={(e) => setVmax(Number(e.target.value) / 100)} />
+            <label className="ws-level"><span>White</span>
+              <input type="range" min={50} max={100} value={Math.round(vmax * 100)} onChange={(e) => setVmax(Number(e.target.value) / 100)} aria-label="White point" />
+              <output>{Math.round(vmax * 100)}%</output>
             </label>
-            <div className="pop-group-label">Band · channel · RGB</div>
-            <div className="band-row" style={{ padding: 0, background: 'transparent' }}>
+          </section>
+
+          <section className="ws-sec" aria-label="Bands">
+            <h3 className="ws-title">Bands</h3>
+            <div className="band-grid" role="group" aria-label="Detector band">
               {BANDS.map((b) => (
-                <button key={b.id} type="button" className="band" style={{ ['--band-color' as string]: b.color }}
+                <button key={b.id} type="button" className={`band-cell${b.id === band ? ' active' : ''}`}
                   aria-pressed={b.id === band} title={`${b.label}: ${b.range}`} onClick={() => setBandAndChannel(b.id)}>
-                  <span className="sw" style={{ background: b.color }} />{b.label}
+                  <span className="sw" style={{ background: b.color }} />
+                  <span>Band {b.id}</span>
                 </button>
               ))}
             </div>
-            <p style={{ fontSize: 12, color: '#8a90ab' }}>{bandMeta.label} ({bandMeta.range}) · 102 channels · same-band blink only</p>
-            <div style={rowStyle}>
-              <label style={{ fontSize: 13 }}>Channel{' '}
-                <select value={channel} onChange={(e) => setChannel(Number(e.target.value))} style={{ ...selStyle, maxWidth: 200 }} aria-label="Spectral channel">
-                  {detChannels.map((c) => (
-                    <option key={c.idx} value={c.idx}>#{c.idx + 1} · {c.wave_um.toFixed(2)} µm</option>
-                  ))}
-                </select>
-              </label>
-              <span style={{ fontSize: 13, color: '#8a90ab' }}>RGB</span>
+            <p className="ws-meta">{bandMeta.label} · {bandMeta.range} · 102 channels · same-band blink only</p>
+            <div className="ws-sub">Channel</div>
+            <label className="ws-field">Spectral channel
+              <select value={channel} onChange={(e) => setChannel(Number(e.target.value))} aria-label="Spectral channel">
+                {detChannels.map((c) => (
+                  <option key={c.idx} value={c.idx}>#{c.idx + 1} · {c.wave_um.toFixed(2)} µm</option>
+                ))}
+              </select>
+            </label>
+            <div className="ws-sub">RGB mapping</div>
+            <div className="ws-row" role="group" aria-label="RGB channel mapping">
               {(['R', 'G', 'B'] as const).map((k, ki) => (
-                <select key={k} value={rgb[ki]} aria-label={`${k} channel`} style={selStyle}
-                  onChange={(e) => setRgb(([r, g, b]) => { const v = [r, g, b] as [number, number, number]; v[ki] = Number(e.target.value); return v; })}>
-                  {CHANNELS.map((c) => <option key={c.idx} value={c.idx}>{k} #{c.idx + 1}</option>)}
-                </select>
+                <label key={k} className="ws-field rgb">{k}
+                  <select value={rgb[ki]} aria-label={`${k} channel`}
+                    onChange={(e) => setRgb(([r, g, b]) => { const v = [r, g, b] as [number, number, number]; v[ki] = Number(e.target.value); return v; })}>
+                    {CHANNELS.map((c) => <option key={c.idx} value={c.idx}>#{c.idx + 1}</option>)}
+                  </select>
+                </label>
               ))}
               <button
-                type="button" className="epoch-chip" aria-pressed={falseColor}
+                type="button" className={`ws-btn${falseColor ? ' active' : ''}`} aria-pressed={falseColor}
                 onClick={() => setFalseColor((v) => !v)}
                 disabled={Object.values(bandPngs ?? {}).filter(Boolean).length < 3}
                 title={Object.values(bandPngs ?? {}).filter(Boolean).length < 3
                   ? 'Needs 3+ band images (still indexing)'
                   : 'Render the chosen R/G/B detector images as false color'}
-                style={falseColor ? { color: '#fff', borderColor: '#7c83fd' } : undefined}
               >
-                {falseColor ? 'Color on' : 'Show in color'}
+                {falseColor ? '✓ Show in color' : 'Show in color'}
               </button>
             </div>
           </section>
-          <section className="tweak-sec" aria-label="Measure">
-            <h3>Measure</h3>
-<p style={{ fontSize: 12, color: '#8a90ab' }}>Click the image to measure that spot — a chip shows the value, and the spectrum feeds the data rail.</p>
-            <div className="mono probe-line">
-              {probe
-                ? <>px {probe.lum}{Number.isFinite(probe.ra) ? <> · {probe.ra.toFixed(3)}°, {probe.dec >= 0 ? '+' : ''}{probe.dec.toFixed(3)}°</> : ' · hover'}</>
-                : 'Hover the image to probe pixels'}
+
+          <section className="ws-sec" aria-label="Measure">
+            <h3 className="ws-title">Measure</h3>
+            <p className="ws-hint">Click the image to measure that spot.</p>
+            <div className="ws-result mono" aria-live="polite">
+              {measureChip
+                ? <>px {measureChip.lum} · {measureChip.label}</>
+                : probe
+                  ? <>px {probe.lum}{Number.isFinite(probe.ra) ? <> · {probe.ra.toFixed(3)}°, {probe.dec >= 0 ? '+' : ''}{probe.dec.toFixed(3)}°</> : ' · hover'}</>
+                  : 'No measurement yet'}
             </div>
-            <canvas ref={histRef} className="hist" aria-label="Brightness histogram of the displayed frame" />
-            <div style={{ fontSize: 12, color: '#8a90ab' }}>
-              Change map: <span ref={diffStatRef} className="mono" style={{ color: '#e8c34a' }} />
-              {mode !== 'diff' && <span className="mono"> — switch to Diff to quantify change</span>}
+            <div className="ws-sub">Spectrum</div>
+            <div className="ws-inset">
+              {specVals ? (
+                <SpectrumPlot values={specVals} band={band} />
+              ) : (
+                <p className="ws-hint">Measure a spot to draw its spectrum.</p>
+              )}
             </div>
-            <div style={{ fontSize: 12, color: '#8a90ab' }}>
+            <div className="ws-sub">Change map</div>
+            <p className="ws-status">
+              <span ref={diffStatRef} className="mono" style={{ color: '#e8c34a' }} />
+              {mode !== 'diff' && <span className="mono">Switch to Diff to quantify change</span>}
+            </p>
+            <div className="ws-sub">Status</div>
+            <p className="ws-status">
               {candidates.length
                 ? `${candidates.length} candidate${candidates.length === 1 ? '' : 's'} — real pixel differencing, ≥5σ`
                 : 'Scanning pixels for movers…'}
-            </div>
+            </p>
             {candidates.length > 0 ? (
               <ul className="cand-detect-list">
                 {candidates.slice(0, 5).map((c, i) => (
@@ -918,9 +948,10 @@ export default function BlinkComparator({
               </ul>
             ) : (
               curImg && prevImg && (
-                <p style={{ fontSize: 12, color: '#8a90ab' }}>No movers above 5σ between these epochs — quiet field.</p>
+                <p className="ws-status">No movers above 5σ between these epochs — quiet field.</p>
               )
             )}
+            <canvas ref={histRef} className="hist" aria-label="Brightness histogram of the displayed frame" />
           </section>
         </aside>
 
