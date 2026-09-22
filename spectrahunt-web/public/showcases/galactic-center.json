@@ -66,6 +66,18 @@
       "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W13_1A/l2b-v24-2026-088/3/level2_2026W13_1A_0229_2D3_spx_l2b-v24-2026-088.fits?center=266.42,-29.01&size=0.15",
       "mjd": null,
       "wavelength_um": 2.02
+    },
+    "1": {
+      "png": "/cutouts/galactic-center_D1.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2025W36_2B/l2b-v20-2025-271/1/level2_2025W36_2B_0423_3D1_spx_l2b-v20-2025-271.fits?center=266.42,-29.01&size=0.15",
+      "mjd": 60924.614025,
+      "wavelength_um": 0.92
+    },
+    "2": {
+      "png": "/cutouts/galactic-center_D2.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W13_1A/l2b-v24-2026-088/2/level2_2026W13_1A_0301_2D2_spx_l2b-v24-2026-088.fits?center=266.42,-29.01&size=0.15",
+      "mjd": 61123.599984,
+      "wavelength_um": 1.36
     }
   }
 }
