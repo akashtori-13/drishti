@@ -134,6 +134,54 @@ export async function getShowcase(id: string): Promise<Showcase> {
   return refresh;
 }
 
+/** A blink needs a pair: at least two epochs with rendered PNGs. */
+export function isBlinkable(s: Showcase | null | undefined): s is Showcase {
+  if (!s || !Array.isArray(s.epochs)) return false;
+  return s.epochs.filter((e) => !!e.png).length >= 2;
+}
+
+function shuffled<T>(arr: readonly T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/** Live-first probe: fresh JSON when reachable, device cache when offline. */
+async function probeShowcase(id: string): Promise<Showcase | null> {
+  try {
+    const r = await fetch(`/showcases/${id}.json`);
+    if (r.ok) {
+      const d = (await r.json()) as Showcase;
+      remember(`sh-showcase:${id}`, d);
+      return d;
+    }
+  } catch { /* fall through to cache */ }
+  try {
+    return await getShowcase(id);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Random blinkable showcase: walks a shuffled pool and returns the first
+ * showcase whose epochs actually have rendered PNGs (pending/unreachable
+ * fields are skipped, not shown). Returns null when nothing is reachable
+ * (offline with an empty cache), so callers can fall back to a curated
+ * sky target.
+ */
+export async function randomBlinkable(excludeId?: string | null): Promise<Showcase | null> {
+  const pool = shuffled(SHOWCASE_IDS).filter((id) => id !== excludeId);
+  for (const id of pool.length ? pool : [...SHOWCASE_IDS]) {
+    const s = await probeShowcase(id);
+    if (isBlinkable(s)) return s;
+  }
+  return null;
+}
+
 // ---------- live on-demand fields (any visited sky position, live API only) ----------
 export const isLiveId = (id: string) => id.startsWith('live:');
 

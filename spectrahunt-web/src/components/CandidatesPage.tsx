@@ -81,9 +81,15 @@ const KIND_LABEL: Record<Kind, string> = {
 
 function Thumb({ card }: { card: Card }) {
   const band = BANDS[card.band - 1];
-  if (card.png) {
+  const [broken, setBroken] = useState(false);
+  // reset when the card's image changes (navigation, revalidation swap-in)
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setBroken(false);
+  }, [card.png]);
+  if (card.png && !broken) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={card.png} alt="" width={260} height={260} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} draggable={false} />;
+    return <img src={card.png} alt="" width={260} height={260} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} draggable={false} onError={() => setBroken(true)} />;
   }
   return (
     <div
@@ -95,7 +101,7 @@ function Thumb({ card }: { card: Card }) {
         color: '#8a90ab', fontSize: 12,
       }}
     >
-      cutout pending
+      {card.png ? 'image failed to load' : 'cutout pending'}
     </div>
   );
 }

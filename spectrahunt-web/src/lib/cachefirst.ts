@@ -65,7 +65,9 @@ export async function swr<T>(key: string, url: string, maxAgeMs: number): Promis
   }
   if (cached !== null) {
     void refresh.then((j) => {
-      if (j !== undefined) window.dispatchEvent(new CustomEvent('sh-revalidate', { detail: { key } }));
+      // same { key, data } contract as showcases.ts notifyRevalidated, so
+      // listeners can swap the fresh payload in without a reload
+      if (j !== undefined) window.dispatchEvent(new CustomEvent('sh-revalidate', { detail: { key, data: j } }));
     });
     return { data: cached, stale: true };
   }

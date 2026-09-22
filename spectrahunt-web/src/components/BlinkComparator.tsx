@@ -114,6 +114,18 @@ export default function BlinkComparator({
   const [sideHover, setSideHover] = useState<{ x: number; y: number; a: number; b: number } | null>(null);
   const [measureChip, setMeasureChip] = useState<{ x: number; y: number; lum: number; label: string } | null>(null);
 
+  // Reset per-frame measurement when the frame set actually changes. Done
+  // during render (not in an effect): `frames` gets a fresh identity on every
+  // parent render, so an effect-based reset would cascade far more often than
+  // needed. Re-renders only when the PNG list contents actually change.
+  const [framesSig, setFramesSig] = useState<string | null>(null);
+  const nextSig = frames.map((f) => f.png ?? '').join('|');
+  if (framesSig !== nextSig) {
+    setFramesSig(nextSig);
+    setSpecVals(null);
+    setMeasureChip(null);
+  }
+
   const mainRef = useRef<HTMLCanvasElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const [sizeTick, setSizeTick] = useState(0);
@@ -130,27 +142,72 @@ export default function BlinkComparator({
   // preload frames progressively (each arrival re-renders; no blank wait).
   // The cache is NEVER cleared: cached URLs stay instantly available and only
   // genuinely new frames show a loading state (no placeholder flash).
+  // Failed loads auto-retry with backoff (3 attempts); exhausted URLs land in
+  // `failed` and render a Retry affordance instead of a forever spinner.
+  const MAX_FRAME_ATTEMPTS = 3;
+  const [failed, setFailed] = useState<Record<string, true>>({});
   const startedLoads = useRef(new Set<string>());
+  const retryTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  useEffect(() => () => {
+    retryTimers.current.forEach(clearTimeout);
+    retryTimers.current = [];
+  }, []);
+  const loadFrame = useCallback((u: string, attempt = 1) => {
+    const attemptLoad = (a: number): void => {
+      void loadImage(u).then((img) => {
+        setLoaded((m) => (m[u] ? m : { ...m, [u]: img }));
+        setFailed((m) => {
+          if (!(u in m)) return m;
+          const next = { ...m };
+          delete next[u];
+          return next;
+        });
+      }).catch(() => {
+        if (a < MAX_FRAME_ATTEMPTS) {
+          const t = setTimeout(() => attemptLoad(a + 1), a * 1000);
+          retryTimers.current.push(t);
+        } else {
+          // keep the URL marked so render loops don't restart it; manual retry
+          // clears the mark explicitly (see retryUrl).
+          setFailed((m) => (m[u] ? m : { ...m, [u]: true }));
+          console.warn(`[blink] frame failed to load after ${a} attempts: ${u}`);
+        }
+      });
+    };
+    attemptLoad(attempt);
+  }, []);
+  const retryUrl = useCallback((u: string) => {
+    startedLoads.current.add(u);
+    setFailed((m) => {
+      if (!(u in m)) return m;
+      const next = { ...m };
+      delete next[u];
+      return next;
+    });
+    loadFrame(u, 1);
+  }, [loadFrame]);
   useEffect(() => {
-    let alive = true;
     const urls = [...new Set(frames.map((f) => f.png).filter((u): u is string => !!u))];
     for (const u of urls) {
       if (startedLoads.current.has(u)) continue;
       startedLoads.current.add(u);
-      void loadImage(u).then((img) => {
-        if (alive) setLoaded((m) => (m[u] ? m : { ...m, [u]: img }));
-      }).catch(() => undefined);
+      loadFrame(u, 1);
     }
-    setSpecVals(null);
-    setMeasureChip(null);
-    return () => { alive = false; };
-  }, [frames]);
+    return () => undefined;
+  }, [frames, loadFrame]);
 
-  // preload band PNGs for true false-color
+  // preload band PNGs for true false-color (one retry; still silent-graceful:
+  // false color simply stays disabled until they arrive)
   useEffect(() => {
     let alive = true;
     const urls = [...new Set(Object.values(bandPngs ?? {}).filter((u): u is string => !!u))];
-    void Promise.all(urls.map((u) => loadImage(u).then((img) => ({ u, img })).catch(() => null))).then((arr) => {
+    const load = (u: string, attempt = 1): Promise<{ u: string; img: HTMLImageElement } | null> =>
+      loadImage(u).then((img) => ({ u, img })).catch(() => {
+        if (attempt < 2) return load(u, attempt + 1);
+        console.warn(`[blink] band image failed to load: ${u}`);
+        return null;
+      });
+    void Promise.all(urls.map((u) => load(u))).then((arr) => {
       if (!alive) return;
       const map: Record<string, HTMLImageElement> = {};
       for (const e of arr) if (e) map[e.u] = e.img;
@@ -414,17 +471,19 @@ export default function BlinkComparator({
       stylize(canvas, stretch, vmin, vmax, invert, cmap, false, diffScale);
     } else if (cur?.png) {
       // frame exists but is still decoding: hold the last loaded frame dimmed
-      // with a small loading tag (never flash the pending message for real data)
+      // with a small loading tag (never flash the pending message for real data).
+      // Exhausted loads (see `failed`) name the failure instead of spinning forever.
+      const isFailed = !!failed[cur.png];
       const hold = prevImg ?? Object.values(loaded)[0];
       if (hold) {
         ctx.globalAlpha = 0.45;
         drawCover(ctx, hold, w, h, pan, zoom);
         ctx.globalAlpha = 1;
       }
-      ctx.fillStyle = 'rgba(238,240,248,.85)';
+      ctx.fillStyle = isFailed ? '#e8c34a' : 'rgba(238,240,248,.85)';
       ctx.font = '12px ui-monospace, monospace';
       ctx.textAlign = 'center';
-      ctx.fillText('loading frame…', w / 2, h - 30);
+      ctx.fillText(isFailed ? 'frame failed to load — use Retry' : 'loading frame…', w / 2, h - 30);
     } else {
       ctx.fillStyle = '#aab0c8';
       ctx.font = '13px system-ui';
@@ -510,7 +569,7 @@ export default function BlinkComparator({
           : '';
       }
     } catch { /* tainted or tiny canvas */ }
-  }, [curImg, prevImg, mode, stretch, vmin, vmax, invert, cmap, diffScale, swipe, pan, zoom, showMarkers, showRgb, falseColor, loadedBand, rgb, bandPngs, fovArcmin, candidates, sizeTick]);
+  }, [curImg, prevImg, mode, stretch, vmin, vmax, invert, cmap, diffScale, swipe, pan, zoom, showMarkers, showRgb, falseColor, loadedBand, rgb, bandPngs, fovArcmin, candidates, sizeTick, failed, loaded, cur?.png]);
 
   // side-by-side render (synchronized pan/zoom + linked cursor)
   useEffect(() => {
@@ -837,6 +896,11 @@ export default function BlinkComparator({
                 />
                 <span className="viewer-tag mono">{modeLabel}</span>
                 <span className="viewer-tag epoch mono">{cur?.label ?? '—'}</span>
+                {cur?.png && !curImg && failed[cur.png] && (
+                  <button type="button" className="frame-retry" onClick={() => retryUrl(cur.png as string)}>
+                    ↻ Retry frame
+                  </button>
+                )}
                 {measureChip && (
                   <div className="measure-chip mono"
                     style={{ left: `${measureChip.x * 100}%`, top: `${measureChip.y * 100}%` }}>
@@ -868,13 +932,16 @@ export default function BlinkComparator({
 
           <div className="filmstrip" role="group" aria-label="Epoch filmstrip">
             {frames.map((f, i) => (
-              <button key={f.label} type="button" onClick={() => { setPlaying(false); onEpochChange(i); }}
-                className={`film${i === idx ? ' active' : ''}`} aria-pressed={i === idx} title={f.mjd ? `${f.label} · MJD ${f.mjd}` : f.label}>
+              <button key={`${f.label}::${i}`} type="button"
+                onClick={() => { setPlaying(false); onEpochChange(i); if (f.png && failed[f.png]) retryUrl(f.png); }}
+                className={`film${i === idx ? ' active' : ''}${f.png && failed[f.png] ? ' failed' : ''}`}
+                aria-pressed={i === idx}
+                title={f.png && failed[f.png] ? `${f.label} · load failed — click to retry` : (f.mjd ? `${f.label} · MJD ${f.mjd}` : f.label)}>
                 {f.png && loaded[f.png] ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={f.png} alt="" draggable={false} />
                 ) : (
-                  <span className="film-empty">{f.mjd ? String(Math.round(f.mjd)).slice(2) : `E${i + 1}`}</span>
+                  <span className="film-empty">{f.png && failed[f.png] ? '↻' : (f.mjd ? String(Math.round(f.mjd)).slice(2) : `E${i + 1}`)}</span>
                 )}
               </button>
             ))}
@@ -1056,8 +1123,8 @@ export default function BlinkComparator({
                 if (e.key === 'Enter' && palHits[0]) { palHits[0].run(); setPalette(false); }
               }} />
             <div className="pal-list" role="listbox" aria-label="Commands">
-              {palHits.map((c) => (
-                <button key={c.name} type="button" role="option" aria-selected={false}
+              {palHits.map((c, i) => (
+                <button key={`${c.name}::${i}`} type="button" role="option" aria-selected={false}
                   onClick={() => { c.run(); setPalette(false); }}>
                   <span>{c.name}</span>{c.hint && <kbd>{c.hint}</kbd>}
                 </button>

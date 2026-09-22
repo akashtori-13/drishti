@@ -85,6 +85,12 @@ export default function SkyPage() {
   const [focus, setFocus] = useState<StelFocus | null>(null);
   const [real, setReal] = useState<Map<string, RealCell> | null>(null);
 
+  // inspector selection (declared before effects: the arrival-target effect calls it)
+  const inspect = (ra: number, dec: number) => {
+    setSel({ nx: ra / 360, ny: (90 - dec) / 180, ra, dec });
+    setField(fieldFromRaDec(ra, dec, grid, real ?? undefined));
+  };
+
   // cross-page jump target (from the command bar): focus + inspect on arrival
   useEffect(() => {
     try {
@@ -115,11 +121,6 @@ export default function SkyPage() {
     });
     return () => { alive = false; };
   }, [grid]);
-
-  const inspect = (ra: number, dec: number) => {
-    setSel({ nx: ra / 360, ny: (90 - dec) / 180, ra, dec });
-    setField(fieldFromRaDec(ra, dec, grid, real ?? undefined));
-  };
 
   const pick = (t: SearchTarget) => {
     if (t.showcaseId) { router.push(blinkURL(t.showcaseId)); return; }
