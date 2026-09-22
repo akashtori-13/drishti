@@ -33,6 +33,7 @@ jobs:
         with: { distribution: temurin, java-version: 21 }
       - name: android SDK packages (preinstalled SDK on runner)
         run: |
+          export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH"
           yes | sdkmanager --licenses > /dev/null
           sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
       - run: cd spectrahunt-web && npm ci && npm run build && npx cap sync android
