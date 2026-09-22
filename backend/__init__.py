@@ -1,4 +1,4 @@
-"""SpectraHunt backend: TAP discovery + IBE cutouts + cross-match (dev API)."""
+"""STELLAR backend: TAP discovery + IBE cutouts + cross-match (dev API)."""
 
 from backend.cache import get_connection, init_db
 from backend.config import BANDS, CITATION_TEXT, DOI, PIPELINE_VERSION, RELEASE

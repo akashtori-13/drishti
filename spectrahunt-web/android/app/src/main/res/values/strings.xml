@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">SpectraHunt</string>
-    <string name="title_activity_main">SpectraHunt</string>
-    <string name="package_name">org.spectrahunt.app.offline</string>
-    <string name="custom_url_scheme">org.spectrahunt.app.offline</string>
+    <string name="app_name">STELLAR</string>
+    <string name="title_activity_main">STELLAR</string>
+    <string name="package_name">org.stellar.app.offline</string>
+    <string name="custom_url_scheme">org.stellar.app.offline</string>
 </resources>

@@ -1,5 +1,5 @@
 """
-SpectraHunt local cache (SQLite scratch).
+STELLAR local cache (SQLite scratch).
 
 Stores SkyBoT responses, TAP discovery results, and pipeline status so repeated
 runs don't hammer IRSA. Git-ignored; the deployed site never reads this.

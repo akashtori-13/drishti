@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "SpectraHunt",
+  "productName": "STELLAR",
   "version": "1.0.0",
-  "identifier": "org.spectrahunt.app",
+  "identifier": "org.stellar.app",
   "build": {
     "frontendDist": "../../spectrahunt-web/out",
     "devUrl": "http://localhost:3000",
@@ -10,7 +10,7 @@
     "beforeDevCommand": "npm run dev --prefix ../spectrahunt-web"
   },
   "app": {
-    "windows": [{ "title": "SpectraHunt", "width": 1280, "height": 860 }],
+    "windows": [{ "title": "STELLAR", "width": 1280, "height": 860 }],
     "security": { "csp": null }
   },
   "bundle": {

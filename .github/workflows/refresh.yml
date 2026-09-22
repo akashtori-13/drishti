@@ -49,8 +49,8 @@ jobs:
 
       - name: Commit refreshed data
         run: |
-          git config user.name "spectrahunt-bot"
-          git config user.email "spectrahunt-bot@users.noreply.github.com"
+          git config user.name "stellar-bot"
+          git config user.email "stellar-bot@users.noreply.github.com"
           git add spectrahunt-web/public/cutouts spectrahunt-web/public/showcases spectrahunt-web/public/coverage.json
           git diff --cached --quiet || git commit -m "Weekly data refresh: cutouts + coverage tallies"
           git push

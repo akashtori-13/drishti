@@ -1,6 +1,6 @@
-# SpectraHunt Agent Skills
+# STELLAR Agent Skills
 
-Project-local skills for UI work on SpectraHunt. Format follows the
+Project-local skills for UI work on STELLAR. Format follows the
 `scientific-agent-skills` convention: one folder per skill, a `SKILL.md`
 with YAML frontmatter (`name`, `description`), optional `references/`.
 

@@ -1,4 +1,4 @@
-# SpectraHunt Architecture (v2)
+# STELLAR Architecture (v2)
 
 Public blink comparator for the SPHEREx sky: **same sky, different time.**
 

@@ -1,4 +1,4 @@
-# Contributing to SpectraHunt
+# Contributing to STELLAR
 
 Welcome — this is a real NASA Space Apps codebase with real users. The bar:
 every pixel traceable, every failure graceful, every change verified.
