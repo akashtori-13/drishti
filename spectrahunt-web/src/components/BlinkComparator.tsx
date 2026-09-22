@@ -145,6 +145,7 @@ export default function BlinkComparator({
       }).catch(() => undefined);
     }
     setSpecVals(null);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMeasureChip(null);
     return () => { alive = false; };
   }, [frames]);
