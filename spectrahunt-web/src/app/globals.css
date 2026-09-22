@@ -709,7 +709,7 @@ kbd{font-family:var(--font-mono); font-size:.6875rem; border:1px solid var(--lin
 
 /* ---------- orbital intro (BORESIGHT act 1) ---------- */
 .orbital{position:relative; height:100vh; height:100dvh; overflow:hidden; background:var(--space);}
-.orbital-sky{position:absolute; inset:0; width:100%; height:100%; display:block; touch-action:manipulation;}
+.orbital-sky{position:absolute; inset:0; width:100%; height:100%; display:block; touch-action:none; cursor:grab;}
 .orbital-hud{
   position:absolute; z-index:5; top:calc(var(--nav-total) + 14px); left:max(16px,env(safe-area-inset-left,0px));
   display:flex; flex-direction:column; gap:5px; font-size:.6875rem; line-height:1.6; color:var(--ink-2);
