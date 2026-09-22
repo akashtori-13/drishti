@@ -121,6 +121,7 @@ export default function AboutPage() {
         <div className="how-cta" style={{ marginTop: 0 }}>
           <Link className="btn primary" href="/sky">Open the sky map</Link>
           <Link className="btn" href="/blink/3i-atlas">Blink 3I/ATLAS</Link>
+          <Link className="btn" href="/intro">Watch the orbital intro</Link>
         </div>
       </section>
     </div>

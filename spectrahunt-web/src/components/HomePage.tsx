@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { blinkURL } from '@/lib/store';
+import { blinkURL, useAppStore } from '@/lib/store';
 import { SHOWCASE_IDS, getCoverage, getShowcase, useLive, type RealCell, type Showcase } from '@/lib/showcases';
 import { BANDS, buildGrid, GRID_H, GRID_W } from '@/lib/sky';
 import { CHANNELS } from '@/lib/astro';
@@ -135,23 +135,69 @@ export default function HomePage() {  const router = useRouter();
   const [wake, setWake] = useState(false);
   const [toast, setToast] = useState(false);
 
-  // BORESIGHT gate (Act 3): first Home visit each session enters through
-  // /intro. Deep links (/sky, /blink/...) never mount this page. The console
-  // register + wake stagger + toast below are the Act 3 home deltas.
+  // Onboarding gate: exactly one thing happens per arrival, in order.
+  // - Entry is persistent (localStorage): mobile OSes wipe session storage
+  //   when background tabs die, which used to replay the intro "sometimes".
+  // - Coarse pointers / slow networks skip the heavy orbital intro and land
+  //   on home directly (intro stays opt-in at /intro).
+  // - Post-entry, the tutorial and the toast never compete: first-timers get
+  //   the tutorial only; returners get the toast (once ever) only.
   useEffect(() => {
-    try {
-      if (!sessionStorage.getItem('sh-entered')) {
+    const entered = () => {
+      try {
+        return localStorage.getItem('sh-entered-v1') === '1'
+          || sessionStorage.getItem('sh-entered') === '1';
+      } catch {
+        return true; // private mode: plain home, no gate
+      }
+    };
+    const remember = (k: string) => {
+      try {
+        if (!localStorage.getItem(k)) {
+          localStorage.setItem(k, '1');
+          return true; // first time seeing this
+        }
+        return false;
+      } catch {
+        return false;
+      }
+    };
+    if (!entered()) {
+      let skipIntro = false;
+      try {
+        const conn = navigator as Navigator & {
+          connection?: { saveData?: boolean; effectiveType?: string };
+        };
+        skipIntro = window.matchMedia('(pointer: coarse)').matches
+          || window.innerWidth < 640
+          || conn.connection?.saveData === true
+          || /2g/.test(conn.connection?.effectiveType ?? '');
+      } catch { /* assume desktop path */ }
+      if (skipIntro) {
+        try {
+          localStorage.setItem('sh-entered-v1', '1');
+          sessionStorage.setItem('sh-entered', '1');
+        } catch { /* noop */ }
+      } else {
         router.replace('/intro');
         return;
       }
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setConsoleMode(true);
-      if (!sessionStorage.getItem('sh-wake-done')) {
-        sessionStorage.setItem('sh-wake-done', '1');
-        setWake(true);
+    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setConsoleMode(true);
+    if (remember('sh-wake-done')) {
+      setWake(true);
+    }
+    // Tutorial (first-timers) and toast (returners) are mutually exclusive —
+    // they used to fire together and fight for the tap.
+    const tutDone = useAppStore.getState().tutorialDone;
+    if (tutDone) {
+      if (remember('sh-toast-shown')) {
+        setToast(true);
       }
-      if (!sessionStorage.getItem('sh-toast-shown')) setToast(true);
-    } catch { /* private mode: plain home, no gate */ }
+    } else {
+      remember('sh-toast-shown'); // consume: the tutorial owns this visit
+    }
   }, [router]);
   const grid = useMemo(() => {
     const g = buildGrid();
@@ -211,7 +257,7 @@ export default function HomePage() {  const router = useRouter();
   const dismissToast = () => {
     setToast(false);
     try {
-      sessionStorage.setItem('sh-toast-shown', '1');
+      localStorage.setItem('sh-toast-shown', '1');
     } catch { /* noop */ }
   };
 
