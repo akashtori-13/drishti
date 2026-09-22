@@ -1,0 +1,44 @@
+{
+  "id": "eros-field",
+  "title": "433 Eros field \u2014 near-Earth asteroid",
+  "ra": 210.32,
+  "dec": 9.11,
+  "measured_at": "2026-09-22T01:51:12.882695+00:00",
+  "detail": "ok",
+  "movers": 3,
+  "variables": 1,
+  "top_sigma": 16.7,
+  "n_epochs": 1,
+  "span_days": 219.4,
+  "variable_flag": false,
+  "known": null,
+  "lightcurve": [
+    {
+      "mjd": 60842.410093,
+      "flux": -0.1280352920293808
+    }
+  ],
+  "spectrum": [
+    {
+      "band": 3,
+      "wavelength_um": 2.02,
+      "flux": -0.20951303094625473,
+      "flux_err": 0.8860867717481337,
+      "mjd": 61062.230085
+    },
+    {
+      "band": 4,
+      "wavelength_um": 3.12,
+      "flux": -0.12461445480585098,
+      "flux_err": 0.33951974173440197,
+      "mjd": 61217.585618
+    },
+    {
+      "band": 6,
+      "wavelength_um": 4.71,
+      "flux": 0.09561145305633545,
+      "flux_err": 0.5039917919169397,
+      "mjd": 61062.230085
+    }
+  ]
+}

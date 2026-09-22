@@ -1,0 +1,41 @@
+{
+  "id": "galactic-center",
+  "title": "Galactic Center \u2014 crowded and dusty",
+  "ra": 266.42,
+  "dec": -29.01,
+  "measured_at": "2026-09-22T01:52:22.207020+00:00",
+  "detail": "ok",
+  "movers": 20,
+  "variables": 17,
+  "top_sigma": 111.9,
+  "n_epochs": 2,
+  "span_days": 2.4,
+  "variable_flag": false,
+  "known": null,
+  "lightcurve": [
+    {
+      "mjd": 61123.192403,
+      "flux": 161.4264316558838
+    },
+    {
+      "mjd": 61125.56777,
+      "flux": 0.0
+    }
+  ],
+  "spectrum": [
+    {
+      "band": 2,
+      "wavelength_um": 1.36,
+      "flux": 567.3452405929565,
+      "flux_err": 32.3484349040745,
+      "mjd": 61123.599984
+    },
+    {
+      "band": 3,
+      "wavelength_um": 2.02,
+      "flux": 0.0,
+      "flux_err": 40.70576860305474,
+      "mjd": 61125.56777
+    }
+  ]
+}
