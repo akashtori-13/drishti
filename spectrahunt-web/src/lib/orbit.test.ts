@@ -168,7 +168,8 @@ describe('swarm helpers', () => {
   });
   it('telemetry is honest at epoch', () => {
     const sats = prepareSwarm(bundle);
-    const t = telemetryFor(sats[0], epochDate(sats[0].sat));
+    const ep = epochDate(sats[0].sat);
+    const t = telemetryFor(sats[0], ep, ep);
     if (!t) throw new Error('must produce telemetry');
     expect(t.name).toBe('SPHEREX');
     expect(t.altKm).toBeGreaterThan(550);

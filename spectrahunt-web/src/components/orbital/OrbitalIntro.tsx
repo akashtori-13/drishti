@@ -67,6 +67,12 @@ interface Scene {
   twinkle: Array<{ x: number; y: number; r: number; ci: number; b: number; ph: number; sp: number }>;
   raf: number;
   earthFade: number;
+  // Time-warp: the sim runs 60x real time (planetarium-style) so the orbit
+  // and the rotating Earth are visible. The HUD clock shows sim time and is
+  // labeled — TLE age stays on the real clock. Reduced motion: warp 1.
+  warp: number;
+  ms0: number;
+  jd0: number;
   hudTimer: ReturnType<typeof setInterval> | null;
   alive: boolean;
 }
@@ -117,6 +123,7 @@ export default function OrbitalIntro({
   const [count, setCount] = useState(swarm.length);
   const [whisper, setWhisper] = useState<string | null>(null);
   const [hoverName, setHoverName] = useState<string | null>(null);
+  const [warp, setWarp] = useState(60);
 
   // Esc skips from first paint.
   useEffect(() => {
@@ -144,7 +151,13 @@ export default function OrbitalIntro({
       earth: null, earthKey: '', stars: null, frames: SHEET_FRAMES,
       picks: [], hero: null, hover: null, nudge: null,
       sats: [], trail: [], twinkle: [], raf: 0, earthFade: 1, hudTimer: null, alive: true,
+      warp: 60, ms0: Date.now(), jd0: nowJD(),
     };
+    if (S.reduced) S.warp = 1;
+
+    // Simulated Julian date: real clock × warp. Positions, trail, clouds and
+    // the HUD clock all read this — one time source, no drift between layers.
+    const simJD = () => S.jd0 + ((Date.now() - S.ms0) / 86400000) * S.warp;
 
     const reducedMq = window.matchMedia('(prefers-reduced-motion: reduce)');
     const onReduced = () => {
@@ -335,7 +348,7 @@ export default function OrbitalIntro({
       const driftLon = S.reduced ? 0 : Math.sin(S.driftT / 83) * 2.2;
       const view: OrthoView = heroGeo
         ? {
-            latC: Math.min(58, Math.max(-58, heroGeo.lat - 30 + driftLat)),
+            latC: Math.min(58, Math.max(-58, heroGeo.lat - 34 + driftLat)),
             lonC: heroGeo.lon + driftLon,
           }
         : { latC: S.view.latC + driftLat, lonC: S.view.lonC + driftLon };
@@ -354,7 +367,7 @@ export default function OrbitalIntro({
         };
       });
       const hp = heroEntry ? S.sats[list.indexOf(heroEntry)] : null;
-      S.hero = hp && hp.visible ? { x: hp.x, y: hp.y, r: Math.max(34, Math.min(S.w, S.h) * 0.075) } : null;
+      S.hero = hp && hp.visible ? { x: hp.x, y: hp.y, r: Math.max(40, Math.min(S.w, S.h) * 0.082) } : null;
       // ground-track trail: past positions, spectrum-tinted
       S.trail = [];
       if (heroEntry && !S.compact) {
@@ -442,7 +455,7 @@ export default function OrbitalIntro({
       if (!S.alive) return;
       S.raf = 0;
       S.driftT = t;
-      const jd = nowJD();
+      const jd = simJD();
       buildEarth(jd);
       projectAll(jd);
       ctx.setTransform(S.dpr, 0, 0, S.dpr, 0, 0);
@@ -531,8 +544,11 @@ export default function OrbitalIntro({
       const list = swarmRef.current;
       const hero = list.find((e) => e.obj.hero) ?? list[0];
       if (!hero) return;
-      const t = telemetryFor(hero);
+      // sim date drives position + clock; real date keeps the TLE age honest
+      const simDate = new Date(S.ms0 + (Date.now() - S.ms0) * S.warp);
+      const t = telemetryFor(hero, simDate, new Date());
       setHud(t);
+      setWarp(S.warp);
       setCount(list.length);
       const doy = epochDate(hero.sat).getTime();
       const start = Date.UTC(epochDate(hero.sat).getUTCFullYear(), 0, 0);
@@ -676,7 +692,7 @@ export default function OrbitalIntro({
           <span className="orbital-hud-dim"> (approx)</span>
         </div>
         <div>
-          TRACKED OBJECTS {count} · SCANNING · QR2
+          TRACKED OBJECTS {count} · SCANNING · QR2 · TIME ×{warp}
           {hud && hud.tleAgeDays > 14 ? <span className="orbital-hud-dim"> · TLE {hud.tleAgeDays.toFixed(0)}d old</span> : ''}
         </div>
       </div>
