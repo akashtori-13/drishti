@@ -86,5 +86,13 @@
   "citation": {
     "doi": "10.26131/IRSA652",
     "text": "SPHEREx QR2 via IRSA."
+  },
+  "bands": {
+    "3": {
+      "png": "/cutouts/dorado-deep_2025-11-09.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2025W45_2A/l2b-v20-2025-314/3/level2_2025W45_2A_0723_3D3_spx_l2b-v20-2025-314.fits?center=92.5,-57.5&size=0.15",
+      "mjd": 60988.877502,
+      "wavelength_um": null
+    }
   }
 }

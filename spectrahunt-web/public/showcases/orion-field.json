@@ -37,5 +37,13 @@
   "citation": {
     "doi": "10.26131/IRSA652",
     "text": "SPHEREx QR2 via IRSA."
+  },
+  "bands": {
+    "3": {
+      "png": "/cutouts/orion-field_Survey-1.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2025W37_2A/l2b-v20-2025-267/3/level2_2025W37_2A_0452_1D3_spx_l2b-v20-2025-267.fits?center=83.82,-5.39&size=0.15",
+      "mjd": null,
+      "wavelength_um": 2.02
+    }
   }
 }
