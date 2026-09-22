@@ -617,7 +617,7 @@ export default function OrbitalIntro({
           {whisper}
         </div>
       )}
-      <button type="button" className="orbital-invite" onClick={onEnter}>
+      <button type="button" className="orbital-invite" onClick={() => onEnter()}>
         Click SPHEREx to see what it&rsquo;s doing.
       </button>
       <button type="button" className="btn orbital-skip" onClick={onSkip} aria-label="Skip intro">

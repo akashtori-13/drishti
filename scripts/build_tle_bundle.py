@@ -17,8 +17,16 @@ import os
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SRC = os.path.join(HERE, "..", "assets", "orbital", "tle", "swarm.json")
+# Untracked asset pipeline output may live in another checkout while the
+# teammate finishes it: SWARM_SRC overrides the default location.
+SRC = os.environ.get(
+    "SWARM_SRC",
+    os.path.join(HERE, "..", "assets", "orbital", "tle", "swarm.json"),
+)
 DST = os.path.join(HERE, "..", "spectrahunt-web", "public", "data", "tle-bundle.json")
+# Static import fallback so the intro works offline on a cold device
+# (IntroExperience imports this; the HUD labels its TLE age honestly).
+FALLBACK = os.path.join(HERE, "..", "spectrahunt-web", "src", "lib", "tle-bundle.fallback.json")
 
 
 def valid(obj: dict) -> bool:
@@ -48,14 +56,19 @@ def main() -> int:
             })
         else:
             dropped += 1
+    now = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     bundle = {
         "source": swarm.get("source", ""),
-        "generated_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "fetched_at": now,
+        "generated_at": now,
         "count": len(kept),
         "objects": kept,
     }
     os.makedirs(os.path.dirname(DST), exist_ok=True)
     with open(DST, "w", encoding="utf-8") as f:
+        json.dump(bundle, f, separators=(",", ":"))
+        f.write("\n")
+    with open(FALLBACK, "w", encoding="utf-8") as f:
         json.dump(bundle, f, separators=(",", ":"))
         f.write("\n")
     print(f"kept {len(kept)}, dropped {dropped} -> {DST} ({os.path.getsize(DST)} bytes)")
