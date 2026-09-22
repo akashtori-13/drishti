@@ -77,12 +77,25 @@ function ageOf(key: string): number {
   }
 }
 
+function notifyRevalidated(key: string, data: unknown) {
+  try {
+    if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+      window.dispatchEvent(new CustomEvent('sh-revalidate', { detail: { key, data } }));
+    }
+  } catch { /* noop */ }
+}
+
 /** Cache-first: device copy resolves instantly when present; refreshes behind. */
 export async function getCoverage(): Promise<Coverage | null> {
   const key = 'sh-coverage';
   const cached = peek<Coverage>(key);
+  const cachedJSON = cached ? JSON.stringify(cached) : null;
   const refresh = fetchJSON<Coverage>('/coverage.json')
-    .then((c) => { remember(key, c); return c; })
+    .then((c) => {
+      remember(key, c);
+      if (cachedJSON !== null && cachedJSON !== JSON.stringify(c)) notifyRevalidated(key, c);
+      return c;
+    })
     .catch((): Coverage | null => null);
   if (cached && ageOf(key) < COVERAGE_TTL) {
     void refresh;
@@ -95,12 +108,23 @@ export async function getCoverage(): Promise<Coverage | null> {
   return refresh;
 }
 
-/** Cache-first per showcase. */
+/** Cache-first per showcase.
+ *
+ * Serves the device copy instantly when present and revalidates behind.
+ * When the background refresh yields different JSON (e.g. newly indexed
+ * cutout PNGs), a `sh-revalidate` window event fires with
+ * `{ key: 'sh-showcase:<id>', data }` so the current view can swap in the
+ * fresh data without requiring a manual reload. Previously the refresh was
+ * discarded, so the first client-side visit after a data update rendered
+ * stale `png:null` ("cutout pending" / "loading frame…") until a full reload.
+ */
 export async function getShowcase(id: string): Promise<Showcase> {
   const key = `sh-showcase:${id}`;
   const cached = peek<Showcase>(key);
+  const cachedJSON = cached ? JSON.stringify(cached) : null;
   const refresh = fetchJSON<Showcase>(`/showcases/${id}.json`).then((d) => {
     remember(key, d);
+    if (cachedJSON !== null && cachedJSON !== JSON.stringify(d)) notifyRevalidated(key, d);
     return d;
   });
   if (cached) {
