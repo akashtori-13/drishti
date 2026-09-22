@@ -18,12 +18,18 @@ export interface BlinkFrame {
 export type CompareMode = 'blink' | 'side' | 'swipe' | 'diff';
 
 /** Load an image element with CORS-clean pixels for canvas sampling. */
-function loadImage(src: string): Promise<HTMLImageElement> {
+function loadImage(src: string, timeoutMs = 20000): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error(`Cannot load ${src}`));
+    const timer = setTimeout(() => {
+      // Image has no abort: blanking src cancels a stalled decode/fetch so a
+      // hung connection can't wedge the loader (retries handle the rest).
+      try { img.src = ''; } catch { /* noop */ }
+      reject(new Error(`Timed out loading ${src}`));
+    }, timeoutMs);
+    img.onload = () => { clearTimeout(timer); resolve(img); };
+    img.onerror = () => { clearTimeout(timer); reject(new Error(`Cannot load ${src}`)); };
     img.src = src;
   });
 }
