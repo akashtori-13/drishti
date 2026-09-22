@@ -1,6 +1,6 @@
 [package]
 name = "stellar"
-version = "1.0.0"
+version = "1.0.1"
 description = "STELLAR: hunt what moves in the infrared sky"
 authors = ["STELLAR"]
 edition = "2021"
