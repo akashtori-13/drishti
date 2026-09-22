@@ -24,7 +24,8 @@ RA, DEC, BAND, SIZE = 270.0, 66.5, 4, 0.15
 def main() -> bool:
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=12)
-    ap.add_argument("--timeout", type=int, default=60)
+    ap.add_argument("--timeout", type=int, default=45)
+    ap.add_argument("--jobs", type=int, default=4)
     args = ap.parse_args()
 
     import numpy as np
@@ -38,27 +39,40 @@ def main() -> bool:
         print(f"only {len(hits)} covering images; need >= 3")
         return False
     picks = hits[-args.n :]
-    print(f"stacking {len(picks)} newest D{BAND} visits", flush=True)
+    print(f"stacking {len(picks)} newest D{BAND} visits ({args.jobs} parallel)", flush=True)
 
-    frames = []
-    for h in picks:
-        tmp = Path(tempfile.mkdtemp()) / "c.fits"
+    async def one(h):
+        from backend.cutouts import fetch_ibe as _fetch
+        tmpdir = Path(tempfile.mkdtemp())
+        tmp = tmpdir / "c.fits"
         try:
-            asyncio.run(fetch_ibe(h["cutout_url"], tmp, timeout=args.timeout))
+            await _fetch(h["cutout_url"], tmp, timeout=args.timeout, retries=1)
             parsed = parse_fits(tmp)
             if parsed["image"] is None:
-                continue
+                return None
             masked, _ = mask_bad_pixels(parsed["image"], parsed.get("flags"), parsed.get("variance"))
-            frames.append((masked, parsed.get("wcs")))
             print(f"  got {h.get('mjd')}", flush=True)
+            return (masked, parsed.get("wcs"))
         except Exception as e:
             print(f"  skip ({str(e)[:80]})")
+            return None
         finally:
             try:
                 tmp.unlink(missing_ok=True)
-                tmp.parent.rmdir()
+                tmpdir.rmdir()
             except Exception:
                 pass
+
+    async def gather():
+        sem = asyncio.Semaphore(args.jobs)
+
+        async def guarded(h):
+            async with sem:
+                return await one(h)
+
+        return await asyncio.gather(*[guarded(h) for h in picks])
+
+    frames = [f for f in asyncio.run(gather()) if f is not None]
     if len(frames) < 3:
         print(f"only {len(frames)} usable frames; aborting")
         return False
