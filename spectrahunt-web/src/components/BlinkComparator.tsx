@@ -70,9 +70,6 @@ function stylize(canvas: HTMLCanvasElement, stretch: Stretch, vmin: number, vmax
   ctx.putImageData(data, 0, 0);
 }
 
-const rowStyle: React.CSSProperties = { display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' };
-const selStyle: React.CSSProperties = { background: '#151929', border: '1px solid var(--line)', borderRadius: 8, padding: '4px 8px', fontSize: 13 };
-
 export default function BlinkComparator({
   frames, band, onBandChange, title, mode, onModeChange, epochIdx, onEpochChange,
   showMarkers, onToggleMarkers, fovArcmin = 10, onSample, center, bandPngs, onStats,
@@ -144,6 +141,7 @@ export default function BlinkComparator({
         if (alive) setLoaded((m) => (m[u] ? m : { ...m, [u]: img }));
       }).catch(() => undefined);
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSpecVals(null);
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMeasureChip(null);
