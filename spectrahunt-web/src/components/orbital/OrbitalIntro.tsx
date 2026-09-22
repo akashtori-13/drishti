@@ -64,8 +64,9 @@ interface Scene {
   nudge: { x0: number; y0: number; x1: number; y1: number; t0: number } | null;
   sats: Array<{ x: number; y: number; visible: boolean; name: string; hero: boolean }>;
   trail: Array<{ x: number; y: number }>;
+  twinkle: Array<{ x: number; y: number; r: number; ci: number; b: number; ph: number; sp: number }>;
   raf: number;
-  lastFrame: number;
+  earthFade: number;
   hudTimer: ReturnType<typeof setInterval> | null;
   alive: boolean;
 }
@@ -142,7 +143,7 @@ export default function OrbitalIntro({
       imgOk: { day: false, night: false, clouds: false, sheet: false, poster: false },
       earth: null, earthKey: '', stars: null, frames: SHEET_FRAMES,
       picks: [], hero: null, hover: null, nudge: null,
-      sats: [], trail: [], raf: 0, lastFrame: 0, hudTimer: null, alive: true,
+      sats: [], trail: [], twinkle: [], raf: 0, earthFade: 1, hudTimer: null, alive: true,
     };
 
     const reducedMq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -157,7 +158,7 @@ export default function OrbitalIntro({
       if (!S.alive || S.raf) return;
       if (S.reduced && !force && S.earth) return; // static frame stands
       S.raf = requestAnimationFrame((t) => {
-        frame(t / 1000, false);
+        frame(t / 1000);
       });
     };
 
@@ -169,8 +170,8 @@ export default function OrbitalIntro({
       canvas.width = Math.round(S.w * S.dpr);
       canvas.height = Math.round(S.h * S.dpr);
       S.cx = S.w * 0.5;
-      S.cy = S.h * 0.82;
-      S.R = Math.min(S.w, S.h) * (S.w < 640 ? 0.85 : 0.72);
+      S.cy = S.h * 0.8;
+      S.R = Math.min(S.w, S.h) * (S.w < 640 ? 0.8 : 0.64);
       S.compact = S.w < 640;
       S.earthKey = '';
       buildStars();
@@ -184,11 +185,25 @@ export default function OrbitalIntro({
       const g = c.getContext('2d');
       if (!g) return;
       const pts = genStars(63182, S.compact ? 90 : 220);
+      S.twinkle = [];
       for (const p of pts) {
         g.globalAlpha = 0.25 + p.b * 0.5;
         g.fillStyle = STAR_FILL[p.ci % STAR_FILL.length];
         const r = p.r * 0.7;
-        g.fillRect(p.x * c.width, p.y * c.height, r, r);
+        const px = p.x * c.width;
+        const py = p.y * c.height;
+        g.fillRect(px, py, r, r);
+        if (S.twinkle.length < 48 && p.b > 0.55) {
+          S.twinkle.push({
+            x: (px / c.width) * S.w,
+            y: (py / c.height) * S.h,
+            r: r * (S.w / c.width),
+            ci: p.ci,
+            b: p.b,
+            ph: (p.x * 39.7 + p.y * 17.3) % (Math.PI * 2),
+            sp: 0.9 + p.b * 1.8,
+          });
+        }
       }
       S.stars = c;
     };
@@ -202,7 +217,7 @@ export default function OrbitalIntro({
       const size = Math.ceil(2 * (R + pad));
       const sun = sunScreenAxis(jd, S.view);
       const drift = (jd * 15) % 360; // cloud drift, deg of longitude
-      const key = `${Math.round(R)}:${S.view.lonC.toFixed(1)}:${sun.depth.toFixed(2)}:${sun.ax.toFixed(2)}:${(drift - (drift % 1)).toFixed(0)}`;
+      const key = `${Math.round(R)}:${S.view.latC.toFixed(1)}:${S.view.lonC.toFixed(1)}:${sun.depth.toFixed(2)}:${sun.ax.toFixed(2)}:${(drift - (drift % 1)).toFixed(0)}`;
       if (S.earth && S.earthKey === key) return;
       S.earthKey = key;
       const layer = S.earth ?? document.createElement('canvas');
@@ -239,7 +254,25 @@ export default function OrbitalIntro({
         g.fillRect(dc - R, dc - R, 2 * R, 2 * R);
         g.restore();
       }
-      if (S.imgOk.clouds) drawTex(S.imgs.clouds, 0.32, drift);
+      if (S.imgOk.clouds) {
+        // cloud plate is white-bg/dark-cloud: invert to black-bg/white-cloud,
+        // then add light — clouds glow instead of smudging the blues.
+        // A whisper of blur melts the webp compression blocks into atmosphere.
+        g.save();
+        g.globalCompositeOperation = 'lighter';
+        try {
+          g.filter = 'invert(1) blur(2px)';
+        } catch {
+          /* older canvas: fall through with soft alpha */
+        }
+        drawTex(S.imgs.clouds, 0.22, drift);
+        try {
+          g.filter = 'none';
+        } catch {
+          /* noop */
+        }
+        g.restore();
+      }
       if (S.imgOk.night && S.imgs.night) {
         const night = document.createElement('canvas');
         night.width = size;
@@ -262,7 +295,7 @@ export default function OrbitalIntro({
           const y0 = dc + sun.ay * L;
           const grad = ng.createLinearGradient(x0, y0, dc + sun.ax * L, dc - sun.ay * L);
           const center = Math.min(1, Math.max(0, 0.5 - sun.depth * 0.5));
-          const wdt = 0.11;
+          const wdt = 0.2;
           const t0 = Math.min(1, Math.max(0, center - wdt));
           const t1 = Math.min(1, Math.max(0, center + wdt));
           grad.addColorStop(0, 'rgba(255,255,255,0.97)');
@@ -287,13 +320,26 @@ export default function OrbitalIntro({
     };
 
     const projectAll = (jd: number) => {
-      // slow spring drift on the camera so the frame never reads as a still
-      const t = S.driftT;
-      const view = S.reduced
-        ? S.view
-        : { latC: S.view.latC + Math.sin(t / 47) * 1.6, lonC: S.view.lonC + Math.sin(t / 83) * 2.2 };
       const list = swarmRef.current;
       const tsinceNow = (m: { sat: { jdsatepoch: number } }) => (jd - m.sat.jdsatepoch) * 1440;
+      // The camera rides with SPHEREx: same meridian, ~24° south of it, so the
+      // craft always hangs over a huge Earth and the ground scrolls beneath.
+      // (A fixed camera leaves a polar orbiter behind the limb half the orbit.)
+      const heroEntry = list.find((e) => e.obj.hero) ?? list[0];
+      let heroGeo: { lat: number; lon: number } | null = null;
+      if (heroEntry) {
+        const hp = propagate(heroEntry.sat, tsinceNow(heroEntry));
+        if (hp.ok) heroGeo = eciToGeo(hp.r, jd);
+      }
+      const driftLat = S.reduced ? 0 : Math.sin(S.driftT / 47) * 1.6;
+      const driftLon = S.reduced ? 0 : Math.sin(S.driftT / 83) * 2.2;
+      const view: OrthoView = heroGeo
+        ? {
+            latC: Math.min(58, Math.max(-58, heroGeo.lat - 30 + driftLat)),
+            lonC: heroGeo.lon + driftLon,
+          }
+        : { latC: S.view.latC + driftLat, lonC: S.view.lonC + driftLon };
+      S.view = view;
       S.sats = list.map(({ obj, sat }) => {
         const p = propagate(sat, tsinceNow({ sat }));
         if (!p.ok) return { x: 0, y: 0, visible: false, name: obj.name, hero: !!obj.hero };
@@ -307,7 +353,6 @@ export default function OrbitalIntro({
           hero: !!obj.hero,
         };
       });
-      const heroEntry = list.find((e) => e.obj.hero) ?? list[0];
       const hp = heroEntry ? S.sats[list.indexOf(heroEntry)] : null;
       S.hero = hp && hp.visible ? { x: hp.x, y: hp.y, r: Math.max(34, Math.min(S.w, S.h) * 0.075) } : null;
       // ground-track trail: past positions, spectrum-tinted
@@ -331,12 +376,24 @@ export default function OrbitalIntro({
       if (!S.hero) return;
       const { x, y, r } = S.hero;
       const bob = S.reduced ? 0 : Math.sin(t / 3.1) * 4;
+      // soft halo so the one crafted machine reads against the dust
+      if (!S.reduced) {
+        const halo = 0.1 + 0.05 * Math.sin(t / 0.7);
+        const hg = ctx.createRadialGradient(x, y + bob, 0, x, y + bob, r * 1.5);
+        hg.addColorStop(0, `rgba(165,172,255,${halo.toFixed(3)})`);
+        hg.addColorStop(1, 'rgba(165,172,255,0)');
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.fillStyle = hg;
+        ctx.fillRect(x - r * 1.5, y + bob - r * 1.5, r * 3, r * 3);
+        ctx.restore();
+      }
       if (S.imgOk.sheet && S.imgs.sheet) {
         const img = S.imgs.sheet;
         const fw = img.naturalWidth / SHEET_COLS;
         const rows = Math.max(1, Math.round(S.frames / SHEET_COLS));
         const fh = img.naturalHeight / rows;
-        const f = S.reduced ? 0 : Math.floor(t / 2.5) % S.frames;
+        const f = S.reduced ? 0 : Math.floor(t / 0.5) % S.frames;
         const sx = (f % SHEET_COLS) * fw;
         const sy = Math.floor(f / SHEET_COLS) * fh;
         ctx.save();
@@ -360,7 +417,7 @@ export default function OrbitalIntro({
         ctx.restore();
       }
       // pulsing hairline bracket (breathes, never blinks out)
-      const pulse = S.reduced ? 0.6 : 0.45 + 0.2 * Math.sin(t / 0.9);
+      const pulse = S.reduced ? 0.6 : 0.5 + 0.28 * Math.sin(t / 0.35);
       ctx.save();
       ctx.globalAlpha = pulse;
       ctx.strokeStyle = '#eef0f8';
@@ -381,14 +438,9 @@ export default function OrbitalIntro({
       ctx.restore();
     };
 
-    const frame = (t: number, force: boolean) => {
+    const frame = (t: number) => {
       if (!S.alive) return;
       S.raf = 0;
-      if (!force && t - S.lastFrame < 0.05) {
-        S.raf = requestAnimationFrame((nt) => frame(nt / 1000, false));
-        return;
-      }
-      S.lastFrame = t;
       S.driftT = t;
       const jd = nowJD();
       buildEarth(jd);
@@ -397,9 +449,24 @@ export default function OrbitalIntro({
       ctx.fillStyle = '#05060c';
       ctx.fillRect(0, 0, S.w, S.h);
       if (S.stars) ctx.drawImage(S.stars, 0, 0, S.w, S.h);
+      if (!S.reduced) {
+        // starlight shimmer: bright stars breathe at their own rates
+        for (const s of S.twinkle) {
+          const a = 0.25 + s.b * 0.55 * (0.55 + 0.45 * Math.sin(t * s.sp + s.ph));
+          ctx.globalAlpha = Math.max(0.08, a);
+          ctx.fillStyle = STAR_FILL[s.ci % STAR_FILL.length];
+          const d = Math.max(1.2, s.r * 1.6);
+          ctx.fillRect(s.x - d / 2, s.y - d / 2, d, d);
+        }
+        ctx.globalAlpha = 1;
+      }
       if (S.earth) {
+        if (S.earthFade < 1) S.earthFade = Math.min(1, S.earthFade + 1 / 54);
         const pad = S.R * 0.14;
+        ctx.save();
+        ctx.globalAlpha = S.earthFade;
         ctx.drawImage(S.earth, S.cx - S.R - pad, S.cy - S.R - pad, 2 * (S.R + pad), 2 * (S.R + pad));
+        ctx.restore();
       }
       // ground-track trail, spectrum gradient along path
       if (S.trail.length > 1) {
@@ -455,7 +522,7 @@ export default function OrbitalIntro({
         }
       }
       if (!S.reduced && !document.hidden) {
-        S.raf = requestAnimationFrame((nt) => frame(nt / 1000, false));
+        S.raf = requestAnimationFrame((nt) => frame(nt / 1000));
       }
     };
 
@@ -553,12 +620,14 @@ export default function OrbitalIntro({
     void Promise.all([loadImg(earthDay), loadImg(earthNight), loadImg(earthClouds), loadImg(craftSprite), loadImg(craftPoster)]).then(
       ([day, night, clouds, sheet, poster]) => {
         if (!S.alive) return;
+        const hadTex = S.imgOk.day;
         S.imgs = { day, night, clouds, sheet, poster };
         S.imgOk = { day: !!day, night: !!night, clouds: !!clouds, sheet: !!sheet, poster: !!poster };
         if (sheet) {
           const rows = Math.max(1, Math.round(sheet.naturalHeight / (sheet.naturalWidth / SHEET_COLS)));
           S.frames = Math.min(SHEET_FRAMES, SHEET_COLS * rows);
         }
+        if (S.imgOk.day && !hadTex) S.earthFade = 0; // fade the real Earth in
         S.earthKey = '';
         kick(true);
       },
