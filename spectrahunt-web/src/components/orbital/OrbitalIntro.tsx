@@ -183,7 +183,7 @@ export default function OrbitalIntro({
       canvas.width = Math.round(S.w * S.dpr);
       canvas.height = Math.round(S.h * S.dpr);
       S.cx = S.w * 0.5;
-      S.cy = S.h * 0.8;
+      S.cy = S.h * 0.72;
       S.R = Math.min(S.w, S.h) * (S.w < 640 ? 0.8 : 0.64);
       S.compact = S.w < 640;
       S.earthKey = '';
@@ -278,7 +278,7 @@ export default function OrbitalIntro({
         } catch {
           /* older canvas: fall through with soft alpha */
         }
-        drawTex(S.imgs.clouds, 0.22, drift);
+        drawTex(S.imgs.clouds, 0.15, drift);
         try {
           g.filter = 'none';
         } catch {
@@ -346,12 +346,20 @@ export default function OrbitalIntro({
       }
       const driftLat = S.reduced ? 0 : Math.sin(S.driftT / 47) * 1.6;
       const driftLon = S.reduced ? 0 : Math.sin(S.driftT / 83) * 2.2;
-      const view: OrthoView = heroGeo
-        ? {
-            latC: Math.min(58, Math.max(-58, heroGeo.lat - 34 + driftLat)),
-            lonC: heroGeo.lon + driftLon,
-          }
-        : { latC: S.view.latC + driftLat, lonC: S.view.lonC + driftLon };
+      // The camera holds a fixed offset from the craft — ~20° south and 12°
+      // west — so SPHEREx hangs upper-left over a huge Earth. Past ±70° the
+      // latitude clamps; the meridian then swings aside in proportion to the
+      // clamped amount (gain ~3 compensates longitude compression near the
+      // pole). All smooth functions of the hero position — no jumps, and the
+      // craft stays well inside the disc, clear of the invitation pill.
+      let view: OrthoView;
+      if (heroGeo) {
+        const wantLat = heroGeo.lat - 20 + driftLat;
+        const latC = Math.min(70, Math.max(-70, wantLat));
+        view = { latC, lonC: heroGeo.lon + 12 + driftLon + (wantLat - latC) * 3 };
+      } else {
+        view = { latC: S.view.latC + driftLat, lonC: S.view.lonC + driftLon };
+      }
       S.view = view;
       S.sats = list.map(({ obj, sat }) => {
         const p = propagate(sat, tsinceNow({ sat }));
