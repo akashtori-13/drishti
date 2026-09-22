@@ -1,0 +1,30 @@
+{
+  "id": "ecliptic-mover",
+  "title": "Ecliptic plane \u2014 asteroid hunting ground",
+  "ra": 180.0,
+  "dec": 0.0,
+  "measured_at": "2026-09-22T01:50:22.203192+00:00",
+  "detail": "ok",
+  "movers": 1,
+  "variables": 1,
+  "top_sigma": 28.9,
+  "n_epochs": 1,
+  "span_days": 369.4,
+  "variable_flag": false,
+  "known": null,
+  "lightcurve": [
+    {
+      "mjd": 61181.269497,
+      "flux": 0.2329363226890564
+    }
+  ],
+  "spectrum": [
+    {
+      "band": 2,
+      "wavelength_um": 1.36,
+      "flux": 0.3415490537881851,
+      "flux_err": 5.712753390537033,
+      "mjd": 61203.536552
+    }
+  ]
+}
