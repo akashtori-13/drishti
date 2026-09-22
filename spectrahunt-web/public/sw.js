@@ -1,11 +1,11 @@
-/* SpectraHunt service worker: offline-first shell + data.
+/* STELLAR service worker: offline-first shell + data.
  * Bump SW_VERSION to invalidate all caches on breaking changes.
  * Strategies:
  *  - navigations: network-first, cache fallback, offline page last resort
  *  - /showcases|reports|coverage|tle JSON: stale-while-revalidate
  *  - images + _next/static + fonts: cache-first (bounded image cache)
  */
-const SW_VERSION = 'spectrahunt-v1';
+const SW_VERSION = 'stellar-v1';
 const STATIC_CACHE = `${SW_VERSION}-static`;
 const DATA_CACHE = `${SW_VERSION}-data`;
 const IMG_CACHE = `${SW_VERSION}-img`;
@@ -13,9 +13,9 @@ const MAX_IMG_ENTRIES = 250;
 
 const OFFLINE_HTML = `<!doctype html><html lang="en"><head><meta charset="utf-8">`
   + `<meta name="viewport" content="width=device-width,initial-scale=1">`
-  + `<title>SpectraHunt — offline</title></head><body style="background:#05060c;color:#eef0f8;`
+  + `<title>STELLAR — offline</title></head><body style="background:#05060c;color:#eef0f8;`
   + `font-family:system-ui;display:grid;place-items:center;min-height:100vh;margin:0;text-align:center">`
-  + `<div><h1>SpectraHunt is offline</h1><p>Reconnect, then reload — visited fields stay cached.</p></div>`
+  + `<div><h1>STELLAR is offline</h1><p>Reconnect, then reload — visited fields stay cached.</p></div>`
   + `</body></html>`;
 
 self.addEventListener('install', (event) => {

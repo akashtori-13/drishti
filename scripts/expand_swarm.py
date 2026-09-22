@@ -79,7 +79,7 @@ def fetch_set(name: str) -> str:
     path = os.path.join(CACHE, f"{name}.tle")
     if not os.path.isfile(path):
         url = f"{MIRROR}/{name}.tle"
-        req = urllib.request.Request(url, headers={"User-Agent": "spectrahunt-swarm/1.0"})
+        req = urllib.request.Request(url, headers={"User-Agent": "stellar-swarm/1.0"})
         with urllib.request.urlopen(req, timeout=60) as r, open(path, "wb") as f:
             f.write(r.read())
     with open(path, encoding="utf-8", errors="replace") as f:

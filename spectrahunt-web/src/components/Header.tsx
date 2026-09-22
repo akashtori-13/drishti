@@ -25,8 +25,8 @@ export default function Header() {
 
   useEffect(() => {
     document.title = pathname === '/'
-      ? 'SpectraHunt: hunt what moves in the infrared sky'
-      : `${LINKS.find((n) => pathname === n.href || (n.match && pathname.startsWith(n.match)))?.label ?? 'SpectraHunt'} — SpectraHunt`;
+      ? 'STELLAR: hunt what moves in the infrared sky'
+      : `${LINKS.find((n) => pathname === n.href || (n.match && pathname.startsWith(n.match)))?.label ?? 'STELLAR'} — STELLAR`;
   }, [pathname]);
 
   useEffect(() => {
@@ -86,9 +86,9 @@ export default function Header() {
   return (
     <>
       <div className="island glass" role="navigation" aria-label="Primary">
-        <Link className="island-brand" href="/" aria-label="SpectraHunt home">
+        <Link className="island-brand" href="/" aria-label="STELLAR home">
           <Icon name="logo" className="logo icon" />
-          <span className="brand-name">SpectraHunt</span>
+          <span className="brand-name">STELLAR</span>
         </Link>
         <nav className="island-links" aria-label="Views">
           {LINKS.map((item) => {

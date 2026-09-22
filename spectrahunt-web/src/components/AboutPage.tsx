@@ -8,8 +8,10 @@ export default function AboutPage() {
   return (
     <div className="prose">
       <p className="hero-kicker">Mission · method · data</p>
-      <h1>About SpectraHunt</h1>
-      <p className="lede">A public blink comparator for the SPHEREx sky, built for the 2026 NASA Space Apps Challenge.</p>
+      <h1>About STELLAR</h1>
+      <p className="lede">STELLAR: SPHEREx Transient Explorer &amp; Light-spectrum Large-scale
+        Archival Repository — a public blink comparator for the SPHEREx sky, built for the
+        NASA Space Apps Challenge 2026 by team AKASHTORI.</p>
       <p className="notice">
         Most fields below blink real SPHEREx cutouts on load. A few cells are
         still indexing (marked “cutout pending”) — coordinates and metadata are

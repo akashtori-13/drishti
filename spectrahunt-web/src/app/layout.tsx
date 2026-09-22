@@ -13,11 +13,11 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "SpectraHunt: hunt what moves in the infrared sky",
+  title: "STELLAR: hunt what moves in the infrared sky",
   description:
-    "SpectraHunt compares repeated SPHEREx passes of the same patch of sky and flags what moved or changed: comets, asteroids and variable stars.",
+    "STELLAR compares repeated SPHEREx passes of the same patch of sky and flags what moved or changed: comets, asteroids and variable stars.",
   openGraph: {
-    title: "SpectraHunt: hunt what moves in the infrared sky",
+    title: "STELLAR: hunt what moves in the infrared sky",
     description:
       "Search any object or sky position, then blink between SPHEREx epochs to see what changed.",
     type: "website",
@@ -54,7 +54,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <NativeShell />
         <noscript>
           <div style={{ position: 'fixed', inset: 0, display: 'grid', placeItems: 'center', background: '#05060c', color: '#eef0f8', zIndex: 200, padding: 24, textAlign: 'center' }}>
-            SpectraHunt needs JavaScript to draw the sky and run searches. Please enable it and reload.
+            STELLAR needs JavaScript to draw the sky and run searches. Please enable it and reload.
           </div>
         </noscript>
         {children}

@@ -1,4 +1,4 @@
-# Resume — SpectraHunt work session
+# Resume — STELLAR work session
 
 Saved: 2026-09-22 (all code + data pushed to `main`).
 

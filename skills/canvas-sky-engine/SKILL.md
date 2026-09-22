@@ -1,16 +1,16 @@
 ---
 name: canvas-sky-engine
-description: Canvas 2D engineering patterns for SpectraHunt's sky surfaces (HeroSky, CoverageMap, StellariumView, BlinkComparator stage, WaitGame). Use when editing any canvas rendering, pointer interaction, projection math, or image-loading pipeline — covers DPR handling, RAF discipline, mirrored projections, hit-test parity, caching, and reduced-motion loops.
+description: Canvas 2D engineering patterns for STELLAR's sky surfaces (HeroSky, CoverageMap, StellariumView, BlinkComparator stage, WaitGame). Use when editing any canvas rendering, pointer interaction, projection math, or image-loading pipeline — covers DPR handling, RAF discipline, mirrored projections, hit-test parity, caching, and reduced-motion loops.
 license: MIT
 compatibility: Browser Canvas 2D only (no WebGL by design). React 19 with refs + effects, no render-loop state.
 metadata:
   version: "1.0"
-  skill-author: SpectraHunt team
+  skill-author: STELLAR team
 ---
 
 # Canvas Sky Engine
 
-SpectraHunt renders real sky imagery on Canvas 2D with overlay math. These are the
+STELLAR renders real sky imagery on Canvas 2D with overlay math. These are the
 patterns the existing code follows — any new canvas work must match them.
 
 ## The four surfaces

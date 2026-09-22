@@ -1,8 +1,8 @@
 [package]
-name = "spectrahunt"
+name = "stellar"
 version = "1.0.0"
-description = "SpectraHunt: hunt what moves in the infrared sky"
-authors = ["SpectraHunt"]
+description = "STELLAR: hunt what moves in the infrared sky"
+authors = ["STELLAR"]
 edition = "2021"
 
 [build-dependencies]

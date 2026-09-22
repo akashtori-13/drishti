@@ -3,7 +3,7 @@ import SiteChrome from '@/components/SiteChrome';
 import CandidatesPage from '@/components/CandidatesPage';
 
 export const metadata: Metadata = {
-  title: 'Candidates — SpectraHunt',
+  title: 'Candidates — STELLAR',
 };
 
 export default function Candidates() {

@@ -1,4 +1,4 @@
-# SpectraHunt Pipeline & Operations Guide
+# STELLAR Pipeline & Operations Guide
 
 How real data gets from IRSA into the bundle — and how to keep it flowing.
 Design context: `SYSTEM_DESIGN.md` §§4–6, 9. API shapes: `docs/API.md`.

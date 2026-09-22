@@ -1,4 +1,4 @@
-"""Generate SpectraHunt PWA/native icon set from brand colors.
+"""Generate STELLAR PWA/native icon set from brand colors.
 
 Usage: .venv/bin/python scripts/gen_icons.py
 Writes: spectrahunt-web/public/icons/{icon-192,icon-512,maskable-512,apple-touch-180}.png

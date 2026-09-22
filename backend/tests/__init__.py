@@ -1,1 +1,1 @@
-"""SpectraHunt backend tests."""
+"""STELLAR backend tests."""

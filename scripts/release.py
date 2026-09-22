@@ -82,7 +82,7 @@ def build_web(version: str) -> None:
         rev = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True, cwd=ROOT).stdout.strip()
     except Exception:
         rev = "unknown"
-    info = {"app": "SpectraHunt", "version": version, "commit": rev, **data_counts()}
+    info = {"app": "STELLAR", "version": version, "commit": rev, **data_counts()}
     (WEB / "out" / "build-info.json").write_text(json.dumps(info, indent=2))
     print(f"web built: {info}")
 
@@ -105,7 +105,7 @@ def build_android(version: str) -> None:
     run(["./gradlew", "assembleDebug", "--no-daemon"], cwd=WEB / "android", env=env)
     DIST.mkdir(exist_ok=True)
     for apk in (WEB / "android" / "app" / "build" / "outputs" / "apk" / "debug").glob("*.apk"):
-        dest = DIST / f"spectrahunt-{version}-debug.apk"
+        dest = DIST / f"stellar-{version}-debug.apk"
         shutil.copy(apk, dest)
         print(f"android APK -> {dest} ({dest.stat().st_size // 1024} KB)")
 
@@ -125,7 +125,7 @@ def build_desktop(version: str) -> None:
     found = 0
     for f in bundle.rglob("*"):
         if f.is_file() and (f.suffix in exts or ".AppImage" in f.name):
-            dest = DIST / f"spectrahunt-{version}-{f.name}"
+            dest = DIST / f"stellar-{version}-{f.name}"
             shutil.copy(f, dest)
             print(f"desktop -> {dest}")
             found += 1
@@ -143,7 +143,7 @@ def main() -> None:
     if args.version:
         bump_version(args.version)
     version = read_version()
-    print(f"=== SpectraHunt release {version} ===", flush=True)
+    print(f"=== STELLAR release {version} ===", flush=True)
     if not args.skip_www:
         build_web(version)
     if not args.skip_android:

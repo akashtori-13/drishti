@@ -295,7 +295,7 @@ def to_glb(meshes: list[Mesh], path: str) -> None:
 
     bin_blob = b"".join(bin_parts)
     gltf = {
-        "asset": {"version": "2.0", "generator": "spectrahunt build_spherex_model"},
+        "asset": {"version": "2.0", "generator": "stellar build_spherex_model"},
         "scene": 0,
         "scenes": [{"nodes": list(range(len(nodes)))}],
         "nodes": nodes,

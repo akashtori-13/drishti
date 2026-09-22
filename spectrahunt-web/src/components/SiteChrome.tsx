@@ -21,7 +21,7 @@ export default function SiteChrome({ children, showTutorial = false }: { childre
         <footer className="site-foot">
           <div className="foot-inner">
             <div className="foot-brand">
-              <span className="brand-name">SpectraHunt</span>
+              <span className="brand-name">STELLAR</span>
               <p className="foot-note">A public blink comparator for the SPHEREx sky. NASA Space Apps Challenge 2026.</p>
             </div>
             <nav className="foot-cols" aria-label="Footer">

@@ -3,7 +3,7 @@ import SiteChrome from '@/components/SiteChrome';
 import HomePage from '@/components/HomePage';
 
 export const metadata: Metadata = {
-  title: 'SpectraHunt: hunt what moves in the infrared sky',
+  title: 'STELLAR: hunt what moves in the infrared sky',
 };
 
 export default function Home() {

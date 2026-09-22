@@ -1,18 +1,18 @@
 ---
 name: majestic-web-ui
-description: Award-winning UI elevation techniques for SpectraHunt — motion language, spring physics, glassmorphism, kinetic typography, micro-interactions, scrollytelling, and the performance/accessibility guardrails that separate majestic from gimmicky. Use whenever upgrading any visual surface or interaction in spectrahunt-web.
+description: Award-winning UI elevation techniques for STELLAR — motion language, spring physics, glassmorphism, kinetic typography, micro-interactions, scrollytelling, and the performance/accessibility guardrails that separate majestic from gimmicky. Use whenever upgrading any visual surface or interaction in spectrahunt-web.
 license: MIT
 compatibility: CSS-first (scroll-driven animations, linear() springs, backdrop-filter); no runtime animation deps preferred — the project enforces a <10MB bundle and no new deps without discussion.
 metadata:
   version: "1.0"
-  skill-author: SpectraHunt team
+  skill-author: STELLAR team
   research-date: "2026-09-22"
 ---
 
 # Majestic Web UI
 
 Distilled 2026 craft standards (Awwwards/Webby winners, GSAP/MotionKit 2026 reports,
-motion-UX research) adapted to SpectraHunt's constraints: static export, hand-written
+motion-UX research) adapted to STELLAR's constraints: static export, hand-written
 CSS, canvas surfaces, zero heavy deps, strict a11y.
 
 ## Prime directives
@@ -25,7 +25,7 @@ CSS, canvas surfaces, zero heavy deps, strict a11y.
 3. **Performance is the trend.** Motion is judged by INP (200ms threshold). Every effect
    must run off the main thread where possible (CSS transform/opacity, canvas RAF).
 4. **Reduced-motion parity is table stakes.** Every motion pattern ships with a reduced
-   variant (crossfade or instant state change). SpectraHunt already does this — keep it.
+   variant (crossfade or instant state change). STELLAR already does this — keep it.
 5. **Motion for mood, copy for meaning.** Never let animation carry information alone.
 
 ## The motion token system (add to globals.css as `--motion-*`)
@@ -98,7 +98,7 @@ on candidate cards (≤2deg), blurred duplicate behind glass for faux refraction
 
 - **NASA Solar System Exploration** (Webby winner): entity-first content, living
   visualizations powered by real APIs — "the sky as it really is: moving, evolving."
-  Lesson SpectraHunt already embodies: real data IS the visual identity.
+  Lesson STELLAR already embodies: real data IS the visual identity.
 - **Stellarium Web**: minimal chrome, HUD bottom bar, sky owns the viewport — matched by
   `/sky`; elevate the HUD with glass + springy popovers.
 - **Awwwards space-site patterns**: near-black (not pure black) bg, one accent gradient,
