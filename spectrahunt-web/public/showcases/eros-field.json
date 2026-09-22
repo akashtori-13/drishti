@@ -6,6 +6,39 @@
   "story": "Near-Earth asteroid 433 Eros drifts through this ecliptic field. Blink two same-band (D3) visits: stars cancel, the mover jumps.",
   "epochs": [
     {
+      "label": "2025-06-16 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": null,
+      "mjd": 60842.813676,
+      "ra": 210.32,
+      "dec": 9.11,
+      "size_deg": 0.15,
+      "png": "/cutouts/eros-field_2025-06-16.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2025W25_1B/l2b-v20-2025-253/3/level2_2025W25_1B_0165_1D3_spx_l2b-v20-2025-253.fits?center=210.32,9.11&size=0.15"
+    },
+    {
+      "label": "2026-01-19 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": null,
+      "mjd": 61059.787886,
+      "ra": 210.32,
+      "dec": 9.11,
+      "size_deg": 0.15,
+      "png": "/cutouts/eros-field_2026-01-19.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W04_1A/l2b-v23-2026-023/3/level2_2026W04_1A_0162_3D3_spx_l2b-v23-2026-023.fits?center=210.32,9.11&size=0.15"
+    },
+    {
+      "label": "2026-01-22 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": null,
+      "mjd": 61062.230085,
+      "ra": 210.32,
+      "dec": 9.11,
+      "size_deg": 0.15,
+      "png": "/cutouts/eros-field_2026-01-22.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W04_1A/l2b-v23-2026-023/3/level2_2026W04_1A_0655_1D3_spx_l2b-v23-2026-023.fits?center=210.32,9.11&size=0.15"
+    },
+    {
       "label": "Survey 1 \u00b7 D3",
       "band": 3,
       "wavelength_um": 2.02,

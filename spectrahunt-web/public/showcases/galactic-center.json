@@ -6,6 +6,28 @@
   "story": "The densest, dustiest sightline in the sky. Thousands of stars per frame \u2014 differencing two visits (D3) is the only way to spot what changed.",
   "epochs": [
     {
+      "label": "2026-03-24 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": null,
+      "mjd": 61123.193895,
+      "ra": 266.42,
+      "dec": -29.01,
+      "size_deg": 0.15,
+      "png": "/cutouts/galactic-center_2026-03-24.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W13_1A/l2b-v24-2026-088/3/level2_2026W13_1A_0229_3D3_spx_l2b-v24-2026-088.fits?center=266.42,-29.01&size=0.15"
+    },
+    {
+      "label": "2026-03-26 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": null,
+      "mjd": 61125.56777,
+      "ra": 266.42,
+      "dec": -29.01,
+      "size_deg": 0.15,
+      "png": "/cutouts/galactic-center_2026-03-26.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W13_2A/l2b-v24-2026-089/3/level2_2026W13_2A_0017_2D3_spx_l2b-v24-2026-089.fits?center=266.42,-29.01&size=0.15"
+    },
+    {
       "label": "Survey 1 \u00b7 D3",
       "band": 3,
       "wavelength_um": 2.02,
