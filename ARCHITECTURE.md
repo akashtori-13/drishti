@@ -4,6 +4,14 @@ Public blink comparator for the SPHEREx sky: **same sky, different time.**
 
 ## 1. Layer contract (the one rule)
 
+Cache-first, everywhere: serve what's on the device immediately, revalidate
+behind, never block the UI on an upstream. Stale beats missing; missing
+renders honestly. Concretely: browser localStorage (showcases, coverage, star
+views) → IndexedDB (imagery) → SQLite TTLs (discovery 1 h, products 6 h,
+catalogs 30 d) → stale-serving fallbacks on outage → graceful `detail`
+strings. Only a cold, offline device with an empty cache ever sees a loading
+state it can't skip.
+
 ```
 IRSA TAP / SIA2 / IBE / S3          ← L0 origin, source of truth
   │

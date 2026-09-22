@@ -59,15 +59,56 @@ export interface Coverage {
   source: string;
 }
 
+import { peek, remember } from '@/lib/cachefirst';
+
 async function fetchJSON<T>(url: string): Promise<T> {
   const r = await fetch(url);
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   return r.json() as Promise<T>;
 }
 
-export const getCoverage = () => fetchJSON<Coverage>('/coverage.json').catch((): Coverage | null => null);
+const COVERAGE_TTL = 3600 * 1000;
 
-export const getShowcase = (id: string) => fetchJSON<Showcase>(`/showcases/${id}.json`);
+function ageOf(key: string): number {
+  try {
+    return Date.now() - Number(localStorage.getItem(`${key}:at`) || 0);
+  } catch {
+    return Infinity;
+  }
+}
+
+/** Cache-first: device copy resolves instantly when present; refreshes behind. */
+export async function getCoverage(): Promise<Coverage | null> {
+  const key = 'sh-coverage';
+  const cached = peek<Coverage>(key);
+  const refresh = fetchJSON<Coverage>('/coverage.json')
+    .then((c) => { remember(key, c); return c; })
+    .catch((): Coverage | null => null);
+  if (cached && ageOf(key) < COVERAGE_TTL) {
+    void refresh;
+    return cached;
+  }
+  if (cached) {
+    void refresh;
+    return cached;
+  }
+  return refresh;
+}
+
+/** Cache-first per showcase. */
+export async function getShowcase(id: string): Promise<Showcase> {
+  const key = `sh-showcase:${id}`;
+  const cached = peek<Showcase>(key);
+  const refresh = fetchJSON<Showcase>(`/showcases/${id}.json`).then((d) => {
+    remember(key, d);
+    return d;
+  });
+  if (cached) {
+    refresh.catch(() => undefined);
+    return cached;
+  }
+  return refresh;
+}
 
 // ---------- live on-demand fields (any visited sky position, live API only) ----------
 export const isLiveId = (id: string) => id.startsWith('live:');
