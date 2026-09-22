@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAppStore } from '@/lib/store';
 
 const STEPS = [
@@ -13,7 +13,15 @@ const STEPS = [
 export default function Tutorial() {
   const { tutorialDone, setTutorialDone } = useAppStore();
   const [i, setI] = useState(0);
-  if (tutorialDone) return null;
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
+  // Render nothing during SSR and hydration: tutorialDone is seeded from
+  // localStorage, which the server never sees — a returning visitor would
+  // hydrate `null` over server-rendered dialog markup (hydration mismatch).
+  if (!mounted || tutorialDone) return null;
   return (
     <div role="dialog" aria-modal="true" aria-label="Quick tutorial"
       style={{ position: 'fixed', inset: 0, zIndex: 80, display: 'grid', placeItems: 'center', background: 'rgba(4,5,10,.72)', padding: 20 }}>
