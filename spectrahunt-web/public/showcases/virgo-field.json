@@ -6,6 +6,17 @@
   "story": "Thousands of galaxies in one pointing. Blink two visits (D3) \u2014 anything that flares could be a supernova or AGN.",
   "epochs": [
     {
+      "label": "2025-06-09 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": null,
+      "mjd": 60835.553188,
+      "ra": 200.0,
+      "dec": 0.0,
+      "size_deg": 0.15,
+      "png": "/cutouts/virgo-field_2025-06-09.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2025W24_1A/l2b-v20-2025-252/3/level2_2025W24_1A_0125_4D3_spx_l2b-v20-2025-252.fits?center=200.0,0.0&size=0.15"
+    },
+    {
       "label": "2025-06-11 \u00b7 D3",
       "band": 3,
       "wavelength_um": null,
@@ -15,6 +26,17 @@
       "size_deg": 0.15,
       "png": "/cutouts/virgo-field_2025-06-11.png",
       "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2025W24_1A/l2b-v20-2025-252/3/level2_2025W24_1A_0537_1D3_spx_l2b-v20-2025-252.fits?center=200.0,0.0&size=0.15"
+    },
+    {
+      "label": "2025-06-13 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": null,
+      "mjd": 60839.282649,
+      "ra": 200.0,
+      "dec": 0.0,
+      "size_deg": 0.15,
+      "png": "/cutouts/virgo-field_2025-06-13.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2025W24_2D/l2b-v20-2025-253/3/level2_2025W24_2D_0149_1D3_spx_l2b-v20-2025-253.fits?center=200.0,0.0&size=0.15"
     },
     {
       "label": "2026-01-14 \u00b7 D3",

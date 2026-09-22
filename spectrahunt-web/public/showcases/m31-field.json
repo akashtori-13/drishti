@@ -6,6 +6,28 @@
   "story": "A whole galaxy in one field. Blink two SPHEREx visits (D3) to hunt novae and long-period variables in M31.",
   "epochs": [
     {
+      "label": "2025-07-21 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": null,
+      "mjd": 60877.780835,
+      "ra": 10.68,
+      "dec": 41.27,
+      "size_deg": 0.15,
+      "png": "/cutouts/m31-field_2025-07-21.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2025W30_1B/l2b-v20-2025-262/3/level2_2025W30_1B_0138_3D3_spx_l2b-v20-2025-262.fits?center=10.68,41.27&size=0.15"
+    },
+    {
+      "label": "2025-07-22 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": null,
+      "mjd": 60878.1887,
+      "ra": 10.68,
+      "dec": 41.27,
+      "size_deg": 0.15,
+      "png": "/cutouts/m31-field_2025-07-22.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2025W30_1B/l2b-v20-2025-262/3/level2_2025W30_1B_0213_2D3_spx_l2b-v20-2025-262.fits?center=10.68,41.27&size=0.15"
+    },
+    {
       "label": "2025-12-18 \u00b7 D3",
       "band": 3,
       "wavelength_um": null,

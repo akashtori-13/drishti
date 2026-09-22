@@ -432,9 +432,15 @@ body[data-view="sky"] .site-foot{display:none;}
 .waitgame canvas{flex:1; min-height:0; width:100%; display:block; touch-action:none; cursor:none;}
 .waitgame-head{position:absolute; top:calc(14px + env(safe-area-inset-top,0px)); left:0; right:0; display:flex; justify-content:space-between; gap:12px; padding:0 20px; font-size:.75rem; color:var(--ink-2); pointer-events:none;}
 .waitgame-score{color:var(--unknown);}
+.waitgame-load{display:flex; flex-direction:column; gap:3px; min-width:0;}
+.waitgame-title{display:flex; align-items:center; gap:8px; font-size:.875rem; font-weight:650; color:var(--ink); letter-spacing:-.01em;}
+.pulse-dot{width:8px; height:8px; border-radius:50%; background:#7c83fd; flex-shrink:0; animation:stel-pulse 1.6s ease-in-out infinite;}
+@media (prefers-reduced-motion: reduce){ .pulse-dot{animation:none;} }
 .waitgame-foot{position:absolute; bottom:calc(16px + env(safe-area-inset-bottom,0px)); left:0; right:0; display:flex; justify-content:space-between; align-items:center; gap:12px; padding:0 20px; font-size:.75rem; color:var(--ink-3); pointer-events:none;}
 .waitgame-foot a{text-decoration:none;}
 .waitgame-foot .epoch-chip{pointer-events:auto;}
+.waitgame-foot .epoch-chip:disabled{opacity:.45; cursor:default;}
+.waitgame-fact{position:absolute; bottom:calc(64px + env(safe-area-inset-bottom,0px)); left:50%; transform:translateX(-50%); max-width:min(480px, calc(100vw - 48px)); margin:0; padding:10px 18px; border-radius:12px; background:rgba(5,6,12,.88); border:1px solid var(--line-strong); color:var(--ink); font-size:.8125rem; text-align:center; pointer-events:none;}
 .bw-status a{color:var(--focus);}
 @media(min-width:961px){
   .blink-workspace{height:100dvh; overflow:hidden;}
@@ -641,6 +647,7 @@ kbd{font-family:var(--font-mono); font-size:.6875rem; border:1px solid var(--lin
 .film.active{border-color:#7c83fd;}
 .film.failed{border-color:#e8c34a;}
 .film.failed .film-empty{color:#e8c34a; font-size:1rem;}
+.film-count{font-size:.75rem; color:var(--ink-3); white-space:nowrap; font-variant-numeric:tabular-nums;}
 .frame-retry{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:5;
   border:1px solid var(--line-strong); background:rgba(5,6,12,.88); color:var(--ink);
   font-size:.8125rem; font-weight:600; padding:10px 18px; border-radius:999px; cursor:pointer;}

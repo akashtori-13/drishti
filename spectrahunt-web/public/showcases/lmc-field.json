@@ -6,6 +6,28 @@
   "story": "Our brightest satellite galaxy, packed with Cepheids and red giants. Two same-band (D3) epochs, blinked.",
   "epochs": [
     {
+      "label": "2025-05-08 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": null,
+      "mjd": 60803.162353,
+      "ra": 80.89,
+      "dec": -69.76,
+      "size_deg": 0.15,
+      "png": "/cutouts/lmc-field_2025-05-08.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2025W19_1B/l2b-v20-2025-241/3/level2_2025W19_1B_0486_3D3_spx_l2b-v20-2025-241.fits?center=80.89,-69.76&size=0.15"
+    },
+    {
+      "label": "2025-05-10 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": null,
+      "mjd": 60805.676569,
+      "ra": 80.89,
+      "dec": -69.76,
+      "size_deg": 0.15,
+      "png": "/cutouts/lmc-field_2025-05-10.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2025W19_2B/l2b-v20-2025-247/3/level2_2025W19_2B_0340_4D3_spx_l2b-v20-2025-247.fits?center=80.89,-69.76&size=0.15"
+    },
+    {
       "label": "2025-05-11 \u00b7 D3",
       "band": 3,
       "wavelength_um": null,

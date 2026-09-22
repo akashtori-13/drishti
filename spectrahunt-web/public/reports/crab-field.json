@@ -3,23 +3,79 @@
   "title": "Crab Nebula \u2014 supernova remnant",
   "ra": 83.63,
   "dec": 22.01,
-  "measured_at": "2026-09-21T23:21:43.868270+00:00",
+  "measured_at": "2026-09-22T22:12:21.393087+00:00",
   "detail": "ok",
   "movers": 6,
   "variables": 20,
   "top_sigma": 33.7,
-  "n_epochs": 0,
-  "span_days": null,
+  "n_epochs": 5,
+  "span_days": 170.0,
   "variable_flag": false,
   "known": null,
-  "lightcurve": [],
+  "lightcurve": [
+    {
+      "mjd": 60936.939108,
+      "flux": 78.73329257965088
+    },
+    {
+      "mjd": 60940.196682,
+      "flux": 71.41275024414062
+    },
+    {
+      "mjd": 61094.30024,
+      "flux": 79.9902732372284
+    },
+    {
+      "mjd": 61102.587068,
+      "flux": 72.60352659225464
+    },
+    {
+      "mjd": 61108.624979,
+      "flux": 78.60574197769165
+    }
+  ],
   "spectrum": [
+    {
+      "band": 1,
+      "wavelength_um": 0.92,
+      "flux": 37.897228717803955,
+      "flux_err": 7.044271852778883,
+      "mjd": 61114.804352
+    },
     {
       "band": 2,
       "wavelength_um": 1.36,
       "flux": 66.66595125198364,
       "flux_err": 12.768193524525088,
       "mjd": 61112.223409
+    },
+    {
+      "band": 3,
+      "wavelength_um": 2.02,
+      "flux": 78.60574197769165,
+      "flux_err": 14.718802367764432,
+      "mjd": 61108.624979
+    },
+    {
+      "band": 4,
+      "wavelength_um": 3.12,
+      "flux": 101.68242263793945,
+      "flux_err": 16.430342479514515,
+      "mjd": 61114.804352
+    },
+    {
+      "band": 5,
+      "wavelength_um": 4.12,
+      "flux": 107.01842021942139,
+      "flux_err": 17.82439114592613,
+      "mjd": 61112.223409
+    },
+    {
+      "band": 6,
+      "wavelength_um": 4.71,
+      "flux": 123.85834312438965,
+      "flux_err": 18.16601788249461,
+      "mjd": 61108.624979
     }
   ]
 }

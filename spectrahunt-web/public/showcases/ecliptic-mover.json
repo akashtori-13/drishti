@@ -17,6 +17,17 @@
       "mjd": 60811.905839
     },
     {
+      "label": "2025-05-18 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": null,
+      "mjd": 60813.065071,
+      "ra": 180.0,
+      "dec": 0.0,
+      "size_deg": 0.15,
+      "png": "/cutouts/ecliptic-mover_2025-05-18.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2025W20_2D/l2b-v20-2025-247/3/level2_2025W20_2D_0424_4D3_spx_l2b-v20-2025-247.fits?center=180.0,0.0&size=0.15"
+    },
+    {
       "label": "2025-12-24 \u00b7 D3",
       "band": 3,
       "wavelength_um": null,

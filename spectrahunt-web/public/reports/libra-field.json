@@ -3,12 +3,12 @@
   "title": "Libra \u2014 ecliptic crossing",
   "ra": 212.5,
   "dec": -2.5,
-  "measured_at": "2026-09-22T15:15:37.049541+00:00",
+  "measured_at": "2026-09-22T22:32:15.637785+00:00",
   "detail": "ok",
   "movers": 0,
-  "variables": 3,
-  "top_sigma": 7.2,
-  "n_epochs": 2,
+  "variables": 9,
+  "top_sigma": 8.3,
+  "n_epochs": 5,
   "span_days": 365.1,
   "variable_flag": false,
   "known": null,
@@ -18,8 +18,20 @@
       "flux": 0.5192105025053024
     },
     {
+      "mjd": 60850.153165,
+      "flux": 0.3242467790842056
+    },
+    {
+      "mjd": 61067.792394,
+      "flux": 0.3840098977088928
+    },
+    {
       "mjd": 61212.087422,
       "flux": 0.3695709779858589
+    },
+    {
+      "mjd": 61219.149021,
+      "flux": 0.4375918507575989
     }
   ],
   "spectrum": [
