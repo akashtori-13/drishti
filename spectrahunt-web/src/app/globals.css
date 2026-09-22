@@ -126,6 +126,11 @@ main:focus{outline:none;}
   background:radial-gradient(ellipse 60% 52% at 50% 46%, rgba(5,6,12,.92) 0%, rgba(5,6,12,.68) 52%, rgba(5,6,12,.12) 100%),
     linear-gradient(rgba(5,6,12,.25), transparent 30%, transparent 62%, rgba(5,6,12,.55));
 }
+.hero-loading{
+  position:absolute; inset:0; z-index:-1; display:grid; place-items:center; align-content:center; gap:12px;
+  color:var(--ink-3); font-size:.8125rem;
+}
+.hero-loading-dot{width:10px; height:10px; border-radius:50%; background:#7c83fd; animation:stel-pulse 1.2s ease-in-out infinite;}
 .featured-wrap{display:flex; flex-direction:column; gap:8px; width:100%; max-width:640px; align-items:center;}
 .feat-dots{display:flex; gap:8px;}
 .feat-dot{width:22px; height:4px; border-radius:4px; border:0; background:rgba(255,255,255,.18); cursor:pointer; padding:0;}
