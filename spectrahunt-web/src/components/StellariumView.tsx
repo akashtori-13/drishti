@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { API_BASE } from '@/lib/showcases';
+import { lerpAngle, poseFromOrientation, radecFromPose } from '@/lib/skyposture';
 import { cachedImageSrc, loadCachedImage, lsGet, lsSet, prefetch } from '@/lib/skycache';
 
 export interface Observer { lat: number; lon: number; name: string }
@@ -214,6 +215,123 @@ export default function StellariumView({
       () => undefined,
       { timeout: 8000 },
     );
+  }, []);
+
+  // ---------- point-at-sky AR: phone sensors drive the camera ----------
+  const [ar, setAr] = useState<'off' | 'on' | 'paused'>('off');
+  const [poseHud, setPoseHud] = useState<{ heading: number; elev: number; acc: number | null } | null>(null);
+  const [arMsg, setArMsg] = useState<string | null>(null);
+  const [calib, setCalib] = useState(0);
+  const arCfg = useRef({ lat: 23.81, lon: 90.41, calib: 0 });
+  const arActive = useRef(false);
+  const smooth = useRef<{ h: number; e: number } | null>(null);
+  const driven = useRef<{ ra: number; dec: number } | null>(null);
+  const lastHud = useRef(0);
+  useEffect(() => {
+    arCfg.current = { lat: obs.lat, lon: obs.lon, calib };
+  });
+  useEffect(() => {
+    try {
+      const v = Number(localStorage.getItem('sh-ar-calib') ?? 0) || 0;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      if (v) setCalib(v);
+    } catch { /* noop */ }
+  }, []);
+  const setCalibBoth = (v: number) => {
+    const c = Math.max(-45, Math.min(45, Math.round(v)));
+    setCalib(c);
+    try { localStorage.setItem('sh-ar-calib', String(c)); } catch { /* noop */ }
+  };
+
+  const onOrientation = useCallback((e: DeviceOrientationEvent) => {
+    if (!arActive.current) return;
+    const o = e as DeviceOrientationEvent & {
+      webkitCompassHeading?: number | null; webkitCompassAccuracy?: number | null;
+    };
+    const rawAngle = window.screen?.orientation?.angle ?? 0;
+    const screenAngle = rawAngle === 270 ? -90 : rawAngle;
+    const pose = poseFromOrientation({
+      alpha: e.alpha, beta: e.beta, gamma: e.gamma,
+      absolute: (e as { absolute?: boolean | null }).absolute ?? false,
+      webkitCompassHeading: o.webkitCompassHeading ?? null,
+      webkitCompassAccuracy: o.webkitCompassAccuracy ?? null,
+      screenAngle,
+    });
+    if (pose.heading == null || pose.elev == null) {
+      setArMsg('No compass signal — wave a figure-8 to calibrate, or use manual look.');
+      return;
+    }
+    const s = smooth.current;
+    const h = s ? lerpAngle(s.h, pose.heading, 0.3) : pose.heading;
+    const ev = s ? s.e + (pose.elev - s.e) * 0.3 : pose.elev;
+    smooth.current = { h, e: ev };
+    const rc = radecFromPose(
+      { heading: h, elev: ev, headingAcc: pose.headingAcc },
+      { lat: arCfg.current.lat, lon: arCfg.current.lon },
+      new Date(), arCfg.current.calib,
+    );
+    if (!rc) return;
+    // drive the camera only on meaningful motion (render-storm guard)
+    const last = driven.current;
+    if (!last || Math.abs(normRa(rc.ra - last.ra)) > 0.15 || Math.abs(rc.dec - last.dec) > 0.15) {
+      driven.current = rc;
+      setRa(normRa(rc.ra));
+      setDec(Math.max(-88, Math.min(88, rc.dec)));
+    }
+    const nowMs = Date.now();
+    if (nowMs - lastHud.current > 250) {
+      lastHud.current = nowMs;
+      setPoseHud({ heading: h, elev: ev, acc: pose.headingAcc });
+    }
+  }, []);
+
+  const stopAR = useCallback(() => {
+    arActive.current = false;
+    window.removeEventListener('deviceorientation', onOrientation as EventListener);
+    setAr('off');
+    setPoseHud(null);
+  }, [onOrientation]);
+
+  useEffect(() => () => {
+    arActive.current = false;
+    window.removeEventListener('deviceorientation', onOrientation as EventListener);
+  }, [onOrientation]);
+
+  const startAR = useCallback(() => {
+    setArMsg(null);
+    if (typeof window === 'undefined' || !('DeviceOrientationEvent' in window)) {
+      setArMsg('Orientation sensors unavailable here — manual look instead.');
+      return;
+    }
+    // AR needs a real site: nudge GPS while still on the default
+    if (obs.name !== 'You (GPS)') locate();
+    const go = () => {
+      smooth.current = null;
+      driven.current = null;
+      arActive.current = true;
+      window.addEventListener('deviceorientation', onOrientation as EventListener);
+      setAr('on');
+    };
+    try {
+      const DOE = DeviceOrientationEvent as unknown as { requestPermission?: () => Promise<string> };
+      if (DOE && typeof DOE.requestPermission === 'function') {
+        // iOS: permission must come from a user gesture (this click qualifies)
+        void DOE.requestPermission().then(
+          (r) => {
+            if (r === 'granted') go();
+            else setArMsg('Motion permission denied — manual look instead.');
+          },
+          () => setArMsg('Motion permission denied — manual look instead.'),
+        );
+      } else go();
+    } catch { go(); }
+  }, [locate, obs.name, onOrientation]);
+
+  const resumeAR = useCallback(() => {
+    smooth.current = null;
+    driven.current = null;
+    arActive.current = true;
+    setAr('on');
   }, []);
 
   // sky image: snapped tiles (map-style) + two-stage preview + device cache.
@@ -434,6 +552,11 @@ export default function StellariumView({
 
   const down = (e: React.PointerEvent) => {
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+    // grabbing the sky pauses sensor look (Resume chip re-engages)
+    if (arActive.current) {
+      arActive.current = false;
+      setAr('paused');
+    }
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (pointers.current.size === 1) {
       drag.current = { x: e.clientX, y: e.clientY, ra, dec, moved: false };
@@ -551,6 +674,25 @@ export default function StellariumView({
         </span>
         <span className="mono">Alt {centerAltAz.alt.toFixed(1)}° Az {centerAltAz.az.toFixed(1)}°</span>
         <span className="mono">FOV {fov < 10 ? fov.toFixed(1) : fov.toFixed(0)}°</span>
+        {ar === 'off' ? (
+          <button type="button" className="epoch-chip" onClick={startAR} title="Point your phone at the sky">◉ Point</button>
+        ) : (
+          <button type="button" className="epoch-chip" aria-pressed={ar === 'on'} onClick={stopAR}
+            title="Stop sensor look">◉ Live{ar === 'paused' ? ' (paused)' : ''}</button>
+        )}
+        {ar === 'paused' && (
+          <button type="button" className="epoch-chip" onClick={resumeAR} title="Resume sensor look">Resume</button>
+        )}
+        {ar !== 'off' && poseHud && (
+          <span className="mono">◉ {poseHud.heading.toFixed(0)}° ↕ {poseHud.elev.toFixed(0)}°{poseHud.acc != null ? ` ±${poseHud.acc.toFixed(0)}°` : ''}</span>
+        )}
+        {ar !== 'off' && (
+          <span role="group" aria-label="Compass calibration" style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+            <button type="button" className="epoch-chip" onClick={() => setCalibBoth(calib - 1)} title="Nudge compass −1°">−1°</button>
+            <button type="button" className="epoch-chip" onClick={() => setCalibBoth(calib + 1)} title="Nudge compass +1°">+1°</button>
+          </span>
+        )}
+        {arMsg && <span className="mono" role="status">{arMsg}</span>}
         {cursor && <span className="mono">→ RA {cursor.ra.toFixed(2)}° Dec {cursor.dec.toFixed(2)}°</span>}
         <select value={survey} onChange={(e) => setSurvey(e.target.value)} aria-label="Sky survey"
           style={{ background: '#151929', border: '1px solid var(--line)', borderRadius: 8, padding: '3px 6px', fontSize: 12 }}>

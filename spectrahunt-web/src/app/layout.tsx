@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Sprite } from "@/components/Icon";
+import SwRegister from "@/components/SwRegister";
+import NativeShell from "@/components/NativeShell";
 import { SKY_ALLSKY_PREVIEW_URL } from "@/lib/sky";
 
 export const viewport: Viewport = {
@@ -21,7 +23,8 @@ export const metadata: Metadata = {
     type: "website",
   },
   icons: {
-    icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%2305060c'/%3E%3Ccircle cx='12' cy='12' r='6.5' fill='none' stroke='%237c83fd' stroke-width='2'/%3E%3Ccircle cx='12' cy='12' r='2' fill='%23eef0f8'/%3E%3C/svg%3E",
+    icon: '/icons/icon-192.png',
+    apple: '/icons/apple-touch-180.png',
   },
 };
 
@@ -47,6 +50,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="min-h-full flex flex-col" data-view="home">
         <Sprite />
+        <SwRegister />
+        <NativeShell />
         <noscript>
           <div style={{ position: 'fixed', inset: 0, display: 'grid', placeItems: 'center', background: '#05060c', color: '#eef0f8', zIndex: 200, padding: 24, textAlign: 'center' }}>
             SpectraHunt needs JavaScript to draw the sky and run searches. Please enable it and reload.

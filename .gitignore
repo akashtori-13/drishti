@@ -30,3 +30,17 @@ data/census_*.json
 .DS_Store
 *.log
 !.gitkeep
+
+# Release artifacts (built by scripts/release.py, attached to GitHub Releases)
+dist/
+
+# Native shells (generated, machine-local)
+spectrahunt-web/android/local.properties
+spectrahunt-web/android/.cxx/
+spectrahunt-web/android/.gradle/
+spectrahunt-web/android/build/
+spectrahunt-web/android/app/build/
+spectrahunt-web/android/captures/
+desktop/src-tauri/target/
+*.keystore
+*.jks
