@@ -9,7 +9,7 @@ Start with `README.md` (what/why), `SYSTEM_DESIGN.md` (whole design),
 ## Setup
 
 ```bash
-git clone <repo> && cd spectrahunt
+git clone https://github.com/akashtori-13/stellar.git && cd stellar
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 cd spectrahunt-web && npm install
 ```
