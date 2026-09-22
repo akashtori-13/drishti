@@ -18,8 +18,11 @@ import shutil
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-WEB = os.path.join(HERE, "..", "assets", "orbital", "earth", "web")
-RENDER = os.path.join(HERE, "..", "assets", "orbital", "render")
+# Untracked asset-pipeline output may live in another checkout while the
+# teammate finishes it: ORBITAL_ASSETS overrides the default root.
+ROOT = os.environ.get("ORBITAL_ASSETS", os.path.join(HERE, "..", "assets", "orbital"))
+WEB = os.path.join(ROOT, "earth", "web")
+RENDER = os.path.join(ROOT, "render")
 DST = os.path.join(HERE, "..", "spectrahunt-web", "public", "orbital")
 BUDGET = 2 * 1024 * 1024
 

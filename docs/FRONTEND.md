@@ -82,7 +82,9 @@ terminator Earth. Props: `swarm, onEnter, onSkip` (+ optional texture/sprite
 URL overrides, default `/orbital/*.webp`). Owns its RAF loop (refs-only
 mutable state, ~20 fps, one static frame under reduced-motion); Earth +
 terminator baked to an offscreen layer, `orthoProject` drives drawing and
-picking alike. Parent owns session gating + routing (not yet wired).
+picking alike. Free look: drag pans, wheel/pinch zooms about the cursor
+(0.5–2.5×), double-click resets; arrows/±/0 work keyboard-first.
+`IntroExperience` owns session gating + routing into `/intro`.
 
 ## Data layer (`lib/`)
 

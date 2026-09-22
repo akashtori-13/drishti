@@ -62,6 +62,14 @@ interface Scene {
   hero: { x: number; y: number; r: number } | null;
   hover: Pick | null;
   nudge: { x0: number; y0: number; x1: number; y1: number; t0: number } | null;
+  // Free-look state (user deltas ride on top of the tracking camera).
+  user: { dLat: number; dLon: number };
+  zoom: number;
+  baseR: number;
+  baseCx: number;
+  baseCy: number;
+  suppressClick: boolean;
+  lastEarthBuild: number;
   sats: Array<{ x: number; y: number; visible: boolean; name: string; hero: boolean }>;
   trail: Array<{ x: number; y: number }>;
   twinkle: Array<{ x: number; y: number; r: number; ci: number; b: number; ph: number; sp: number }>;
@@ -150,6 +158,8 @@ export default function OrbitalIntro({
       imgOk: { day: false, night: false, clouds: false, sheet: false, poster: false },
       earth: null, earthKey: '', stars: null, frames: SHEET_FRAMES,
       picks: [], hero: null, hover: null, nudge: null,
+      user: { dLat: 0, dLon: 0 }, zoom: 1, baseR: 100, baseCx: 0, baseCy: 0,
+      suppressClick: false, lastEarthBuild: 0,
       sats: [], trail: [], twinkle: [], raf: 0, earthFade: 1, hudTimer: null, alive: true,
       warp: 60, ms0: Date.now(), jd0: nowJD(),
     };
@@ -182,12 +192,42 @@ export default function OrbitalIntro({
       S.dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.round(S.w * S.dpr);
       canvas.height = Math.round(S.h * S.dpr);
-      S.cx = S.w * 0.5;
-      S.cy = S.h * 0.8;
-      S.R = Math.min(S.w, S.h) * (S.w < 640 ? 0.8 : 0.64);
+      S.baseCx = S.w * 0.5;
+      S.baseCy = S.h * 0.72;
+      S.baseR = Math.min(S.w, S.h) * (S.w < 640 ? 0.8 : 0.64);
+      // fresh layout resets the free-look frame
+      S.user = { dLat: 0, dLon: 0 };
+      S.zoom = 1;
+      S.cx = S.baseCx;
+      S.cy = S.baseCy;
+      S.R = S.baseR;
       S.compact = S.w < 640;
       S.earthKey = '';
       buildStars();
+      kick(true);
+    };
+
+    // Zoom about the cursor: the sky point under it stays under it.
+    const zoomAt = (mx: number, my: number, factor: number) => {
+      const nz = Math.min(2.5, Math.max(0.5, S.zoom * factor));
+      if (nz === S.zoom) return;
+      const ux = (mx - S.cx) / S.R;
+      const uy = (S.cy - my) / S.R;
+      S.zoom = nz;
+      S.R = S.baseR * nz;
+      S.cx = Math.min(S.w / 2 + S.R, Math.max(S.w / 2 - S.R, mx - ux * S.R));
+      S.cy = Math.min(S.h / 2 + S.R, Math.max(S.h / 2 - S.R, my + uy * S.R));
+      S.earthKey = '';
+      kick(true);
+    };
+
+    const resetLook = () => {
+      S.user = { dLat: 0, dLon: 0 };
+      S.zoom = 1;
+      S.cx = S.baseCx;
+      S.cy = S.baseCy;
+      S.R = S.baseR;
+      S.earthKey = '';
       kick(true);
     };
 
@@ -232,6 +272,11 @@ export default function OrbitalIntro({
       const drift = (jd * 15) % 360; // cloud drift, deg of longitude
       const key = `${Math.round(R)}:${S.view.latC.toFixed(1)}:${S.view.lonC.toFixed(1)}:${sun.depth.toFixed(2)}:${sun.ax.toFixed(2)}:${(drift - (drift % 1)).toFixed(0)}`;
       if (S.earth && S.earthKey === key) return;
+      // during active zoom the radius changes every frame: rebuild at most
+      // ~7 Hz and let the cached layer cover the gaps (imperceptible)
+      const nowMs = Date.now();
+      if (S.earth && nowMs - S.lastEarthBuild < 150) return;
+      S.lastEarthBuild = nowMs;
       S.earthKey = key;
       const layer = S.earth ?? document.createElement('canvas');
       layer.width = size;
@@ -278,7 +323,7 @@ export default function OrbitalIntro({
         } catch {
           /* older canvas: fall through with soft alpha */
         }
-        drawTex(S.imgs.clouds, 0.22, drift);
+        drawTex(S.imgs.clouds, 0.15, drift);
         try {
           g.filter = 'none';
         } catch {
@@ -346,12 +391,23 @@ export default function OrbitalIntro({
       }
       const driftLat = S.reduced ? 0 : Math.sin(S.driftT / 47) * 1.6;
       const driftLon = S.reduced ? 0 : Math.sin(S.driftT / 83) * 2.2;
-      const view: OrthoView = heroGeo
-        ? {
-            latC: Math.min(58, Math.max(-58, heroGeo.lat - 34 + driftLat)),
-            lonC: heroGeo.lon + driftLon,
-          }
-        : { latC: S.view.latC + driftLat, lonC: S.view.lonC + driftLon };
+      // The camera holds a fixed offset from the craft — ~20° south and 12°
+      // west — so SPHEREx hangs upper-left over a huge Earth. Past ±70° the
+      // latitude clamps; the meridian then swings aside in proportion to the
+      // clamped amount (gain ~3 compensates longitude compression near the
+      // pole). All smooth functions of the hero position — no jumps, and the
+      // craft stays well inside the disc, clear of the invitation pill.
+      let view: OrthoView;
+      if (heroGeo) {
+        const wantLat = heroGeo.lat - 20 + driftLat;
+        const latC = Math.min(70, Math.max(-70, wantLat));
+        view = {
+          latC: Math.min(85, Math.max(-85, latC + S.user.dLat)),
+          lonC: heroGeo.lon + 12 + driftLon + (wantLat - latC) * 3 + S.user.dLon,
+        };
+      } else {
+        view = { latC: S.view.latC + driftLat, lonC: S.view.lonC + driftLon };
+      }
       S.view = view;
       S.sats = list.map(({ obj, sat }) => {
         const p = propagate(sat, tsinceNow({ sat }));
@@ -367,7 +423,7 @@ export default function OrbitalIntro({
         };
       });
       const hp = heroEntry ? S.sats[list.indexOf(heroEntry)] : null;
-      S.hero = hp && hp.visible ? { x: hp.x, y: hp.y, r: Math.max(40, Math.min(S.w, S.h) * 0.082) } : null;
+      S.hero = hp && hp.visible ? { x: hp.x, y: hp.y, r: Math.max(40, Math.min(S.w, S.h) * 0.082) * S.zoom } : null;
       // ground-track trail: past positions, spectrum-tinted
       S.trail = [];
       if (heroEntry && !S.compact) {
@@ -556,10 +612,16 @@ export default function OrbitalIntro({
       setNorad({ norad: hero.obj.norad, cospar: hero.obj.cospar ?? '', epochDoy });
     };
 
-    const onMove = (e: PointerEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+    const setCursor = (x: number, y: number, dragging: boolean) => {
+      if (dragging) {
+        canvas.style.cursor = 'grabbing';
+        return;
+      }
+      canvas.style.cursor =
+        S.hero && Math.hypot(S.hero.x - x, S.hero.y - y) < S.hero.r * 1.7 ? 'crosshair' : 'grab';
+    };
+
+    const hoverAt = (x: number, y: number) => {
       let best: Pick | null = null;
       let bestD = 14;
       for (const p of S.picks) {
@@ -586,10 +648,110 @@ export default function OrbitalIntro({
           tag.style.display = 'none';
         }
       }
-      canvas.style.cursor = S.hero && Math.hypot(S.hero.x - x, S.hero.y - y) < S.hero.r * 1.7 ? 'crosshair' : 'default';
+    };
+
+    // Free look: one finger drags the sky (grab-and-pull), two fingers pinch,
+    // wheel zooms about the cursor. Clicks (<5 px travel) still enter/whisper.
+    const pointers = new Map<number, { x: number; y: number }>();
+    let downAt: { x: number; y: number } | null = null;
+    let pinchD0 = 0;
+    let pinchZoom0 = 1;
+
+    const toLocal = (e: PointerEvent | WheelEvent | MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    };
+
+    const onPointerDown = (e: PointerEvent) => {
+      try {
+        canvas.setPointerCapture(e.pointerId);
+      } catch {
+        /* noop */
+      }
+      const p = toLocal(e);
+      pointers.set(e.pointerId, p);
+      if (pointers.size === 1) {
+        downAt = p;
+        S.suppressClick = false;
+      } else if (pointers.size === 2) {
+        const [a, b] = [...pointers.values()];
+        pinchD0 = Math.max(1, Math.hypot(a.x - b.x, a.y - b.y));
+        pinchZoom0 = S.zoom;
+        downAt = null; // second finger cancels the tap
+        setCursor(p.x, p.y, true);
+      }
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      const p = toLocal(e);
+      const prev = pointers.get(e.pointerId);
+      pointers.set(e.pointerId, p);
+      if (pointers.size === 2) {
+        const [a, b] = [...pointers.values()];
+        const d = Math.max(1, Math.hypot(a.x - b.x, a.y - b.y));
+        const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+        zoomAt(mid.x, mid.y, (d / pinchD0) * (pinchZoom0 / S.zoom));
+        setCursor(p.x, p.y, true);
+        return;
+      }
+      if (!prev || !downAt) {
+        if (e.pointerType === 'mouse') {
+          hoverAt(p.x, p.y);
+          setCursor(p.x, p.y, false);
+        }
+        return;
+      }
+      const dx = p.x - prev.x;
+      const dy = p.y - prev.y;
+      if (Math.hypot(p.x - downAt.x, p.y - downAt.y) > 5) S.suppressClick = true;
+      // grab-and-pull the sky: content follows the pointer
+      const cosLat = Math.max(0.35, Math.cos((S.view.latC * Math.PI) / 180));
+      const deg = 180 / Math.PI;
+      S.user.dLon = Math.min(90, Math.max(-90, S.user.dLon - ((dx / S.R) * deg) / cosLat));
+      S.user.dLat = Math.min(45, Math.max(-45, S.user.dLat + (dy / S.R) * deg));
+      setCursor(p.x, p.y, true);
+      kick(true); // user gestures always earn a frame, even reduced-motion
+    };
+
+    const onPointerUp = (e: PointerEvent) => {
+      pointers.delete(e.pointerId);
+      if (pointers.size === 0) {
+        downAt = null;
+        const p = toLocal(e);
+        setCursor(p.x, p.y, false);
+      }
+    };
+
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const p = toLocal(e);
+      zoomAt(p.x, p.y, e.deltaY < 0 ? 1.12 : 1 / 1.12);
+    };
+
+    const onDblClick = () => resetLook();
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      const step = e.shiftKey ? 10 : 3;
+      let used = true;
+      if (e.key === 'ArrowLeft') S.user.dLon = Math.max(-90, S.user.dLon - step);
+      else if (e.key === 'ArrowRight') S.user.dLon = Math.min(90, S.user.dLon + step);
+      else if (e.key === 'ArrowUp') S.user.dLat = Math.min(45, S.user.dLat + step);
+      else if (e.key === 'ArrowDown') S.user.dLat = Math.max(-45, S.user.dLat - step);
+      else if (e.key === '+' || e.key === '=') zoomAt(S.cx, S.cy, 1.15);
+      else if (e.key === '-' || e.key === '_') zoomAt(S.cx, S.cy, 1 / 1.15);
+      else if (e.key === '0') resetLook();
+      else used = false;
+      if (used) {
+        e.preventDefault();
+        kick(true);
+      }
     };
 
     const onClick = (e: MouseEvent) => {
+      if (S.suppressClick) {
+        S.suppressClick = false;
+        return; // that was a drag, not a tap
+      }
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
@@ -626,7 +788,13 @@ export default function OrbitalIntro({
     resize();
     const ro = new ResizeObserver(resize);
     ro.observe(wrap);
-    canvas.addEventListener('pointermove', onMove);
+    canvas.addEventListener('pointerdown', onPointerDown);
+    canvas.addEventListener('pointermove', onPointerMove);
+    canvas.addEventListener('pointerup', onPointerUp);
+    canvas.addEventListener('pointercancel', onPointerUp);
+    canvas.addEventListener('wheel', onWheel, { passive: false });
+    canvas.addEventListener('dblclick', onDblClick);
+    canvas.addEventListener('keydown', onKeyDown);
     canvas.addEventListener('click', onClick);
     document.addEventListener('visibilitychange', onVis);
     refreshHud();
@@ -655,7 +823,13 @@ export default function OrbitalIntro({
       if (S.raf) cancelAnimationFrame(S.raf);
       if (S.hudTimer) clearInterval(S.hudTimer);
       ro.disconnect();
-      canvas.removeEventListener('pointermove', onMove);
+      canvas.removeEventListener('pointerdown', onPointerDown);
+      canvas.removeEventListener('pointermove', onPointerMove);
+      canvas.removeEventListener('pointerup', onPointerUp);
+      canvas.removeEventListener('pointercancel', onPointerUp);
+      canvas.removeEventListener('wheel', onWheel);
+      canvas.removeEventListener('dblclick', onDblClick);
+      canvas.removeEventListener('keydown', onKeyDown);
       canvas.removeEventListener('click', onClick);
       document.removeEventListener('visibilitychange', onVis);
       reducedMq.removeEventListener('change', onReduced);
@@ -670,9 +844,10 @@ export default function OrbitalIntro({
         ref={canvasRef}
         className="orbital-sky"
         role="img"
+        tabIndex={0}
         aria-label={
           hud
-            ? `Live orbit: SPHEREx over ${hud.lat.toFixed(1)} degrees ${hud.lat >= 0 ? 'north' : 'south'}, ${Math.abs(hud.lon).toFixed(1)} degrees ${hud.lon >= 0 ? 'east' : 'west'}. ${count} objects tracked. Activate the invitation to enter.`
+            ? `Live orbit: SPHEREx over ${hud.lat.toFixed(1)} degrees ${hud.lat >= 0 ? 'north' : 'south'}, ${Math.abs(hud.lon).toFixed(1)} degrees ${hud.lon >= 0 ? 'east' : 'west'}. ${count} objects tracked. Drag to look around, scroll to zoom, arrows and plus minus work when focused. Activate the invitation to enter.`
             : 'Live orbit view loading.'
         }
       />
@@ -695,6 +870,7 @@ export default function OrbitalIntro({
           TRACKED OBJECTS {count} · SCANNING · QR2 · TIME ×{warp}
           {hud && hud.tleAgeDays > 14 ? <span className="orbital-hud-dim"> · TLE {hud.tleAgeDays.toFixed(0)}d old</span> : ''}
         </div>
+        <div className="orbital-hud-dim">DRAG look · SCROLL zoom · DOUBLE-CLICK reset</div>
       </div>
       <div ref={tagRef} className="orbital-tag mono" style={{ display: 'none' }} aria-hidden="true" />
       {whisper && (
