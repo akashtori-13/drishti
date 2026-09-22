@@ -190,3 +190,27 @@ Deltas to current Home:
 3. `components/orbital/GlitchTransition.tsx` — Act 2 post-pass + route swap.
 4. Home deltas (Act 3 wake stagger, console copy, toast).
 5. Reduced-motion/mobile/offline passes; eslint + tsc + build gates; bundle audit.
+
+---
+
+## Asset status (prepared 2026-09-22, in `assets/orbital/`)
+
+- `tle/spherex.json` + `tle/swarm.json` — real AFSPC TLEs (via N2YO; CelesTrak blocked
+  from the build network): SPHEREx (NORAD 63182, 2025-047E) + 16 curated swarm objects
+  incl. all four PUNCH rideshare siblings, ISS, CSS, HST, Terra, Aqua, Suomi NPP,
+  NOAA-19/21, GOES 13, Landsat 8, Sentinel-2A, Jason 3.
+- `earth/` — NASA Blue Marble day (2048×1024), Black Marble night lights (2048×1024),
+  clouds (1024×512), web-optimized WebP in `earth/web/` (~420KB total). Plus the two
+  NASA-3D-Resources Earth plates (topo map + Apollo-style photo) as alternates.
+- `reference/` — official NASA/JPL artist concepts PIA26531/26532/26533 + cleanroom
+  photos (concentric cones, outer photon shield, telescope, work stand) — the model
+  was traced from these.
+- `model/spherex.glb` + `spherex.npz` — procedural SPHEREx model (22 meshes, 3,260 tris,
+  PBR metallic-roughness materials), built by `scripts/spherex_model.py`.
+- `render/` — software-rendered turntable: 48 frames @ 512² + 8×6 sprite sheet
+  (`spherex_turntable.webp`, 268KB) + `poster.webp`, built by
+  `scripts/render_turntable.py` (numpy rasterizer: z-buffer, Blinn-Phong with corrected
+  dielectric F0=0.04, Fresnel rim, sun key + earthshine fill).
+
+Re-render after any model tweak: `python scripts/spherex_model.py && python
+scripts/render_turntable.py --frames 48 --size 512`.
