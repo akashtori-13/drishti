@@ -1,5 +1,16 @@
 apply plugin: 'com.android.application'
 
+// Release signing: app/keystore.properties (local, git-ignored) or
+// STELLAR_KEYSTORE_* env vars (CI secrets). Unsigned otherwise.
+def ksProps = new Properties()
+def ksPropFile = file('keystore.properties')
+if (ksPropFile.exists()) ksPropFile.withInputStream { ksProps.load(it) }
+def ksPath = ksProps.getProperty('storeFile') ?: System.getenv('STELLAR_KEYSTORE_FILE')
+def ksPass = ksProps.getProperty('storePassword') ?: System.getenv('STELLAR_KEYSTORE_PASSWORD')
+def ksAlias = ksProps.getProperty('keyAlias') ?: System.getenv('STELLAR_KEY_ALIAS') ?: 'stellar'
+def ksKeyPass = ksProps.getProperty('keyPassword') ?: System.getenv('STELLAR_KEY_PASSWORD')
+def ksReady = ksPath && ksPass && ksKeyPass && new File(ksPath).exists()
+
 android {
     namespace = "org.stellar.app.offline"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -7,8 +18,8 @@ android {
         applicationId "org.stellar.app.offline"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 10000
+        versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,10 +27,24 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    if (ksReady) {
+        signingConfigs {
+            stellarRelease {
+                storeFile file(ksPath)
+                storePassword ksPass
+                keyAlias ksAlias
+                keyPassword ksKeyPass
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (ksReady) {
+                signingConfig signingConfigs.stellarRelease
+            }
         }
     }
 }

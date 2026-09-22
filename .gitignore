@@ -42,5 +42,6 @@ spectrahunt-web/android/build/
 spectrahunt-web/android/app/build/
 spectrahunt-web/android/captures/
 desktop/src-tauri/target/
+spectrahunt-web/android/app/keystore.properties
 *.keystore
 *.jks
