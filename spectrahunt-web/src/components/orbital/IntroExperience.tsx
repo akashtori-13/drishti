@@ -8,9 +8,10 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import OrbitalIntro from './OrbitalIntro';
 import GlitchTransition from './GlitchTransition';
-import { getSwarmBundle, prepareSwarm, type PreparedSat } from '@/lib/orbit';
+import { getSwarmBundle, prepareSwarm, type PreparedSat, type SwarmBundle } from '@/lib/orbit';
+import FALLBACK from '@/lib/tle-bundle.fallback.json';
 
-const EMPTY = { source: 'empty fallback', fetched_at: '', objects: [] };
+const fallback = FALLBACK as SwarmBundle;
 
 export default function IntroExperience() {
   const router = useRouter();
@@ -21,7 +22,7 @@ export default function IntroExperience() {
 
   useEffect(() => {
     let alive = true;
-    void getSwarmBundle(EMPTY).then((b) => {
+    void getSwarmBundle(fallback).then((b) => {
       if (alive) setSwarm(prepareSwarm(b));
     });
     return () => {
@@ -37,21 +38,31 @@ export default function IntroExperience() {
     );
   }
 
-  const enter = (f?: { x: number; y: number }) => {
+  // Passing the gate (enter or skip) marks the session so Home never bounces.
+  const pass = () => {
     try {
       sessionStorage.setItem('sh-entered', '1');
     } catch {
       /* noop */
     }
+  };
+
+  const enter = (f?: { x: number; y: number }) => {
+    pass();
     setSrc(document.querySelector('.orbital-sky') as HTMLCanvasElement | null);
     setFocus(f ?? null);
     setPhase('glitch');
   };
 
+  const skip = () => {
+    pass();
+    router.push('/');
+  };
+
   return (
     <>
       {phase === 'orbit' && (
-        <OrbitalIntro swarm={swarm} onEnter={enter} onSkip={() => router.push('/')} />
+        <OrbitalIntro swarm={swarm} onEnter={enter} onSkip={skip} />
       )}
       {phase === 'glitch' && (
         <GlitchTransition source={src} focus={focus} onDone={() => router.push('/')} />

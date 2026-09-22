@@ -67,7 +67,7 @@ function fieldFromRaDec(ra: number, dec: number, grid: number[][], real?: Map<st
 }
 
 /** Rotating featured detections: real fields with ≥2 rendered cutouts. */
-function FeaturedCycle({ fields }: { fields: Showcase[] }) {
+function FeaturedCycle({ fields, consoleMode }: { fields: Showcase[]; consoleMode: boolean }) {
   const cands = useMemo(
     () => fields.filter((f) => f.epochs.filter((e) => e.png).length >= 2).slice(0, 5),
     [fields],
@@ -106,7 +106,7 @@ function FeaturedCycle({ fields }: { fields: Showcase[] }) {
           <img src={pngs[1]} alt="" draggable={false} className="b" />
         </span>
         <span className="feat-body">
-          <span className="feat-k">Real detection</span>
+          <span className="feat-k">{consoleMode ? 'Recent captures' : 'Real detection'}</span>
           <span className="feat-t">{f.title}</span>
           <span className="feat-s">
             Two SPHEREx visits{span !== null ? `, ${span} days apart` : ''}. The stars cancel out; the mover remains. →
@@ -130,6 +130,28 @@ function FeaturedCycle({ fields }: { fields: Showcase[] }) {
 }
 
 export default function HomePage() {  const router = useRouter();
+  const [consoleMode, setConsoleMode] = useState(false);
+  const [wake, setWake] = useState(false);
+  const [toast, setToast] = useState(false);
+
+  // BORESIGHT gate (Act 3): first Home visit each session enters through
+  // /intro. Deep links (/sky, /blink/...) never mount this page. The console
+  // register + wake stagger + toast below are the Act 3 home deltas.
+  useEffect(() => {
+    try {
+      if (!sessionStorage.getItem('sh-entered')) {
+        router.replace('/intro');
+        return;
+      }
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setConsoleMode(true);
+      if (!sessionStorage.getItem('sh-wake-done')) {
+        sessionStorage.setItem('sh-wake-done', '1');
+        setWake(true);
+      }
+      if (!sessionStorage.getItem('sh-toast-shown')) setToast(true);
+    } catch { /* private mode: plain home, no gate */ }
+  }, [router]);
   const grid = useMemo(() => {
     const g = buildGrid();
     return g;
@@ -185,9 +207,22 @@ export default function HomePage() {  const router = useRouter();
 
   const cutouts = fields.flatMap((f) => f.epochs).filter((e) => e.png).length;
 
+  const dismissToast = () => {
+    setToast(false);
+    try {
+      sessionStorage.setItem('sh-toast-shown', '1');
+    } catch { /* noop */ }
+  };
+
+  useEffect(() => {
+    if (!toast) return;
+    const t = window.setTimeout(dismissToast, 6500);
+    return () => window.clearTimeout(t);
+  }, [toast]);
+
   return (
     <div>
-      <section className="hero" id="hero">
+      <section className={wake ? 'hero wake' : 'hero'} id="hero">
         <HeroSky grid={grid} coverage={coverage}
           markers={SHOWCASE_POINTS}
           onMarker={(id) => router.push(blinkURL(id))}
@@ -195,6 +230,7 @@ export default function HomePage() {  const router = useRouter();
         <div className="hero-scrim" />
 
         <div className="hero-core">
+          {consoleMode && <p className="hero-kicker">Live feed · 102 channels · all sky</p>}
           <h1>Hunt what moves in the infrared sky</h1>
           <p className="hero-sub">
             SPHEREx re-images the whole sky every six months. SpectraHunt shows what changed.
@@ -213,7 +249,7 @@ export default function HomePage() {  const router = useRouter();
             <SurpriseButton onPick={pick} />
           </div>
 
-          <FeaturedCycle fields={fields} />
+          <FeaturedCycle fields={fields} consoleMode={consoleMode} />
           <p className="credit-line">Built on public SPHEREx Quick Release 2 data (NASA/IPAC).</p>
         </div>
       </section>
@@ -328,6 +364,15 @@ export default function HomePage() {  const router = useRouter();
           </div>
         </div>
       </section>
+
+      {toast && (
+        <div className="orbital-toast glass" role="status">
+          <span>You are looking at the actual survey sky. Click anywhere.</span>
+          <button type="button" className="icon-btn" aria-label="Dismiss" onClick={dismissToast}>
+            ×
+          </button>
+        </div>
+      )}
 
       <Inspector
         field={field} blinkId={field ? (nearestShowcase(field.ra, field.dec) ?? (useLive && field.epochs >= 2 ? 'live' : null)) : null}
