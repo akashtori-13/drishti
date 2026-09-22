@@ -147,6 +147,13 @@ export default function StellariumView({
   const [img, setImg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [cursor, setCursor] = useState<{ ra: number; dec: number; alt: number; az: number } | null>(null);
+  // Live clock readout is client-only: SSR and hydration render a placeholder
+  // so a minute rollover between server render and hydration can't mismatch.
+  const [clockOn, setClockOn] = useState(false);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setClockOn(true);
+  }, []);
   const [lines, setLines] = useState<ConLines | null>(null);
   const [stars, setStars] = useState<Array<{ ra: number; dec: number; g_mag: number | null }>>([]);
   const t = new Date(now.getTime() + offH * 3600e3);
@@ -666,7 +673,7 @@ export default function StellariumView({
       {/* HUD */}
       <div className="stel-hud">
         <button type="button" className="epoch-chip" onClick={locate} title="Use device location">📍 {obs.name}</button>
-        <span className="mono">{t.toLocaleDateString()} {t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+        <span className="mono">{clockOn ? `${t.toLocaleDateString()} ${t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : '—'}</span>
         <span role="group" aria-label="Time step" style={{ display: 'flex', gap: 4 }}>
           <button type="button" className="epoch-chip" onClick={() => setOffH((h) => h - 1)} title="Back 1 hour">−1h</button>
           <button type="button" className="epoch-chip" onClick={() => setOffH((h) => h + 1)} title="Forward 1 hour">+1h</button>

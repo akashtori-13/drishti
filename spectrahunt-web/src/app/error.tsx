@@ -2,26 +2,35 @@
 
 import Link from 'next/link';
 import { useEffect } from 'react';
-import SiteChrome from '@/components/SiteChrome';
 
-export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+/** Last-resort boundary: a render throw can never blank the whole window. */
+export default function Error({
+  error, reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
   useEffect(() => {
     try {
-      console.error('route error:', error.message);
+      console.error('[stellar] route error:', error.message);
     } catch { /* noop */ }
   }, [error]);
   return (
-    <SiteChrome>
-      <div className="page" style={{ textAlign: 'center', paddingTop: 80 }}>
-        <p className="hero-kicker">rendering fault · data is safe</p>
-        <div style={{ fontSize: 64 }} aria-hidden="true">☄</div>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', marginTop: 16 }}>Something flared up</h1>
-        <p style={{ color: 'var(--ink-2)', marginTop: 12 }}>This view failed to render. Your data is safe — try again or pick another field.</p>
-        <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginTop: 20, flexWrap: 'wrap' }}>
+    <div style={{
+      minHeight: '100dvh', display: 'grid', placeItems: 'center', padding: 24,
+      background: '#05060c', color: '#eef0f8', textAlign: 'center',
+    }}>
+      <div style={{ maxWidth: 420 }}>
+        <p style={{ fontSize: 12, color: '#8a90ab', letterSpacing: '.14em' }}>OFF THE CHARTED SKY</p>
+        <h1 style={{ fontSize: 28, margin: '8px 0' }}>Something failed to render</h1>
+        <p style={{ color: '#aab0c8', lineHeight: 1.6 }}>
+          The sky is still there. Try again, or head home — cached fields work offline.
+        </p>
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 20 }}>
           <button type="button" className="btn primary" onClick={() => reset()}>Try again</button>
-          <Link href="/" className="btn">Home</Link>
+          <Link className="btn" href="/">Home</Link>
         </div>
       </div>
-    </SiteChrome>
+    </div>
   );
 }

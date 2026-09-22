@@ -610,13 +610,17 @@ function readBundleCache(): SwarmBundle | null {
 /**
  * Cache-first swarm bundle: device copy resolves instantly, refresh behind.
  * Falls back to the bundled static file, then the caller-supplied fallback.
- * Never throws.
+ * Never throws, never hangs: the network leg races a timeout so a stalled
+ * fetch (cold profile, slow disk, offline shell) can't wedge the intro on
+ * "ACQUIRING SIGNAL" forever.
  */
-export async function getSwarmBundle(fallback: SwarmBundle): Promise<SwarmBundle> {
+export async function getSwarmBundle(fallback: SwarmBundle, timeoutMs = 8000): Promise<SwarmBundle> {
   const cached = readBundleCache();
   const refresh = (async (): Promise<SwarmBundle | null> => {
+    const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const timer = setTimeout(() => ctrl?.abort(), timeoutMs);
     try {
-      const r = await fetch(BUNDLE_URL);
+      const r = await fetch(BUNDLE_URL, ctrl ? { signal: ctrl.signal } : undefined);
       if (!r.ok) return null;
       const j = (await r.json()) as SwarmBundle;
       if (!j || !Array.isArray(j.objects)) return null;
@@ -629,6 +633,8 @@ export async function getSwarmBundle(fallback: SwarmBundle): Promise<SwarmBundle
       return j;
     } catch {
       return null;
+    } finally {
+      clearTimeout(timer);
     }
   })();
   if (cached && bundleAge() < BUNDLE_TTL) {

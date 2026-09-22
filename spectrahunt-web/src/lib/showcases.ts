@@ -61,10 +61,16 @@ export interface Coverage {
 
 import { peek, remember } from '@/lib/cachefirst';
 
-async function fetchJSON<T>(url: string): Promise<T> {
-  const r = await fetch(url);
-  if (!r.ok) throw new Error(`HTTP ${r.status}`);
-  return r.json() as Promise<T>;
+async function fetchJSON<T>(url: string, timeoutMs = 15000): Promise<T> {
+  const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const timer = setTimeout(() => ctrl?.abort(), timeoutMs);
+  try {
+    const r = await fetch(url, ctrl ? { signal: ctrl.signal } : undefined);
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json() as Promise<T>;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 const COVERAGE_TTL = 3600 * 1000;
