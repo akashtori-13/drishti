@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { SHOWCASE_IDS, getShowcase, type Showcase } from '@/lib/showcases';
 import { BANDS } from '@/lib/sky';
 import { useRouter } from 'next/navigation';
@@ -104,6 +104,8 @@ export default function CandidatesPage() {
   const router = useRouter();
   const [cards, setCards] = useState<Card[]>([]);
   const [filter, setFilter] = useState<Filter>('all');
+  const docsRef = useRef(new Map<string, Showcase>());
+  const repsRef = useRef(new Map<string, Report>());
 
   useEffect(() => {
     let alive = true;
@@ -114,9 +116,27 @@ export default function CandidatesPage() {
       if (!alive) return;
       const map = new Map<string, Report>();
       for (const r of reps) if (r) map.set(r.id, r);
-      setCards(cardsFrom(docs.filter((d): d is Showcase => d !== null), map));
+      docsRef.current = new Map(docs.filter((d): d is Showcase => d !== null).map((d) => [d.id, d]));
+      repsRef.current = map;
+      setCards(cardsFrom([...docsRef.current.values()], map));
     });
-    return () => { alive = false; };
+    // Background revalidation: getShowcase() serves stale instantly and refreshes
+    // behind. Fresh arrivals (e.g. newly indexed PNGs) update the card in place.
+    const onRevalidate = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { key?: string; data?: Showcase } | undefined;
+      if (!detail?.key?.startsWith('sh-showcase:') || !detail?.data) return;
+      const fresh = detail.data;
+      if (!(SHOWCASE_IDS as readonly string[]).includes(fresh.id)) return;
+      const prev = docsRef.current.get(fresh.id);
+      try {
+        if (prev && JSON.stringify(prev) === JSON.stringify(fresh)) return;
+      } catch { /* fall through and swap */ }
+      docsRef.current.set(fresh.id, fresh);
+      if (!alive) return;
+      setCards(cardsFrom([...docsRef.current.values()], repsRef.current));
+    };
+    window.addEventListener('sh-revalidate', onRevalidate);
+    return () => { alive = false; window.removeEventListener('sh-revalidate', onRevalidate); };
   }, []);
 
   const list = cards.filter((c) =>

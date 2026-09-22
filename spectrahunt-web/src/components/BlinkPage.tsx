@@ -215,6 +215,28 @@ export default function BlinkPage({ id }: { id: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
+  // Background revalidation: getShowcase() serves the device copy instantly and
+  // refreshes behind. When fresh JSON arrives (e.g. newly indexed PNGs), swap
+  // it in without a manual reload — preserving the viewer's band/epoch choice.
+  useEffect(() => {
+    if (isLiveId(id)) return;
+    const onRevalidate = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { key?: string; data?: Showcase } | undefined;
+      if (detail?.key !== `sh-showcase:${id}` || !detail?.data) return;
+      const fresh = detail.data;
+      if (fresh.id !== id) return;
+      setData((prev) => {
+        if (!prev || prev.id !== id) return prev;
+        try {
+          if (JSON.stringify(prev) === JSON.stringify(fresh)) return prev;
+        } catch { /* fall through and swap */ }
+        return fresh;
+      });
+    };
+    window.addEventListener('sh-revalidate', onRevalidate);
+    return () => window.removeEventListener('sh-revalidate', onRevalidate);
+  }, [id]);
+
   // live spectrum + light curve (real pipeline numbers when API is live)
   useEffect(() => {
     if (!viewing || !useLive) return;
