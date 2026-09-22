@@ -56,6 +56,64 @@ export default function AboutPage() {
           detector pixel sees a different wavelength depending on sky position. We only
           compare epochs whose wavelengths agree within half the local bandwidth.
         </p>
+        <p>
+          The numbers have units and error bars: 6.2″ pixels, aperture fluxes with
+          uncertainties, light curves in MJD, six-band spectra in µm. Significance (σ)
+          comes from aligned difference imaging — movers appear as paired bright-and-dark
+          dipoles, and the in-browser detector flags them at ±5σ. Same-band enforcement
+          lives in code (<span className="mono">cutouts.py: wavelengths_match</span>);
+          unmeasured sky renders dark and says so instead of guessing.
+        </p>
+      </section>
+
+      <section>
+        <h2>Ground truth: we recover the known sky</h2>
+        <p>Before trusting new candidates, we check the pipeline against targets whose
+          positions are independently established. Field centers land sub-arcminute:</p>
+        <table className="band-table">
+          <thead><tr><th scope="col">Field</th><th scope="col">Target</th><th scope="col">Offset</th></tr></thead>
+          <tbody>
+            {[
+              ['M31 field', 'M31', '0.2′'],
+              ['Crab field', 'Crab Nebula (M1)', '0.3′'],
+              ['LMC field', 'Large Magellanic Cloud', '0.2′'],
+              ['SMC field', 'Small Magellanic Cloud', '0.1′'],
+              ['Orion field', 'Orion Nebula (M42)', '0.1′'],
+              ['Omega Cen field', 'Omega Centauri', '0.3′'],
+              ['M51 field', 'Whirlpool Galaxy', '0.3′'],
+              ['M101 field', 'Pinwheel Galaxy', '0.1′'],
+              ['Galactic Center', 'Sgr A* region', '0.2′'],
+            ].map(([f, t, o]) => (
+              <tr key={f}><td>{f}</td><td>{t}</td><td className="mono">{o}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p>Moving targets verify differently: 3I/ATLAS matches the published SPHEREx
+          characterization (Lisse et al., RNAAS 9:242 and follow-up), and solar-system
+          suspects are checked against SkyBoT ephemerides at each exposure&apos;s MJD.</p>
+      </section>
+
+      <section>
+        <h2>Impact: who this is for</h2>
+        <p>
+          Students meeting the infrared sky for the first time, amateur astronomers
+          without archive-query expertise, and researchers who need a thirty-second
+          look at a position before committing to a full IRSA session. Everything runs
+          in a browser — including an 8&nbsp;MB offline Android build for places where
+          bandwidth is scarce and wifi dies. Every measurement is reusable: candidates,
+          light curves, and spectra ship as public JSON any app can fetch.
+        </p>
+      </section>
+
+      <section>
+        <h2>Team</h2>
+        <p>
+          Built by <strong style={{ color: '#fff' }}>Team AKASHTORI</strong> for the NASA
+          Space Apps Challenge 2026 — build, research, and presenting split across the
+          crew. Contributors and commit history are on{' '}
+          <a href="https://github.com/akashtori-13/stellar" target="_blank" rel="noopener">GitHub</a>.
+        </p>
       </section>
 
       <section>
@@ -103,6 +161,7 @@ export default function AboutPage() {
           <li><a href="https://alasky.cds.unistra.fr/" target="_blank" rel="noopener">DSS2 and 2MASS sky imagery (CDS, Strasbourg)</a></li>
           <li><a href="https://simbad.cds.unistra.fr/simbad/" target="_blank" rel="noopener">SIMBAD astronomical database (CDS)</a></li>
           <li><a href="https://vo.imcce.fr/webservices/skybot/" target="_blank" rel="noopener">IMCCE SkyBoT, solar-system cone search</a></li>
+          <li><a href="https://celestrak.org/" target="_blank" rel="noopener">CelesTrak — SPHEREx orbit elements (TLE)</a></li>
         </ul>
       </section>
 
