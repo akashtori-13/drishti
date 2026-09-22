@@ -38,9 +38,12 @@ export default function IntroExperience() {
     );
   }
 
-  // Passing the gate (enter or skip) marks the session so Home never bounces.
+  // Passing the gate (enter or skip) marks entry so Home never bounces.
+  // localStorage (not session): mobile OSes kill background tabs and wipe
+  // session storage, which used to replay the intro "sometimes".
   const pass = () => {
     try {
+      localStorage.setItem('sh-entered-v1', '1');
       sessionStorage.setItem('sh-entered', '1');
     } catch {
       /* noop */
