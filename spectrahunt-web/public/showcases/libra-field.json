@@ -6,6 +6,50 @@
   "story": "Right on the ecliptic, asteroids stream through here. Three visits (D3) \u2014 blink for the dot that jumps.",
   "epochs": [
     {
+      "label": "2025-06-21 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": null,
+      "mjd": 60847.030713,
+      "ra": 212.5,
+      "dec": -2.5,
+      "size_deg": 0.15,
+      "png": "/cutouts/libra-field_2025-06-21.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2025W25_2A/l2b-v20-2025-254/3/level2_2025W25_2A_0322_3D3_spx_l2b-v20-2025-254.fits?center=212.5,-2.5&size=0.15"
+    },
+    {
+      "label": "2026-01-26 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": null,
+      "mjd": 61066.167115,
+      "ra": 212.5,
+      "dec": -2.5,
+      "size_deg": 0.15,
+      "png": "/cutouts/libra-field_2026-01-26.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W05_1A/l2b-v23-2026-030/3/level2_2026W05_1A_0038_2D3_spx_l2b-v23-2026-030.fits?center=212.5,-2.5&size=0.15"
+    },
+    {
+      "label": "2026-01-28 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": null,
+      "mjd": 61068.47725,
+      "ra": 212.5,
+      "dec": -2.5,
+      "size_deg": 0.15,
+      "png": "/cutouts/libra-field_2026-01-28.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W05_1A/l2b-v23-2026-030/3/level2_2026W05_1A_0533_3D3_spx_l2b-v23-2026-030.fits?center=212.5,-2.5&size=0.15"
+    },
+    {
+      "label": "2026-06-21 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": null,
+      "mjd": 61212.090407,
+      "ra": 212.5,
+      "dec": -2.5,
+      "size_deg": 0.15,
+      "png": "/cutouts/libra-field_2026-06-21.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W25_2A/l2b-v25-2026-174/3/level2_2026W25_2A_0563_4D3_spx_l2b-v25-2026-174.fits?center=212.5,-2.5&size=0.15"
+    },
+    {
       "label": "Survey 1 \u00b7 D3",
       "band": 3,
       "wavelength_um": 2.02,
