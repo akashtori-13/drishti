@@ -50,7 +50,6 @@ function RailHistogram({ watch }: { watch: unknown }) {
     };
     const t = requestAnimationFrame(() => setTimeout(draw, 60));
     return () => cancelAnimationFrame(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watch]);
   return <canvas ref={ref} className="hist" style={{ width: '100%' }} aria-label="Live frame brightness histogram" />;
 }
@@ -94,12 +93,12 @@ function BandSpectrum({ viewing, sample, liveSpec, band }: {
     let alive = true;
     const entries = Object.entries(viewing.bands ?? {})
       .filter(([, b]) => b.png)
-      .map(([k, b]) => ({ det: Number(k), png: b.png as string, wave: b.wavelength_um ?? 0 }));
+      .map(([, b]) => ({ png: b.png as string, wave: b.wavelength_um ?? 0 }));
     if (!entries.length) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setPts(null); return;
     }
-    void Promise.all(entries.map(({ det, png, wave }) => new Promise<{ wave: number; flux: number } | null>((resolve) => {
+    void Promise.all(entries.map(({ png, wave }) => new Promise<{ wave: number; flux: number } | null>((resolve) => {
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => {
@@ -450,7 +449,7 @@ export default function BlinkPage({ id }: { id: string }) {
                 <>
                   <div className="epoch-list">
                     {epochs.map((e, i) => (
-                      <button key={e.label} type="button" onClick={() => setEpochIdx(i)}
+                      <button key={`${e.label}::${i}`} type="button" onClick={() => setEpochIdx(i)}
                         className={`epoch-item${i === epochIdx ? ' active' : ''}`} aria-pressed={i === epochIdx}>
                         <span>{e.label}</span>
                         <span className="mono">{e.mjd ? mjdToDate(e.mjd) : ''}</span>
