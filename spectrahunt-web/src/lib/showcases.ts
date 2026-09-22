@@ -93,7 +93,7 @@ export async function getCoverage(): Promise<Coverage | null> {
   const refresh = fetchJSON<Coverage>('/coverage.json')
     .then((c) => {
       remember(key, c);
-      if (cachedJSON !== JSON.stringify(c)) notifyRevalidated(key, c);
+      if (cachedJSON !== null && cachedJSON !== JSON.stringify(c)) notifyRevalidated(key, c);
       return c;
     })
     .catch((): Coverage | null => null);
@@ -124,7 +124,7 @@ export async function getShowcase(id: string): Promise<Showcase> {
   const cachedJSON = cached ? JSON.stringify(cached) : null;
   const refresh = fetchJSON<Showcase>(`/showcases/${id}.json`).then((d) => {
     remember(key, d);
-    if (cachedJSON !== JSON.stringify(d)) notifyRevalidated(key, d);
+    if (cachedJSON !== null && cachedJSON !== JSON.stringify(d)) notifyRevalidated(key, d);
     return d;
   });
   if (cached) {
