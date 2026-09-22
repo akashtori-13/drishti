@@ -567,7 +567,7 @@ export function prepareSwarm(bundle: SwarmBundle): PreparedSat[] {
 }
 
 /** Live HUD numbers for one satellite. Null when propagation refuses. */
-export function telemetryFor(entry: PreparedSat, at?: Date): Telemetry | null {
+export function telemetryFor(entry: PreparedSat, at?: Date, ageAt?: Date): Telemetry | null {
   const jd = nowJD(at);
   const p = propagate(entry.sat, (jd - entry.sat.jdsatepoch) * 1440);
   if (!p.ok) return null;
@@ -581,7 +581,7 @@ export function telemetryFor(entry: PreparedSat, at?: Date): Telemetry | null {
     velKmS: Math.hypot(p.v.x, p.v.y, p.v.z),
     incDeg: entry.sat.inclo / DEG,
     mjd: mjdFromJD(jd),
-    tleAgeDays: jd - entry.sat.jdsatepoch,
+    tleAgeDays: nowJD(ageAt) - entry.sat.jdsatepoch,
     boresight: approxBoresight(p.r, p.v),
   };
 }
