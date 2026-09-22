@@ -49,7 +49,7 @@ export interface RealCell {
   images: number; images_capped: boolean;
   epochs: number; bands: number;
   span_mjd: [number, number] | null;
-  per_band: Record<string, number>;
+  per_band?: Record<string, number>;
 }
 
 export interface Coverage {

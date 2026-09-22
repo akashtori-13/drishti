@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Sprite } from "@/components/Icon";
+import { SKY_ALLSKY_PREVIEW_URL } from "@/lib/sky";
 
 export const viewport: Viewport = {
   themeColor: "#05060c",
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className="h-full antialiased">
       <head>
+        <link rel="preload" as="image" href={SKY_ALLSKY_PREVIEW_URL} fetchPriority="high" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link

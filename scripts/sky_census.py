@@ -230,8 +230,10 @@ def finalize(cells):
             "images": c["images"], "images_capped": bool(c.get("capped")),
             "epochs": len(passes), "bands": bands,
             "span_mjd": [mjds[0], mjds[-1]] if mjds else None,
-            "per_band": c["per_band"],
         }
+        # NOTE: raw mjds arrays and per-band tallies are deliberately dropped
+        # here (megabytes on deep cells); epochs/bands/span carry the science
+        # the UI needs. Full tallies stay in data/census_* scratch files.
 
     out = {
         "grid": {"w": GRID_W, "h": GRID_H},

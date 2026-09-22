@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   GRID_H, GRID_W, LEVEL_COLORS, cellOf, drawBracket,
-  fmtDec, fmtRa, SKY_ALLSKY_URL,
+  fmtDec, fmtRa, SKY_ALLSKY_URL, SKY_ALLSKY_PREVIEW_URL,
 } from '@/lib/sky';
 import { loadCachedImage } from '@/lib/skycache';
 
@@ -45,9 +45,17 @@ export default function HeroSky({
     state.current.markers = markers;
   });
 
-  // real infrared sky (2MASS all-sky CAR, cached on device)
+  // real infrared sky, two-stage: fast preview first, full res after.
+  // A loading shimmer covers the cold first paint (no blank confusion).
   useEffect(() => {
     let alive = true;
+    void loadCachedImage(SKY_ALLSKY_PREVIEW_URL)
+      .then((im) => {
+        if (!alive) return;
+        state.current.img = im;
+        setSkyReady(true);
+      })
+      .catch(() => undefined);
     void loadCachedImage(SKY_ALLSKY_URL)
       .then((im) => {
         if (!alive) return;
@@ -302,6 +310,12 @@ export default function HeroSky({
     <div ref={hostRef} style={{ position: 'absolute', inset: 0 }}>
       <canvas ref={canvasRef} id="heroCanvas" aria-hidden="true" />
       <div ref={tipRef} className="sky-tip mono" aria-hidden="true" />
+      {!skyReady && (
+        <div className="hero-loading" aria-hidden="true">
+          <span className="hero-loading-dot" />
+          <span>Loading real sky…</span>
+        </div>
+      )}
     </div>
   );
 }
