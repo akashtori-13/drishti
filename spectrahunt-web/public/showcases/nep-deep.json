@@ -24,6 +24,17 @@
       "size_deg": 0.15,
       "png": "/cutouts/nep-deep_Deep-stack-late.png",
       "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W32_2A/l2b-v27-2026-223/4/level2_2026W32_2A_0746_2D4_spx_l2b-v27-2026-223.fits?center=270.0,66.5&size=0.05"
+    },
+    {
+      "label": "Deep stack (9 visits)",
+      "band": 4,
+      "wavelength_um": 3.12,
+      "ra": 270.0,
+      "dec": 66.5,
+      "size_deg": 0.15,
+      "png": "/cutouts/nep-deep_Deep-stack.png",
+      "mjd": 60793.955896,
+      "note": "Median of 9 recent D4 visits. Stacked locally; goes deepest."
     }
   ],
   "tap": {
