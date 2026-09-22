@@ -158,6 +158,13 @@ def query_gaia_cone(ra: float, dec: float, radius_deg: float, mag_limit: float =
     w.start()
     w.join(timeout=timeout)
     if w.is_alive() or "error" in box:
+        # outage: serve last-known cone rather than nothing
+        try:
+            stale = api_cache_get(db_path, key, 30 * 86400, allow_stale=True)
+            if isinstance(stale, list):
+                return stale
+        except Exception:
+            pass
         return []
     out = []
     for r in box.get("rows", []):
@@ -206,6 +213,13 @@ def query_gaia(ra: float, dec: float, radius_arcsec: float = 8.0,
     w.start()
     w.join(timeout=timeout)
     if w.is_alive() or "error" in box:
+        # outage: serve last-known cone rather than nothing
+        try:
+            stale = api_cache_get(db_path, key, 30 * 86400, allow_stale=True)
+            if isinstance(stale, list):
+                return stale
+        except Exception:
+            pass
         return []
     out = []
     for r in box.get("rows", []):
