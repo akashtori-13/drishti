@@ -9,6 +9,7 @@ zustand, canvas 2D (no WebGL, no Aladin). Styling: `src/app/globals.css`
 | Route | File | Notes |
 |---|---|---|
 | `/` | `app/page.tsx` | Hero + tutorial + how-it-works |
+| `/intro` | `app/intro/page.tsx` | BORESIGHT orbital intro (Acts 1-2) → `/` |
 | `/sky` | `app/sky/page.tsx` | Observer (default) / all-sky map toggle |
 | `/blink/[id]` | `app/blink/[id]/page.tsx` | 15 IDs via `generateStaticParams`; unknown → branded 404 |
 | `/blink/live?ra=&dec=&band=` | `app/blink/live/page.tsx` | Any visited field (Suspense + searchParams) |
@@ -74,6 +75,15 @@ center?, bandPngs?`. Internals:
 - WebM via `canvas.captureStream` + MediaRecorder; PNG via `toDataURL`.
 - Wheel: non-passive listener (no console warnings); reduced-motion disables autoplay.
 
+## Orbital intro (`components/orbital/OrbitalIntro`)
+
+Act 1 of BORESIGHT (`docs/ORBITAL_INTRO.md`): live SPHEREx + swarm on a real
+terminator Earth. Props: `swarm, onEnter, onSkip` (+ optional texture/sprite
+URL overrides, default `/orbital/*.webp`). Owns its RAF loop (refs-only
+mutable state, ~20 fps, one static frame under reduced-motion); Earth +
+terminator baked to an offscreen layer, `orthoProject` drives drawing and
+picking alike. Parent owns session gating + routing (not yet wired).
+
 ## Data layer (`lib/`)
 
 - `showcases.ts` — `SHOWCASE_IDS` (20), static JSON fetch, `useLive` flag,
@@ -87,6 +97,10 @@ center?, bandPngs?`. Internals:
 - `skycache.ts` — IndexedDB imagery + neighbor prefetch, localStorage JSON
   (lines, per-view stars, LRU-capped), `loadCachedImage`.
 - `motion.ts` — see above.
+- `orbit.ts` — hand-ported near-earth SGP4 (zero deps) + WGS-84 sub-point,
+  Sun/subsolar math, `(approx)` boresight proxy, cache-first
+  `/data/tle-bundle.json` swarm loader. Deep-space/low-inclination refused
+  honestly.
 
 ## Conventions for contributors
 
