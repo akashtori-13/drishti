@@ -154,6 +154,14 @@ export default function BlinkPage({ id }: { id: string }) {
     variable_flag: boolean; known: { name: string; kind: string } | null; detail: string;
   } | null>(null);
   const [detStats, setDetStats] = useState<{ movers: number; variables: number; ready: boolean } | null>(null);
+  // live blink: the game stays until a full pair decodes (one frame is a
+  // still, not a blink). Latched during render — detStats flips back to null
+  // whenever the viewer steps onto a pending frame, but the game must not
+  // reappear mid-browse.
+  const [pairSeen, setPairSeen] = useState(false);
+  if (detStats?.ready && !pairSeen) {
+    setPairSeen(true);
+  }
   const viewing = data && data.id === id ? data : null;
 
   // load showcase (static JSON or live IRSA frames)
@@ -163,6 +171,7 @@ export default function BlinkPage({ id }: { id: string }) {
     setLoading(true);
     setErr(null);
     setData(null);
+    setPairSeen(false);
     setSample(null);
     setLiveSpec(null);
     setLiveLc(null);
@@ -349,6 +358,9 @@ export default function BlinkPage({ id }: { id: string }) {
         ? <WaitGame status="Fetching live IRSA frames — discovery, renders, cross-match…" />
         : <div className="bw-status">Loading {id}…</div>
       )}
+      {!loading && isLiveId(id) && viewing && !pairSeen && (
+        <WaitGame status="First frames decoding — almost there…" />
+      )}
       {err && !loading && (
         <div className="bw-status error">
           Couldn’t load this field: {err} — try a <Link href="/blink/3i-atlas">curated blink</Link> or pick another map point.
@@ -356,7 +368,7 @@ export default function BlinkPage({ id }: { id: string }) {
       )}
 
       {viewing && (
-        <div className="bw-grid">
+        <div className="bw-grid" style={isLiveId(id) && !pairSeen ? { display: 'none' } : undefined}>
           <section className="bw-viewer" aria-label="Epoch comparator">
             <div className="bw-title">
               <h1>{viewing.title}</h1>

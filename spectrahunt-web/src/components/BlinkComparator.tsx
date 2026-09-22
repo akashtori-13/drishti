@@ -145,11 +145,14 @@ export default function BlinkComparator({
   const probeSrc = useRef<{ img: HTMLImageElement; w: number; h: number } | null>(null);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // preload frames progressively (each arrival re-renders; no blank wait).
-  // The cache is NEVER cleared: cached URLs stay instantly available and only
-  // genuinely new frames show a loading state (no placeholder flash).
-  // Failed loads auto-retry with backoff (3 attempts); exhausted URLs land in
-  // `failed` and render a Retry affordance instead of a forever spinner.
+  // preload frames in stages (the project norm: preview first, refine after).
+  // Stage 1 (second effect): the current + previous frames start instantly —
+  // first paint needs one download, not all. Stage 2 (first effect): the rest
+  // stagger ~350ms apart so 8 parallel IBE renders don't thunder the archive
+  // at once. startedLoads dedupes across re-renders; the URL-signature guard
+  // stops autoplay ticks (new array identity, same URLs) from cancelling
+  // pending loads. Failed loads auto-retry with backoff (3 attempts);
+  // exhausted URLs land in `failed` and render a Retry affordance.
   const MAX_FRAME_ATTEMPTS = 3;
   const [failed, setFailed] = useState<Record<string, true>>({});
   const startedLoads = useRef(new Set<string>());
@@ -192,15 +195,38 @@ export default function BlinkComparator({
     });
     loadFrame(u, 1);
   }, [loadFrame]);
+  const bulkSig = useRef<string | null>(null);
   useEffect(() => {
     const urls = [...new Set(frames.map((f) => f.png).filter((u): u is string => !!u))];
+    const sig = [...urls].sort().join('|');
+    if (bulkSig.current === sig) return;
+    bulkSig.current = sig;
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    let delay = 0;
     for (const u of urls) {
       if (startedLoads.current.has(u)) continue;
       startedLoads.current.add(u);
+      if (delay === 0) loadFrame(u, 1);
+      else {
+        const t = setTimeout(() => loadFrame(u, 1), delay);
+        timers.push(t);
+        retryTimers.current.push(t);
+      }
+      delay += 350;
+    }
+    return () => { timers.forEach(clearTimeout); };
+  }, [frames, loadFrame]);
+
+  // Stage 1: whatever the viewer is standing on jumps the stagger queue.
+  useEffect(() => {
+    if (!n) return;
+    for (const f of [frames[idx], frames[(idx - 1 + n) % n]]) {
+      const u = f?.png;
+      if (!u || startedLoads.current.has(u)) continue;
+      startedLoads.current.add(u);
       loadFrame(u, 1);
     }
-    return () => undefined;
-  }, [frames, loadFrame]);
+  }, [frames, idx, n, loadFrame]);
 
   // preload band PNGs for true false-color (one retry; still silent-graceful:
   // false color simply stays disabled until they arrive)
@@ -222,12 +248,22 @@ export default function BlinkComparator({
     return () => { alive = false; };
   }, [bandPngs]);
 
+  // autoplay rides only decoded frames: stepping onto a pending/failed frame
+  // would flash "loading" or "cutout pending" mid-blink. Manual transport
+  // (steps, scrub, filmstrip) keeps full agency and shows each frame's state.
+  const availIdx = useMemo(
+    () => frames.map((f, i) => (f.png && loaded[f.png] ? i : -1)).filter((i) => i >= 0),
+    [frames, loaded],
+  );
   // autoplay
   useEffect(() => {
-    if (!playing || n < 2) return;
-    timer.current = setInterval(() => onEpochChange((idx + 1) % n), speed);
+    if (!playing || availIdx.length < 2) return;
+    timer.current = setInterval(() => {
+      const pos = availIdx.indexOf(idx);
+      onEpochChange(pos >= 0 ? availIdx[(pos + 1) % availIdx.length] : availIdx[0]);
+    }, speed);
     return () => { if (timer.current) clearInterval(timer.current); };
-  }, [playing, speed, n, idx, onEpochChange]);
+  }, [playing, speed, availIdx, idx, onEpochChange]);
 
   // reduced motion: never autoplay
   useEffect(() => {
@@ -312,6 +348,8 @@ export default function BlinkComparator({
 
   const curImg = cur?.png ? loaded[cur.png] : undefined;
   const prevImg = prev?.png ? loaded[prev.png] : undefined;
+  const totalFrames = frames.filter((f) => f.png).length;
+  const doneFrames = frames.filter((f) => f.png && loaded[f.png]).length;
   // real motion candidates from the actual pixels (recomputed when frames arrive)
   const candidates: MotionCandidate[] = useMemo(() => {
     if (!curImg || !prevImg) return [];
@@ -954,6 +992,9 @@ export default function BlinkComparator({
             <label className="rate">Rate
               <input type="range" min={150} max={1200} step={10} value={speed} onChange={(e) => setSpeed(Number(e.target.value))} aria-label="Blink rate" />
             </label>
+            {doneFrames < totalFrames && (
+              <span className="mono film-count" role="status">loading frames {doneFrames}/{totalFrames}</span>
+            )}
           </div>
         </div>
         </div>
