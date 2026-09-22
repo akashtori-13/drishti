@@ -141,9 +141,7 @@ export default function BlinkComparator({
         if (alive) setLoaded((m) => (m[u] ? m : { ...m, [u]: img }));
       }).catch(() => undefined);
     }
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSpecVals(null);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMeasureChip(null);
     return () => { alive = false; };
   }, [frames]);
@@ -267,12 +265,10 @@ export default function BlinkComparator({
   useEffect(() => {
     if (!onStats) return;
     if (!curImg || !prevImg) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       onStats(null);
       return;
     }
     const movers = candidates.filter((c) => c.kind === 'mover').length;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     onStats({ movers, variables: candidates.length - movers, ready: true });
   }, [candidates, curImg, prevImg, onStats]);
   const bandMeta = BANDS[band - 1];
@@ -816,11 +812,13 @@ export default function BlinkComparator({
             {mode === 'side' ? (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, width: '100%', height: '100%' }}>
                 <div style={{ position: 'relative' }}>
-                  <canvas ref={leftRef} style={{ width: '100%', height: '100%', display: 'block' }} aria-label={`${title} — ${prev?.label}`} />
+                  <canvas ref={leftRef} style={{ width: '100%', height: '100%', display: 'block', cursor: 'crosshair' }} aria-label={`${title} — ${prev?.label}`}
+                    onMouseMove={onSideMove} onMouseLeave={() => setSideHover(null)} />
                   <span className="viewer-tag mono">{prev?.label ?? '—'}</span>
                 </div>
                 <div style={{ position: 'relative' }}>
-                  <canvas ref={rightRef} style={{ width: '100%', height: '100%', display: 'block' }} aria-label={`${title} — ${cur?.label}`} />
+                  <canvas ref={rightRef} style={{ width: '100%', height: '100%', display: 'block', cursor: 'crosshair' }} aria-label={`${title} — ${cur?.label}`}
+                    onMouseMove={onSideMove} onMouseLeave={() => setSideHover(null)} />
                   <span className="viewer-tag epoch mono">{cur?.label ?? '—'}</span>
                 </div>
               </div>
