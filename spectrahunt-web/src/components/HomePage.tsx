@@ -3,47 +3,16 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { blinkURL, useAppStore } from '@/lib/store';
+import { useAppStore } from '@/lib/store';
 import { SHOWCASE_IDS, getCoverage, getShowcase, useLive, type RealCell, type Showcase } from '@/lib/showcases';
-import { BANDS, buildGrid, GRID_H, GRID_W } from '@/lib/sky';
+import { BANDS, buildGrid, GRID_H, GRID_W, nearestShowcase, SHOWCASE_POINTS } from '@/lib/sky';
 import { CHANNELS } from '@/lib/astro';
 import HeroSky from '@/components/HeroSky';
 import SearchBox, { type SearchTarget } from '@/components/SearchBox';
 import SurpriseButton from '@/components/SurpriseButton';
 import InstallButton from '@/components/InstallButton';
+import OrbitHero from '@/components/orbital/OrbitHero';
 import Inspector, { type InspectorField } from '@/components/Inspector';
-
-const SHOWCASE_POINTS = [
-  { id: '3i-atlas', ra: 252.6633, dec: -17.4904 },
-  { id: 'ecliptic-mover', ra: 180, dec: 0 },
-  { id: 'nep-deep', ra: 270, dec: 66.5 },
-  { id: 'orion-field', ra: 83.82, dec: -5.39 },
-  { id: 'galactic-center', ra: 266.42, dec: -29.01 },
-  { id: 'm31-field', ra: 10.68, dec: 41.27 },
-  { id: 'lmc-field', ra: 80.89, dec: -69.76 },
-  { id: 'virgo-field', ra: 200, dec: 0 },
-  { id: 'eros-field', ra: 210.32, dec: 9.11 },
-  { id: 'crab-field', ra: 83.63, dec: 22.01 },
-  { id: 'omega-cen-field', ra: 201.69, dec: -47.48 },
-  { id: 'carina-field', ra: 161.26, dec: -59.68 },
-  { id: 'm51-field', ra: 202.47, dec: 47.2 },
-  { id: 'm101-field', ra: 210.8, dec: 54.35 },
-  { id: 'smc-field', ra: 13.18, dec: -72.83 },
-  { id: 'dorado-deep', ra: 92.5, dec: -57.5 },
-  { id: 'draco-field', ra: 267.5, dec: 57.5 },
-  { id: 'ophiuchus-field', ra: 247.5, dec: -7.5 },
-  { id: 'libra-field', ra: 212.5, dec: -2.5 },
-  { id: 'hercules-field', ra: 252.5, dec: 12.5 },
-];
-
-function nearestShowcase(ra: number, dec: number): string | null {
-  let best: string | null = null;
-  let bestD = 3.0;
-  for (const s of SHOWCASE_POINTS) {    const d = Math.hypot(s.ra - ra, s.dec - dec);
-    if (d < bestD) { bestD = d; best = s.id; }
-  }
-  return best;
-}
 
 function fieldFromRaDec(ra: number, dec: number, grid: number[][], real?: Map<string, RealCell>): InspectorField {
   const i = Math.min(GRID_W - 1, Math.max(0, Math.floor((ra / 360) * GRID_W)));
@@ -67,8 +36,10 @@ function fieldFromRaDec(ra: number, dec: number, grid: number[][], real?: Map<st
   };
 }
 
-/** Rotating featured detections: real fields with ≥2 rendered cutouts. */
-function FeaturedCycle({ fields, consoleMode }: { fields: Showcase[]; consoleMode: boolean }) {
+/** Rotating featured detections: real fields with ≥2 rendered cutouts.
+ *  Currently parked (hero shows the data strip instead) — kept for repurposing. */
+export function FeaturedCycle({ fields, consoleMode }: { fields: Showcase[]; consoleMode: boolean }) {
+  const openPreview = useAppStore((s) => s.openPreview);
   const cands = useMemo(
     () => fields.filter((f) => f.epochs.filter((e) => e.png).length >= 2).slice(0, 5),
     [fields],
@@ -94,9 +65,10 @@ function FeaturedCycle({ fields, consoleMode }: { fields: Showcase[]; consoleMod
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
     >
-      <Link
+      <button
         key={f.id}
-        href={blinkURL(f.id, { mode: 'diff' })}
+        type="button"
+        onClick={() => openPreview(f.id)}
         className="featured"
         aria-label={`Featured real detection: ${f.title}`}
       >
@@ -113,7 +85,7 @@ function FeaturedCycle({ fields, consoleMode }: { fields: Showcase[]; consoleMod
             Two SPHEREx visits{span !== null ? `, ${span} days apart` : ''}. The stars cancel out; the mover remains. →
           </span>
         </span>
-      </Link>
+      </button>
       {cands.length > 1 && (
         <div className="feat-dots" role="group" aria-label="Featured fields">
           {cands.map((c, k) => (
@@ -130,8 +102,44 @@ function FeaturedCycle({ fields, consoleMode }: { fields: Showcase[]; consoleMod
   );
 }
 
+/** Where every pixel comes from: eight source cards with honest status. */
+function SourcesSection() {
+  const sources = [
+    { name: 'SPHEREx QR2', contrib: 'All-sky infrared visits — our core imagery', status: 'live' },
+    { name: 'DSS2', contrib: 'Optical context frames per field', status: 'synced' },
+    { name: '2MASS', contrib: 'Near-infrared context frames', status: 'synced' },
+    { name: 'Gaia DR3', contrib: 'Precision astrometry for cross-matching', status: 'live' },
+    { name: 'SIMBAD', contrib: 'Object names, types, and references', status: 'live' },
+    { name: 'SkyBoT', contrib: 'Asteroid positions at exposure time', status: 'degraded' },
+    { name: 'Horizons', contrib: 'Ephemerides and verification links', status: 'live' },
+    { name: 'CelesTrak', contrib: 'Orbital elements for the live orbit view', status: 'synced' },
+  ] as const;
+  return (
+    <section className="sources" aria-labelledby="sources-h">
+      <div className="sources-inner">
+        <p className="hero-kicker">Where every pixel comes from</p>
+        <h2 id="sources-h">Eight sources, one sky</h2>
+        <p className="sources-lead">Every image, number, and candidate traces to these archives — live where possible, honestly labeled where degraded.</p>
+        <ul className="source-grid">
+          {sources.map((s) => (
+            <li key={s.name} className="source-card">
+              <span className="source-head">
+                <span className={`src-dot ${s.status}`} aria-hidden="true" />
+                <span className="source-name">{s.name}</span>
+                <span className={`source-status ${s.status}`}>{s.status}</span>
+              </span>
+              <span className="source-contrib">{s.contrib}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
 export default function HomePage() {  const router = useRouter();
-  const [consoleMode, setConsoleMode] = useState(false);
+  const openPreview = useAppStore((s) => s.openPreview);
+  const [, setConsoleMode] = useState(false);
   const [wake, setWake] = useState(false);
   const [toast, setToast] = useState(false);
 
@@ -248,8 +256,13 @@ export default function HomePage() {  const router = useRouter();
   }, []);
 
   const pick = (t: SearchTarget) => {
-    if (t.showcaseId) { router.push(blinkURL(t.showcaseId)); return; }
-    setField(fieldFromRaDec(t.ra, t.dec, grid, real ?? undefined));
+    if (t.showcaseId) { openPreview(t.showcaseId); return; }
+    const near = nearestShowcase(t.ra, t.dec);
+    if (near) { openPreview(near); return; }
+    try {
+      sessionStorage.setItem('sh-target', JSON.stringify({ ra: t.ra, dec: t.dec }));
+    } catch { /* noop */ }
+    router.push('/sky');
   };
 
   const cutouts = fields.flatMap((f) => f.epochs).filter((e) => e.png).length;
@@ -272,34 +285,40 @@ export default function HomePage() {  const router = useRouter();
       <section className={wake ? 'hero wake' : 'hero'} id="hero">
         <HeroSky grid={grid} coverage={coverage}
           markers={SHOWCASE_POINTS}
-          onMarker={(id) => router.push(blinkURL(id))}
+          onMarker={(id) => openPreview(id)}
           onInspect={(ra, dec) => setField(fieldFromRaDec(ra, dec, grid, real ?? undefined))} />
         <div className="hero-scrim" />
 
-        <div className="hero-core">
-          {consoleMode && <p className="hero-kicker">Live feed · 102 channels · all sky</p>}
-          <h1>Hunt what moves in the infrared sky</h1>
-          <p className="hero-sub">
-            SPHEREx re-images the whole sky every six months. STELLAR shows what changed.
-          </p>
+        <div className="hero-columns">
+          <div className="hero-copy">
+            <h1>Hunt what moves in the infrared sky</h1>
 
-          <SearchBox
-            id="hs" placeholder="Search an object, field, or coordinates"
-            onPick={pick}
-          />
+            <SearchBox
+              id="hs" placeholder="Search an object, field, or coordinates"
+              onPick={pick}
+            />
 
-          <div className="quick">
-            <button type="button" className="chip" onClick={() => router.push(blinkURL('3i-atlas'))}>3I/ATLAS</button>
-            <button type="button" className="chip" onClick={() => router.push(blinkURL('galactic-center'))}>Galactic Center</button>
-            <button type="button" className="chip" onClick={() => pick({ label: 'Orion Complex', ra: 83.82, dec: -5.39 })}>Orion Complex</button>
-            <span className="quick-sep" aria-hidden="true">·</span>
-            <SurpriseButton onPick={pick} />
-            <InstallButton />
+            <div className="quick">
+              <button type="button" className="chip" onClick={() => openPreview('3i-atlas')}>3I/ATLAS</button>
+              <button type="button" className="chip" onClick={() => openPreview('galactic-center')}>Galactic Center</button>
+              <button type="button" className="chip" onClick={() => pick({ label: 'Orion Complex', ra: 83.82, dec: -5.39 })}>Orion Complex</button>
+              <span className="quick-sep" aria-hidden="true">·</span>
+              <SurpriseButton onPick={pick} />
+              <InstallButton />
+            </div>
           </div>
 
-          <FeaturedCycle fields={fields} consoleMode={consoleMode} />
-          <p className="credit-line">Built on public SPHEREx Quick Release 2 data (NASA/IPAC).</p>
+          <div className="hero-orbit">
+            <OrbitHero />
+          </div>
         </div>
+
+        <p className="credits" aria-label="Data sources">
+          <span className="credits-group"><span className="credits-role">Imaging</span><span>DSS2 · 2MASS · SPHEREx QR2</span></span>
+          <span className="credits-group"><span className="credits-role">Astrometry</span><span>Gaia DR3</span></span>
+          <span className="credits-group"><span className="credits-role">Catalogs</span><span>SIMBAD</span></span>
+          <span className="credits-group"><span className="credits-role">Tracking</span><span>SkyBoT · Horizons · CelesTrak</span></span>
+        </p>
       </section>
 
       <section className="fields" id="fields" aria-labelledby="fields-h">
@@ -315,7 +334,7 @@ export default function HomePage() {  const router = useRouter();
             {fields.map((f) => {
               const png = f.epochs.find((e) => e.png)?.png ?? null;
               return (
-                <Link key={f.id} href={blinkURL(f.id)} className="field-card" role="listitem"
+                <button key={f.id} type="button" onClick={() => openPreview(f.id)} className="field-card" role="listitem"
                   aria-label={`${f.title}, ${f.epochs.length} epochs`}>
                   <span className="field-thumb">
                     {png ? (
@@ -330,7 +349,7 @@ export default function HomePage() {  const router = useRouter();
                     <span className="field-name">{f.title}</span>
                     <span className="field-meta mono">D{f.epochs[0]?.band ?? 3} · {f.epochs[0]?.wavelength_um?.toFixed(2) ?? '—'} µm</span>
                   </span>
-                </Link>
+                </button>
               );
             })}
             {!fields.length && (
@@ -339,6 +358,8 @@ export default function HomePage() {  const router = useRouter();
           </div>
         </div>
       </section>
+
+      <SourcesSection />
 
       <section className="nums" aria-label="By the numbers">
         <div className="nums-inner">
@@ -428,7 +449,7 @@ export default function HomePage() {  const router = useRouter();
         onOpenBlink={() => {
           if (field) {
             const id = nearestShowcase(field.ra, field.dec);
-            if (id) router.push(blinkURL(id));
+            if (id) openPreview(id);
             else if (useLive && field.epochs >= 2) router.push(`/blink/live?ra=${field.ra.toFixed(3)}&dec=${field.dec.toFixed(3)}&band=3`);
           }
           setField(null);

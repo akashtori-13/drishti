@@ -3,8 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { SHOWCASE_IDS, getShowcase, type Showcase } from '@/lib/showcases';
 import { BANDS } from '@/lib/sky';
-import { useRouter } from 'next/navigation';
-import { blinkURL } from '@/lib/store';
+import { useAppStore } from '@/lib/store';
 import { arcsecPerDay, toCSV } from '@/lib/astro';
 
 interface ReportObject {
@@ -114,7 +113,7 @@ function Thumb({ card }: { card: Card }) {
 }
 
 export default function CandidatesPage() {
-  const router = useRouter();
+  const openPreview = useAppStore((s) => s.openPreview);
   const [cards, setCards] = useState<Card[]>([]);
   const [filter, setFilter] = useState<Filter>('all');
   const [openId, setOpenId] = useState<string | null>(null);
@@ -209,14 +208,16 @@ export default function CandidatesPage() {
             <button
               type="button" className="cand"
               aria-label={`${c.name}, ${KIND_LABEL[c.kind]}, ${c.stat}, ${band.label}`}
-              onClick={() => router.push(blinkURL(c.id))}
+              onClick={() => openPreview(c.id)}
             >
               <div className="cand-thumb">
                 <Thumb card={c} />
-                <span className={`badge ${c.kind === 'known' ? 'known' : c.kind === 'pending' ? '' : 'unknown'}`}>
-                  <span className="dot" />{c.kind === 'known' && c.knownName ? `Known · ${c.knownName}` : KIND_LABEL[c.kind]}
+                <span className="cand-badges">
+                  <span className={`badge ${c.kind === 'known' ? 'known' : c.kind === 'pending' ? '' : 'unknown'}`}>
+                    <span className="dot" />{c.kind === 'known' && c.knownName ? `Known · ${c.knownName}` : KIND_LABEL[c.kind]}
+                  </span>
+                  <span className="cand-score mono">{c.stat}</span>
                 </span>
-                <span className="cand-score mono">{c.stat}</span>
               </div>
               <div className="cand-body">
                 <div className="cand-name">{c.name}</div>
