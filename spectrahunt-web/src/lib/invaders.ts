@@ -75,10 +75,15 @@ export interface Alien {
   alive: boolean;
 }
 
+/** Sprite pixel size (shared by engine + renderer). */
+export const SPRITE_PX = 4;
+/** Horizontal slot per column: fits the widest sprite (11px) + breathing room. */
+export const SLOT = 11 * SPRITE_PX + 12;
+
 /** Wave layout: rows grow to 5, columns fit the playfield. Returns aliens. */
-export function layoutWave(wave: number, fieldW: number, cell: number): Alien[] {
+export function layoutWave(wave: number, fieldW: number): Alien[] {
   const rows = Math.min(2 + Math.floor((wave - 1) / 1), 5);
-  const cols = Math.max(4, Math.min(9, Math.floor(fieldW / (cell * 1.6))));
+  const cols = Math.max(4, Math.min(9, Math.floor(fieldW / SLOT)));
   const out: Alien[] = [];
   for (let r = 0; r < rows; r++) {
     const def = ROW_DEFS[r % ROW_DEFS.length];
@@ -86,7 +91,7 @@ export function layoutWave(wave: number, fieldW: number, cell: number): Alien[] 
       out.push({
         col: c, row: r,
         x: 0, y: 0,
-        w: def.sprite[0][0].length * 3, h: def.sprite[0].length * 3,
+        w: def.sprite[0][0].length * SPRITE_PX, h: def.sprite[0].length * SPRITE_PX,
         sprite: def.sprite, color: def.color, score: def.score,
         alive: true,
       });
