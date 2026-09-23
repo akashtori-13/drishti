@@ -1,7 +1,11 @@
+'use client';
+
 import Link from 'next/link';
 import SiteChrome from '@/components/SiteChrome';
+import { useAppStore } from '@/lib/store';
 
 export default function NotFound() {
+  const openPreview = useAppStore((s) => s.openPreview);
   return (
     <SiteChrome>
       <div className="page" style={{ textAlign: 'center', paddingTop: 80 }}>
@@ -12,7 +16,7 @@ export default function NotFound() {
         <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginTop: 20, flexWrap: 'wrap' }}>
           <Link href="/" className="btn primary">Home</Link>
           <Link href="/sky" className="btn">Sky map</Link>
-          <Link href="/blink/3i-atlas" className="btn">3I/ATLAS blink</Link>
+          <button type="button" className="btn" onClick={() => openPreview('3i-atlas')}>3I/ATLAS blink</button>
         </div>
       </div>
     </SiteChrome>

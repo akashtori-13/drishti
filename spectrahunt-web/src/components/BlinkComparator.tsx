@@ -6,6 +6,7 @@ import SpectrumPlot from '@/components/Plots';
 import { BANDS } from '@/lib/sky';
 import { CHANNELS, applyStretch, colormap, type Colormap, type Stretch } from '@/lib/astro';
 import { detectMotion, sampleGray, type MotionCandidate } from '@/lib/motion';
+import { loadCachedImage } from '@/lib/skycache';
 
 export interface BlinkFrame {
   label: string;
@@ -17,20 +18,17 @@ export interface BlinkFrame {
 
 export type CompareMode = 'blink' | 'side' | 'swipe' | 'diff';
 
-/** Load an image element with CORS-clean pixels for canvas sampling. */
+/** Load an image through the device cache (memory → IndexedDB → network).
+ * First visit fetches from the web; every later visit serves cache and never
+ * touches the network for that URL. Bounded by `timeoutMs` (a late arrival
+ * still warms the cache in the background for next time). */
 function loadImage(src: string, timeoutMs = 20000): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    const timer = setTimeout(() => {
-      // Image has no abort: blanking src cancels a stalled decode/fetch so a
-      // hung connection can't wedge the loader (retries handle the rest).
-      try { img.src = ''; } catch { /* noop */ }
-      reject(new Error(`Timed out loading ${src}`));
-    }, timeoutMs);
-    img.onload = () => { clearTimeout(timer); resolve(img); };
-    img.onerror = () => { clearTimeout(timer); reject(new Error(`Cannot load ${src}`)); };
-    img.src = src;
+    const timer = setTimeout(() => reject(new Error(`Timed out loading ${src}`)), timeoutMs);
+    void loadCachedImage(src).then(
+      (img) => { clearTimeout(timer); resolve(img); },
+      (e: unknown) => { clearTimeout(timer); reject(e instanceof Error ? e : new Error(`Cannot load ${src}`)); },
+    );
   });
 }
 
@@ -145,25 +143,41 @@ export default function BlinkComparator({
   const probeSrc = useRef<{ img: HTMLImageElement; w: number; h: number } | null>(null);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // preload frames in stages (the project norm: preview first, refine after).
-  // Stage 1 (second effect): the current + previous frames start instantly —
-  // first paint needs one download, not all. Stage 2 (first effect): the rest
-  // stagger ~350ms apart so 8 parallel IBE renders don't thunder the archive
-  // at once. startedLoads dedupes across re-renders; the URL-signature guard
-  // stops autoplay ticks (new array identity, same URLs) from cancelling
-  // pending loads. Failed loads auto-retry with backoff (3 attempts);
-  // exhausted URLs land in `failed` and render a Retry affordance.
+  // staged preloading that heals itself (the project norm: preview first,
+  // refine after). A pump reconciles desired-vs-actual on EVERY render: any
+  // frame URL that is neither loaded, failed, nor in flight gets started —
+  // current pair first, one new start per pump, ~350ms apart so IBE renders
+  // don't thunder the archive. Timer chains, generation counters, and
+  // started-sets all proved fragile across autoplay re-renders, StrictMode
+  // remounts, and HMR swaps (frames stranded at 1/5 with zero errors); this
+  // converges under all of them because it never assumes past scheduling
+  // happened. Failed loads auto-retry with backoff (3 attempts); exhausted
+  // URLs land in `failed` and render a Retry affordance.
   const MAX_FRAME_ATTEMPTS = 3;
   const [failed, setFailed] = useState<Record<string, true>>({});
-  const startedLoads = useRef(new Set<string>());
+  const inflight = useRef(new Set<string>());
+  const lastStart = useRef(0);
   const retryTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  // Refs survive hot-module swaps positionally: an older loader revision's
+  // ref objects can land in these slots (stale in-flight marks, a string
+  // timestamp). Reset + validate on mount so no past revision can wedge the
+  // pump. Declared before the pump so it runs first. (A duplicate start from
+  // a dropped mark is harmless: loaded/failed guards dedupe on settle.)
+  useEffect(() => {
+    inflight.current = new Set<string>();
+    if (typeof lastStart.current !== 'number') lastStart.current = 0;
+    if (!Array.isArray(retryTimers.current)) retryTimers.current = [];
+  }, []);
   useEffect(() => () => {
     retryTimers.current.forEach(clearTimeout);
     retryTimers.current = [];
   }, []);
   const loadFrame = useCallback((u: string, attempt = 1) => {
+    if (inflight.current.has(u)) return;
+    inflight.current.add(u);
     const attemptLoad = (a: number): void => {
       void loadImage(u).then((img) => {
+        inflight.current.delete(u);
         setLoaded((m) => (m[u] ? m : { ...m, [u]: img }));
         setFailed((m) => {
           if (!(u in m)) return m;
@@ -176,8 +190,7 @@ export default function BlinkComparator({
           const t = setTimeout(() => attemptLoad(a + 1), a * 1000);
           retryTimers.current.push(t);
         } else {
-          // keep the URL marked so render loops don't restart it; manual retry
-          // clears the mark explicitly (see retryUrl).
+          inflight.current.delete(u);
           setFailed((m) => (m[u] ? m : { ...m, [u]: true }));
           console.warn(`[blink] frame failed to load after ${a} attempts: ${u}`);
         }
@@ -186,7 +199,6 @@ export default function BlinkComparator({
     attemptLoad(attempt);
   }, []);
   const retryUrl = useCallback((u: string) => {
-    startedLoads.current.add(u);
     setFailed((m) => {
       if (!(u in m)) return m;
       const next = { ...m };
@@ -195,39 +207,30 @@ export default function BlinkComparator({
     });
     loadFrame(u, 1);
   }, [loadFrame]);
-  const bulkSig = useRef<string | null>(null);
+  // pump on every render + a heartbeat for settled pages (autoplay ticks
+  // re-render constantly; a paused static page relies on the interval).
+  // Local showcase PNGs all start at once (same-origin, instant); live
+  // /api/frame.png renders stay throttled so IBE isn't thundered.
   useEffect(() => {
-    const urls = [...new Set(frames.map((f) => f.png).filter((u): u is string => !!u))];
-    const sig = [...urls].sort().join('|');
-    if (bulkSig.current === sig) return;
-    bulkSig.current = sig;
-    // NOTE: staggered starts are intentionally NOT cleaned up on re-runs.
-    // Parent re-renders (autoplay ticks mint a fresh frames array every
-    // 550ms) and StrictMode remounts would otherwise cancel pending starts
-    // faster than they fire — stranding every frame past the first two.
-    // Stale-URL starts merely warm the cache; unmount writes are React-18
-    // no-ops. Retry backoffs keep their own unmount cleanup below.
-    let delay = 0;
-    for (const u of urls) {
-      if (startedLoads.current.has(u)) continue;
-      startedLoads.current.add(u);
-      if (delay === 0) loadFrame(u, 1);
-      else setTimeout(() => loadFrame(u, 1), delay);
-      delay += 350;
-    }
-    return () => undefined;
-  }, [frames, loadFrame]);
-
-  // Stage 1: whatever the viewer is standing on jumps the stagger queue.
-  useEffect(() => {
-    if (!n) return;
-    for (const f of [frames[idx], frames[(idx - 1 + n) % n]]) {
-      const u = f?.png;
-      if (!u || startedLoads.current.has(u)) continue;
-      startedLoads.current.add(u);
-      loadFrame(u, 1);
-    }
-  }, [frames, idx, n, loadFrame]);
+    const pump = () => {
+      const urls = [...new Set(frames.map((f) => f.png).filter((u): u is string => !!u))];
+      const ordered = [frames[idx]?.png, n ? frames[(idx - 1 + n) % n]?.png : undefined, ...urls];
+      const now = Date.now();
+      let remoteStarted = false;
+      for (const u of ordered) {
+        if (!u || loaded[u] || failed[u] || inflight.current.has(u)) continue;
+        if (u.includes('/api/')) {
+          if (remoteStarted || now - lastStart.current < 350) continue;
+          remoteStarted = true;
+          lastStart.current = now;
+        }
+        loadFrame(u, 1);
+      }
+    };
+    pump();
+    const t = setInterval(pump, 350);
+    return () => clearInterval(t);
+  });
 
   // preload band PNGs for true false-color (one retry; still silent-graceful:
   // false color simply stays disabled until they arrive)
@@ -336,7 +339,7 @@ export default function BlinkComparator({
     if (!stage) return;
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-      setZoom((z) => Math.min(6, Math.max(0.6, z * (e.deltaY > 0 ? 0.92 : 1.09))));
+      setZoom((z) => Math.min(6, Math.max(0.2, z * (e.deltaY > 0 ? 0.92 : 1.09))));
     };
     stage.addEventListener('wheel', onWheel, { passive: false });
     const ro = new ResizeObserver(() => setSizeTick((t) => t + 1));

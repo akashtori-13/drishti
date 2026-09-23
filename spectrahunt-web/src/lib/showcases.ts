@@ -74,6 +74,7 @@ async function fetchJSON<T>(url: string, timeoutMs = 15000): Promise<T> {
 }
 
 const COVERAGE_TTL = 3600 * 1000;
+const SHOWCASE_TTL = 3600 * 1000;
 
 function ageOf(key: string): number {
   try {
@@ -104,8 +105,7 @@ export async function getCoverage(): Promise<Coverage | null> {
     })
     .catch((): Coverage | null => null);
   if (cached && ageOf(key) < COVERAGE_TTL) {
-    void refresh;
-    return cached;
+    return cached; // fresh device copy: zero network
   }
   if (cached) {
     void refresh;
@@ -116,18 +116,17 @@ export async function getCoverage(): Promise<Coverage | null> {
 
 /** Cache-first per showcase.
  *
- * Serves the device copy instantly when present and revalidates behind.
- * When the background refresh yields different JSON (e.g. newly indexed
- * cutout PNGs), a `sh-revalidate` window event fires with
- * `{ key: 'sh-showcase:<id>', data }` so the current view can swap in the
- * fresh data without requiring a manual reload. Previously the refresh was
- * discarded, so the first client-side visit after a data update rendered
- * stale `png:null` ("cutout pending" / "loading frame…") until a full reload.
+ * Serves the device copy instantly when present. The network is touched only
+ * when nothing is cached, or when the copy is older than SHOWCASE_TTL (then
+ * it revalidates behind and swaps fresh data in via `sh-revalidate`).
  */
 export async function getShowcase(id: string): Promise<Showcase> {
   const key = `sh-showcase:${id}`;
   const cached = peek<Showcase>(key);
   const cachedJSON = cached ? JSON.stringify(cached) : null;
+  if (cached && ageOf(key) < SHOWCASE_TTL) {
+    return cached; // fresh device copy: zero network
+  }
   const refresh = fetchJSON<Showcase>(`/showcases/${id}.json`).then((d) => {
     remember(key, d);
     if (cachedJSON !== null && cachedJSON !== JSON.stringify(d)) notifyRevalidated(key, d);

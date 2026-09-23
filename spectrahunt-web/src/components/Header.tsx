@@ -6,7 +6,8 @@ import { useEffect, useRef, useState } from 'react';
 import Icon from '@/components/Icon';
 import SearchBox, { type SearchTarget } from '@/components/SearchBox';
 import SurpriseButton from '@/components/SurpriseButton';
-import { blinkURL } from '@/lib/store';
+import { useAppStore } from '@/lib/store';
+import { nearestShowcase } from '@/lib/sky';
 
 const LINKS = [
   { href: '/sky', label: 'Sky' },
@@ -21,6 +22,7 @@ export default function Header() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [menu, setMenu] = useState(false);
+  const openPreview = useAppStore((s) => s.openPreview);
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -71,7 +73,12 @@ export default function Header() {
   const pick = (t: SearchTarget) => {
     setOpen(false);
     if (t.showcaseId) {
-      router.push(blinkURL(t.showcaseId));
+      openPreview(t.showcaseId);
+      return;
+    }
+    const near = nearestShowcase(t.ra, t.dec);
+    if (near) {
+      openPreview(near);
       return;
     }
     try {
@@ -110,7 +117,7 @@ export default function Header() {
           compact
           className="island-icon"
           onPick={(t) => {
-            if (t.showcaseId) router.push(blinkURL(t.showcaseId));
+            if (t.showcaseId) openPreview(t.showcaseId);
             else {
               try {
                 sessionStorage.setItem('sh-target', JSON.stringify({ ra: t.ra, dec: t.dec }));
@@ -147,7 +154,7 @@ export default function Header() {
             <div className="cmd-foot">
               <SurpriseButton onPick={(t) => {
                 setOpen(false); setMenu(false);
-                if (t.showcaseId) router.push(blinkURL(t.showcaseId));
+                if (t.showcaseId) openPreview(t.showcaseId);
                 else {
                   try {
                     sessionStorage.setItem('sh-target', JSON.stringify({ ra: t.ra, dec: t.dec }));

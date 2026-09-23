@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { blinkURL } from '@/lib/store';
+import { useAppStore } from '@/lib/store';
 import { LEVEL_COLORS } from '@/lib/sky';
 import { buildGrid, GRID_H, GRID_W } from '@/lib/sky';
 import { getCoverage, type RealCell } from '@/lib/showcases';
@@ -12,41 +12,8 @@ import SearchBox, { type SearchTarget } from '@/components/SearchBox';
 import SurpriseButton from '@/components/SurpriseButton';
 import Inspector, { type InspectorField } from '@/components/Inspector';
 import type { SkyHover } from '@/components/HeroSky';
-import { fmtDec, fmtRa } from '@/lib/sky';
+import { fmtDec, fmtRa, nearestShowcase } from '@/lib/sky';
 import { useLive } from '@/lib/showcases';
-
-const SHOWCASE_POINTS = [
-  { id: '3i-atlas', ra: 252.6633, dec: -17.4904 },
-  { id: 'ecliptic-mover', ra: 180, dec: 0 },
-  { id: 'nep-deep', ra: 270, dec: 66.5 },
-  { id: 'orion-field', ra: 83.82, dec: -5.39 },
-  { id: 'galactic-center', ra: 266.42, dec: -29.01 },
-  { id: 'm31-field', ra: 10.68, dec: 41.27 },
-  { id: 'lmc-field', ra: 80.89, dec: -69.76 },
-  { id: 'virgo-field', ra: 200, dec: 0 },
-  { id: 'eros-field', ra: 210.32, dec: 9.11 },
-  { id: 'crab-field', ra: 83.63, dec: 22.01 },
-  { id: 'omega-cen-field', ra: 201.69, dec: -47.48 },
-  { id: 'carina-field', ra: 161.26, dec: -59.68 },
-  { id: 'm51-field', ra: 202.47, dec: 47.2 },
-  { id: 'm101-field', ra: 210.8, dec: 54.35 },
-  { id: 'smc-field', ra: 13.18, dec: -72.83 },
-  { id: 'dorado-deep', ra: 92.5, dec: -57.5 },
-  { id: 'draco-field', ra: 267.5, dec: 57.5 },
-  { id: 'ophiuchus-field', ra: 247.5, dec: -7.5 },
-  { id: 'libra-field', ra: 212.5, dec: -2.5 },
-  { id: 'hercules-field', ra: 252.5, dec: 12.5 },
-];
-
-function nearestShowcase(ra: number, dec: number): string | null {
-  let best: string | null = null;
-  let bestD = 3.0;
-  for (const s of SHOWCASE_POINTS) {
-    const d = Math.hypot(s.ra - ra, s.dec - dec);
-    if (d < bestD) { bestD = d; best = s.id; }
-  }
-  return best;
-}
 
 function fieldFromRaDec(ra: number, dec: number, grid: number[][], real?: Map<string, RealCell>): InspectorField {
   const i = Math.min(GRID_W - 1, Math.max(0, Math.floor((ra / 360) * GRID_W)));
@@ -73,6 +40,7 @@ function fieldFromRaDec(ra: number, dec: number, grid: number[][], real?: Map<st
 /** Full-page sky map view: search tools, coverage canvas, legend, inspector. */
 export default function SkyPage() {
   const router = useRouter();
+  const openPreview = useAppStore((s) => s.openPreview);
   const grid = useMemo(() => {
     const g = buildGrid();
     return g;
@@ -91,7 +59,8 @@ export default function SkyPage() {
     setField(fieldFromRaDec(ra, dec, grid, real ?? undefined));
   };
 
-  // cross-page jump target (from the command bar): focus + inspect on arrival
+  // cross-page jump target (from the command bar): focus marker on arrival.
+  // The inspector panel opens only on map taps, never on arrival.
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem('sh-target');
@@ -101,10 +70,9 @@ export default function SkyPage() {
       if (Number.isFinite(t.ra) && Number.isFinite(t.dec)) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setFocus({ ra: t.ra, dec: t.dec, key: Date.now() });
-        inspect(t.ra, t.dec);
+        setSel({ nx: t.ra / 360, ny: (90 - t.dec) / 180, ra: t.ra, dec: t.dec });
       }
     } catch { /* noop */ }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -123,9 +91,13 @@ export default function SkyPage() {
   }, [grid]);
 
   const pick = (t: SearchTarget) => {
-    if (t.showcaseId) { router.push(blinkURL(t.showcaseId)); return; }
+    if (t.showcaseId) { openPreview(t.showcaseId); return; }
+    const near = nearestShowcase(t.ra, t.dec);
+    if (near) { openPreview(near); return; }
+    // search arrivals focus the map only — the inspector panel belongs to
+    // map clicks, so it stays closed until the user taps the sky itself
     if (observer) setFocus({ ra: t.ra, dec: t.dec, key: Date.now() });
-    inspect(t.ra, t.dec);
+    setSel({ nx: t.ra / 360, ny: (90 - t.dec) / 180, ra: t.ra, dec: t.dec });
   };
 
   return (
@@ -211,7 +183,7 @@ export default function SkyPage() {
         onOpenBlink={() => {
           if (field) {
             const id = nearestShowcase(field.ra, field.dec);
-            if (id) router.push(blinkURL(id));
+            if (id) openPreview(id);
             else if (useLive && field.epochs >= 2) router.push(`/blink/live?ra=${field.ra.toFixed(3)}&dec=${field.dec.toFixed(3)}&band=3`);
           }
           setField(null);
