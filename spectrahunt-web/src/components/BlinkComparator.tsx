@@ -201,20 +201,21 @@ export default function BlinkComparator({
     const sig = [...urls].sort().join('|');
     if (bulkSig.current === sig) return;
     bulkSig.current = sig;
-    const timers: ReturnType<typeof setTimeout>[] = [];
+    // NOTE: staggered starts are intentionally NOT cleaned up on re-runs.
+    // Parent re-renders (autoplay ticks mint a fresh frames array every
+    // 550ms) and StrictMode remounts would otherwise cancel pending starts
+    // faster than they fire — stranding every frame past the first two.
+    // Stale-URL starts merely warm the cache; unmount writes are React-18
+    // no-ops. Retry backoffs keep their own unmount cleanup below.
     let delay = 0;
     for (const u of urls) {
       if (startedLoads.current.has(u)) continue;
       startedLoads.current.add(u);
       if (delay === 0) loadFrame(u, 1);
-      else {
-        const t = setTimeout(() => loadFrame(u, 1), delay);
-        timers.push(t);
-        retryTimers.current.push(t);
-      }
+      else setTimeout(() => loadFrame(u, 1), delay);
       delay += 350;
     }
-    return () => { timers.forEach(clearTimeout); };
+    return () => undefined;
   }, [frames, loadFrame]);
 
   // Stage 1: whatever the viewer is standing on jumps the stagger queue.

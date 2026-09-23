@@ -81,7 +81,12 @@ main:focus{outline:none;}
 .island-icon .icon{width:17px; height:17px;}
 .island-menu{display:none;}
 .cmd-veil{position:fixed; inset:0; z-index:90; background:rgba(4,5,10,.6); display:grid; justify-items:center; align-items:start; padding:12vh 16px 16px;}
-.cmd-panel{width:min(560px,100%); border-radius:20px; padding:14px; display:flex; flex-direction:column; gap:10px;}
+.cmd-panel{width:min(560px,100%); min-width:0; max-width:calc(100vw - 32px); max-height:calc(100dvh - 24px); overflow-y:auto; border-radius:20px; padding:14px; display:flex; flex-direction:column; gap:10px;}
+@media(max-width:640px){
+  .cmd-veil{background:rgba(2,3,6,.84); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); padding:10vh 16px 16px;}
+  .cmd-panel{padding:12px; background:var(--space-2); border:1px solid var(--line); -webkit-backdrop-filter:none; backdrop-filter:none;}
+  .cmd-links a{padding:10px 12px;}
+}
 .cmd-panel .search-shell{height:56px;}
 .cmd-links{display:grid; grid-template-columns:1fr 1fr; gap:6px;}
 .cmd-links a{display:flex; flex-direction:column; gap:2px; padding:12px 14px; border-radius:12px; text-decoration:none; border:1px solid transparent;}
@@ -538,6 +543,11 @@ kbd{font-family:var(--font-mono); font-size:.6875rem; border:1px solid var(--lin
   background:var(--space-2); border:1px solid var(--line); transition:border-color .15s, transform .15s;
 }
 .cand:hover{border-color:var(--line-strong);}
+.cand-wrap{display:flex; flex-direction:column; min-width:0;}
+.cand-wrap .cand{width:100%; cursor:pointer; font:inherit; color:inherit;}
+.cand-objects-toggle{align-self:flex-start; margin-top:8px;}
+.cand-objects{list-style:none; margin:8px 0 0; padding:0; display:flex; flex-direction:column; gap:6px; font-size:.75rem; color:var(--ink-2);}
+.cand-objects li{border:1px solid var(--line); border-radius:8px; padding:6px 10px; background:rgba(255,255,255,.02); overflow-wrap:anywhere;}
 .cand-thumb{position:relative; aspect-ratio:1/1; background:#04050a;}
 .cand-thumb canvas{width:100%; height:100%; display:block;}
 .cand-thumb .badge{position:absolute; top:12px; left:12px; background:rgba(5,6,12,.82);}
@@ -630,7 +640,7 @@ kbd{font-family:var(--font-mono); font-size:.6875rem; border:1px solid var(--lin
 .stage-wrap{position:relative; border-radius:20px; overflow:hidden; background:#04050a; border:1px solid var(--line);}
 .stage-wrap.square{aspect-ratio:1/1; width:min(100%, calc(100dvh - 330px)); min-width:min(100%, 280px); margin:0 auto;}
 .stage-wrap canvas{position:absolute; inset:0;}
-.controls-zone{position:relative; z-index:96; display:flex; flex-direction:column; gap:8px;}
+.controls-zone{position:relative; z-index:2; display:flex; flex-direction:column; gap:8px;}
 .transport-row{display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; flex-wrap:wrap;}
 .transport-row .play.mini{width:38px; height:38px; flex-shrink:0;}
 .transport-row .play.mini .icon{width:17px; height:17px;}
