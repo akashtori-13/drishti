@@ -390,6 +390,8 @@ button.field-card{background:var(--space-2);}
 body[data-view="sky"] .site-foot{display:none;}
 .foot-inner{max-width:1120px; margin:0 auto; display:flex; flex-wrap:wrap; justify-content:space-between; gap:20px 48px; align-items:flex-start;}
 .foot-brand{display:flex; flex-direction:column; gap:10px; max-width:40ch;}
+.foot-brand .brand-row .logo{width:22px; height:22px;}
+.foot-brand .brand-row .brand-name{font-weight:650; color:var(--ink);}
 .foot-cols{display:flex; gap:48px; flex-wrap:wrap;}
 .foot-col{display:flex; flex-direction:column; gap:8px; font-size:.8125rem;}
 .foot-col a{color:var(--ink-2); text-decoration:none;}
