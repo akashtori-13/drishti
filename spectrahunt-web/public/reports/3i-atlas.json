@@ -3,12 +3,12 @@
   "title": "3I/ATLAS \u2014 interstellar comet, Aug vs Dec 2025",
   "ra": 252.6633,
   "dec": -17.4904,
-  "measured_at": "2026-09-22T22:02:29.746105+00:00",
+  "measured_at": "2026-09-23T08:19:21.293962+00:00",
   "detail": "ok",
   "movers": 13,
   "variables": 9,
   "top_sigma": 143.4,
-  "n_epochs": 5,
+  "n_epochs": 4,
   "span_days": 135.1,
   "variable_flag": false,
   "known": {
@@ -16,11 +16,93 @@
     "kind": "interstellar comet",
     "citation": "Lisse et al. RNAAS 9:242; SPHEREx obscore_3I_Atlas.vot"
   },
-  "lightcurve": [
+  "objects": [
     {
-      "mjd": 60888.33344,
-      "flux": 3.2895868569612503
+      "kind": "mover",
+      "sigma": 143.4,
+      "x": 10.0,
+      "y": 25.0,
+      "label": "Unidentified \u2013 possible discovery"
     },
+    {
+      "kind": "mover",
+      "sigma": 26.6,
+      "x": 16.0,
+      "y": 25.5,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "mover",
+      "sigma": 26.1,
+      "x": 10.0,
+      "y": 4.5,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "mover",
+      "sigma": 24.6,
+      "x": 20.0,
+      "y": 11.5,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "mover",
+      "sigma": 24.2,
+      "x": 11.5,
+      "y": 9.5,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "mover",
+      "sigma": 15.1,
+      "x": 24.0,
+      "y": 4.5,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "mover",
+      "sigma": 14.2,
+      "x": 2.0,
+      "y": 1.5,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "mover",
+      "sigma": 12.2,
+      "x": 10.5,
+      "y": 19.0,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "mover",
+      "sigma": 10.1,
+      "x": 11.0,
+      "y": 11.0,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "mover",
+      "sigma": 9.7,
+      "x": 22.5,
+      "y": 24.5,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "mover",
+      "sigma": 9.2,
+      "x": 2.0,
+      "y": 25.5,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "mover",
+      "sigma": 7.9,
+      "x": 2.5,
+      "y": 14.5,
+      "label": "Unidentified \u2013 possible discovery"
+    }
+  ],
+  "lightcurve": [
     {
       "mjd": 60898.456487,
       "flux": 4.107525199651718

@@ -7,12 +7,17 @@ import { useRouter } from 'next/navigation';
 import { blinkURL } from '@/lib/store';
 import { arcsecPerDay, toCSV } from '@/lib/astro';
 
+interface ReportObject {
+  kind: string; sigma: number; x: number; y: number; label: string | null;
+}
+
 interface Report {
   id: string;
   movers: number; variables: number; top_sigma: number;
   span_days: number | null; variable_flag: boolean;
   known: { name: string; kind: string } | null;
   detail: string;
+  objects?: ReportObject[];
 }
 
 type Kind = 'known' | 'mover' | 'variable' | 'unidentified' | 'pending';
@@ -22,6 +27,7 @@ interface Card {
   kind: Kind; knownName: string;
   stat: string; date: string; png: string | null;
   motion: number | null; mjds: Array<number | undefined>;
+  objects: ReportObject[];
 }
 
 type Filter = 'all' | 'unknown' | 'known';
@@ -68,6 +74,7 @@ function cardsFrom(showcases: Showcase[], reports: Map<string, Report>): Card[] 
       kind, knownName, stat,
       date: (s.epochs[0]?.mjd ? `MJD ${s.epochs[0].mjd}` : 'QR2'),
       png: s.epochs[0]?.png ?? null, motion, mjds,
+      objects: rep?.objects ?? [],
     };
   });
   const rank: Record<Kind, number> = { known: 0, mover: 1, variable: 2, unidentified: 3, pending: 4 };
@@ -110,6 +117,7 @@ export default function CandidatesPage() {
   const router = useRouter();
   const [cards, setCards] = useState<Card[]>([]);
   const [filter, setFilter] = useState<Filter>('all');
+  const [openId, setOpenId] = useState<string | null>(null);
   const docsRef = useRef(new Map<string, Showcase>());
   const repsRef = useRef(new Map<string, Report>());
 
@@ -195,9 +203,11 @@ export default function CandidatesPage() {
       <div className="cand-grid">
         {list.map((c) => {
           const band = BANDS[c.band - 1];
+          const open = openId === c.id;
           return (
+            <div key={c.id} className="cand-wrap">
             <button
-              key={c.id} type="button" className="cand"
+              type="button" className="cand"
               aria-label={`${c.name}, ${KIND_LABEL[c.kind]}, ${c.stat}, ${band.label}`}
               onClick={() => router.push(blinkURL(c.id))}
             >
@@ -217,6 +227,30 @@ export default function CandidatesPage() {
                 </div>
               </div>
             </button>
+            {c.objects.length > 0 && (
+              <>
+                <button
+                  type="button" className="epoch-chip cand-objects-toggle" aria-expanded={open}
+                  onClick={() => setOpenId(open ? null : c.id)}
+                >
+                  {open ? 'Hide objects' : `Objects (${c.objects.length})`}
+                </button>
+                {open && (
+                  <ul className="cand-objects" aria-label={`Measured objects in ${c.name}`}>
+                    {c.objects.map((o, i) => (
+                      <li key={i} className="mono">
+                        <span className={o.kind === 'mover' ? 'tag-mover' : 'tag-var'}>
+                          {o.kind === 'mover' ? 'MOVER' : 'VARIABLE'}
+                        </span>{' '}
+                        #{i + 1} · {o.sigma.toFixed(1)}σ · x={o.x} y={o.y}
+                        {o.label && o.label !== 'Unidentified – possible discovery' ? ` · ${o.label}` : ''}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </>
+            )}
+            </div>
           );
         })}
       </div>

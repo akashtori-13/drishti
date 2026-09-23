@@ -76,6 +76,7 @@ def classify(sid: str, force: bool = False):
     variable_flag = flag_variable(lc)
 
     mjds = [e.get("mjd") for e in doc.get("epochs", []) if e.get("mjd") is not None]
+    objects = sorted(cands, key=lambda c: c.get("sigma", 0), reverse=True)[:12]
     report = {
         "id": sid, "title": doc.get("title"), "ra": doc.get("ra"), "dec": doc.get("dec"),
         "measured_at": datetime.now(timezone.utc).isoformat(),
@@ -84,6 +85,12 @@ def classify(sid: str, force: bool = False):
         "n_epochs": len(lc), "span_days": round(max(mjds) - min(mjds), 1) if len(mjds) >= 2 else None,
         "variable_flag": variable_flag,
         "known": KNOWN.get(sid),
+        "objects": [
+            {"kind": c.get("kind"), "sigma": round(float(c.get("sigma", 0)), 1),
+             "x": round(float(c.get("x", 0)), 1), "y": round(float(c.get("y", 0)), 1),
+             "label": c.get("label")}
+            for c in objects
+        ],
         "lightcurve": [{"mjd": p.get("mjd"), "flux": p.get("flux")} for p in lc],
         "spectrum": rep.get("spectrum", []),
     }
