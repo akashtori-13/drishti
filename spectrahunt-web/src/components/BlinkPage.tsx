@@ -154,6 +154,15 @@ export default function BlinkPage({ id }: { id: string }) {
     variable_flag: boolean; known: { name: string; kind: string } | null; detail: string;
   } | null>(null);
   const [detStats, setDetStats] = useState<{ movers: number; variables: number; ready: boolean } | null>(null);
+  // Fetch progress for the WaitGame panel: monotonic step counter so the
+  // player sees what is loading and how far along it is.
+  const [prog, setProg] = useState({ done: 0, total: 3, label: 'Contacting IRSA…' });
+  // True while the full epoch list loads behind an already-visible starter pair.
+  const [enriching, setEnriching] = useState(false);
+  const liveTarget = isLiveId(id) ? parseLiveId(id) : null;
+  const fetchTarget = liveTarget
+    ? `RA ${liveTarget.ra.toFixed(2)}° · Dec ${liveTarget.dec.toFixed(2)}° · band D${liveTarget.band}`
+    : id;
   // live blink: the game stays until a full pair decodes (one frame is a
   // still, not a blink). Latched during render — detStats flips back to null
   // whenever the viewer steps onto a pending frame, but the game must not
@@ -176,13 +185,21 @@ export default function BlinkPage({ id }: { id: string }) {
     setLiveSpec(null);
     setLiveLc(null);
     setReport(null);
+    setEnriching(false);
+    setProg({ done: 0, total: 3, label: 'Contacting IRSA…' });
+    const mark = (done: number, label: string) => {
+      if (!alive) return;
+      setProg((p) => (done > p.done ? { done, total: 3, label } : p));
+    };
     void fetch(`/reports/${id}.json`).then((r) => (r.ok ? r.json() : null))
       .then((j) => { if (alive && j && j.detail === 'ok') setReport(j); })
-      .catch(() => undefined);
-    const done = (d: Showcase) => {
+      .catch(() => undefined)
+      .finally(() => mark(1, 'Measurement report checked — fetching SPHEREx frames…'));
+    const done = (d: Showcase, readyLabel?: string) => {
       if (!alive) return;
       setData(d);
       setLoading(false);
+      mark(2, readyLabel ?? `${d.epochs.length} epoch${d.epochs.length === 1 ? '' : 's'} found — cross-matching known objects…`);
       setBand(d.epochs[0]?.band ?? 3);
       setEpochIdx(0);
       // shared-link state (?band=&epoch=&mode=) applies once on entry
@@ -197,14 +214,43 @@ export default function BlinkPage({ id }: { id: string }) {
       } catch { /* keep defaults */ }
       setSkybot(null);
       const mjd = d.epochs[0]?.mjd;
-      if (mjd) void skybotMatches(d.ra, d.dec, mjd).then((m) => { if (alive) setSkybot(m); });
+      if (mjd) void skybotMatches(d.ra, d.dec, mjd)
+        .then((m) => { if (alive) setSkybot(m); })
+        .finally(() => mark(3, 'Cross-match complete — rendering your blink…'));
+      else mark(3, 'Ready — rendering your blink…');
     };
     if (isLiveId(id)) {
       const p = parseLiveId(id);
       if (!p) { setErr('Bad live-field link.'); setLoading(false); return; }
       setBand(p.band);
-      void fetchLiveShowcase(p.ra, p.dec, p.band)
-        .then(done)
+      // Fast first paint: oldest+newest starter pair only — the blink page
+      // appears as soon as 2 frames decode. The full epoch list enriches
+      // in the background while the user is already browsing.
+      const enrich = (first: Showcase) => {
+        setEnriching(true);
+        void fetchLiveShowcase(p.ra, p.dec, p.band)
+          .then((full) => {
+            if (!alive || full.epochs.length <= first.epochs.length) return;
+            // Keep the epoch the user is viewing: remap by PNG URL, so the
+            // blink doesn't jump under them when the list grows.
+            const curPng = first.epochs[useAppStore.getState().epochIdx]?.png;
+            const ni = curPng ? full.epochs.findIndex((e) => e.png === curPng) : -1;
+            if (ni >= 0) setEpochIdx(ni);
+            setData((prev) => {
+              if (!prev || prev.id !== id) return prev;
+              return prev.epochs.length >= full.epochs.length
+                ? prev
+                : { ...prev, epochs: full.epochs, story: full.story };
+            });
+          })
+          .catch(() => undefined)
+          .finally(() => { if (alive) setEnriching(false); });
+      };
+      void fetchLiveShowcase(p.ra, p.dec, p.band, 2)
+        .then((d) => {
+          done(d, 'Starter pair found — rendering, gathering the rest…');
+          enrich(d);
+        })
         .catch((e: unknown) => {
           if (!alive) return;
           setErr(e instanceof Error ? e.message : String(e));
@@ -354,12 +400,14 @@ export default function BlinkPage({ id }: { id: string }) {
         </div>
       </div>
 
-      {loading && (isLiveId(id)
-        ? <WaitGame status="Fetching live IRSA frames — discovery, renders, cross-match…" />
-        : <div className="bw-status">Loading {id}…</div>
-      )}
-      {!loading && isLiveId(id) && viewing && !pairSeen && (
-        <WaitGame status="First frames decoding — almost there…" />
+      {loading && !isLiveId(id) && <div className="bw-status">Loading {id}…</div>}
+      {/* One persistent game instance per field (keyed by id): progress
+        steps only change props, so the run never restarts mid-fetch. */}
+      {isLiveId(id) && (loading || (!!viewing && !pairSeen)) && (
+        <WaitGame key={id}
+          headline={loading ? undefined : 'Decoding your blink'}
+          target={fetchTarget}
+          progress={loading ? prog : { done: 2, total: 3, label: `Decoding first pair of ${viewing?.epochs.length ?? 2} epochs…` }} />
       )}
       {err && !loading && (
         <div className="bw-status error">
@@ -459,6 +507,7 @@ export default function BlinkPage({ id }: { id: string }) {
               )}
               {tab === 'epochs' && (
                 <>
+                  {enriching && <p className="fine">Gathering the remaining frames in the background — they appear below as they arrive…</p>}
                   <div className="epoch-list">
                     {epochs.map((e, i) => (
                       <button key={`${e.label}::${i}`} type="button" onClick={() => setEpochIdx(i)}

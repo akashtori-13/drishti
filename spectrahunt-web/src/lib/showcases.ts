@@ -210,10 +210,10 @@ interface FramesResponse {
   count?: number;
 }
 
-export async function fetchLiveShowcase(ra: number, dec: number, band = 3): Promise<Showcase> {
+export async function fetchLiveShowcase(ra: number, dec: number, band = 3, n = 8): Promise<Showcase> {
   if (!useLive) throw new Error('Live fields need the dev API (DATA_MODE=live)');
   const r = await fetch(
-    `${API_BASE}/api/frames?ra=${ra}&dec=${dec}&band=${band}&size_deg=0.15`);
+    `${API_BASE}/api/frames?ra=${ra}&dec=${dec}&band=${band}&size_deg=0.15&n=${n}`);
   if (!r.ok) throw new Error(`frames HTTP ${r.status}`);
   const j = (await r.json()) as FramesResponse;
   if (!j.epochs.length) throw new Error(j.detail === 'need-2-epochs' ? 'Fewer than 2 SPHEREx visits here' : 'No IRSA coverage');
