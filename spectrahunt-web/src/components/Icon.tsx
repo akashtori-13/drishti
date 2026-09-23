@@ -9,15 +9,10 @@ export function Sprite() {
   return (
     <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true" focusable="false">
       <defs>
-        <linearGradient id="spec" gradientUnits="userSpaceOnUse" x1="1" y1="0" x2="23" y2="0">
-          <stop offset="0" stopColor="#7c83fd" /><stop offset=".2" stopColor="#5aa9e6" />
-          <stop offset=".4" stopColor="#4fc9a8" /><stop offset=".6" stopColor="#e8c34a" />
-          <stop offset=".8" stopColor="#f08a4b" /><stop offset="1" stopColor="#e85d4a" />
-        </linearGradient>
-        <symbol id="i-logo" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="7.5" fill="none" stroke="url(#spec)" strokeWidth="2.2" />
-          <path d="M12 1.5v4.2M12 18.3v4.2M1.5 12h4.2M18.3 12h4.2" stroke="url(#spec)" strokeWidth="2" strokeLinecap="round" fill="none" />
-          <circle cx="12" cy="12" r="2.3" fill="#eef0f8" />
+        <symbol id="i-logo" viewBox="0 0 512 512">
+          <circle cx="241.33" cy="270.67" r="106.56" fill="currentColor" />
+          <path d="M473.97 206.47A241.33 241.33 0 1 1 305.53 38.03A21.94 21.94 0 0 1 293.86 80.33A197.45 197.45 0 1 0 431.67 218.14A21.94 21.94 0 0 1 473.97 206.47Z" fill="currentColor" />
+          <path d="M320.06 154.37A10.97 10.97 0 0 1 318 141.71L384.53 8.66A15.67 15.67 0 0 1 409.62 4.58L507.42 102.38A15.67 15.67 0 0 1 503.34 127.47L370.29 194A10.97 10.97 0 0 1 357.63 191.94Z" fill="currentColor" />
         </symbol>
         <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" strokeWidth="1.8" /><path d="M20 20l-4.9-4.9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" fill="none" /></symbol>
         <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></symbol>

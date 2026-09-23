@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Header from '@/components/Header';
+import Icon from '@/components/Icon';
 import Tutorial from '@/components/Tutorial';
 import ArtifactPreview from '@/components/ArtifactPreview';
 import { useAppStore } from '@/lib/store';
@@ -25,7 +26,10 @@ export default function SiteChrome({ children, showTutorial = false }: { childre
         <footer className="site-foot">
           <div className="foot-inner">
             <div className="foot-brand">
-              <span className="brand-name">STELLAR</span>
+              <span className="brand-row" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Icon name="logo" className="logo icon" />
+                <span className="brand-name">STELLAR</span>
+              </span>
               <p className="foot-note">A public blink comparator for the SPHEREx sky. NASA Space Apps Challenge 2026.</p>
             </div>
             <nav className="foot-cols" aria-label="Footer">
