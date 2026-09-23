@@ -154,3 +154,46 @@ export function textWidth(text: string): number {
 export function glyphOf(ch: string): string[] {
   return GLYPHS[ch] ?? GLYPHS['?'];
 }
+
+// ---------- canvas renderer (DOM-free: context passed in, unit-tested) ----------
+
+/** Blit a sprite: only ink cells (not space/dot) paint. */
+export function drawSprite(
+  ctx: CanvasRenderingContext2D, rows: string[], x: number, y: number, color: string,
+) {
+  ctx.fillStyle = color;
+  for (let r = 0; r < rows.length; r++) {
+    const row = rows[r] ?? '';
+    for (let c = 0; c < row.length; c++) {
+      const ch = row[c];
+      if (ch !== ' ' && ch !== '.') ctx.fillRect(Math.round(x + c * SPRITE_PX), Math.round(y + r * SPRITE_PX), SPRITE_PX, SPRITE_PX);
+    }
+  }
+}
+
+/** Chunky bitmap text. Empty font cells are '.' — skipped exactly like spaces.
+ *  Returns width drawn. */
+export function drawPixelText(
+  ctx: CanvasRenderingContext2D, text: string, x: number, y: number, scale: number, color: string,
+): number {
+  const s = text.toUpperCase();
+  ctx.fillStyle = color;
+  let cx = Math.round(x);
+  for (const ch of s) {
+    const g = glyphOf(ch);
+    for (let r = 0; r < 5; r++) {
+      for (let c = 0; c < 3; c++) {
+        if (g[r][c] !== ' ' && g[r][c] !== '.') ctx.fillRect(cx + c * scale, Math.round(y) + r * scale, scale, scale);
+      }
+    }
+    cx += 4 * scale;
+  }
+  return textWidth(s) * scale;
+}
+
+/** Centered bitmap text for arcade screens (countdown, game over). */
+export function drawPixelTextC(
+  ctx: CanvasRenderingContext2D, text: string, cx: number, y: number, scale: number, color: string,
+) {
+  drawPixelText(ctx, text, cx - (textWidth(text) * scale) / 2, y, scale, color);
+}

@@ -34,7 +34,7 @@ curl localhost:8000/api/health
 |---|---|---|
 | GET | `/api/epochs?ra=&dec=&band=&size_deg=` | Covering images oldest-first: `{cutout_url,mjd,bandpass}[]`. TAP-first (60 s daemon bound), SIA2 fallback, `[]` when unreachable |
 | GET | `/api/cutout.png?ra=&dec=&band=&size_deg=` | Newest covering image rendered (zscale+asinh, bad-pixel masked), file-cached |
-| GET | `/api/frames?ra=&dec=&band=&size_deg=` | ≤8 sampled epochs with per-epoch render URLs — makes **any** visited field blinkable |
+| GET | `/api/frames?ra=&dec=&band=&size_deg=&n=` | ≤`n` sampled epochs (default 8; `n=2` = oldest+newest starter pair) with per-epoch render URLs — makes **any** visited field blinkable |
 | GET | `/api/frame.png?ra=&dec=&band=&size_deg=&epoch=i` | Renders epoch `i` (file-cached, pruned past 500) |
 
 ```bash

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  glyphOf, killScore, layoutWave, marchSpeed, overlap, textWidth,
+  drawPixelText, drawPixelTextC, drawSprite, glyphOf, killScore, layoutWave, marchSpeed, overlap, textWidth,
 } from './invaders';
 
 describe('layoutWave', () => {
@@ -46,5 +46,55 @@ describe('pixel font', () => {
     expect(textWidth('')).toBe(0);
     expect(glyphOf('A')).toHaveLength(5);
     expect(glyphOf('~')[0]).toBeDefined();
+  });
+});
+
+describe('bitmap renderer', () => {
+  function mockCtx() {
+    const rects: Array<[number, number, number, number]> = [];
+    const ctx = {
+      fillStyle: '',
+      fillRect: (x: number, y: number, w: number, h: number) => { rects.push([x, y, w, h]); },
+    };
+    return { ctx, rects };
+  }
+  const asCtx = (c: { fillStyle: string; fillRect: (x: number, y: number, w: number, h: number) => void }) =>
+    c as unknown as CanvasRenderingContext2D;
+
+  it('paints only ink cells, never empty font cells', () => {
+    // A has exactly 10 ink cells; space and dots paint nothing.
+    const { ctx, rects } = mockCtx();
+    expect(drawPixelText(asCtx(ctx), 'A', 0, 0, 1, '#fff')).toBe(3);
+    expect(rects).toHaveLength(10);
+    const { ctx: ctx2, rects: rects2 } = mockCtx();
+    drawPixelText(asCtx(ctx2), '  ', 0, 0, 2, '#fff');
+    expect(rects2).toHaveLength(0);
+  });
+
+  it('never renders a glyph as a solid block', () => {
+    // Regression: the renderer once skipped only ' ', but empty font cells
+    // are '.', so every glyph painted as a 3x5 brick.
+    const glyphs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:.!?-+ ';
+    for (const ch of glyphs) {
+      const { ctx, rects } = mockCtx();
+      drawPixelText(asCtx(ctx), ch, 0, 0, 1, '#fff');
+      const ink = glyphOf(ch).join('').replace(/[ .]/g, '').length;
+      expect(rects.length).toBe(ink);
+      expect(rects.length).toBeLessThan(15);
+    }
+  });
+
+  it('centers text on the given x', () => {
+    const { ctx, rects } = mockCtx();
+    drawPixelTextC(asCtx(ctx), 'A', 100, 0, 2, '#fff');
+    // first ink cell of A (row '.X.', scale 2): 100 - (3*2)/2 + 1*2
+    expect(rects).toHaveLength(10);
+    expect(rects[0][0]).toBe(99);
+  });
+
+  it('drawSprite skips empty sprite cells', () => {
+    const { ctx, rects } = mockCtx();
+    drawSprite(asCtx(ctx), ['X.', '.X'], 0, 0, '#fff');
+    expect(rects).toHaveLength(2);
   });
 });

@@ -485,18 +485,28 @@ body[data-view="sky"] .site-foot{display:none;}
 .bw-toggles{display:flex; align-items:center; gap:8px; font-size:.75rem; color:var(--ink-2); margin-left:auto;}
 .bw-status{padding:14px 18px; border-radius:14px; background:var(--space-2); border:1px solid var(--line); color:var(--ink-2); font-size:.875rem;}
 .bw-status.error{border-color:rgba(232,93,74,.5); color:#f0a295;}
-.waitgame{position:fixed; inset:0; z-index:80; background:#04050a; display:flex; flex-direction:column;}
-.waitgame canvas{flex:1; min-height:0; width:100%; display:block; touch-action:none; cursor:none;}
-.waitgame-head{position:absolute; top:calc(14px + env(safe-area-inset-top,0px)); left:0; right:0; display:flex; justify-content:space-between; gap:12px; padding:0 20px; font-size:.75rem; color:var(--ink-2); pointer-events:none;}
+.waitgame{position:fixed; inset:0; z-index:80; background:#04050a; display:flex; flex-direction:column; align-items:center; gap:14px; padding:calc(18px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px)); overflow-y:auto;}
+.waitgame-top{width:min(560px,100%); flex-shrink:0; text-align:center; padding:16px 22px 18px; border-radius:18px; background:rgba(5,6,12,.85); border:1px solid var(--line-strong);}
+.waitgame-stage{position:relative; width:min(960px,100%); flex:1; min-height:320px; display:flex; flex-direction:column; border-radius:20px; border:1px solid var(--line-strong); background:#04050a; overflow:hidden;}
+.waitgame-stage-head{display:flex; justify-content:space-between; align-items:center; gap:8px 16px; flex-wrap:wrap; padding:10px 16px; border-bottom:1px solid var(--line);}
+.waitgame-stage-tag{font-size:.6875rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3);}
 .waitgame-score{color:var(--unknown);}
-.waitgame-load{display:flex; flex-direction:column; gap:3px; min-width:0;}
-.waitgame-title{display:flex; align-items:center; gap:8px; font-size:.875rem; font-weight:650; color:var(--ink); letter-spacing:-.01em;}
+.waitgame-stage canvas{flex:1; min-height:0; width:100%; display:block; touch-action:none;}
 .pulse-dot{width:8px; height:8px; border-radius:50%; background:#7c83fd; flex-shrink:0; animation:stel-pulse 1.6s ease-in-out infinite;}
 @media (prefers-reduced-motion: reduce){ .pulse-dot{animation:none;} }
-.waitgame-foot{position:absolute; bottom:calc(16px + env(safe-area-inset-bottom,0px)); left:0; right:0; display:flex; justify-content:space-between; align-items:center; gap:12px; padding:0 20px; font-size:.75rem; color:var(--ink-3); pointer-events:none;}
+.waitgame-fetch-title{margin:0; display:flex; align-items:center; justify-content:center; gap:10px; font-size:1.25rem; font-weight:750; color:var(--ink); letter-spacing:-.01em;}
+.waitgame-fetch-target{margin:6px 0 0; font-size:.8125rem; color:var(--ink-2);}
+.waitgame-bar{margin-top:10px; height:8px; border-radius:99px; background:rgba(255,255,255,.09); overflow:hidden;}
+.waitgame-bar-fill{height:100%; border-radius:99px; background:linear-gradient(90deg,#7c83fd,#4fc9a8); transition:width .5s ease;}
+.waitgame-fetch-step{margin:8px 0 0; font-size:.75rem; color:var(--ink-2);}
+@media (prefers-reduced-motion: reduce){ .waitgame-bar-fill{transition:none;} }
+.waitgame-foot{display:flex; justify-content:space-between; align-items:center; gap:8px 16px; flex-wrap:wrap; padding:10px 16px; border-top:1px solid var(--line); font-size:.75rem; color:var(--ink-3);}
 .waitgame-foot a{text-decoration:none;}
-.waitgame-foot .epoch-chip{pointer-events:auto;}
-.waitgame-foot .epoch-chip:disabled{opacity:.45; cursor:default;}
+@media(max-width:640px){
+  .waitgame{gap:10px; padding-left:12px; padding-right:12px;}
+  .waitgame-fetch-title{font-size:1.125rem;}
+  .waitgame-stage{min-height:280px;}
+}
 .waitgame-fact{position:absolute; bottom:calc(64px + env(safe-area-inset-bottom,0px)); left:50%; transform:translateX(-50%); max-width:min(480px, calc(100vw - 48px)); margin:0; padding:10px 18px; border-radius:12px; background:rgba(5,6,12,.88); border:1px solid var(--line-strong); color:var(--ink); font-size:.8125rem; text-align:center; pointer-events:none;}
 .bw-status a{color:var(--focus);}
 @media(min-width:961px){

@@ -313,14 +313,17 @@ async def _render_frame_png(cutout_url: str):
 @app.get("/api/frames")
 async def api_frames(ra: float = Query(...), dec: float = Query(...),
                      band: int = Query(3, ge=1, le=6),
-                     size_deg: float = Query(CUTOUT_SIZE_DEG, gt=0, le=0.5)):
-    """Epoch list for ANY sky position: makes every visited field blinkable (live mode)."""
+                     size_deg: float = Query(CUTOUT_SIZE_DEG, gt=0, le=0.5),
+                     n: int = Query(8, ge=2, le=12)):
+    """Epoch list for ANY sky position: makes every visited field blinkable (live mode).
+    n=2 returns the oldest+newest pair only — the fastest first paint; the
+    client enriches to the full list in the background."""
     from backend.pipeline import _sample_hits, discover_cached
     try:
         hits = discover_cached(ra, dec, band, size_deg, DATABASE_PATH)
         if len(hits) < 2:
             return {"epochs": [], "detail": "need-2-epochs"}
-        picks = _sample_hits(hits, 8)
+        picks = _sample_hits(hits, n)
         base = f"/api/frame.png?ra={ra}&dec={dec}&band={band}&size_deg={size_deg}"
         idx_of = {id(h): i for i, h in enumerate(hits)}
         return {"epochs": [

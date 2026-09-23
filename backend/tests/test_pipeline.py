@@ -88,3 +88,19 @@ def test_flag_variable():
     assert not flag_variable([{"flux": 100.0, "flux_err": 150.0}, {"flux": 400.0, "flux_err": 150.0}])
     assert not flag_variable([])
     assert not flag_variable([{"flux": None}])
+
+
+def test_sample_hits_two_returns_oldest_newest():
+    from backend.pipeline import _sample_hits
+    hits = [{"mjd": 60000.0 + i * 100, "cutout_url": f"u{i}"} for i in (3, 1, 4, 0, 2)]
+    picks = _sample_hits(hits, 2)
+    assert [h["mjd"] for h in picks] == [60000.0, 60400.0]
+
+
+def test_sample_hits_full_span_included():
+    from backend.pipeline import _sample_hits
+    hits = [{"mjd": 60000.0 + i * 10} for i in range(20)]
+    picks = _sample_hits(hits, 8)
+    mjds = [h["mjd"] for h in picks]
+    assert mjds[0] == 60000.0 and mjds[-1] == 60190.0
+    assert mjds == sorted(mjds) and len(mjds) == 8
