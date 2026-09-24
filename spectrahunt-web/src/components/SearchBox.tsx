@@ -22,12 +22,12 @@ interface Suggestion {
 
 /** Combobox search: showcases, coordinates (decimal + sexagesimal), constellations, Sesame names. */
 export default function SearchBox({
-  id, placeholder, compact = false, onPick,
+  id, placeholder, compact = false, defaultValue = '', onPick,
 }: {
-  id: string; placeholder: string; compact?: boolean;
+  id: string; placeholder: string; compact?: boolean; defaultValue?: string;
   onPick: (t: SearchTarget) => void;
 }) {
-  const [q, setQ] = useState('');
+  const [q, setQ] = useState(defaultValue);
   const [open, setOpen] = useState(false);
   const [hl, setHl] = useState(-1);
   const [err, setErr] = useState<string | null>(null);
