@@ -187,6 +187,7 @@ export default function Header() {
       role="navigation"
       aria-label="Primary"
       data-typing={typing || undefined}
+      data-home={pathname === '/' || undefined}
       onInput={onNavInput}
       onKeyUp={onNavInput}
     >
