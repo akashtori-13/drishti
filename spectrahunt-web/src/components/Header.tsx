@@ -194,7 +194,7 @@ export default function Header() {
         )}
         {pathname !== '/' && (
           <button type="button" className="island-iconbtn" aria-label="Search and navigate (Ctrl+K)"
-            title="Search and navigate (Ctrl+K)" onClick={() => setPanel((p) => (p === 'search' ? null : 'search'))}>
+            title="Search and navigate (Ctrl+K)" onClick={() => { setHovered(false); setPanel((p) => (p === 'search' ? null : 'search')); }}>
             <Icon name="search" className="icon" />
             <span className="ibtn-label" aria-hidden="true">Search</span>
           </button>
@@ -204,6 +204,7 @@ export default function Header() {
           label="Surprise"
           className="island-iconbtn"
           onPick={(t) => {
+            setPanel(null);
             if (t.showcaseId) openPreview(t.showcaseId);
             else {
               try {
@@ -215,7 +216,10 @@ export default function Header() {
         />
         <button type="button" className="island-iconbtn" aria-label={panel === 'menu' ? 'Close menu' : 'Open menu'}
           aria-expanded={expanded} aria-controls="island-body"
-          onClick={() => setPanel((p) => (p === 'menu' ? null : 'menu'))}>
+          onClick={() => {
+            setHovered(false);
+            setPanel((p) => (p === 'menu' ? null : 'menu'));
+          }}>
           <Icon name={panel === 'menu' ? 'x' : 'menu'} className="icon" />
           <span className="ibtn-label" aria-hidden="true">Menu</span>
         </button>
