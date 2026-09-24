@@ -148,6 +148,16 @@ export default function HomePage() {  const router = useRouter();
   const [, setConsoleMode] = useState(false);
   const [wake, setWake] = useState(false);
   const [toast, setToast] = useState(false);
+  // No globe on small phones: saves data, battery, and a 320px-tall canvas
+  // nobody asked for (matches the CSS that would shrink it anyway).
+  const [hideGlobe, setHideGlobe] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 640px)');
+    const apply = () => setHideGlobe(mq.matches);
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
+  }, []);
   const heroRef = useRef<HTMLElement | null>(null);
   const copyRef = useRef<HTMLDivElement | null>(null);
   const orbitRef = useRef<HTMLDivElement | null>(null);
@@ -363,9 +373,11 @@ export default function HomePage() {  const router = useRouter();
             </div>
           </div>
 
-          <div ref={orbitRef} className="hero-orbit">
-            <OrbitHero />
-          </div>
+          {!hideGlobe && (
+            <div ref={orbitRef} className="hero-orbit">
+              <OrbitHero />
+            </div>
+          )}
         </div>
 
         <p className="credits" aria-label="Data sources">

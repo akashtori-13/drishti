@@ -573,7 +573,30 @@ export default function OrbitHero() {
       const r = canvas.getBoundingClientRect();
       return { x: e.clientX - r.left, y: e.clientY - r.top };
     };
+    // multi-touch pinch zoom state (touch only; mouse keeps drag+wheel)
+    const pinchPts = new Map<number, { x: number; y: number }>();
+    let pinchBase: { dist: number; zoom: number } | null = null;
+    let pinched = false;
     const onMove = (e: PointerEvent) => {
+      if (pinchPts.has(e.pointerId)) {
+        pinchPts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      }
+      if (pinchPts.size >= 2) {
+        // two-finger pinch zoom (touch); single-finger drag pauses meanwhile
+        const pts = [...pinchPts.values()];
+        const dist = Math.max(20, Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y));
+        if (pinchBase) {
+          const ratio = dist / Math.max(20, pinchBase.dist);
+          S.zoom = Math.min(2.2, Math.max(0.6, pinchBase.zoom * ratio));
+          applyZoom();
+          S.ringAt = 0;
+          pinched = true;
+          poke();
+        } else {
+          pinchBase = { dist, zoom: S.zoom };
+        }
+        return;
+      }
       if (dragRef.current) {
         const dx = e.clientX - dragRef.current.x;
         const dy = e.clientY - dragRef.current.y;
@@ -605,9 +628,26 @@ export default function OrbitHero() {
     };
     const onDown = (e: PointerEvent) => {
       (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+      pinchPts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pinchPts.size === 2) {
+        const pts = [...pinchPts.values()];
+        pinchBase = {
+          dist: Math.max(20, Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y)), zoom: S.zoom,
+        };
+        dragRef.current = null;
+        return;
+      }
       dragRef.current = { x: e.clientX, y: e.clientY, lon: S.lonC, lat: S.latC };
     };
     const onUp = (e: PointerEvent) => {
+      pinchPts.delete(e.pointerId);
+      if (pinchPts.size < 2) pinchBase = null;
+      if (pinchPts.size === 1) {
+        const [, pt] = [...pinchPts.entries()][0];
+        dragRef.current = { x: pt.x, y: pt.y, lon: S.lonC, lat: S.latC };
+        return;
+      }
+      if (pinched) { pinched = false; dragRef.current = null; return; }
       const wasDrag = dragRef.current &&
         Math.hypot(e.clientX - dragRef.current.x, e.clientY - dragRef.current.y) > 5;
       dragRef.current = null;
@@ -662,6 +702,7 @@ export default function OrbitHero() {
     canvas.addEventListener('pointermove', onMove);
     canvas.addEventListener('pointerdown', onDown);
     canvas.addEventListener('pointerup', onUp);
+    canvas.addEventListener('pointercancel', onUp);
     canvas.addEventListener('wheel', onWheel, { passive: false });
     canvas.addEventListener('keydown', onKey);
     layout();
@@ -675,6 +716,7 @@ export default function OrbitHero() {
       canvas.removeEventListener('pointermove', onMove);
       canvas.removeEventListener('pointerdown', onDown);
       canvas.removeEventListener('pointerup', onUp);
+      canvas.removeEventListener('pointercancel', onUp);
       canvas.removeEventListener('wheel', onWheel);
       canvas.removeEventListener('keydown', onKey);
     };
