@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import Icon from '@/components/Icon';
+import Icon, { type IconName } from '@/components/Icon';
 import SearchBox, { type SearchTarget } from '@/components/SearchBox';
 import SurpriseButton from '@/components/SurpriseButton';
 import { useAppStore } from '@/lib/store';
@@ -12,7 +12,7 @@ import { nearestShowcase } from '@/lib/sky';
 const LINKS = [
   { href: '/sky', label: 'Sky', desc: 'Observer and all-sky views' },
   { href: '/blink/3i-atlas', label: 'Blink', match: '/blink', desc: 'Compare epochs' },
-  { href: '/candidates', label: 'Candidates', desc: 'Measured fields' },
+  { href: '/candidates', label: 'Fields', desc: 'Measured fields' },
   { href: '/about', label: 'About', desc: 'Mission and method' },
 ];
 
@@ -154,6 +154,16 @@ export default function Header() {
   const skyActive = pathname === '/sky';
   const candActive = pathname.startsWith('/candidates');
 
+  // Menu hierarchy: Home first, product views in navbar order, About last,
+  // then the Surprise action separated below. Labels match the navbar.
+  const MENU: { href: string; label: string; desc: string; icon: IconName; active: boolean }[] = [
+    { href: '/', label: 'Home', desc: 'Front door', icon: 'home', active: pathname === '/' },
+    { href: '/sky', label: 'Sky', desc: 'Observer and all-sky views', icon: 'skymap', active: skyActive },
+    { href: '/blink/3i-atlas', label: 'Blink', desc: 'Compare epochs', icon: 'split', active: pathname.startsWith('/blink') },
+    { href: '/candidates', label: 'Fields', desc: 'Measured fields', icon: 'target', active: candActive },
+    { href: '/about', label: 'About', desc: 'Mission and method', icon: 'info', active: pathname === '/about' },
+  ];
+
   return (
     <div
       ref={islandRef}
@@ -227,18 +237,20 @@ export default function Header() {
       </div>
       {menuOpen && (
         <nav id="menu-sheet" className="menu-sheet glass" aria-label="Views">
-          <SurpriseButton className="cmd-surprise" onPick={surprisePick} />
-          {[{ href: '/', label: 'Home', desc: 'Front door' }, ...LINKS.map((l) => ({
-            ...l,
-            desc: l.label === 'Sky' ? 'Observer and all-sky views'
-              : l.label === 'Blink' ? 'Compare epochs'
-              : l.label === 'Candidates' ? 'Measured fields' : 'Mission and method',
-          }))].map((item) => (
-            <Link key={item.href} href={item.href} onClick={() => setMenuOpen(false)}>
-              <span className="cmd-link-label">{item.label}</span>
-              <span className="cmd-link-desc">{item.desc}</span>
+          {MENU.map((item) => (
+            <Link key={item.href} href={item.href} onClick={() => setMenuOpen(false)}
+              aria-current={item.active ? 'page' : undefined}
+              className={`menu-link${item.active ? ' active' : ''}`}>
+              <Icon name={item.icon} className="icon" />
+              <span className="menu-text">
+                <span className="menu-label">{item.label}</span>
+                <span className="menu-desc">{item.desc}</span>
+              </span>
+              <Icon name="fwd" className="icon m-chev" />
             </Link>
           ))}
+          <div className="menu-div" role="separator" aria-hidden="true" />
+          <SurpriseButton className="menu-link menu-action" onPick={surprisePick} desc="Open a random blink" />
         </nav>
       )}
     </div>
