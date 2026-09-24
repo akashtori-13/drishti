@@ -12,7 +12,7 @@ import { nearestShowcase } from '@/lib/sky';
 const LINKS = [
   { href: '/sky', label: 'Sky', desc: 'Observer and all-sky views' },
   { href: '/blink/3i-atlas', label: 'Blink', match: '/blink', desc: 'Compare epochs' },
-  { href: '/candidates', label: 'Fields', desc: 'Measured fields' },
+  { href: '/candidates', label: 'Featured', desc: 'Measured fields' },
   { href: '/about', label: 'About', desc: 'Mission and method' },
 ];
 
@@ -27,8 +27,8 @@ function appLink(): string {
 
 /**
  * Plain navbar: one fixed-height row, no morphing, no resizing panels.
- * Desktop row: brand, Sky link, search input (flex), Fields link, menu.
- * Mobile row: brand, sky/search/fields icons, menu (bottom dock); the
+ * Desktop row: brand, Sky link, search input (flex), Featured link, menu.
+ * Mobile row: brand, sky/search/featured icons, menu (bottom dock); the
  * search icon swaps in a full-width input row at the same height.
  * Typing hides every sibling control (logo stays) with a width animation.
  * Suggestions and the menu sheet are absolutely positioned overlays —
@@ -176,7 +176,7 @@ export default function Header() {
     { href: '/', label: 'Home', desc: 'Front door', icon: 'home', active: pathname === '/' },
     { href: '/sky', label: 'Sky', desc: 'Observer and all-sky views', icon: 'skymap', active: skyActive },
     { href: '/blink/3i-atlas', label: 'Blink', desc: 'Compare epochs', icon: 'split', active: pathname.startsWith('/blink') },
-    { href: '/candidates', label: 'Fields', desc: 'Measured fields', icon: 'target', active: candActive },
+    { href: '/candidates', label: 'Featured', desc: 'Measured fields', icon: 'target', active: candActive },
     { href: '/about', label: 'About', desc: 'Mission and method', icon: 'info', active: pathname === '/about' },
   ];
 
@@ -224,16 +224,16 @@ export default function Header() {
             <span className="ibtn-label" aria-hidden="true">Search</span>
           </button>
         )}
-        <Link href="/candidates" aria-label="Candidate fields"
+        <Link href="/candidates" aria-label="Featured fields"
           aria-current={candActive ? 'page' : undefined}
           className={`nav-textlink collapsible${candActive ? ' active' : ''}`}>
-          Fields
+          Featured
         </Link>
-        <Link href="/candidates" aria-label="Candidate fields"
+        <Link href="/candidates" aria-label="Featured fields"
           aria-current={candActive ? 'page' : undefined}
           className={`island-iconbtn nav-icononly collapsible${candActive ? ' active' : ''}`}>
           <Icon name="target" className="icon" />
-          <span className="ibtn-label" aria-hidden="true">Fields</span>
+          <span className="ibtn-label" aria-hidden="true">Featured</span>
         </Link>
         <button type="button" className="island-iconbtn collapsible" aria-label={menuOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={menuOpen} aria-controls={menuOpen ? 'menu-sheet' : undefined}
