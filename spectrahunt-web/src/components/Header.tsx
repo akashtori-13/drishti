@@ -17,6 +17,15 @@ const LINKS = [
 ];
 
 /**
+ * Where "Get the app" points. Today every platform lands on the GitHub
+ * releases page (APK, AppImage/deb, exe). Tomorrow this branches into
+ * platform-aware store links — keep all routing here.
+ */
+function appLink(): string {
+  return 'https://github.com/akashtori-13/stellar/releases';
+}
+
+/**
  * Plain navbar: one fixed-height row, no morphing, no resizing panels.
  * Desktop row: brand, Sky link, search input (flex), Fields link, menu.
  * Mobile row: brand, sky/search/fields icons, menu (bottom dock); the
@@ -263,6 +272,14 @@ export default function Header() {
           ))}
           <div className="menu-div" role="separator" aria-hidden="true" />
           <SurpriseButton className="menu-link menu-action" onPick={surprisePick} desc="Open a random blink" />
+          <a className="menu-link menu-action" href={appLink()} target="_blank" rel="noreferrer"
+            title="Open the release builds page">
+            <Icon name="dl" className="icon" />
+            <span className="menu-text">
+              <span className="menu-label">Get the app</span>
+              <span className="menu-desc">Android · Linux · Windows builds</span>
+            </span>
+          </a>
         </nav>
       )}
     </div>

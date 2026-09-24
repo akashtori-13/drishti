@@ -11,7 +11,6 @@ import { CHANNELS } from '@/lib/astro';
 import HeroSky from '@/components/HeroSky';
 import SearchBox, { type SearchTarget } from '@/components/SearchBox';
 import SurpriseButton from '@/components/SurpriseButton';
-import InstallButton from '@/components/InstallButton';
 import OrbitHero from '@/components/orbital/OrbitHero';
 import Inspector, { type InspectorField } from '@/components/Inspector';
 import SpaceBackdrop from '@/components/SpaceBackdrop';
@@ -302,7 +301,6 @@ export default function HomePage() {  const router = useRouter();
               <button type="button" className="chip" onClick={() => pick({ label: 'Orion Complex', ra: 83.82, dec: -5.39 })}>Orion Complex</button>
               <span className="quick-sep" aria-hidden="true">·</span>
               <SurpriseButton onPick={pick} />
-              <InstallButton />
             </div>
           </div>
 
