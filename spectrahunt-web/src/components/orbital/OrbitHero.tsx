@@ -660,6 +660,10 @@ export default function OrbitHero() {
       if (h && h === S.hero) router.push('/intro');
     };
     const onWheel = (e: WheelEvent) => {
+      // zoom only over the globe disc itself — the halo/atmosphere and the
+      // void around it stay scrollable so the wheel never traps the page.
+      const p = toLocal(e);
+      if (Math.hypot(p.x - S.cx, p.y - S.cy) > S.R) return;
       e.preventDefault();
       S.zoom = Math.min(2.2, Math.max(0.6, S.zoom * (e.deltaY > 0 ? 0.92 : 1.09)));
       applyZoom();
