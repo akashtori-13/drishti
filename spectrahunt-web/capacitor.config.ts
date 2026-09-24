@@ -12,6 +12,12 @@ const config: CapacitorConfig = {
     androidScheme: 'https',
     hostname: 'stellar.app',
   },
+  android: {
+    // WebView background behind the page: matches --space so there is no
+    // white flash on launch or overscroll. System bars are styled natively
+    // in res/values (colors.xml + styles.xml).
+    backgroundColor: '#05060c',
+  },
 };
 
 export default config;

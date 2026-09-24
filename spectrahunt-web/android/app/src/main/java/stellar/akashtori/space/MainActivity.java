@@ -1,4 +1,4 @@
-package org.stellar.app.offline;
+package stellar.akashtori.space;
 
 import com.getcapacitor.BridgeActivity;
 
