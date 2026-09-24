@@ -216,7 +216,7 @@ export default function Header() {
             </nav>
           )}
           {showSearch && (
-            <SearchBox id="nav-search" placeholder="Jump to an object, field, or coordinates" onPick={pick} />
+            <SearchBox id="nav-search" placeholder="Jump to an object or field…" onPick={pick} />
           )}
           {showCarousel && fields && fields.length > 0 && (
             <div className="island-carousel">
