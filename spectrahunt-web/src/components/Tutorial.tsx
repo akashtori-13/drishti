@@ -81,12 +81,12 @@ export default function Tutorial() {
     }, 160);
   };
   return (
-    <div role="dialog" aria-modal="true" aria-label="Quick tutorial"
+    <div role="dialog" aria-modal="true" aria-label="Quick tutorial" className="tut-veil"
       style={{ position: 'fixed', inset: 0, zIndex: 80, display: 'grid', placeItems: 'center', background: 'rgba(4,5,10,.72)', padding: 20 }}>
       <div
         ref={panelRef}
         tabIndex={-1}
-        className="glass"
+        className="glass tut-panel"
         style={{ position: 'relative', maxWidth: 480, width: '100%', borderRadius: 20, padding: 28, outline: 'none' }}
       >
         <button type="button" onClick={() => setTutorialDone(true)} aria-label="Skip tutorial"
