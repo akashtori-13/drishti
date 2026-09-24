@@ -6,6 +6,28 @@
   "story": "A whole galaxy in one field. Blink two SPHEREx visits (D3) to hunt novae and long-period variables in M31.",
   "epochs": [
     {
+      "label": "2025-07-21 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": null,
+      "mjd": 60877.780835,
+      "ra": 10.68,
+      "dec": 41.27,
+      "size_deg": 0.15,
+      "png": "/cutouts/m31-field_2025-07-21.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2025W30_1B/l2b-v20-2025-262/3/level2_2025W30_1B_0138_3D3_spx_l2b-v20-2025-262.fits?center=10.68,41.27&size=0.15"
+    },
+    {
+      "label": "2025-07-22 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": null,
+      "mjd": 60878.1887,
+      "ra": 10.68,
+      "dec": 41.27,
+      "size_deg": 0.15,
+      "png": "/cutouts/m31-field_2025-07-22.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2025W30_1B/l2b-v20-2025-262/3/level2_2025W30_1B_0213_2D3_spx_l2b-v20-2025-262.fits?center=10.68,41.27&size=0.15"
+    },
+    {
       "label": "2025-12-18 \u00b7 D3",
       "band": 3,
       "wavelength_um": null,
@@ -88,6 +110,36 @@
       "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2025W29_2A/l2b-v20-2025-262/3/level2_2025W29_2A_0202_1D3_spx_l2b-v20-2025-262.fits?center=10.68,41.27&size=0.15",
       "mjd": null,
       "wavelength_um": 2.02
+    },
+    "1": {
+      "png": "/cutouts/m31-field_D1.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W28_2A/l2b-v25-2026-195/1/level2_2026W28_2A_0257_1D1_spx_l2b-v25-2026-195.fits?center=10.68,41.27&size=0.15",
+      "mjd": 61231.748984,
+      "wavelength_um": 0.92
+    },
+    "2": {
+      "png": "/cutouts/m31-field_D2.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W29_1A/l2b-v25-2026-203/2/level2_2026W29_1A_0362_4D2_spx_l2b-v25-2026-203.fits?center=10.68,41.27&size=0.15",
+      "mjd": 61235.894077,
+      "wavelength_um": 1.36
+    },
+    "4": {
+      "png": "/cutouts/m31-field_D4.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W28_2A/l2b-v25-2026-195/4/level2_2026W28_2A_0257_1D4_spx_l2b-v25-2026-195.fits?center=10.68,41.27&size=0.15",
+      "mjd": 61231.748984,
+      "wavelength_um": 3.12
+    },
+    "5": {
+      "png": "/cutouts/m31-field_D5.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W29_1A/l2b-v25-2026-203/5/level2_2026W29_1A_0443_2D5_spx_l2b-v25-2026-203.fits?center=10.68,41.27&size=0.15",
+      "mjd": 61236.29855,
+      "wavelength_um": 4.12
+    },
+    "6": {
+      "png": "/cutouts/m31-field_D6.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr3/level2/2026W30_1B/l2b-v27-2026-222/6/level2_2026W30_1B_0564_3D6_spx_l2b-v27-2026-222.fits?center=10.68,41.27&size=0.15",
+      "mjd": 61243.836178,
+      "wavelength_um": 4.71
     }
   }
 }

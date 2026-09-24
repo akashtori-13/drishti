@@ -3,7 +3,7 @@ import SiteChrome from '@/components/SiteChrome';
 import AboutPage from '@/components/AboutPage';
 
 export const metadata: Metadata = {
-  title: 'About — SpectraHunt',
+  title: 'About — STELLAR',
 };
 
 export default function About() {

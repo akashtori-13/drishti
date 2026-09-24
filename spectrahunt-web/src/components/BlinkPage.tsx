@@ -50,7 +50,6 @@ function RailHistogram({ watch }: { watch: unknown }) {
     };
     const t = requestAnimationFrame(() => setTimeout(draw, 60));
     return () => cancelAnimationFrame(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watch]);
   return <canvas ref={ref} className="hist" style={{ width: '100%' }} aria-label="Live frame brightness histogram" />;
 }
@@ -94,12 +93,12 @@ function BandSpectrum({ viewing, sample, liveSpec, band }: {
     let alive = true;
     const entries = Object.entries(viewing.bands ?? {})
       .filter(([, b]) => b.png)
-      .map(([k, b]) => ({ det: Number(k), png: b.png as string, wave: b.wavelength_um ?? 0 }));
+      .map(([, b]) => ({ png: b.png as string, wave: b.wavelength_um ?? 0 }));
     if (!entries.length) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setPts(null); return;
     }
-    void Promise.all(entries.map(({ det, png, wave }) => new Promise<{ wave: number; flux: number } | null>((resolve) => {
+    void Promise.all(entries.map(({ png, wave }) => new Promise<{ wave: number; flux: number } | null>((resolve) => {
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => {
@@ -155,6 +154,14 @@ export default function BlinkPage({ id }: { id: string }) {
     variable_flag: boolean; known: { name: string; kind: string } | null; detail: string;
   } | null>(null);
   const [detStats, setDetStats] = useState<{ movers: number; variables: number; ready: boolean } | null>(null);
+  // live blink: the game stays until a full pair decodes (one frame is a
+  // still, not a blink). Latched during render — detStats flips back to null
+  // whenever the viewer steps onto a pending frame, but the game must not
+  // reappear mid-browse.
+  const [pairSeen, setPairSeen] = useState(false);
+  if (detStats?.ready && !pairSeen) {
+    setPairSeen(true);
+  }
   const viewing = data && data.id === id ? data : null;
 
   // load showcase (static JSON or live IRSA frames)
@@ -164,6 +171,7 @@ export default function BlinkPage({ id }: { id: string }) {
     setLoading(true);
     setErr(null);
     setData(null);
+    setPairSeen(false);
     setSample(null);
     setLiveSpec(null);
     setLiveLc(null);
@@ -183,7 +191,8 @@ export default function BlinkPage({ id }: { id: string }) {
         const qb = parseInt(q.get('band') ?? '', 10);
         if (qb >= 1 && qb <= 6) setBand(qb);
         const qe = parseInt(q.get('epoch') ?? '', 10);
-        if (Number.isInteger(qe) && qe >= 0) setEpochIdx(qe);
+        // clamp both ends: negative or past-the-last shared links land on an edge
+        if (Number.isInteger(qe)) setEpochIdx(Math.min(Math.max(0, qe), Math.max(0, d.epochs.length - 1)));
         const qm = q.get('mode');
         if (qm === 'side' || qm === 'swipe' || qm === 'diff' || qm === 'blink') setCompareMode(qm);
       } catch { /* keep defaults */ }
@@ -269,6 +278,24 @@ export default function BlinkPage({ id }: { id: string }) {
     return window.location.origin + blinkURL(id, { band, epoch: epochIdx, mode: compareMode });
   };
 
+  // Space/WaitGame double-handling guard (capture phase, runs before the
+  // game and viewer handlers): editable targets keep their keys — neither the
+  // invaders game nor blink transport may steal Space/arrows from a field.
+  useEffect(() => {
+    const guard = (e: KeyboardEvent) => {
+      if (e.key !== ' ' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      const t = e.target as HTMLElement | null;
+      if (!t || typeof t.tagName !== 'string') return;
+      const tag = t.tagName;
+      if (['INPUT', 'SELECT', 'TEXTAREA'].includes(tag)
+        || t.getAttribute?.('role') === 'combobox' || t.isContentEditable) {
+        e.stopPropagation();
+      }
+    };
+    document.addEventListener('keydown', guard, { capture: true });
+    return () => document.removeEventListener('keydown', guard, { capture: true });
+  }, []);
+
   useEffect(() => {
     try {
       const raw = localStorage.getItem(`sh-flags-${id}`);
@@ -290,15 +317,22 @@ export default function BlinkPage({ id }: { id: string }) {
   const copyLink = async () => {
     const url = shareURL();
     try {
-      await navigator.clipboard.writeText(url);
-    } catch {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+        return;
+      }
+    } catch { /* fall through to the legacy path */ }
+    try {
       const ta = document.createElement('textarea');
       ta.value = url;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
       document.body.appendChild(ta);
       ta.select();
       document.execCommand('copy');
       ta.remove();
-    }
+    } catch { /* clipboard unavailable — link stays in the address bar */ }
   };
 
   const exportJSON = () => {
@@ -350,6 +384,9 @@ export default function BlinkPage({ id }: { id: string }) {
         ? <WaitGame status="Fetching live IRSA frames — discovery, renders, cross-match…" />
         : <div className="bw-status">Loading {id}…</div>
       )}
+      {!loading && isLiveId(id) && viewing && !pairSeen && (
+        <WaitGame status="First frames decoding — almost there…" />
+      )}
       {err && !loading && (
         <div className="bw-status error">
           Couldn’t load this field: {err} — try a <Link href="/blink/3i-atlas">curated blink</Link> or pick another map point.
@@ -357,7 +394,7 @@ export default function BlinkPage({ id }: { id: string }) {
       )}
 
       {viewing && (
-        <div className="bw-grid">
+        <div className="bw-grid" style={isLiveId(id) && !pairSeen ? { display: 'none' } : undefined}>
           <section className="bw-viewer" aria-label="Epoch comparator">
             <div className="bw-title">
               <h1>{viewing.title}</h1>
@@ -450,7 +487,7 @@ export default function BlinkPage({ id }: { id: string }) {
                 <>
                   <div className="epoch-list">
                     {epochs.map((e, i) => (
-                      <button key={e.label} type="button" onClick={() => setEpochIdx(i)}
+                      <button key={`${e.label}::${i}`} type="button" onClick={() => setEpochIdx(i)}
                         className={`epoch-item${i === epochIdx ? ' active' : ''}`} aria-pressed={i === epochIdx}>
                         <span>{e.label}</span>
                         <span className="mono">{e.mjd ? mjdToDate(e.mjd) : ''}</span>

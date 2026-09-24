@@ -3,7 +3,7 @@ import SiteChrome from '@/components/SiteChrome';
 import SkyPage from '@/components/SkyPage';
 
 export const metadata: Metadata = {
-  title: 'Sky map — SpectraHunt',
+  title: 'Sky map — STELLAR',
 };
 
 export default function Sky() {

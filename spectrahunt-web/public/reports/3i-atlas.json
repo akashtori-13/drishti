@@ -3,12 +3,12 @@
   "title": "3I/ATLAS \u2014 interstellar comet, Aug vs Dec 2025",
   "ra": 252.6633,
   "dec": -17.4904,
-  "measured_at": "2026-09-21T23:07:27.980192+00:00",
-  "detail": "ok",
-  "movers": 13,
-  "variables": 9,
-  "top_sigma": 143.4,
-  "n_epochs": 2,
+  "measured_at": "2026-09-23T15:06:15.902836+00:00",
+  "detail": "pipeline-error: 'NoneType' object has no attribute 'get'",
+  "movers": 0,
+  "variables": 0,
+  "top_sigma": 0.0,
+  "n_epochs": 0,
   "span_days": 135.1,
   "variable_flag": false,
   "known": {
@@ -16,44 +16,7 @@
     "kind": "interstellar comet",
     "citation": "Lisse et al. RNAAS 9:242; SPHEREx obscore_3I_Atlas.vot"
   },
-  "lightcurve": [
-    {
-      "mjd": 60888.33344,
-      "flux": 3.2895868569612503
-    },
-    {
-      "mjd": 61112.604449,
-      "flux": 4.297384470701218
-    }
-  ],
-  "spectrum": [
-    {
-      "band": 1,
-      "wavelength_um": 0.92,
-      "flux": 0.8839185982942581,
-      "flux_err": 3.1266256515115147,
-      "mjd": 61104.726712
-    },
-    {
-      "band": 2,
-      "wavelength_um": 1.36,
-      "flux": 3.0375034511089325,
-      "flux_err": 3.550481461654223,
-      "mjd": 61259.333673
-    },
-    {
-      "band": 3,
-      "wavelength_um": 2.02,
-      "flux": 4.297384470701218,
-      "flux_err": 3.901506252599151,
-      "mjd": 61112.604449
-    },
-    {
-      "band": 6,
-      "wavelength_um": 4.71,
-      "flux": 0.6341693997383118,
-      "flux_err": 0.7199606194039081,
-      "mjd": 61112.604449
-    }
-  ]
+  "objects": [],
+  "lightcurve": [],
+  "spectrum": []
 }

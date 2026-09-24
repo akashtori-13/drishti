@@ -4,7 +4,7 @@ export const dynamic = 'force-static';
 import { SHOWCASE_IDS } from '@/lib/showcases';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = 'https://spectrahunt.space';
+  const base = 'https://stellar.space';
   const now = new Date();
   return [
     { url: `${base}/`, lastModified: now },

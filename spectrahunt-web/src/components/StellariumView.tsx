@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { API_BASE } from '@/lib/showcases';
+import { lerpAngle, poseFromOrientation, radecFromPose } from '@/lib/skyposture';
 import { cachedImageSrc, loadCachedImage, lsGet, lsSet, prefetch } from '@/lib/skycache';
 
 export interface Observer { lat: number; lon: number; name: string }
@@ -146,6 +147,13 @@ export default function StellariumView({
   const [img, setImg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [cursor, setCursor] = useState<{ ra: number; dec: number; alt: number; az: number } | null>(null);
+  // Live clock readout is client-only: SSR and hydration render a placeholder
+  // so a minute rollover between server render and hydration can't mismatch.
+  const [clockOn, setClockOn] = useState(false);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setClockOn(true);
+  }, []);
   const [lines, setLines] = useState<ConLines | null>(null);
   const [stars, setStars] = useState<Array<{ ra: number; dec: number; g_mag: number | null }>>([]);
   const t = new Date(now.getTime() + offH * 3600e3);
@@ -158,6 +166,26 @@ export default function StellariumView({
   const drag = useRef<{ x: number; y: number; ra: number; dec: number; moved: boolean } | null>(null);
   const pointers = useRef(new Map<number, { x: number; y: number }>());
   const pinch = useRef<{ dist: number; fov: number } | null>(null);
+  // RAF-throttled look: pointermove only stages values, one state flush per frame.
+  const pendingLook = useRef<{ ra: number; dec: number; cursor: { ra: number; dec: number; alt: number; az: number } | null } | null>(null);
+  const flushRaf = useRef(0);
+  const flushLook = () => {
+    flushRaf.current = 0;
+    const p = pendingLook.current;
+    pendingLook.current = null;
+    if (!p) return;
+    setRa(p.ra);
+    setDec(p.dec);
+    setCursor(p.cursor);
+  };
+  const kickLook = () => {
+    if (!flushRaf.current) flushRaf.current = requestAnimationFrame(flushLook);
+  };
+  useEffect(() => () => {
+    cancelAnimationFrame(flushRaf.current);
+    flushRaf.current = 0;
+    pendingLook.current = null;
+  }, []);
 
   // mirror latest view for canvas callbacks (synced in an effect, never during render)
   useEffect(() => {
@@ -214,6 +242,123 @@ export default function StellariumView({
       () => undefined,
       { timeout: 8000 },
     );
+  }, []);
+
+  // ---------- point-at-sky AR: phone sensors drive the camera ----------
+  const [ar, setAr] = useState<'off' | 'on' | 'paused'>('off');
+  const [poseHud, setPoseHud] = useState<{ heading: number; elev: number; acc: number | null } | null>(null);
+  const [arMsg, setArMsg] = useState<string | null>(null);
+  const [calib, setCalib] = useState(0);
+  const arCfg = useRef({ lat: 23.81, lon: 90.41, calib: 0 });
+  const arActive = useRef(false);
+  const smooth = useRef<{ h: number; e: number } | null>(null);
+  const driven = useRef<{ ra: number; dec: number } | null>(null);
+  const lastHud = useRef(0);
+  useEffect(() => {
+    arCfg.current = { lat: obs.lat, lon: obs.lon, calib };
+  });
+  useEffect(() => {
+    try {
+      const v = Number(localStorage.getItem('sh-ar-calib') ?? 0) || 0;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      if (v) setCalib(v);
+    } catch { /* noop */ }
+  }, []);
+  const setCalibBoth = (v: number) => {
+    const c = Math.max(-45, Math.min(45, Math.round(v)));
+    setCalib(c);
+    try { localStorage.setItem('sh-ar-calib', String(c)); } catch { /* noop */ }
+  };
+
+  const onOrientation = useCallback((e: DeviceOrientationEvent) => {
+    if (!arActive.current) return;
+    const o = e as DeviceOrientationEvent & {
+      webkitCompassHeading?: number | null; webkitCompassAccuracy?: number | null;
+    };
+    const rawAngle = window.screen?.orientation?.angle ?? 0;
+    const screenAngle = rawAngle === 270 ? -90 : rawAngle;
+    const pose = poseFromOrientation({
+      alpha: e.alpha, beta: e.beta, gamma: e.gamma,
+      absolute: (e as { absolute?: boolean | null }).absolute ?? false,
+      webkitCompassHeading: o.webkitCompassHeading ?? null,
+      webkitCompassAccuracy: o.webkitCompassAccuracy ?? null,
+      screenAngle,
+    });
+    if (pose.heading == null || pose.elev == null) {
+      setArMsg('No compass signal — wave a figure-8 to calibrate, or use manual look.');
+      return;
+    }
+    const s = smooth.current;
+    const h = s ? lerpAngle(s.h, pose.heading, 0.3) : pose.heading;
+    const ev = s ? s.e + (pose.elev - s.e) * 0.3 : pose.elev;
+    smooth.current = { h, e: ev };
+    const rc = radecFromPose(
+      { heading: h, elev: ev, headingAcc: pose.headingAcc },
+      { lat: arCfg.current.lat, lon: arCfg.current.lon },
+      new Date(), arCfg.current.calib,
+    );
+    if (!rc) return;
+    // drive the camera only on meaningful motion (render-storm guard)
+    const last = driven.current;
+    if (!last || Math.abs(normRa(rc.ra - last.ra)) > 0.15 || Math.abs(rc.dec - last.dec) > 0.15) {
+      driven.current = rc;
+      setRa(normRa(rc.ra));
+      setDec(Math.max(-88, Math.min(88, rc.dec)));
+    }
+    const nowMs = Date.now();
+    if (nowMs - lastHud.current > 250) {
+      lastHud.current = nowMs;
+      setPoseHud({ heading: h, elev: ev, acc: pose.headingAcc });
+    }
+  }, []);
+
+  const stopAR = useCallback(() => {
+    arActive.current = false;
+    window.removeEventListener('deviceorientation', onOrientation as EventListener);
+    setAr('off');
+    setPoseHud(null);
+  }, [onOrientation]);
+
+  useEffect(() => () => {
+    arActive.current = false;
+    window.removeEventListener('deviceorientation', onOrientation as EventListener);
+  }, [onOrientation]);
+
+  const startAR = useCallback(() => {
+    setArMsg(null);
+    if (typeof window === 'undefined' || !('DeviceOrientationEvent' in window)) {
+      setArMsg('Orientation sensors unavailable here — manual look instead.');
+      return;
+    }
+    // AR needs a real site: nudge GPS while still on the default
+    if (obs.name !== 'You (GPS)') locate();
+    const go = () => {
+      smooth.current = null;
+      driven.current = null;
+      arActive.current = true;
+      window.addEventListener('deviceorientation', onOrientation as EventListener);
+      setAr('on');
+    };
+    try {
+      const DOE = DeviceOrientationEvent as unknown as { requestPermission?: () => Promise<string> };
+      if (DOE && typeof DOE.requestPermission === 'function') {
+        // iOS: permission must come from a user gesture (this click qualifies)
+        void DOE.requestPermission().then(
+          (r) => {
+            if (r === 'granted') go();
+            else setArMsg('Motion permission denied — manual look instead.');
+          },
+          () => setArMsg('Motion permission denied — manual look instead.'),
+        );
+      } else go();
+    } catch { go(); }
+  }, [locate, obs.name, onOrientation]);
+
+  const resumeAR = useCallback(() => {
+    smooth.current = null;
+    driven.current = null;
+    arActive.current = true;
+    setAr('on');
   }, []);
 
   // sky image: snapped tiles (map-style) + two-stage preview + device cache.
@@ -434,6 +579,11 @@ export default function StellariumView({
 
   const down = (e: React.PointerEvent) => {
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+    // grabbing the sky pauses sensor look (Resume chip re-engages)
+    if (arActive.current) {
+      arActive.current = false;
+      setAr('paused');
+    }
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (pointers.current.size === 1) {
       drag.current = { x: e.clientX, y: e.clientY, ra, dec, moved: false };
@@ -466,19 +616,31 @@ export default function StellariumView({
     const x = -((e.clientX - r.left - r.width / 2) / scale);
     const y = -((e.clientY - r.top - r.height / 2) / scale);
     const p = unproject(x, y, view.current.ra, view.current.dec);
-    if (p.dec >= -90 && p.dec <= 90) {
-      const a = altAz(p.ra, p.dec, obs.lat, obs.lon, t);
-      setCursor({ ...p, ...a });
+    const cursor = p.dec >= -90 && p.dec <= 90
+      ? { ...p, ...altAz(p.ra, p.dec, obs.lat, obs.lon, t) }
+      : null;
+    if (!drag.current) {
+      // hover readout joins the same per-frame flush (no render per move)
+      pendingLook.current = { ra: view.current.ra, dec: view.current.dec, cursor };
+      kickLook();
+      return;
     }
-    if (!drag.current) return;
     const dx = e.clientX - drag.current.x;
     const dy = e.clientY - drag.current.y;
     if (Math.hypot(dx, dy) > 5) drag.current.moved = true;
-    else return;
+    else {
+      pendingLook.current = { ra: view.current.ra, dec: view.current.dec, cursor };
+      kickLook();
+      return;
+    }
     // drag sky with the pointer (mirrored X mapping: center moves +RA when dragged right)
     const degPerPx = view.current.fov / r.width;
-    setRa(normRa(drag.current.ra + dx * degPerPx / Math.max(0.3, Math.cos(view.current.dec * D2R))));
-    setDec(Math.max(-88, Math.min(88, drag.current.dec + dy * degPerPx)));
+    pendingLook.current = {
+      ra: normRa(drag.current.ra + dx * degPerPx / Math.max(0.3, Math.cos(view.current.dec * D2R))),
+      dec: Math.max(-88, Math.min(88, drag.current.dec + dy * degPerPx)),
+      cursor,
+    };
+    kickLook();
   };
   const up = (e: React.PointerEvent) => {
     pointers.current.delete(e.pointerId);
@@ -487,7 +649,13 @@ export default function StellariumView({
       // drop back to single-finger pan from the remaining finger
       const [id, pt] = [...pointers.current.entries()][0];
       void id;
-      drag.current = { x: pt.x, y: pt.y, ra, dec, moved: true };
+      // state may lag one flushed frame behind the drag — anchor from pending
+      drag.current = {
+        x: pt.x, y: pt.y,
+        ra: pendingLook.current?.ra ?? ra,
+        dec: pendingLook.current?.dec ?? dec,
+        moved: true,
+      };
       return;
     }
     const wasDrag = drag.current?.moved;
@@ -508,6 +676,21 @@ export default function StellariumView({
   ];
   const centerAz = centerAltAz.az;
 
+  // keyboard parity: arrows look around, Enter/Space inspects the center.
+  // Discrete key steps need no RAF throttle — one state update per keypress.
+  const onKeyLook = (e: React.KeyboardEvent) => {
+    const step = e.shiftKey ? fov / 2 : fov / 10;
+    const decStep = step / Math.max(0.3, Math.cos(dec * D2R));
+    let handled = true;
+    if (e.key === 'ArrowLeft') setRa((v) => normRa(v - decStep));
+    else if (e.key === 'ArrowRight') setRa((v) => normRa(v + decStep));
+    else if (e.key === 'ArrowUp') setDec((v) => Math.min(88, v + step));
+    else if (e.key === 'ArrowDown') setDec((v) => Math.max(-88, v - step));
+    else if (e.key === 'Enter' || e.key === ' ') onInspect(ra, dec);
+    else handled = false;
+    if (handled) e.preventDefault();
+  };
+
   return (
     <div className="stel" ref={hostRef}>
       {img && (
@@ -515,9 +698,9 @@ export default function StellariumView({
         <img src={img} alt="" aria-hidden="true" draggable={false}
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
       )}
-      <canvas ref={canvasRef} role="img"
-        aria-label={`Observer sky view centered RA ${ra.toFixed(1)}, Dec ${dec.toFixed(1)}, field ${fov.toFixed(0)} degrees. Drag to look, scroll to zoom, click to inspect.`}
-        onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}
+      <canvas ref={canvasRef} role="img" tabIndex={0}
+        aria-label={`Observer sky view centered RA ${ra.toFixed(1)}, Dec ${dec.toFixed(1)}, field ${fov.toFixed(0)} degrees. Drag to look, scroll to zoom, click to inspect. Arrow keys look, Enter inspects the center.`}
+        onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onKeyDown={onKeyLook}
         onPointerLeave={() => { pointers.current.clear(); pinch.current = null; drag.current = null; setCursor(null); }}
       />
       {loading && !img && <div className="stel-load">Loading real sky…</div>}
@@ -543,7 +726,7 @@ export default function StellariumView({
       {/* HUD */}
       <div className="stel-hud">
         <button type="button" className="epoch-chip" onClick={locate} title="Use device location">📍 {obs.name}</button>
-        <span className="mono">{t.toLocaleDateString()} {t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+        <span className="mono">{clockOn ? `${t.toLocaleDateString()} ${t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : '—'}</span>
         <span role="group" aria-label="Time step" style={{ display: 'flex', gap: 4 }}>
           <button type="button" className="epoch-chip" onClick={() => setOffH((h) => h - 1)} title="Back 1 hour">−1h</button>
           <button type="button" className="epoch-chip" onClick={() => setOffH((h) => h + 1)} title="Forward 1 hour">+1h</button>
@@ -551,6 +734,25 @@ export default function StellariumView({
         </span>
         <span className="mono">Alt {centerAltAz.alt.toFixed(1)}° Az {centerAltAz.az.toFixed(1)}°</span>
         <span className="mono">FOV {fov < 10 ? fov.toFixed(1) : fov.toFixed(0)}°</span>
+        {ar === 'off' ? (
+          <button type="button" className="epoch-chip" onClick={startAR} title="Point your phone at the sky">◉ Point</button>
+        ) : (
+          <button type="button" className="epoch-chip" aria-pressed={ar === 'on'} onClick={stopAR}
+            title="Stop sensor look">◉ Live{ar === 'paused' ? ' (paused)' : ''}</button>
+        )}
+        {ar === 'paused' && (
+          <button type="button" className="epoch-chip" onClick={resumeAR} title="Resume sensor look">Resume</button>
+        )}
+        {ar !== 'off' && poseHud && (
+          <span className="mono">◉ {poseHud.heading.toFixed(0)}° ↕ {poseHud.elev.toFixed(0)}°{poseHud.acc != null ? ` ±${poseHud.acc.toFixed(0)}°` : ''}</span>
+        )}
+        {ar !== 'off' && (
+          <span role="group" aria-label="Compass calibration" style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+            <button type="button" className="epoch-chip" onClick={() => setCalibBoth(calib - 1)} title="Nudge compass −1°">−1°</button>
+            <button type="button" className="epoch-chip" onClick={() => setCalibBoth(calib + 1)} title="Nudge compass +1°">+1°</button>
+          </span>
+        )}
+        {arMsg && <span className="mono" role="status">{arMsg}</span>}
         {cursor && <span className="mono">→ RA {cursor.ra.toFixed(2)}° Dec {cursor.dec.toFixed(2)}°</span>}
         <select value={survey} onChange={(e) => setSurvey(e.target.value)} aria-label="Sky survey"
           style={{ background: '#151929', border: '1px solid var(--line)', borderRadius: 8, padding: '3px 6px', fontSize: 12 }}>
