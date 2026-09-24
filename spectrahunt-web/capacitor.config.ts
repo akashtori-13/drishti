@@ -3,7 +3,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 // Offline-first native shell: serves the static export bundled in `out/`.
 // Same source as web/desktop — no per-platform web code.
 const config: CapacitorConfig = {
-  appId: 'org.stellar.app.offline',
+  appId: 'stellar.akashtori.space',
   appName: 'STELLAR',
   webDir: 'out',
   server: {
