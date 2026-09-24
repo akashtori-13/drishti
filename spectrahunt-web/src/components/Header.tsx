@@ -192,11 +192,13 @@ export default function Header() {
             />
           </form>
         )}
-        <button type="button" className="island-iconbtn" aria-label="Search and navigate (Ctrl+K)"
-          title="Search and navigate (Ctrl+K)" onClick={() => setPanel((p) => (p === 'search' ? null : 'search'))}>
-          <Icon name="search" className="icon" />
-          <span className="ibtn-label" aria-hidden="true">Search</span>
-        </button>
+        {pathname !== '/' && (
+          <button type="button" className="island-iconbtn" aria-label="Search and navigate (Ctrl+K)"
+            title="Search and navigate (Ctrl+K)" onClick={() => setPanel((p) => (p === 'search' ? null : 'search'))}>
+            <Icon name="search" className="icon" />
+            <span className="ibtn-label" aria-hidden="true">Search</span>
+          </button>
+        )}
         <SurpriseButton
           compact
           label="Surprise"
