@@ -34,8 +34,17 @@ export default function InstallButton() {
     <button
       type="button" className="chip"
       onClick={() => {
-        void deferred.prompt().then(() => deferred.userChoice).catch(() => undefined);
-        setDeferred(null);
+        void (async () => {
+          try {
+            await deferred.prompt();
+            const choice = await deferred.userChoice;
+            // Keep the deferred prompt until the user accepts, so a
+            // dismissal leaves the install affordance available.
+            if (choice?.outcome === 'accepted') setDeferred(null);
+          } catch {
+            /* keep deferred for retry */
+          }
+        })();
       }}
     >
       Install app

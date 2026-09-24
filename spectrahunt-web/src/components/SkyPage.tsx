@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { LEVEL_COLORS } from '@/lib/sky';
@@ -52,6 +52,46 @@ export default function SkyPage() {
   const [field, setField] = useState<InspectorField | null>(null);
   const [focus, setFocus] = useState<StelFocus | null>(null);
   const [real, setReal] = useState<Map<string, RealCell> | null>(null);
+  // Observer<->All-sky crossfade: `shown` (rendered view) lags `observer`
+  // (target) through a fade-out / swap / fade-in. Consumes the motion tokens
+  // with local fallbacks until the shared .xfade class lands in globals.css.
+  const [shown, setShown] = useState(true);
+  const [fading, setFading] = useState(false);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const swapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wantFocus = useRef(false);
+  const reduced = useMemo(
+    () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    [],
+  );
+  useEffect(() => () => {
+    if (swapTimer.current) clearTimeout(swapTimer.current);
+  }, []);
+  // focus continuity: if focus was inside the sky stage at swap time, carry it
+  // to the incoming canvas once mounted.
+  useEffect(() => {
+    if (wantFocus.current) {
+      wantFocus.current = false;
+      stageRef.current?.querySelector('canvas')?.focus();
+    }
+  }, [shown]);
+  const setView = (next: boolean) => {
+    if (next === observer) return;
+    if (swapTimer.current) clearTimeout(swapTimer.current);
+    // sel continuity: arriving in Observer centers it on the map selection
+    if (next && sel) setFocus({ ra: sel.ra, dec: sel.dec, key: Date.now() });
+    wantFocus.current = !!stageRef.current?.contains(document.activeElement);
+    setObserver(next);
+    if (reduced) {
+      setShown(next); // instant cut under reduced motion
+      return;
+    }
+    setFading(true);
+    swapTimer.current = setTimeout(() => {
+      setShown(next);
+      requestAnimationFrame(() => requestAnimationFrame(() => setFading(false)));
+    }, 220);
+  };
 
   // inspector selection (declared before effects: the arrival-target effect calls it)
   const inspect = (ra: number, dec: number) => {
@@ -103,21 +143,31 @@ export default function SkyPage() {
   return (
     <div id="view-sky">
       <h1 className="sr-only">Sky map</h1>
-      {observer ? (
-        <StellariumView
-          focus={focus}
-          onInspect={inspect}
-          initial={{ ra: 83.8, dec: -5.4 }}
-          liveStars={useLive}
-        />
-      ) : (
-        <CoverageMap
-          grid={grid} coverage={coverage} selected={sel}
-          onHover={setHover}
-          onInspect={inspect}
-        />
-      )}
-      {!observer && (
+      <div
+        ref={stageRef}
+        className="xfade"
+        style={{
+          position: 'absolute', inset: 0,
+          opacity: fading ? 0 : 1,
+          transition: reduced ? 'none' : 'opacity var(--dur-ui, 220ms) var(--ease-out, cubic-bezier(.23,1,.32,1))',
+        }}
+      >
+        {shown ? (
+          <StellariumView
+            focus={focus}
+            onInspect={inspect}
+            initial={{ ra: 83.8, dec: -5.4 }}
+            liveStars={useLive}
+          />
+        ) : (
+          <CoverageMap
+            grid={grid} coverage={coverage} selected={sel}
+            onHover={setHover}
+            onInspect={inspect}
+          />
+        )}
+      </div>
+      {!shown && (
         <>
           {/* compass + FOV indicator overlays */}
           <div aria-hidden="true" style={{ position: 'absolute', top: 'calc(var(--nav-total) + 170px)', right: 18, zIndex: 5, width: 56, height: 56, borderRadius: '50%', background: 'rgba(5,6,12,.78)', border: '1px solid var(--line)', display: 'grid', placeItems: 'center', fontSize: 12, color: '#eef0f8', fontFamily: 'monospace' }}>
@@ -139,11 +189,11 @@ export default function SkyPage() {
         </div>
         <div className="tool-row">
           <div className="segment" role="group" aria-label="Sky view">
-            <button type="button" aria-pressed={observer} onClick={() => setObserver(true)}>Observer</button>
-            <button type="button" aria-pressed={!observer} onClick={() => setObserver(false)}>All-sky map</button>
+            <button type="button" className={observer ? 'active' : ''} aria-pressed={observer} onClick={() => setView(true)}>Observer</button>
+            <button type="button" className={!observer ? 'active' : ''} aria-pressed={!observer} onClick={() => setView(false)}>All-sky map</button>
           </div>
         </div>
-        {!observer && (
+        {!shown && (
           <div className="tool-row">
             <span id="covLabel">Coverage overlay</span>
             <button
@@ -152,12 +202,12 @@ export default function SkyPage() {
             />
           </div>
         )}
-        <p className="map-help">{observer
+        <p className="map-help">{shown
           ? 'Drag to look around, scroll to zoom. Click any point to inspect its SPHEREx visits.'
           : 'Click any field to see how many times SPHEREx has visited it and whether anything moved.'}</p>
       </div>
 
-      {!observer && (
+      {!shown && (
         <div className="map-bar glass">
           <div className="legend">
             <span>Epochs observed</span>
@@ -168,7 +218,7 @@ export default function SkyPage() {
             </span>
             <span>1 to 5+</span>
             <span className="sep" aria-hidden="true" />
-            <span title="Asteroids stream through the ecliptic band" style={{ color: '#e8c34a' }}>◆ ecliptic</span>
+            <span title="Approximate ecliptic search zone — the dashed gold curve on the map is the true plane" style={{ color: '#e8c34a' }}>◆ ecliptic</span>
           </div>
           <span className="sep" aria-hidden="true" />
           <span className="mono" id="skyReadout" aria-hidden="true">

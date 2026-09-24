@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   GRID_H, GRID_W, LEVEL_COLORS, TAU, cellOf, drawBracket,
-  SKY_ALLSKY_URL,
+  SKY_ALLSKY_URL, SKY_ALLSKY_PREVIEW_URL,
 } from '@/lib/sky';
 import { loadCachedImage } from '@/lib/skycache';
 import type { SkyHover } from '@/components/HeroSky';
@@ -23,18 +23,29 @@ export default function CoverageMap({
   const st = useRef<{ w: number; h: number } & {
     grid: number[][]; coverage: boolean; selected: MapSelection | null;
     img: HTMLImageElement | null;
-  }>({ w: 0, h: 0, grid, coverage, selected, img: null });
+    kb: { ra: number; dec: number; active: boolean };
+  }>({ w: 0, h: 0, grid, coverage, selected, img: null, kb: { ra: 180, dec: 0, active: false } });
   const cb = useRef({ onHover, onInspect });
+  const kickRef = useRef<() => void>(() => undefined);
   useEffect(() => {
     cb.current = { onHover, onInspect };
     st.current.grid = grid;
     st.current.coverage = coverage;
     st.current.selected = selected;
+    kickRef.current();
   });
 
-  // real infrared all-sky background, cached on device
+  // real infrared all-sky background, two-stage like HeroSky: fast preview
+  // first, full res after. Cached on device via skycache.
   useEffect(() => {
     let alive = true;
+    void loadCachedImage(SKY_ALLSKY_PREVIEW_URL)
+      .then((im) => {
+        if (!alive) return;
+        st.current.img = im;
+        setSkyReady(true);
+      })
+      .catch(() => undefined);
     void loadCachedImage(SKY_ALLSKY_URL)
       .then((im) => {
         if (!alive) return;
@@ -105,7 +116,10 @@ export default function CoverageMap({
       }
 
       ctx.lineWidth = 1;
-      // ecliptic highway: |dec| <= 15° band where asteroids stream (positional truth)
+      // Ecliptic search zone (schematic, not positional truth): the shaded band
+      // is a ±15° Dec window where near-ecliptic asteroids stream. The TRUE
+      // ecliptic is a great circle tilted 23.44° to the equator — drawn below
+      // as the dashed gold sinusoid — not a Dec band.
       const ey0 = ((90 - 15) / 180) * h;
       const ey1 = ((90 + 15) / 180) * h;
       ctx.fillStyle = 'rgba(240,187,82,.045)';
@@ -114,6 +128,19 @@ export default function CoverageMap({
       ctx.setLineDash([6, 5]);
       ctx.beginPath(); ctx.moveTo(0, ey0 + 0.5); ctx.lineTo(w, ey0 + 0.5); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(0, ey1 + 0.5); ctx.lineTo(w, ey1 + 0.5); ctx.stroke();
+      // true ecliptic: dec = asin(sin(23.44°) · sin(ra)), crossing the equator
+      // at RA 0°/180° like the real plane.
+      ctx.strokeStyle = 'rgba(240,187,82,.55)';
+      ctx.beginPath();
+      const eps = (23.44 * Math.PI) / 180;
+      for (let x = 0; x <= w; x += 4) {
+        const ra = (x / w) * 360;
+        const decE = Math.asin(Math.sin(eps) * Math.sin((ra * Math.PI) / 180)) * (180 / Math.PI);
+        const y = ((90 - decE) / 180) * h;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
       ctx.setLineDash([]);
       for (let ra = 30; ra < 360; ra += 30) {
         const x = Math.round((ra / 360) * w) + 0.5;
@@ -155,6 +182,12 @@ export default function CoverageMap({
         ctx.beginPath(); ctx.arc(s.selected.nx * w, s.selected.ny * h, 2.2, 0, TAU);
         ctx.fillStyle = '#fff'; ctx.fill();
       }
+      // keyboard inspection cursor (focus-ring color, distinct from selection)
+      if (s.kb.active) {
+        ctx.strokeStyle = '#a5acff';
+        ctx.lineWidth = 1.5;
+        drawBracket(ctx, (s.kb.ra / 360) * w, ((90 - s.kb.dec) / 180) * h, 14, 6);
+      }
     };
 
     const tick = () => {
@@ -162,8 +195,10 @@ export default function CoverageMap({
       draw();
     };
     const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
+    kickRef.current = kick;
     const onVis = () => kick();
     document.addEventListener('visibilitychange', onVis);
+    const downPos = { x: 0, y: 0 };
 
     const move = (e: PointerEvent) => {
       if (e.pointerType === 'touch') return;
@@ -178,15 +213,46 @@ export default function CoverageMap({
       kick();
     };
     const leave = () => { hover = null; cb.current.onHover(null); kick(); };
+    const onDown = (e: PointerEvent) => {
+      downPos.x = e.clientX;
+      downPos.y = e.clientY;
+    };
     const click = (e: MouseEvent) => {
+      // drag (>5px) is a pan gesture, not a click — Hero parity
+      if (Math.hypot(e.clientX - downPos.x, e.clientY - downPos.y) > 5) return;
       const r = canvas.getBoundingClientRect();
       const nx = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
       const ny = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
       cb.current.onInspect(nx * 360, 90 - ny * 180);
     };
+    const onFocus = () => { s.kb.active = true; kick(); };
+    const onBlur = () => { s.kb.active = false; kick(); };
+    const onKey = (e: KeyboardEvent) => {
+      const step = e.shiftKey ? 15 : 5;
+      let handled = true;
+      if (e.key === 'ArrowLeft') s.kb.ra = (((s.kb.ra - step) % 360) + 360) % 360;
+      else if (e.key === 'ArrowRight') s.kb.ra = (s.kb.ra + step) % 360;
+      else if (e.key === 'ArrowUp') s.kb.dec = Math.min(85, s.kb.dec + step);
+      else if (e.key === 'ArrowDown') s.kb.dec = Math.max(-85, s.kb.dec - step);
+      else if (e.key === 'Enter' || e.key === ' ') cb.current.onInspect(s.kb.ra, s.kb.dec);
+      else handled = false;
+      if (handled) {
+        e.preventDefault();
+        const c = cellOf(s.kb.ra, s.kb.dec);
+        const nx = s.kb.ra / 360;
+        const ny = (90 - s.kb.dec) / 180;
+        hover = { ...c, ra: s.kb.ra, dec: s.kb.dec, n: s.grid[c.j][c.i], x: nx * s.w, y: ny * s.h, nx, ny };
+        cb.current.onHover({ i: c.i, j: c.j, ra: s.kb.ra, dec: s.kb.dec, n: s.grid[c.j][c.i], x: nx * s.w, y: ny * s.h });
+        kick();
+      }
+    };
     canvas.addEventListener('pointermove', move);
     canvas.addEventListener('pointerleave', leave);
+    canvas.addEventListener('pointerdown', onDown);
     canvas.addEventListener('click', click);
+    canvas.addEventListener('focus', onFocus);
+    canvas.addEventListener('blur', onBlur);
+    canvas.addEventListener('keydown', onKey);
 
     layout();
     const ro = new ResizeObserver(() => { layout(); kick(); });
@@ -197,10 +263,14 @@ export default function CoverageMap({
       document.removeEventListener('visibilitychange', onVis);
       canvas.removeEventListener('pointermove', move);
       canvas.removeEventListener('pointerleave', leave);
+      canvas.removeEventListener('pointerdown', onDown);
       canvas.removeEventListener('click', click);
+      canvas.removeEventListener('focus', onFocus);
+      canvas.removeEventListener('blur', onBlur);
+      canvas.removeEventListener('keydown', onKey);
       ro.disconnect();
     };
   }, [skyReady]);
 
-  return <canvas id="skyCanvas" ref={canvasRef} role="img" aria-label="All-sky coverage map over real infrared imagery. Use the search box to jump to a field, or click the map to inspect one." />;
+  return <canvas id="skyCanvas" ref={canvasRef} role="img" tabIndex={0} aria-label="All-sky coverage map over real infrared imagery. The shaded band marks the approximate ecliptic search zone; the dashed gold curve is the true ecliptic plane. Arrow keys move the cursor, Enter inspects. Click the map to inspect a field." />;
 }

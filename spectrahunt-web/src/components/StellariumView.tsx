@@ -166,6 +166,26 @@ export default function StellariumView({
   const drag = useRef<{ x: number; y: number; ra: number; dec: number; moved: boolean } | null>(null);
   const pointers = useRef(new Map<number, { x: number; y: number }>());
   const pinch = useRef<{ dist: number; fov: number } | null>(null);
+  // RAF-throttled look: pointermove only stages values, one state flush per frame.
+  const pendingLook = useRef<{ ra: number; dec: number; cursor: { ra: number; dec: number; alt: number; az: number } | null } | null>(null);
+  const flushRaf = useRef(0);
+  const flushLook = () => {
+    flushRaf.current = 0;
+    const p = pendingLook.current;
+    pendingLook.current = null;
+    if (!p) return;
+    setRa(p.ra);
+    setDec(p.dec);
+    setCursor(p.cursor);
+  };
+  const kickLook = () => {
+    if (!flushRaf.current) flushRaf.current = requestAnimationFrame(flushLook);
+  };
+  useEffect(() => () => {
+    cancelAnimationFrame(flushRaf.current);
+    flushRaf.current = 0;
+    pendingLook.current = null;
+  }, []);
 
   // mirror latest view for canvas callbacks (synced in an effect, never during render)
   useEffect(() => {
@@ -596,19 +616,31 @@ export default function StellariumView({
     const x = -((e.clientX - r.left - r.width / 2) / scale);
     const y = -((e.clientY - r.top - r.height / 2) / scale);
     const p = unproject(x, y, view.current.ra, view.current.dec);
-    if (p.dec >= -90 && p.dec <= 90) {
-      const a = altAz(p.ra, p.dec, obs.lat, obs.lon, t);
-      setCursor({ ...p, ...a });
+    const cursor = p.dec >= -90 && p.dec <= 90
+      ? { ...p, ...altAz(p.ra, p.dec, obs.lat, obs.lon, t) }
+      : null;
+    if (!drag.current) {
+      // hover readout joins the same per-frame flush (no render per move)
+      pendingLook.current = { ra: view.current.ra, dec: view.current.dec, cursor };
+      kickLook();
+      return;
     }
-    if (!drag.current) return;
     const dx = e.clientX - drag.current.x;
     const dy = e.clientY - drag.current.y;
     if (Math.hypot(dx, dy) > 5) drag.current.moved = true;
-    else return;
+    else {
+      pendingLook.current = { ra: view.current.ra, dec: view.current.dec, cursor };
+      kickLook();
+      return;
+    }
     // drag sky with the pointer (mirrored X mapping: center moves +RA when dragged right)
     const degPerPx = view.current.fov / r.width;
-    setRa(normRa(drag.current.ra + dx * degPerPx / Math.max(0.3, Math.cos(view.current.dec * D2R))));
-    setDec(Math.max(-88, Math.min(88, drag.current.dec + dy * degPerPx)));
+    pendingLook.current = {
+      ra: normRa(drag.current.ra + dx * degPerPx / Math.max(0.3, Math.cos(view.current.dec * D2R))),
+      dec: Math.max(-88, Math.min(88, drag.current.dec + dy * degPerPx)),
+      cursor,
+    };
+    kickLook();
   };
   const up = (e: React.PointerEvent) => {
     pointers.current.delete(e.pointerId);
@@ -617,7 +649,13 @@ export default function StellariumView({
       // drop back to single-finger pan from the remaining finger
       const [id, pt] = [...pointers.current.entries()][0];
       void id;
-      drag.current = { x: pt.x, y: pt.y, ra, dec, moved: true };
+      // state may lag one flushed frame behind the drag — anchor from pending
+      drag.current = {
+        x: pt.x, y: pt.y,
+        ra: pendingLook.current?.ra ?? ra,
+        dec: pendingLook.current?.dec ?? dec,
+        moved: true,
+      };
       return;
     }
     const wasDrag = drag.current?.moved;
@@ -638,6 +676,21 @@ export default function StellariumView({
   ];
   const centerAz = centerAltAz.az;
 
+  // keyboard parity: arrows look around, Enter/Space inspects the center.
+  // Discrete key steps need no RAF throttle — one state update per keypress.
+  const onKeyLook = (e: React.KeyboardEvent) => {
+    const step = e.shiftKey ? fov / 2 : fov / 10;
+    const decStep = step / Math.max(0.3, Math.cos(dec * D2R));
+    let handled = true;
+    if (e.key === 'ArrowLeft') setRa((v) => normRa(v - decStep));
+    else if (e.key === 'ArrowRight') setRa((v) => normRa(v + decStep));
+    else if (e.key === 'ArrowUp') setDec((v) => Math.min(88, v + step));
+    else if (e.key === 'ArrowDown') setDec((v) => Math.max(-88, v - step));
+    else if (e.key === 'Enter' || e.key === ' ') onInspect(ra, dec);
+    else handled = false;
+    if (handled) e.preventDefault();
+  };
+
   return (
     <div className="stel" ref={hostRef}>
       {img && (
@@ -645,9 +698,9 @@ export default function StellariumView({
         <img src={img} alt="" aria-hidden="true" draggable={false}
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
       )}
-      <canvas ref={canvasRef} role="img"
-        aria-label={`Observer sky view centered RA ${ra.toFixed(1)}, Dec ${dec.toFixed(1)}, field ${fov.toFixed(0)} degrees. Drag to look, scroll to zoom, click to inspect.`}
-        onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}
+      <canvas ref={canvasRef} role="img" tabIndex={0}
+        aria-label={`Observer sky view centered RA ${ra.toFixed(1)}, Dec ${dec.toFixed(1)}, field ${fov.toFixed(0)} degrees. Drag to look, scroll to zoom, click to inspect. Arrow keys look, Enter inspects the center.`}
+        onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onKeyDown={onKeyLook}
         onPointerLeave={() => { pointers.current.clear(); pinch.current = null; drag.current = null; setCursor(null); }}
       />
       {loading && !img && <div className="stel-load">Loading real sky…</div>}

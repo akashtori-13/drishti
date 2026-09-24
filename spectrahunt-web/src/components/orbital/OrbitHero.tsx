@@ -45,8 +45,11 @@ export default function OrbitHero() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const tipRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ x: number; y: number; lon: number; lat: number } | null>(null);
+  const routerRef = useRef(router);
+  useEffect(() => {
+    routerRef.current = router;
+  });
   const [mode, setMode] = useState<'loading' | 'live' | 'poster'>('loading');
-  const [hoverName, setHoverName] = useState<string | null>(null);
   useEffect(() => {
     const canvas = canvasRef.current;
     const wrap = wrapRef.current;
@@ -77,8 +80,20 @@ export default function OrbitHero() {
       reduced: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
       hover: null as PreparedSat | null,
       drag: null as { x: number; y: number; lon: number; lat: number } | null,
+      sphereImg: null as ImageData | null,
+      ringPts: null as Array<{ x: number; y: number } | null> | null,
+      ringAt: 0,
+      ringLon: 0,
+      ringLat: 0,
+      lastT: 0,
     };
     const simJD = () => S.jd0 + ((Date.now() - S.ms0) / 86400000) * WARP;
+
+    // P0: S.R is the single source of disc scale; zoom only changes S.zoom,
+    // applyZoom() recomputes S.R so wheel/pinch/keyboard zoom never no-ops.
+    const applyZoom = () => {
+      S.R = Math.min(S.w, S.h) * 0.33 * S.zoom;
+    };
 
     const layout = () => {
       const r = wrap.getBoundingClientRect();
@@ -90,7 +105,7 @@ export default function OrbitHero() {
       S.cx = S.w * 0.5;
       S.cy = S.h * 0.52;
       // earth + halo must fit vertically: cy + 1.45R <= h (halo was clipping)
-      S.R = Math.min(S.w, S.h) * 0.33 * S.zoom;
+      applyZoom();
     };
 
     const project = (lat: number, lon: number): SatPt => {
@@ -112,13 +127,20 @@ export default function OrbitHero() {
       return { lat: g.lat, lon: g.lon };
     };
 
-    const draw = () => {
+    const draw = (nowMs = performance.now()) => {
       const { w, h } = S;
       if (!w || !h) return;
-      // ease home after idle drags: Bangladesh stays centered, always
+      // keep disc scale in sync even if zoom changed without a layout
+      const wantR = Math.min(S.w, S.h) * 0.33 * S.zoom;
+      if (Math.abs(wantR - S.R) > 0.01) S.R = wantR;
+      // dt-based ease home after idle drags: frame-rate independent lerp.
+      // Bangladesh stays centered, always.
+      const dt = Math.min(0.05, Math.max(0.001, (nowMs - (S.lastT || nowMs - 16)) / 1000));
+      S.lastT = nowMs;
       if (!dragRef.current && S.backAt > 0 && Date.now() > S.backAt) {
-        const dl = (((S.homeLon - S.lonC + 540) % 360) - 180) * 0.04;
-        const db = (S.homeLat - S.latC) * 0.04;
+        const k = 1 - Math.exp(-dt * 2.4);
+        const dl = (((S.homeLon - S.lonC + 540) % 360) - 180) * k;
+        const db = (S.homeLat - S.latC) * k;
         S.lonC = normLon(S.lonC + dl);
         S.latC = Math.max(-60, Math.min(60, S.latC + db));
         if (Math.abs(dl) < 0.02 && Math.abs(db) < 0.02) {
@@ -159,7 +181,11 @@ export default function OrbitHero() {
         const rot = 180;
         const sctx = S.sphere.getContext('2d');
         if (sctx) {
-          const img = sctx.createImageData(ER * 2, ER * 2);
+          // per-frame budget: reuse one ImageData buffer, never allocate
+          if (!S.sphereImg || S.sphereImg.width !== ER * 2 || S.sphereImg.height !== ER * 2) {
+            S.sphereImg = sctx.createImageData(ER * 2, ER * 2);
+          }
+          const img = S.sphereImg;
           const px = img.data;
           // fixed golden-hour sun over South Asia: BD always starts in
           // daylight. Lighting only — satellites still fly real time.
@@ -279,19 +305,34 @@ export default function OrbitHero() {
       ctx.fill();
 
       // orbit ring: hero path sampled over one period, brightest near the
-      // spacecraft and fading along the path so depth reads at a glance
+      // spacecraft and fading along the path so depth reads at a glance.
+      // Per-frame budget: the 72-segment SGP4 sweep is cached ~1Hz (and on
+      // camera moves); frames in between redraw the cached polyline.
       if (S.hero) {
         try {
-          const per = periodMin(S.hero.sat);
+          const moved = Math.abs(S.lonC - S.ringLon) > 0.05 || Math.abs(S.latC - S.ringLat) > 0.05;
+          if (!S.ringPts || nowMs - S.ringAt > 1000 || moved) {
+            const per = periodMin(S.hero.sat);
+            const pts: Array<{ x: number; y: number } | null> = [];
+            for (let k = 0; k <= 72; k++) {
+              const jj = jd + (per / 1440) * (k / 72);
+              const p = propagate(S.hero.sat, (jj - S.hero.sat.jdsatepoch) * 1440);
+              if (!p.ok) { pts.push(null); continue; }
+              const g = eciToGeo(p.r, jj);
+              const pt = project(g.lat, g.lon);
+              pts.push(pt.behind ? null : { x: pt.x, y: pt.y });
+            }
+            S.ringPts = pts;
+            S.ringAt = nowMs;
+            S.ringLon = S.lonC;
+            S.ringLat = S.latC;
+          }
           ctx.lineWidth = 1.2;
           let prev: { x: number; y: number } | null = null;
-          for (let k = 0; k <= 72; k++) {
-            const jj = jd + (per / 1440) * (k / 72);
-            const p = propagate(S.hero.sat, (jj - S.hero.sat.jdsatepoch) * 1440);
-            if (!p.ok) { prev = null; continue; }
-            const g = eciToGeo(p.r, jj);
-            const pt = project(g.lat, g.lon);
-            if (pt.behind) { prev = null; continue; }
+          const pts = S.ringPts ?? [];
+          for (let k = 0; k < pts.length; k++) {
+            const pt = pts[k];
+            if (!pt) { prev = null; continue; }
             if (prev) {
               const a = 0.08 + 0.42 * (1 - k / 72);
               ctx.strokeStyle = `rgba(124,131,253,${a.toFixed(3)})`;
@@ -458,16 +499,16 @@ export default function OrbitHero() {
     };
 
     let raf = 0;
-    const loop = () => {
+    const loop = (t: number) => {
       raf = 0;
-      draw();
+      draw(t);
       if (S.inView && !S.reduced && document.visibilityState === 'visible') raf = requestAnimationFrame(loop);
     };
     const poke = () => {
       if (S.inView && !S.reduced && document.visibilityState === 'visible') {
         if (!raf) raf = requestAnimationFrame(loop);
       } else if (!raf) {
-        raf = requestAnimationFrame(() => { raf = 0; draw(); });
+        raf = requestAnimationFrame((t) => { raf = 0; draw(t); });
       }
     };
 
@@ -547,11 +588,12 @@ export default function OrbitHero() {
       const p = toLocal(e);
       const h = pick(p.x, p.y);
       S.hover = h;
-      setHoverName(h ? h.obj.name : null);
-      // tooltip rides beside the cursor (positioned directly: no re-render)
+      // ref-only tooltip: position + text mutate the DOM node, no React
+      // state churn on every pointermove.
       const tip = tipRef.current;
       if (tip) {
         if (h) {
+          tip.textContent = h.obj.name;
           tip.style.opacity = '1';
           tip.style.left = `${Math.min(S.w - 8, p.x + 16)}px`;
           tip.style.top = `${Math.max(8, p.y - 14)}px`;
@@ -580,7 +622,33 @@ export default function OrbitHero() {
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
       S.zoom = Math.min(2.2, Math.max(0.6, S.zoom * (e.deltaY > 0 ? 0.92 : 1.09)));
+      applyZoom();
+      S.ringAt = 0; // disc scale changed: ring cache must rebuild
       poke();
+    };
+    const onKey = (e: KeyboardEvent) => {
+      const step = 4;
+      let used = true;
+      if (e.key === 'ArrowLeft') S.lonC = normLon(S.lonC - step);
+      else if (e.key === 'ArrowRight') S.lonC = normLon(S.lonC + step);
+      else if (e.key === 'ArrowUp') S.latC = Math.max(-60, Math.min(60, S.latC + step));
+      else if (e.key === 'ArrowDown') S.latC = Math.max(-60, Math.min(60, S.latC - step));
+      else if (e.key === '+' || e.key === '=' || e.key === 'Add') {
+        S.zoom = Math.min(2.2, S.zoom * 1.12);
+        applyZoom();
+        S.ringAt = 0;
+      } else if (e.key === '-' || e.key === '_' || e.key === 'Subtract') {
+        S.zoom = Math.max(0.6, S.zoom / 1.12);
+        applyZoom();
+        S.ringAt = 0;
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        routerRef.current.push('/intro');
+      } else used = false;
+      if (used) {
+        e.preventDefault();
+        S.backAt = 0; // keyboard takes over: cancel the ease-home drift
+        poke();
+      }
     };
     const io = new IntersectionObserver((es) => {
       S.inView = es.some((e) => e.isIntersecting);
@@ -595,6 +663,7 @@ export default function OrbitHero() {
     canvas.addEventListener('pointerdown', onDown);
     canvas.addEventListener('pointerup', onUp);
     canvas.addEventListener('wheel', onWheel, { passive: false });
+    canvas.addEventListener('keydown', onKey);
     layout();
     poke();
     return () => {
@@ -607,6 +676,7 @@ export default function OrbitHero() {
       canvas.removeEventListener('pointerdown', onDown);
       canvas.removeEventListener('pointerup', onUp);
       canvas.removeEventListener('wheel', onWheel);
+      canvas.removeEventListener('keydown', onKey);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -622,17 +692,15 @@ export default function OrbitHero() {
   return (
     <div ref={wrapRef} className="orbit-hero">
       <canvas
-        ref={canvasRef} role="img"
-        aria-label="Live orbital view: SPHEREx and tracked satellites over Earth. Drag to rotate, scroll to zoom."
+        ref={canvasRef} role="img" tabIndex={0}
+        aria-label="Live orbital view: SPHEREx and tracked satellites over Earth. Drag to rotate, scroll to zoom. Focus and use arrow keys to rotate, plus and minus to zoom, Enter to open the intro."
       />
       <div
         ref={tipRef}
         className="orbit-tip mono"
         aria-hidden="true"
         style={{ opacity: 0 }}
-      >
-        {hoverName}
-      </div>
+      />
     </div>
   );
 }

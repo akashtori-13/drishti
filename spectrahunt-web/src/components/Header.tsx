@@ -24,6 +24,7 @@ export default function Header() {
   const [menu, setMenu] = useState(false);
   const openPreview = useAppStore((s) => s.openPreview);
   const panelRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     document.title = pathname === '/'
@@ -37,38 +38,60 @@ export default function Header() {
     setMenu(false);
   }, [pathname]);
 
+  // Single Ctrl+K toggle listener (mounted once).
   useEffect(() => {
-    if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         setOpen((o) => !o);
       }
     };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
+
+  // Veil dialog: Escape close, outside click, focus trap + initial/return focus.
+  useEffect(() => {
+    if (!open) return;
+    triggerRef.current = document.activeElement as HTMLElement | null;
+    const panel = panelRef.current;
+    const first = panel?.querySelector<HTMLElement>('input, a[href], button:not([disabled])');
+    (first ?? undefined)?.focus?.();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false);
+        setMenu(false);
+      }
+      if (e.key === 'Tab' && panel) {
+        const items = panel.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        );
+        if (items.length === 0) return;
+        const firstEl = items[0];
+        const lastEl = items[items.length - 1];
+        if (e.shiftKey && document.activeElement === firstEl) {
+          e.preventDefault();
+          lastEl.focus();
+        } else if (!e.shiftKey && document.activeElement === lastEl) {
+          e.preventDefault();
+          firstEl.focus();
+        }
+      }
+    };
     const onDown = (e: MouseEvent) => {
-      if (panelRef.current && !panelRef.current.contains(e.target as Node)) setOpen(false);
+      if (panel && !panel.contains(e.target as Node)) {
+        setOpen(false);
+        setMenu(false);
+      }
     };
     document.addEventListener('keydown', onKey);
     document.addEventListener('mousedown', onDown);
     return () => {
       document.removeEventListener('keydown', onKey);
       document.removeEventListener('mousedown', onDown);
+      triggerRef.current?.focus?.();
     };
-  }, [open ]);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-        const tag = (e.target as HTMLElement).tagName;
-        if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tag)) return;
-        e.preventDefault();
-        setOpen(true);
-      }
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, []);
+  }, [open]);
 
   const pick = (t: SearchTarget) => {
     setOpen(false);
@@ -133,7 +156,7 @@ export default function Header() {
       </div>
       {open && (
         <div className="cmd-veil" onMouseDown={() => { setOpen(false); setMenu(false); }}>
-          <div ref={panelRef} className="cmd-panel glass" role="dialog" aria-modal="true" aria-label="Navigate"
+          <div ref={panelRef} className="cmd-panel glass" role="dialog" aria-modal="true" aria-label="Navigate" tabIndex={-1}
             onMouseDown={(e) => e.stopPropagation()}>
             {menu && (
               <nav className="cmd-links sheet" aria-label="Views">

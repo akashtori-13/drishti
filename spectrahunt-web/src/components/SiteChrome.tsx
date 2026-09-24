@@ -14,13 +14,15 @@ export default function SiteChrome({ children, showTutorial = false }: { childre
   const openPreview = useAppStore((s) => s.openPreview);
   const isSky = pathname === '/sky';
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen relative">
       <a className="skip" href="#main">Skip to content</a>
       <Header />
       {showTutorial && <Tutorial />}
       <ArtifactPreview />
       <main id="main" tabIndex={-1} className="flex-1">
-        {children}
+        <div key={pathname} className="xfade xfade-route">
+          {children}
+        </div>
       </main>
       {!isSky && (
         <footer className="site-foot">

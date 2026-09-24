@@ -75,6 +75,7 @@ interface Scene {
   twinkle: Array<{ x: number; y: number; r: number; ci: number; b: number; ph: number; sp: number }>;
   raf: number;
   earthFade: number;
+  prevT: number;
   // Time-warp: the sim runs 60x real time (planetarium-style) so the orbit
   // and the rotating Earth are visible. The HUD clock shows sim time and is
   // labeled — TLE age stays on the real clock. Reduced motion: warp 1.
@@ -130,6 +131,14 @@ export default function OrbitalIntro({
   const [norad, setNorad] = useState<{ norad: number; cospar: string; epochDoy: string } | null>(null);
   const [count, setCount] = useState(swarm.length);
   const [whisper, setWhisper] = useState<string | null>(null);
+  const [whisperVis, setWhisperVis] = useState(false);
+  const whisperTimers = useRef<number[]>([]);
+  useEffect(() => {
+    const timers = whisperTimers.current;
+    return () => {
+      timers.forEach((t) => window.clearTimeout(t));
+    };
+  }, []);
   const [hoverName, setHoverName] = useState<string | null>(null);
   const [warp, setWarp] = useState(60);
 
@@ -160,7 +169,7 @@ export default function OrbitalIntro({
       picks: [], hero: null, hover: null, nudge: null,
       user: { dLat: 0, dLon: 0 }, zoom: 1, baseR: 100, baseCx: 0, baseCy: 0,
       suppressClick: false, lastEarthBuild: 0,
-      sats: [], trail: [], twinkle: [], raf: 0, earthFade: 1, hudTimer: null, alive: true,
+      sats: [], trail: [], twinkle: [], raf: 0, earthFade: 1, prevT: 0, hudTimer: null, alive: true,
       warp: 60, ms0: Date.now(), jd0: nowJD(),
     };
     if (S.reduced) S.warp = 1;
@@ -510,6 +519,10 @@ export default function OrbitalIntro({
     const frame = (t: number) => {
       if (!S.alive) return;
       S.raf = 0;
+      // time-based fade + drift: dt in seconds so the Earth crossfade runs
+      // ~0.9s on any refresh rate, not N frames.
+      const dt = Math.min(0.1, Math.max(0.001, S.prevT ? t - S.prevT : 0.016));
+      S.prevT = t;
       S.driftT = t;
       const jd = simJD();
       buildEarth(jd);
@@ -530,7 +543,7 @@ export default function OrbitalIntro({
         ctx.globalAlpha = 1;
       }
       if (S.earth) {
-        if (S.earthFade < 1) S.earthFade = Math.min(1, S.earthFade + 1 / 54);
+        if (S.earthFade < 1) S.earthFade = Math.min(1, S.earthFade + dt / 0.9);
         const pad = S.R * 0.14;
         ctx.save();
         ctx.globalAlpha = S.earthFade;
@@ -772,10 +785,22 @@ export default function OrbitalIntro({
       }
       if (best && S.hero) {
         S.nudge = { x0: best.x, y0: best.y, x1: S.hero.x, y1: S.hero.y, t0: S.driftT };
+        // symmetric whisper: fade in on mount, fade out before unmount
+        // (same .xfade curve both ways, ~220ms).
+        whisperTimers.current.forEach((t) => window.clearTimeout(t));
+        whisperTimers.current = [];
         setWhisper('Not this one. That one sees in 102 colors.');
-        window.setTimeout(() => {
+        setWhisperVis(false);
+        const inT = window.setTimeout(() => {
+          if (S.alive) setWhisperVis(true);
+        }, 30);
+        const outT = window.setTimeout(() => {
+          if (S.alive) setWhisperVis(false);
+        }, 2200);
+        const goneT = window.setTimeout(() => {
           if (S.alive) setWhisper(null);
-        }, 2600);
+        }, 2480);
+        whisperTimers.current = [inT, outT, goneT];
         kick(true);
       }
     };
@@ -874,14 +899,32 @@ export default function OrbitalIntro({
       </div>
       <div ref={tagRef} className="orbital-tag mono" style={{ display: 'none' }} aria-hidden="true" />
       {whisper && (
-        <div className="orbital-whisper" role="status">
+        <div
+          className="orbital-whisper xfade"
+          role="status"
+          style={{
+            opacity: whisperVis ? 1 : 0,
+            transition: 'opacity var(--dur-ui, 220ms) var(--ease-out, cubic-bezier(.23,1,.32,1))',
+          }}
+        >
           {whisper}
         </div>
       )}
-      <button type="button" className="orbital-invite" onClick={() => onEnter()}>
+      <button
+        type="button"
+        className="orbital-invite pressable"
+        style={{ transition: 'transform var(--dur-tap, 120ms) var(--ease-out, cubic-bezier(.23,1,.32,1))' }}
+        onClick={() => onEnter()}
+      >
         Click SPHEREx to see what it&rsquo;s doing.
       </button>
-      <button type="button" className="btn orbital-skip" onClick={onSkip} aria-label="Skip intro">
+      <button
+        type="button"
+        className="btn orbital-skip pressable"
+        style={{ transition: 'transform var(--dur-tap, 120ms) var(--ease-out, cubic-bezier(.23,1,.32,1))' }}
+        onClick={onSkip}
+        aria-label="Skip intro"
+      >
         Skip intro
       </button>
       <span className="sr-only" aria-live="polite">

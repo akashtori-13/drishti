@@ -290,7 +290,8 @@ export default function ArtifactPreview() {
     <div className="pv-veil" onMouseDown={(e) => { if (e.target === e.currentTarget) closePreview(); }}>
       <div ref={panelRef} className="pv-panel glass" role="dialog" aria-modal="true"
         aria-label={data ? `Preview: ${data.title}` : 'Artifact preview'}>
-        <button ref={closeRef} type="button" className="pv-close" aria-label="Close preview"
+        <button ref={closeRef} type="button" className="pv-close pressable" aria-label="Close preview"
+          style={{ minWidth: 44, minHeight: 44 }}
           onClick={closePreview}>×</button>
         {!data && !err && <div className="pv-loading" aria-label="Loading preview"><span /></div>}
         {err && !data && (
@@ -319,10 +320,10 @@ export default function ArtifactPreview() {
               <span className="viewer-tag mono">{cur?.label ?? '—'}</span>
               {n > 1 && (
                 <div className="pv-transport" role="group" aria-label="Frame transport">
-                  <button type="button" className="icon-btn" onClick={() => step(-1)} aria-label="Previous frame">‹</button>
-                  <button type="button" className="icon-btn" onClick={() => setPlaying((p) => (n > 1 ? !p : p))}
+                  <button type="button" className="icon-btn pressable" style={{ minWidth: 44, minHeight: 44 }} onClick={() => step(-1)} aria-label="Previous frame">‹</button>
+                  <button type="button" className="icon-btn pressable" style={{ minWidth: 44, minHeight: 44 }} onClick={() => setPlaying((p) => (n > 1 ? !p : p))}
                     aria-label={playing ? 'Pause' : 'Play'}>{playing ? '❚❚' : '▶'}</button>
-                  <button type="button" className="icon-btn" onClick={() => step(1)} aria-label="Next frame">›</button>
+                  <button type="button" className="icon-btn pressable" style={{ minWidth: 44, minHeight: 44 }} onClick={() => step(1)} aria-label="Next frame">›</button>
                   <span className="mono pv-count" aria-live="off">{idx + 1}/{n}</span>
                 </div>
               )}

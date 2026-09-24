@@ -5,6 +5,12 @@ import { SHOWCASE_IDS, getShowcase, type Showcase } from '@/lib/showcases';
 import { BANDS } from '@/lib/sky';
 import { useAppStore } from '@/lib/store';
 import { arcsecPerDay, toCSV } from '@/lib/astro';
+import { Reveal } from '@/lib/reveal';
+import { useTiltGroup } from '@/lib/tilt';
+
+interface ReportObject {
+  kind: string; sigma: number; x: number; y: number; label: string | null;
+}
 
 interface ReportObject {
   kind: string; sigma: number; x: number; y: number; label: string | null;
@@ -119,6 +125,8 @@ export default function CandidatesPage() {
   const [openId, setOpenId] = useState<string | null>(null);
   const docsRef = useRef(new Map<string, Showcase>());
   const repsRef = useRef(new Map<string, Report>());
+  const gridRef = useRef<HTMLDivElement>(null);
+  useTiltGroup(gridRef);
 
   useEffect(() => {
     let alive = true;
@@ -199,27 +207,28 @@ export default function CandidatesPage() {
       </div>
 
       {!list.length && <p className="empty">No candidates match this filter.</p>}
-      <div className="cand-grid">
-        {list.map((c) => {
+      <div className="cand-grid" ref={gridRef}>
+        {list.map((c, i) => {
           const band = BANDS[c.band - 1];
           const open = openId === c.id;
           return (
-            <div key={c.id} className="cand-wrap">
+            <Reveal key={c.id} index={i}>
+            <div className="cand-wrap">
             <button
-              type="button" className="cand"
+              type="button" className="cand" data-tilt
               aria-label={`${c.name}, ${KIND_LABEL[c.kind]}, ${c.stat}, ${band.label}`}
               onClick={() => openPreview(c.id)}
             >
               <div className="cand-thumb">
                 <Thumb card={c} />
+              </div>
+              <div className="cand-body">
                 <span className="cand-badges">
                   <span className={`badge ${c.kind === 'known' ? 'known' : c.kind === 'pending' ? '' : 'unknown'}`}>
                     <span className="dot" />{c.kind === 'known' && c.knownName ? `Known · ${c.knownName}` : KIND_LABEL[c.kind]}
                   </span>
                   <span className="cand-score mono">{c.stat}</span>
                 </span>
-              </div>
-              <div className="cand-body">
                 <div className="cand-name">{c.name}</div>
                 <div className="cand-meta mono"><span>{band.label}</span><span>{c.date}</span></div>
                 <div className="cand-meta mono">
@@ -252,6 +261,7 @@ export default function CandidatesPage() {
               </>
             )}
             </div>
+            </Reveal>
           );
         })}
       </div>

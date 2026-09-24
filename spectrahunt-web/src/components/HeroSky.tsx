@@ -40,8 +40,10 @@ export default function HeroSky({
     meteor: { x: number; y: number; vx: number; vy: number; born: number } | null;
     nextMeteorAt: number;
     inView: boolean;
+    kb: { ra: number; dec: number; active: boolean };
   }>({ w: 0, h: 0, hover: null, hoverMarker: null, bright: false, selected: null, grid, coverage, img: null, markers,
-    par: { x: 0, y: 0, tx: 0, ty: 0 }, sparks: [], meteor: null, nextMeteorAt: 0, inView: true });
+    par: { x: 0, y: 0, tx: 0, ty: 0 }, sparks: [], meteor: null, nextMeteorAt: 0, inView: true,
+    kb: { ra: 180, dec: 0, active: false } });
   const cb = useRef({ onInspect, onMarker });
   useEffect(() => {
     cb.current = { onInspect, onMarker };
@@ -210,6 +212,12 @@ export default function HeroSky({
         ctx.strokeStyle = '#fff';
         ctx.lineWidth = 1.5;
         drawBracket(ctx, st.selected.nx * w, st.selected.ny * h, 14, 6);
+      }
+      // keyboard inspection cursor (focus-ring color, distinct from selection)
+      if (st.kb.active) {
+        ctx.strokeStyle = '#a5acff';
+        ctx.lineWidth = 1.5;
+        drawBracket(ctx, (st.kb.ra / 360) * w, ((90 - st.kb.dec) / 180) * h, 14, 6);
       }
       // blinkable-field markers: tiny unlabeled dots; label is a hover tooltip only
       ctx.textBaseline = 'middle';
@@ -405,6 +413,53 @@ export default function HeroSky({
     canvas.addEventListener('pointerleave', leave);
     canvas.addEventListener('pointerdown', onDown);
     canvas.addEventListener('click', click);
+    // keyboard parity: arrows move an inspection cursor, Enter/Space inspects
+    // (or activates a nearby marker), M jumps to the next marker.
+    const onFocus = () => { st.kb.active = true; kick(); };
+    const onBlur = () => { st.kb.active = false; kick(); };
+    const activateKb = () => {
+      const k = st.kb;
+      const nx = k.ra / 360;
+      const ny = (90 - k.dec) / 180;
+      for (const m of st.markers) {
+        if (Math.hypot(m.ra / 360 - nx, (90 - m.dec) / 180 - ny) < 0.06 && cb.current.onMarker) {
+          cb.current.onMarker(m.id);
+          return;
+        }
+      }
+      const r = canvas.getBoundingClientRect();
+      st.selected = { nx, ny };
+      cb.current.onInspect(k.ra, k.dec, r.left + nx * r.width, r.top + ny * r.height);
+      wake();
+    };
+    const cycleMarker = () => {
+      if (!st.markers.length) return;
+      let best = 0;
+      let bestD = Infinity;
+      st.markers.forEach((m, idx) => {
+        const d = Math.hypot(m.ra - st.kb.ra, (m.dec - st.kb.dec) * 2);
+        if (d < bestD) { bestD = d; best = idx; }
+      });
+      const next = st.markers[(best + 1) % st.markers.length];
+      st.kb.ra = next.ra;
+      st.kb.dec = next.dec;
+      kick();
+    };
+    const onKey = (e: KeyboardEvent) => {
+      const step = e.shiftKey ? 15 : 5;
+      let handled = true;
+      if (e.key === 'ArrowLeft') st.kb.ra = (((st.kb.ra - step) % 360) + 360) % 360;
+      else if (e.key === 'ArrowRight') st.kb.ra = (st.kb.ra + step) % 360;
+      else if (e.key === 'ArrowUp') st.kb.dec = Math.min(85, st.kb.dec + step);
+      else if (e.key === 'ArrowDown') st.kb.dec = Math.max(-85, st.kb.dec - step);
+      else if (e.key === 'Enter' || e.key === ' ') activateKb();
+      else if (e.key === 'm' || e.key === 'M') cycleMarker();
+      else handled = false;
+      if (handled) { e.preventDefault(); kick(); }
+    };
+    canvas.addEventListener('focus', onFocus);
+    canvas.addEventListener('blur', onBlur);
+    canvas.addEventListener('keydown', onKey);
 
     layout();
     const ro = new ResizeObserver(() => { layout(); kick(); });
@@ -421,6 +476,9 @@ export default function HeroSky({
       canvas.removeEventListener('pointerleave', leave);
       canvas.removeEventListener('pointerdown', onDown);
       canvas.removeEventListener('click', click);
+      canvas.removeEventListener('focus', onFocus);
+      canvas.removeEventListener('blur', onBlur);
+      canvas.removeEventListener('keydown', onKey);
       ro.disconnect();
       io.disconnect();
     };
@@ -428,7 +486,8 @@ export default function HeroSky({
 
   return (
     <div ref={hostRef} style={{ position: 'absolute', inset: 0 }}>
-      <canvas ref={canvasRef} id="heroCanvas" aria-hidden="true" />
+      <canvas ref={canvasRef} id="heroCanvas" role="img" tabIndex={0}
+        aria-label="Interactive infrared all-sky image. Arrow keys move the inspection cursor, Enter inspects the field, M jumps between highlighted fields." />
       <div ref={tipRef} className="sky-tip mono" aria-hidden="true" />
       {!skyReady && (
         <div className="hero-loading" aria-hidden="true">
