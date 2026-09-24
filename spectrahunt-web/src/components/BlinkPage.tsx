@@ -211,7 +211,7 @@ export default function BlinkPage({ id }: { id: string }) {
         // clamp both ends: negative or past-the-last shared links land on an edge
         if (Number.isInteger(qe)) setEpochIdx(Math.min(Math.max(0, qe), Math.max(0, d.epochs.length - 1)));
         const qm = q.get('mode');
-        if (qm === 'side' || qm === 'swipe' || qm === 'diff' || qm === 'blink') setCompareMode(qm);
+        if (qm === 'side' || qm === 'swipe' || qm === 'diff' || qm === 'blink' || qm === 'color') setCompareMode(qm);
       } catch { /* keep defaults */ }
       setSkybot(null);
       const mjd = d.epochs[0]?.mjd;
