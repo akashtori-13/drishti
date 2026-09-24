@@ -6,6 +6,7 @@ import {
   fmtDec, fmtRa, SKY_ALLSKY_URL, SKY_ALLSKY_PREVIEW_URL,
 } from '@/lib/sky';
 import { loadCachedImage } from '@/lib/skycache';
+import { drawBrightTwinkles, getStarLayer, loadBrightStars, type CatStar } from '@/lib/starmap';
 
 export interface SkyHover { i: number; j: number; ra: number; dec: number; n: number; x: number; y: number }
 
@@ -36,13 +37,15 @@ export default function HeroSky({
     img: HTMLImageElement | null;
     markers: HeroMarker[];
     par: { x: number; y: number; tx: number; ty: number };
-    sparks: Array<{ x: number; y: number; r: number; ph: number; sp: number }>;
+    layer: HTMLCanvasElement | null;
+    brightStars: CatStar[];
     meteor: { x: number; y: number; vx: number; vy: number; born: number } | null;
     nextMeteorAt: number;
     inView: boolean;
     kb: { ra: number; dec: number; active: boolean };
   }>({ w: 0, h: 0, hover: null, hoverMarker: null, bright: false, selected: null, grid, coverage, img: null, markers,
-    par: { x: 0, y: 0, tx: 0, ty: 0 }, sparks: [], meteor: null, nextMeteorAt: 0, inView: true,
+    par: { x: 0, y: 0, tx: 0, ty: 0 }, layer: null, brightStars: [],
+    meteor: null, nextMeteorAt: 0, inView: true,
     kb: { ra: 180, dec: 0, active: false } });
   const cb = useRef({ onInspect, onMarker });
   useEffect(() => {
@@ -70,6 +73,11 @@ export default function HeroSky({
         setSkyReady(true);
       })
       .catch(() => undefined);
+    // catalog stars for the live twinkle pass (layer builds on layout)
+    void loadBrightStars().then((ss) => {
+      if (!alive) return;
+      state.current.brightStars = ss;
+    });
     return () => { alive = false; };
   }, []);
 
@@ -102,22 +110,16 @@ export default function HeroSky({
       canvas.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       st.w = w; st.h = h;
+      // rebuild the prerendered real-sky layer for the new size, then repaint
+      st.layer = null;
+      void getStarLayer(w, h, dpr).then((cv) => {
+        if (cv && st.w === w && st.h === h) { st.layer = cv; kick(); }
+      });
     };
 
     const draw = (nowMs = 0) => {
       const { w, h } = st;
       if (!w || !h) return;
-      // seed twinkles once per size
-      if (!st.sparks.length) {
-        let s = 20260801;
-        const rnd = () => {
-          s = (s * 1664525 + 1013904223) >>> 0;
-          return s / 0xffffffff;
-        };
-        st.sparks = Array.from({ length: 80 }, () => ({
-          x: rnd(), y: rnd(), r: 0.5 + rnd() * 1.4, ph: rnd() * TAU, sp: 0.5 + rnd() * 1.6,
-        }));
-      }
       const t = nowMs / 1000;
       const live = shouldRun();
       // ease parallax toward pointer target (desktop depth cue)
@@ -148,7 +150,12 @@ export default function HeroSky({
         ctx.fillStyle = '#04050a';
         ctx.fillRect(0, 0, w, h);
       }
-
+      // real-sky layer (catalog stars, constellation lines, nebula glows)
+      // sits above the contrast veil so catalog points lead the grain,
+      // exactly like the markers and coverage cells drawn after it
+      if (st.layer) {
+        ctx.drawImage(st.layer, 0, 0, w, h);
+      }
       // survey sweep band: always drawn (the instrument's motion is the hook);
       // measured-cell glow needs coverage data and layers on top when present.
       const sweepX = live ? (((t * w) / 75 + w * 0.15) % (w * 1.3)) - w * 0.15 : -w;
@@ -246,14 +253,8 @@ export default function HeroSky({
           ctx.textAlign = 'left';
         }
       }
-      // twinkling foreground stars
-      for (const s of st.sparks) {
-        const tw = live ? 0.22 + 0.3 * (0.5 + 0.5 * Math.sin(s.ph + t * s.sp)) : 0.3;
-        ctx.fillStyle = `rgba(220,228,245,${tw.toFixed(3)})`;
-        ctx.beginPath();
-        ctx.arc(s.x * w, s.y * h, s.r, 0, TAU);
-        ctx.fill();
-      }
+      // twinkling bright catalog stars (real positions, deterministic phases)
+      drawBrightTwinkles(ctx, w, h, t, live, st.brightStars);
       // occasional shooting star (ambient only)
       if (live && !st.meteor && nowMs > st.nextMeteorAt) {
         const sx = Math.random() * w * 0.7 + w * 0.15;
@@ -487,7 +488,7 @@ export default function HeroSky({
   return (
     <div ref={hostRef} style={{ position: 'absolute', inset: 0 }}>
       <canvas ref={canvasRef} id="heroCanvas" role="img" tabIndex={0}
-        aria-label="Interactive infrared all-sky image. Arrow keys move the inspection cursor, Enter inspects the field, M jumps between highlighted fields." />
+        aria-label="Interactive infrared all-sky image with Yale Bright Star Catalog stars, constellation lines, and artistic nebula glows. Arrow keys move the inspection cursor, Enter inspects the field, M jumps between highlighted fields." />
       <div ref={tipRef} className="sky-tip mono" aria-hidden="true" />
       {!skyReady && (
         <div className="hero-loading" aria-hidden="true">

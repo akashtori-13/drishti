@@ -316,7 +316,7 @@ export default function HomePage() {  const router = useRouter();
         <p className="credits" aria-label="Data sources">
           <span className="credits-group"><span className="credits-role">Imaging</span><span>DSS2 · 2MASS · SPHEREx QR2</span></span>
           <span className="credits-group"><span className="credits-role">Astrometry</span><span>Gaia DR3</span></span>
-          <span className="credits-group"><span className="credits-role">Catalogs</span><span>SIMBAD</span></span>
+          <span className="credits-group"><span className="credits-role">Catalogs</span><span>SIMBAD · Yale BSC</span></span>
           <span className="credits-group"><span className="credits-role">Tracking</span><span>SkyBoT · Horizons · CelesTrak</span></span>
         </p>
       </section>
