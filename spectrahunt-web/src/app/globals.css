@@ -87,13 +87,12 @@ main:focus{outline:none;}
 }
 .island[data-expanded]{
   max-width:min(560px, calc(100vw - 24px));
+  width:min(560px, calc(100vw - 24px));
   border-radius:26px;
-  height:min(600px, calc(100dvh - 32px));
+  max-height:calc(100dvh - 32px);
   overflow-y:auto;
   scrollbar-width:thin;
 }
-.island[data-expanded] .island-body-wrap{flex:1; min-height:0;}
-.island[data-expanded] .island-body{overflow-y:auto;}
 .island-row{display:flex; align-items:center; justify-content:space-evenly; gap:4px; width:100%;}
 /* one button shape for all five destinations: 48px touch target, icon 20px */
 .island-iconbtn{
