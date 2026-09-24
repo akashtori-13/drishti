@@ -32,6 +32,7 @@ export default function Header() {
   const [panel, setPanel] = useState<'menu' | 'search' | null>(null);
   const [hovered, setHovered] = useState(false);
   const [searching, setSearching] = useState(false);
+  const [miniQ, setMiniQ] = useState('');
   const [fields, setFields] = useState<Showcase[] | null>(null);
   const openPreview = useAppStore((s) => s.openPreview);
   const islandRef = useRef<HTMLDivElement>(null);
@@ -50,6 +51,12 @@ export default function Header() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setPanel(null);
   }, [pathname]);
+
+  useEffect(() => {
+    // Clear the mini-bar text once the panel closes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (panel === null) setMiniQ('');
+  }, [panel]);
 
   // Single Ctrl+K toggle listener (mounted once).
   useEffect(() => {
@@ -165,6 +172,26 @@ export default function Header() {
           <Icon name="skymap" className="icon" />
           <span className="ibtn-label" aria-hidden="true">Sky</span>
         </Link>
+        {pathname !== '/' && (
+          <form
+            className="island-mini"
+            role="search"
+            onSubmit={(e) => {
+              e.preventDefault();
+              setPanel('search');
+            }}
+          >
+            <Icon name="search" className="icon" />
+            <input
+              value={miniQ}
+              onChange={(e) => { setMiniQ(e.target.value); setPanel('search'); }}
+              onFocus={() => setPanel('search')}
+              placeholder="Jump to an object or field…"
+              aria-label="Jump to an object or field"
+              autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} enterKeyHint="search"
+            />
+          </form>
+        )}
         <button type="button" className="island-iconbtn" aria-label="Search and navigate (Ctrl+K)"
           title="Search and navigate (Ctrl+K)" onClick={() => setPanel((p) => (p === 'search' ? null : 'search'))}>
           <Icon name="search" className="icon" />
@@ -216,7 +243,7 @@ export default function Header() {
             </nav>
           )}
           {showSearch && (
-            <SearchBox id="nav-search" placeholder="Jump to an object or field…" onPick={pick} />
+            <SearchBox id="nav-search" placeholder="Jump to an object or field…" defaultValue={miniQ} onPick={pick} />
           )}
           {showCarousel && fields && fields.length > 0 && (
             <div className="island-carousel">
