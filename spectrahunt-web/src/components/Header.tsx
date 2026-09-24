@@ -52,9 +52,7 @@ export default function Header() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMenuOpen(false);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMSearch(false);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTyping(false);
   }, [pathname]);
 
