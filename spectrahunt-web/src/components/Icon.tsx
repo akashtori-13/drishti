@@ -1,7 +1,7 @@
 'use client';
 
 export type IconName =
-  | 'logo' | 'search' | 'back' | 'fwd' | 'down' | 'x'
+  | 'logo' | 'search' | 'skymap' | 'back' | 'fwd' | 'down' | 'x'
   | 'play' | 'pause' | 'ext' | 'menu' | 'dice';
 
 /** Single-copy SVG sprite (render once in layout). */
@@ -15,6 +15,7 @@ export function Sprite() {
           <path d="M320.06 154.37A10.97 10.97 0 0 1 318 141.71L384.53 8.66A15.67 15.67 0 0 1 409.62 4.58L507.42 102.38A15.67 15.67 0 0 1 503.34 127.47L370.29 194A10.97 10.97 0 0 1 357.63 191.94Z" fill="currentColor" />
         </symbol>
         <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" strokeWidth="1.8" /><path d="M20 20l-4.9-4.9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" fill="none" /></symbol>
+        <symbol id="i-skymap" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" strokeWidth="1.8" /><ellipse cx="12" cy="12" rx="4" ry="8.5" fill="none" stroke="currentColor" strokeWidth="1.8" /><path d="M3.5 12h17" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" fill="none" /><circle cx="15.5" cy="9" r="1.6" fill="currentColor" /></symbol>
         <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></symbol>
         <symbol id="i-fwd" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></symbol>
         <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></symbol>

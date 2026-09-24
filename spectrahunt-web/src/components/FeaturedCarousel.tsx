@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useAppStore } from '@/lib/store';
 import type { Showcase } from '@/lib/showcases';
 
@@ -14,6 +14,7 @@ export function FeaturedCycle({ fields, consoleMode }: { fields: Showcase[]; con
   );
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
+  const touchX = useRef<number | null>(null);
   useEffect(() => {
     if (cands.length < 2 || paused) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -25,6 +26,10 @@ export function FeaturedCycle({ fields, consoleMode }: { fields: Showcase[]; con
   const pngs = f.epochs.map((e) => e.png).filter(Boolean) as string[];
   const mjds = f.epochs.map((e) => e.mjd).filter((m): m is number => m !== undefined);
   const span = mjds.length >= 2 ? Math.round(Math.abs(mjds[mjds.length - 1] - mjds[0])) : null;
+  const swipe = (d: number) => {
+    setPaused(true);
+    setI((v) => (v + d + cands.length) % cands.length);
+  };
   return (
     <div
       className="featured-wrap"
@@ -32,6 +37,14 @@ export function FeaturedCycle({ fields, consoleMode }: { fields: Showcase[]; con
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
+      onTouchStart={(e) => { touchX.current = e.touches[0].clientX; }}
+      onTouchEnd={(e) => {
+        if (touchX.current === null) return;
+        const dx = e.changedTouches[0].clientX - touchX.current;
+        touchX.current = null;
+        if (Math.abs(dx) < 40) return;
+        swipe(dx < 0 ? 1 : -1);
+      }}
     >
       <button
         key={f.id}
