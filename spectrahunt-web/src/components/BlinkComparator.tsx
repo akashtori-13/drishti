@@ -17,7 +17,7 @@ export interface BlinkFrame {
   mjd?: number;
 }
 
-export type CompareMode = 'blink' | 'side' | 'swipe' | 'diff' | 'replay';
+export type CompareMode = 'blink' | 'side' | 'swipe' | 'diff' | 'replay' | 'color';
 
 /** Load an image through the device cache (memory → IndexedDB → network).
  * First visit fetches from the web; every later visit serves cache and never
@@ -178,7 +178,8 @@ export default function BlinkComparator({
     return ch[Math.floor(ch.length / 2)]?.idx ?? 0;
   });
   const [rgb, setRgb] = useState<[number, number, number]>([16, 33, 50]);
-  const [showRgb, setShowRgb] = useState(false);
+  // Motion color is an exclusive view mode, not an overlay toggle.
+  const showRgb = mode === 'color';
   const [falseColor, setFalseColor] = useState(false);
   const [loaded, setLoaded] = useState<Record<string, HTMLImageElement>>({});
   const [loadedBand, setLoadedBand] = useState<Record<string, HTMLImageElement>>({});
@@ -1416,7 +1417,7 @@ export default function BlinkComparator({
     return !!bandPngs[id];
   };
 
-  const modeLabel = mode === 'replay' ? 'Replay · simulated motion' : mode === 'diff' ? 'Difference B−A' : mode === 'swipe' ? 'Swipe A | B' : mode === 'side' ? 'Side-by-side' : falseColor ? 'False color' : showRgb ? 'Motion color' : 'Blink';
+  const modeLabel = mode === 'replay' ? 'Replay · simulated motion' : mode === 'diff' ? 'Difference B−A' : mode === 'swipe' ? 'Swipe A | B' : mode === 'side' ? 'Side-by-side' : mode === 'color' ? 'Motion color' : falseColor ? 'False color' : 'Blink';
 
   interface Cmd { name: string; hint: string; run: () => void }
   const commands: Cmd[] = [
@@ -1424,10 +1425,9 @@ export default function BlinkComparator({
       { name: 'Next epoch', hint: '→', run: () => step(1) },
       { name: 'Previous epoch', hint: '←', run: () => step(-1) },
       ...frames.map((f, i) => ({ name: `Go to ${f.label}`, hint: `E${i + 1}`, run: () => { setPlaying(false); onEpochChange(i); } })),
-      ...(['blink', 'side', 'swipe', 'diff', 'replay'] as CompareMode[]).map((m) => ({
+      ...(['blink', 'side', 'swipe', 'diff', 'replay', 'color'] as CompareMode[]).map((m) => ({
         name: `Mode: ${m}`, hint: '', run: () => onModeChangeWrap(m),
       })),
-      { name: 'Toggle motion color', hint: '', run: () => setShowRgb((v) => !v) },
       ...(['linear', 'log', 'sqrt', 'asinh'] as Stretch[]).map((s) => ({
         name: `Stretch: ${s}`, hint: '', run: () => setStretch(s),
       })),
@@ -1555,14 +1555,13 @@ export default function BlinkComparator({
           <section className="ws-sec" aria-label="View">
             <h3 className="ws-title">View</h3>
             <div className="seg seg-full" role="group" aria-label="Compare mode">
-              {(['blink', 'side', 'swipe', 'diff', 'replay'] as CompareMode[]).map((m) => (
+              {(['blink', 'side', 'swipe', 'diff', 'replay', 'color'] as CompareMode[]).map((m) => (
                 <button key={m} type="button" className={`seg-btn${mode === m ? ' active' : ''}`} aria-pressed={mode === m}
-                  onClick={() => onModeChangeWrap(m)}>
-                  {m === 'blink' ? 'Blink' : m === 'side' ? 'Side' : m === 'swipe' ? 'Swipe' : m === 'diff' ? 'Diff' : 'Replay'}
+                  onClick={() => onModeChangeWrap(m)}
+                  title={m === 'color' ? 'Motion color: epoch B red, epoch A green' : undefined}>
+                  {m === 'blink' ? 'Blink' : m === 'side' ? 'Side' : m === 'swipe' ? 'Swipe' : m === 'diff' ? 'Diff' : m === 'replay' ? 'Replay' : 'Color'}
                 </button>
               ))}
-              <button type="button" className={`seg-btn${showRgb ? ' active' : ''}`} aria-pressed={showRgb}
-                onClick={() => setShowRgb((v) => !v)} title="False-color: epoch B red, epoch A green">Color</button>
             </div>
             {mode === 'replay' && (
               <p className="ws-hint">Simulated replay: detected movers fly their measured vectors, blanks auto-skipped. Rendered — not pixels.</p>
