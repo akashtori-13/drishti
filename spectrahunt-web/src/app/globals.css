@@ -153,7 +153,8 @@ main:focus{outline:none;}
 .island-carousel .featured-wrap{align-items:stretch;}
 .island-carousel .featured{width:100%;}
 .island-carousel .feat-dots{justify-content:center;}
-.island-body .search-shell{flex-wrap:wrap;}
+.island-body .search-shell{flex-wrap:wrap; height:auto; min-height:66px;}
+.island-body .search-shell input{height:auto; padding:10px 0;}
 .island-body .s-list{position:static; flex:1 1 100%; margin-top:8px; max-height:32dvh;}
 .island-brand{text-decoration:none; border-radius:999px; flex-shrink:0;}
 .island-brand .logo{width:24px; height:24px;}
@@ -183,18 +184,16 @@ main:focus{outline:none;}
   .island{gap:0;}
   /* bottom-mounted dock island on phones: same pill, same behavior.
      Ground-up flow: icon row hugs the bottom (thumb), content stacks
-     above it, and suggestions pop UP from the search field. */
+     above it, and suggestions sit ABOVE the input (order:-1) so the
+     list grows upward into the island instead of clipping. */
   .island{
     top:auto; bottom:calc(12px + env(safe-area-inset-bottom,0px));
     flex-direction:column-reverse;
   }
   .island-body nav.cmd-links{order:2;}
   .island-body .island-carousel{order:1;}
-  .island-body .search-shell{order:3; flex-wrap:nowrap;}
-  .island-body .s-list{
-    position:absolute; top:auto; bottom:calc(100% + 8px); left:0; right:0;
-    flex:none; margin-top:0; max-height:28dvh;
-  }
+  .island-body .search-shell{order:3; flex-wrap:wrap;}
+  .island-body .s-list{order:-1; margin-top:0; margin-bottom:8px; max-height:30dvh;}
 }
 /* ---------- tutorial bottom sheet (small screens) ---------- */
 @media(max-width:640px){
