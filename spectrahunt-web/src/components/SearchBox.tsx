@@ -149,6 +149,7 @@ export default function SearchBox({
             else if (e.key === 'Escape') { setOpen(false); }
           }}
           role="combobox" aria-expanded={open} aria-controls={`${id}-list`} aria-autocomplete="list"
+          aria-activedescendant={hl >= 0 && opts[hl] ? `${id}-opt-${hl}` : undefined}
           placeholder={placeholder} aria-label={placeholder}
           autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} enterKeyHint="search"
         />
@@ -163,6 +164,7 @@ export default function SearchBox({
             <div key={`${o.group}-${o.name}`}>
               {(i === 0 || opts[i - 1].group !== o.group) && <div className="s-group">{o.group}</div>}
               <div
+                id={`${id}-opt-${i}`}
                 className={`opt${i === hl ? ' hl' : ''}`} role="option" aria-selected={i === hl}
                 onMouseDown={(e) => {
                   e.preventDefault();

@@ -152,9 +152,29 @@ main:focus{outline:none;}
 .island-carousel .featured-wrap{align-items:stretch;}
 .island-carousel .featured{width:100%;}
 .island-carousel .feat-dots{justify-content:center;}
-.island-body .search-shell{flex-wrap:wrap; height:auto; min-height:66px;}
+.island-body .search-shell{flex-wrap:wrap; height:auto; min-height:66px; row-gap:0;}
 .island-body .search-shell input{height:auto; padding:10px 0;}
-.island-body .s-list{position:static; flex:1 1 100%; margin-top:8px; max-height:32dvh;}
+/* single-surface suggestions: no box of its own — the shell's gradient ring
+   wraps input + list together. Hairline separates list from input row. */
+.island-body .s-list{
+  position:static; flex:1 1 100%;
+  background:none; border:0; border-radius:0; box-shadow:none;
+  padding:8px 0 0; margin:0;
+  border-top:1px solid rgba(255,255,255,.08);
+  max-height:min(252px, 34dvh); overflow-y:auto;
+  -webkit-mask-image:linear-gradient(to bottom, #000 calc(100% - 22px), transparent);
+  mask-image:linear-gradient(to bottom, #000 calc(100% - 22px), transparent);
+}
+.island-body .s-group{
+  padding:8px 0 5px; font-size:.75rem; font-weight:600;
+  text-transform:uppercase; letter-spacing:.1em; color:#aab0c8;
+}
+.island-body .opt{padding:11px 13px 11px 0; min-height:44px; border-radius:8px;}
+.island-body .opt > span:first-child{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.island-body .opt.hl{background:rgba(255,255,255,.09);}
+.island-body .opt .o-meta{display:none; flex-shrink:0;}
+.island-body .opt.hl .o-meta{display:inline;}
+.island-body .opt.hl::after{content:'↵'; color:var(--ink-3); font-size:.8125rem; flex-shrink:0;}
 .island-brand{text-decoration:none; border-radius:999px; flex-shrink:0;}
 .island-brand .logo{width:24px; height:24px;}
 .cmd-veil{position:fixed; inset:0; z-index:90; background:rgba(4,5,10,.6); display:grid; justify-items:center; align-items:start; padding:12vh 16px 16px;}
@@ -216,7 +236,11 @@ main:focus{outline:none;}
   .island-body nav.cmd-links{order:2;}
   .island-body .island-carousel{order:1;}
   .island-body .search-shell{order:3; flex-wrap:wrap;}
-  .island-body .s-list{order:-1; margin-top:0; margin-bottom:8px; max-height:30dvh;}
+  .island-body .s-list{
+    order:-1; margin:0; padding:0 0 8px;
+    border-top:0; border-bottom:1px solid rgba(255,255,255,.08);
+    max-height:min(252px, 30dvh);
+  }
 }
 /* ---------- tutorial bottom sheet (small screens) ---------- */
 @media(max-width:640px){
