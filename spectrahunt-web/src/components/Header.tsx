@@ -26,13 +26,10 @@ function appLink(): string {
 }
 
 /**
- * Plain navbar: one fixed-height row, no morphing, no resizing panels.
- * Desktop row: brand, Sky link, search input (flex), Featured link, menu.
- * Mobile row: brand, sky/search/featured icons, menu (bottom dock); the
- * search icon swaps in a full-width input row at the same height.
+ * Dynamic-island navbar: a fixed pill that morphs open to contain the menu
+ * (desktop; mobile menu rises above the dock), and reduces back on close.
  * Typing hides every sibling control (logo stays) with a width animation.
- * Suggestions and the menu sheet are absolutely positioned overlays —
- * page content never shifts.
+ * Desktop search suggestions overlay below the bar with a spring entrance.
  */
 export default function Header() {
   const rawPathname = usePathname();
@@ -188,6 +185,7 @@ export default function Header() {
       aria-label="Primary"
       data-typing={typing || undefined}
       data-home={pathname === '/' || undefined}
+      data-open={menuOpen || undefined}
       onInput={onNavInput}
       onKeyUp={onNavInput}
     >
@@ -258,8 +256,10 @@ export default function Header() {
           </div>
         </div>
       )}
-      {menuOpen && (
-        <nav id="menu-sheet" className="menu-sheet glass" aria-label="Views">
+      <div className="island-body" data-open={menuOpen || undefined}>
+        <div className="island-body-in">
+          {menuOpen && (
+            <nav id="menu-sheet" className="menu-sheet" aria-label="Views">
           {MENU.map((item) => (
             <Link key={item.href} href={item.href} onClick={() => setMenuOpen(false)}
               aria-current={item.active ? 'page' : undefined}
@@ -282,7 +282,9 @@ export default function Header() {
             </span>
           </a>
         </nav>
-      )}
+          )}
+        </div>
+      </div>
     </div>
   );
 }
