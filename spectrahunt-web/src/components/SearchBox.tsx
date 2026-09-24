@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Icon from '@/components/Icon';
 import { SHOWCASE_IDS, getShowcase, type Showcase } from '@/lib/showcases';
 import { parseCoordinates, findConstellation, CONSTELLATIONS } from '@/lib/astro';
@@ -33,7 +33,20 @@ export default function SearchBox({
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [opts, setOpts] = useState<Suggestion[]>([]);
+  const [moreAbove, setMoreAbove] = useState(false);
+  const [moreBelow, setMoreBelow] = useState(false);
   const boxRef = useRef<HTMLFormElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+
+  // fade affordance only on edges hiding content; list ends stay opaque
+  const syncMore = () => {
+    const el = listRef.current;
+    if (!el) { setMoreAbove(false); setMoreBelow(false); return; }
+    setMoreAbove(el.scrollTop > 4);
+    setMoreBelow(el.scrollHeight > el.clientHeight + 4
+      && el.scrollTop + el.clientHeight < el.scrollHeight - 4);
+  };
+  useEffect(() => { if (open) syncMore(); }, [open, opts]);
 
   const build = (value: string): Suggestion[] => {
     const out: Suggestion[] = [];
@@ -162,7 +175,8 @@ export default function SearchBox({
           <Icon name="search" className="s-go-icon icon" />
           <span className="s-go-label">{busy ? '…' : compact ? 'Go' : 'Search'}</span>
         </button>
-        <div className={`s-list${open ? ' open' : ''}`} id={`${id}-list`} role="listbox" aria-label="Suggestions">
+        <div ref={listRef} className={`s-list${open ? ' open' : ''}`} id={`${id}-list`} role="listbox" aria-label="Suggestions"
+          data-more-above={moreAbove || undefined} data-more-below={moreBelow || undefined} onScroll={syncMore}>
           {err && <div className="s-empty" role="alert">{err}</div>}
           {!err && opts.map((o, i) => (
             <div key={`${o.group}-${o.name}`}>
