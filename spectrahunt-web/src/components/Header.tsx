@@ -52,15 +52,19 @@ export default function Header() {
     setTyping(false);
   }, [pathname]);
 
-  // Ctrl+K: focus the desktop input, or open the mobile input row.
+  // Ctrl+K: navbar input, else the page's own search (hero, map tools),
+  // else the mobile input row.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        const desktop = document.querySelector<HTMLInputElement>('#nav-search-input');
-        if (desktop && getComputedStyle(desktop).display !== 'none') {
-          desktop.focus();
-        } else {
+        const visible = (s: string) => {
+          const el = document.querySelector<HTMLInputElement>(s);
+          return el && getComputedStyle(el).display !== 'none' ? el : null;
+        };
+        const target = visible('#nav-search-input') ?? visible('#hs-input') ?? visible('#ms-input');
+        if (target) target.focus();
+        else {
           setMSearch(true);
           requestAnimationFrame(() => {
             document.querySelector<HTMLInputElement>('#nav-msearch-input')?.focus();
@@ -153,6 +157,9 @@ export default function Header() {
 
   const skyActive = pathname === '/sky';
   const candActive = pathname.startsWith('/candidates');
+  // Home and Sky have their own search surfaces (hero, map tools):
+  // the navbar carries no search affordance there.
+  const bare = pathname === '/' || skyActive;
 
   // Menu hierarchy: Home first, product views in navbar order, About last,
   // then the Surprise action separated below. Labels match the navbar.
@@ -191,19 +198,23 @@ export default function Header() {
           <Icon name="skymap" className="icon" />
           <span className="ibtn-label" aria-hidden="true">Sky</span>
         </Link>
-        <div
-          className="nav-search"
-          role="search"
-        >
-          <Icon name="search" className="icon" />
-          <SearchBox key={pathname} id="nav-search" placeholder="Jump to an object or field…" onPick={pick} />
-          <kbd className="kbd-hint" aria-hidden="true">⌘K</kbd>
-        </div>
-        <button type="button" className="island-iconbtn nav-msearch-toggle collapsible" aria-label="Search and navigate (Ctrl+K)"
-          title="Search and navigate (Ctrl+K)" onClick={() => setMSearch(true)}>
-          <Icon name="search" className="icon" />
-          <span className="ibtn-label" aria-hidden="true">Search</span>
-        </button>
+        {!bare && (
+          <div
+            className="nav-search"
+            role="search"
+          >
+            <Icon name="search" className="icon" />
+            <SearchBox key={pathname} id="nav-search" placeholder="Jump to an object or field…" onPick={pick} />
+            <kbd className="kbd-hint" aria-hidden="true">⌘K</kbd>
+          </div>
+        )}
+        {!bare && (
+          <button type="button" className="island-iconbtn nav-msearch-toggle collapsible" aria-label="Search and navigate (Ctrl+K)"
+            title="Search and navigate (Ctrl+K)" onClick={() => setMSearch(true)}>
+            <Icon name="search" className="icon" />
+            <span className="ibtn-label" aria-hidden="true">Search</span>
+          </button>
+        )}
         <Link href="/candidates" aria-label="Candidate fields"
           aria-current={candActive ? 'page' : undefined}
           className={`nav-textlink collapsible${candActive ? ' active' : ''}`}>
@@ -222,19 +233,21 @@ export default function Header() {
           <span className="ibtn-label" aria-hidden="true">Menu</span>
         </button>
       </div>
-      <div className="island-mrow" data-open={mSearch || undefined}>
-        <button type="button" className="island-iconbtn" aria-label="Back to navigation"
-          onClick={() => setMSearch(false)}>
-          <Icon name="back" className="icon" />
-        </button>
-        <div
-          className="nav-search"
-          role="search"
-        >
-          <Icon name="search" className="icon" />
-          <SearchBox key={pathname} id="nav-msearch" placeholder="Jump to an object or field…" onPick={pick} />
+      {!bare && (
+        <div className="island-mrow" data-open={mSearch || undefined}>
+          <button type="button" className="island-iconbtn" aria-label="Back to navigation"
+            onClick={() => setMSearch(false)}>
+            <Icon name="back" className="icon" />
+          </button>
+          <div
+            className="nav-search"
+            role="search"
+          >
+            <Icon name="search" className="icon" />
+            <SearchBox key={pathname} id="nav-msearch" placeholder="Jump to an object or field…" onPick={pick} />
+          </div>
         </div>
-      </div>
+      )}
       {menuOpen && (
         <nav id="menu-sheet" className="menu-sheet glass" aria-label="Views">
           {MENU.map((item) => (
