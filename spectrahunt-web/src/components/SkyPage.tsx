@@ -142,7 +142,7 @@ export default function SkyPage() {
 
   return (
     <div id="view-sky">
-      <h1 className="sr-only">Sky map</h1>
+      <h1 className="sr-only">SkyMap</h1>
       <div
         ref={stageRef}
         className="xfade"
