@@ -109,9 +109,9 @@ main:focus{outline:none;}
    panel (concentric radius), closing reduces it back to the pill */
 .island[data-open]{border-radius:24px; padding-bottom:12px;
   box-shadow:0 30px 80px -12px rgba(0,0,0,.85), inset 0 1px 0 rgba(255,255,255,.08);}
-.island-body{display:grid; grid-template-rows:0fr; transition:grid-template-rows var(--dur-island) var(--ease-island);}
+.island-body{display:grid; grid-template-rows:0fr; transition:grid-template-rows var(--dur-island) var(--ease-island); border-radius:inherit;}
 .island-body[data-open]{grid-template-rows:1fr;}
-.island-body-in{overflow:hidden; min-height:0; opacity:0; transition:opacity .22s ease;}
+.island-body-in{overflow:hidden; min-height:0; opacity:0; transition:opacity .22s ease; border-radius:inherit;}
 .island-body[data-open] .island-body-in{opacity:1;}
 .island-row{display:flex; align-items:center; gap:8px; width:100%; min-height:48px; transition:gap .3s ease;}
 .island[data-typing] .island-row{gap:0;}
