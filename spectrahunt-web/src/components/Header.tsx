@@ -27,7 +27,9 @@ const LINKS = [
  * are exclusive so the island never clutters.
  */
 export default function Header() {
-  const pathname = usePathname();
+  const rawPathname = usePathname();
+  // Trailing-slash URLs (/sky/) must match route checks (/sky).
+  const pathname = rawPathname.length > 1 ? rawPathname.replace(/\/+$/, '') : rawPathname;
   const router = useRouter();
   const [panel, setPanel] = useState<'menu' | 'search' | null>(null);
   const [hovered, setHovered] = useState(false);
@@ -183,7 +185,7 @@ export default function Header() {
           <Icon name="skymap" className="icon" />
           <span className="ibtn-label" aria-hidden="true">Sky</span>
         </Link>
-        {pathname !== '/' && (
+        {pathname !== '/' && pathname !== '/sky' && (
           <form
             className="island-mini"
             role="search"
@@ -203,7 +205,7 @@ export default function Header() {
             />
           </form>
         )}
-        {pathname !== '/' && (
+        {pathname !== '/' && pathname !== '/sky' && (
           <button type="button" className="island-iconbtn" aria-label="Search and navigate (Ctrl+K)"
             title="Search and navigate (Ctrl+K)" onClick={() => { setHovered(false); setPanel((p) => (p === 'search' ? null : 'search')); }}>
             <Icon name="search" className="icon" />
