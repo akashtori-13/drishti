@@ -187,7 +187,7 @@ export default function CandidatesPage() {
       <div className="page-head">
         <div>
           <p className="hero-kicker">Measured fields · sorted by significance</p>
-          <h1>Candidate fields</h1>
+          <h1>Featured fields</h1>
           <p>Curated SPHEREx fields, each measured by the detection pipeline (aligned difference, dipole significance, light curves). Kinds come from real numbers — or honest “unidentified”.</p>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
