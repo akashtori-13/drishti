@@ -729,6 +729,7 @@ kbd{font-family:var(--font-mono); font-size:.6875rem; border:1px solid var(--lin
 .film:hover{border-color:var(--line-strong);}
 .film.active{border-color:#7c83fd;}
 .film.failed{border-color:#e8c34a;}
+.film.blank{opacity:.3; filter:saturate(.5);}
 .film.failed .film-empty{color:#e8c34a; font-size:1rem;}
 .film-count{font-size:.75rem; color:var(--ink-3); white-space:nowrap; font-variant-numeric:tabular-nums;}
 .frame-retry{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:5;
@@ -823,7 +824,7 @@ kbd{font-family:var(--font-mono); font-size:.6875rem; border:1px solid var(--lin
 .epoch-item .mono{color:var(--ink-3);}
 
 /* ---------- blink side controls ---------- */
-.seg{display:flex; background:rgba(255,255,255,.05); border-radius:12px; padding:3px; gap:2px;}
+.seg{display:flex; flex-wrap:wrap; background:rgba(255,255,255,.05); border-radius:12px; padding:3px; gap:2px;}
 .seg-btn{border:0; background:transparent; color:var(--ink-3); font-size:.8125rem; font-weight:600; padding:7px 13px; border-radius:9px; white-space:nowrap;}
 .seg-btn:hover{color:var(--ink);}
 .seg-btn.active{background:rgba(124,131,253,.28); color:#fff;}

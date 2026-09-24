@@ -5,8 +5,9 @@ import Icon from '@/components/Icon';
 import SpectrumPlot from '@/components/Plots';
 import { BANDS } from '@/lib/sky';
 import { CHANNELS, applyStretch, colormap, type Colormap, type Stretch } from '@/lib/astro';
-import { detectMotion, sampleGray, type MotionCandidate } from '@/lib/motion';
+import { assignTrackIds, buildTracks, detectMotion, sampleGrayAt, sampleGray, type TrackedCandidate, type Track } from '@/lib/motion';
 import { loadCachedImage } from '@/lib/skycache';
+import { API_BASE } from '@/lib/showcases';
 
 export interface BlinkFrame {
   label: string;
@@ -16,7 +17,7 @@ export interface BlinkFrame {
   mjd?: number;
 }
 
-export type CompareMode = 'blink' | 'side' | 'swipe' | 'diff';
+export type CompareMode = 'blink' | 'side' | 'swipe' | 'diff' | 'chart' | 'replay';
 
 /** Load an image through the device cache (memory → IndexedDB → network).
  * First visit fetches from the web; every later visit serves cache and never
@@ -74,9 +75,76 @@ function stylize(canvas: HTMLCanvasElement, stretch: Stretch, vmin: number, vmax
   ctx.putImageData(data, 0, 0);
 }
 
+/** Realistic star: bright core, soft halo, diffraction spikes. Alpha scales all. */
+function drawStarSprite(
+  ctx: CanvasRenderingContext2D, x: number, y: number, r: number,
+  core: string, halo: string, alpha = 1,
+) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  const g = ctx.createRadialGradient(x, y, 0, x, y, r * 3.2);
+  g.addColorStop(0, halo);
+  g.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(x, y, r * 3.2, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = halo;
+  ctx.lineWidth = Math.max(1, r * 0.45);
+  const L = r * 3.4;
+  ctx.beginPath();
+  ctx.moveTo(x - L, y); ctx.lineTo(x + L, y);
+  ctx.moveTo(x, y - L); ctx.lineTo(x, y + L);
+  ctx.stroke();
+  ctx.fillStyle = core;
+  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+}
+
+/** Small solar-system body: coma glow, nucleus, dust tail opposite motion. */
+function drawComet(
+  ctx: CanvasRenderingContext2D, x: number, y: number, ang: number, size: number,
+  color: string, alpha = 1,
+) {
+  const tx = -Math.cos(ang);
+  const ty = -Math.sin(ang);
+  const tailLen = size * 7;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  // dust tail: linear gradient triangle trailing behind
+  const tg = ctx.createLinearGradient(x, y, x + tx * tailLen, y + ty * tailLen);
+  tg.addColorStop(0, color);
+  tg.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = tg;
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  const px = -ty;
+  const py = tx;
+  ctx.lineTo(x + tx * tailLen + px * size * 0.9, y + ty * tailLen + py * size * 0.9);
+  ctx.lineTo(x + tx * tailLen - px * size * 0.9, y + ty * tailLen - py * size * 0.9);
+  ctx.closePath();
+  ctx.globalAlpha = alpha * 0.55;
+  ctx.fill();
+  ctx.globalAlpha = alpha;
+  // coma + nucleus
+  const g = ctx.createRadialGradient(x, y, 0, x, y, size * 2.6);
+  g.addColorStop(0, '#ffffff');
+  g.addColorStop(0.35, color);
+  g.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(x, y, size * 2.6, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(x, y, Math.max(1.4, size * 0.7), 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+}
+
+/** Smoothstep easing for glide + shuttle motion (no velocity snaps). */
+function smooth01(t: number): number {
+  const k = Math.min(1, Math.max(0, t));
+  return k * k * (3 - 2 * k);
+}
+
 export default function BlinkComparator({
   frames, band, onBandChange, title, mode, onModeChange, epochIdx, onEpochChange,
-  showMarkers, onToggleMarkers, fovArcmin = 10, onSample, center, bandPngs, onStats,
+  showMarkers, onToggleMarkers, fovArcmin = 10, onSample, center, knownNames, bandPngs, onStats,
 }: {
   frames: BlinkFrame[]; band: number; onBandChange: (b: number) => void; title: string;
   mode: CompareMode; onModeChange: (m: CompareMode) => void;
@@ -84,6 +152,8 @@ export default function BlinkComparator({
   showMarkers: boolean; onToggleMarkers?: () => void; fovArcmin?: number;
   onSample?: (args: { x: number; y: number; values: number[] }) => void;
   center?: { ra: number; dec: number };
+  /** Known-object names at field center (SkyBoT) for the chart overlay. */
+  knownNames?: string[];
   /** Newest-epoch PNG per detector (1-6) for true false-color composites. */
   bandPngs?: Record<number, string | null>;
   onStats?: (s: { movers: number; variables: number; ready: boolean } | null) => void;
@@ -259,15 +329,79 @@ export default function BlinkComparator({
     () => frames.map((f, i) => (f.png && loaded[f.png] ? i : -1)).filter((i) => i >= 0),
     [frames, loaded],
   );
+  // replay rides pairs with measured motion only: tracked candidates per
+  // epoch pair (prev → cur), with measured endpoint brightness and stable
+  // cross-pair numbers. Recomputed as frames decode; cheap (96px
+  // downsamples), cached by the memo. Keyed on the PNG URL list — the
+  // frames array itself is a fresh literal every parent render, which must
+  // NOT invalidate the cache (it would cascade: candidates → onStats →
+  // parent setState → render → infinite loop).
+  const pairFramesSig = frames.map((f) => f.png ?? '').join('|');
+  const pairCands = useMemo(() => {
+    const out: TrackedCandidate[][] = [];
+    for (let i = 0; i < n; i++) {
+      const a = frames[(i - 1 + n) % n];
+      const b = frames[i];
+      const ia = a.png ? loaded[a.png] : undefined;
+      const ib = b.png ? loaded[b.png] : undefined;
+      if (!ia || !ib) { out.push([]); continue; }
+      try {
+        const ga = sampleGray(ia);
+        const gb = sampleGray(ib);
+        if (!ga || !gb) { out.push([]); continue; }
+        out.push(detectMotion(ga, gb).map((c) => ({
+          ...c, n: 0, ba: sampleGrayAt(ga, c.x, c.y), bb: sampleGrayAt(gb, c.x, c.y),
+        })));
+      } catch { out.push([]); /* ignore undecodable pairs */ }
+    }
+    // chain numbers across pairs so one object keeps its identity (and its
+    // label) while stepping through epochs
+    let free = 1;
+    const numbered: TrackedCandidate[][] = [];
+    for (let i = 0; i < n; i++) {
+      const prev = numbered[(i - 1 + n) % n] ?? [];
+      const { ids, next } = assignTrackIds(prev, out[i], free);
+      free = next;
+      numbered.push(out[i].map((c, k) => ({ ...c, n: ids[k] })));
+    }
+    return numbered;
+  }, [pairFramesSig, loaded, n]);
+  const pairMotion = useMemo(() => pairCands.map((l) => l.length > 0), [pairCands]);
+  const motionIdx = useMemo(() => {
+    const out: number[] = [];
+    for (let i = 0; i < n; i++) if (pairMotion[i]) out.push(i);
+    return out;
+  }, [pairMotion, n]);
+  // full measured paths per object (initial place → last place), for the
+  // replay flight lines. Deterministic: rebuilt identically while caller
+  // passes the same numbered pairs.
+  const tracks: Track[] = useMemo(() => buildTracks(pairCands), [pairCands]);
+  // live mirrors for callbacks (transport + autoplay stay correct mid-flight)
+  const pairMotionRef = useRef<boolean[]>([]);
+  pairMotionRef.current = pairMotion;
+  const playingRef = useRef(playing);
+  playingRef.current = playing;
+  const phaseRef = useRef(0);
+  // replay glide: previous-pair positions by track number for pair-change easing
+  const glideRef = useRef<{ map: Map<number, { x: number; y: number }>; t0: number } | null>(null);
+  const glideCands = useRef<TrackedCandidate[] | null>(null);
+  // replay motion trails: recent traveler positions per track number
+  const trailRef = useRef(new Map<number, Array<{ x: number; y: number }>>());
   // autoplay
   useEffect(() => {
     if (!playing || availIdx.length < 2) return;
     timer.current = setInterval(() => {
+      // replay rides motion pairs only — blank pairs never take the stage
+      if (mode === 'replay' && motionIdx.length) {
+        const pos = motionIdx.indexOf(idx);
+        onEpochChange(pos >= 0 ? motionIdx[(pos + 1) % motionIdx.length] : motionIdx[0]);
+        return;
+      }
       const pos = availIdx.indexOf(idx);
       onEpochChange(pos >= 0 ? availIdx[(pos + 1) % availIdx.length] : availIdx[0]);
     }, speed);
     return () => { if (timer.current) clearInterval(timer.current); };
-  }, [playing, speed, availIdx, idx, onEpochChange]);
+  }, [playing, speed, availIdx, idx, onEpochChange, mode, motionIdx]);
 
   // reduced motion: never autoplay
   useEffect(() => {
@@ -285,8 +419,15 @@ export default function BlinkComparator({
 
   const step = useCallback((d: number) => {
     setPlaying(false);
+    // replay transport hops between motion pairs; blanks are never shown
+    if (mode === 'replay' && d !== 0 && motionIdx.length) {
+      for (let k = 1; k <= n; k++) {
+        const j = (((idx + d * k) % n) + n) % n;
+        if (motionIdx.includes(j)) { onEpochChange(j); return; }
+      }
+    }
     onEpochChange((idx + d + n) % n);
-  }, [idx, n, onEpochChange]);
+  }, [idx, n, onEpochChange, mode, motionIdx]);
 
   const cur = frames[idx];
   const prev = frames[prevIdx];
@@ -355,17 +496,30 @@ export default function BlinkComparator({
   const totalFrames = frames.filter((f) => f.png).length;
   const doneFrames = frames.filter((f) => f.png && loaded[f.png]).length;
   // real motion candidates from the actual pixels (recomputed when frames arrive)
-  const candidates: MotionCandidate[] = useMemo(() => {
-    if (!curImg || !prevImg) return [];
-    try {
-      const a = sampleGray(prevImg);
-      const b = sampleGray(curImg);
-      if (!a || !b) return [];
-      return detectMotion(a, b);
-    } catch {
-      return [];
+  const candidates: TrackedCandidate[] = useMemo(
+    () => pairCands[Math.min(idx, Math.max(0, n - 1))] ?? [],
+    [pairCands, idx],
+  );
+  // chart-mode star layer: Gaia points around the field center (cached
+  // server-side 30d). Empty without the live API — the chart still draws
+  // detections, with an on-canvas note. Primitive deps: center is an inline
+  // literal upstream, so object identity would refetch every render.
+  const [chartStars, setChartStars] = useState<Array<{ ra: number; dec: number; g_mag: number | null }>>([]);
+  useEffect(() => {
+    if (mode !== 'chart' || !center || !API_BASE) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setChartStars((prev) => (prev.length ? [] : prev));
+      return;
     }
-  }, [curImg, prevImg]);
+    let alive = true;
+    const fov = Math.max(0.3, fovArcmin / 60 + 0.2);
+    void fetch(`${API_BASE}/api/stars?ra=${center.ra.toFixed(2)}&dec=${center.dec.toFixed(2)}&fov_deg=${fov.toFixed(1)}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => { if (alive && j && Array.isArray(j.stars)) setChartStars(j.stars); })
+      .catch(() => undefined);
+    return () => { alive = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, center?.ra, center?.dec, fovArcmin]);
   // detection summary for the data rail (parent-owned state, effect boundary)
   useEffect(() => {
     if (!onStats) return;
@@ -392,10 +546,249 @@ export default function BlinkComparator({
     (probeSrc as { canvas?: HTMLCanvasElement }).canvas = c;
   }, [curImg]);
 
+  // replay entry: land on a motion pair when entering the mode (once per
+  // entry while pairs are still decoding; scrubbed blank pairs are left
+  // alone with an honest on-canvas note).
+  const replayEntered = useRef(false);
+  useEffect(() => {
+    if (mode !== 'replay') { replayEntered.current = false; return; }
+    if (replayEntered.current) return;
+    const pm = pairMotionRef.current;
+    if (!pm.some(Boolean)) return; // nothing measured yet; retry as pairs decode
+    replayEntered.current = true;
+    const j = pm.findIndex(Boolean);
+    if (j >= 0 && j !== idx) onEpochChange(j);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, pairMotion]);
+
+  // Replay: full-view simulated motion. Self-contained rAF loop over refs —
+  // no react churn per frame. Detected movers fly their measured dipole
+  // vectors (ping-pong), variables pulse, Gaia stars hold the field.
+  useEffect(() => {
+    if (mode !== 'replay') return;
+    const canvas = mainRef.current;
+    const host = canvas?.parentElement;
+    if (!canvas || !host) return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let lastW = 0;
+    let lastH = 0;
+    let last = performance.now();
+
+    const draw = (_nowMs = 0, staticFrame = false) => {
+      const w = host.clientWidth;
+      const h = host.clientHeight || host.clientWidth;
+      if (!w || !h) return;
+      if (w !== lastW || h !== lastH) {
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+        lastW = w; lastH = h;
+      }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      // deep-field backdrop with vignette
+      const bg = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h) * 0.72);
+      bg.addColorStop(0, '#070a18');
+      bg.addColorStop(1, '#02030a');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, w, h);
+      // faint graticule
+      ctx.strokeStyle = 'rgba(255,255,255,.06)';
+      ctx.lineWidth = 1;
+      for (const f of [1 / 3, 2 / 3]) {
+        ctx.beginPath(); ctx.moveTo(f * w, 0); ctx.lineTo(f * w, h); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, f * h); ctx.lineTo(w, f * h); ctx.stroke();
+      }
+      // Gaia starfield through the linear field mapping (F across the width)
+      if (center && chartStars.length) {
+        const F = Math.max(1e-6, fovArcmin / 60);
+        const cosd = Math.cos((center.dec * Math.PI) / 180);
+        for (const s of chartStars) {
+          const dx = (-(s.ra - center.ra) * cosd) / F;
+          const dy = (s.dec - center.dec) / F;
+          if (Math.abs(dx) > 0.55 || Math.abs(dy) > 0.55) continue;
+          const sx = w / 2 + dx * w;
+          const sy = h / 2 - dy * h;
+          const g = s.g_mag ?? 14;
+          if (g < 11) {
+            drawStarSprite(ctx, sx, sy, Math.min(2.2, Math.max(1, 2.4 - (g - 6) * 0.2)), '#e8efff', 'rgba(200,220,255,.7)');
+          } else {
+            const r = Math.min(2.4, Math.max(0.6, 2.6 - (g - 6) * 0.24));
+            ctx.fillStyle = 'rgba(220,228,245,.66)';
+            ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI * 2); ctx.fill();
+          }
+        }
+      }
+      // known object at field center
+      if (knownNames?.length) {
+        ctx.strokeStyle = 'rgba(95,207,154,.85)';
+        ctx.setLineDash([5, 5]);
+        ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(w / 2, h / 2, 20, 0, Math.PI * 2); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#5fcf9a';
+        ctx.font = '600 11px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(knownNames[0].slice(0, 30), w / 2, h / 2 - 28);
+        ctx.textAlign = 'left';
+      }
+      const pm = pairMotionRef.current;
+      const motionCount = pm.filter(Boolean).length;
+      const allDecoded = totalFrames > 0 && doneFrames >= totalFrames;
+      if (!candidates.length) {
+        ctx.fillStyle = '#8a90ab';
+        ctx.font = '12px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(
+          motionCount > 0
+            ? 'NO MOTION IN THIS PAIR — STEP TO SKIP'
+            : allDecoded ? 'NO MOTION IN ANY PAIR — TRY BLINK OR DIFF' : 'SCANNING PAIRS FOR MOTION…',
+          w / 2, h / 2,
+        );
+        ctx.textAlign = 'left';
+      } else {
+        // loop phase from accumulated play time: pause freezes, rate bends tempo.
+        // eased shuttle (smoothstep): travelers glide A→B with no velocity snap.
+        const T = staticFrame ? -1 : phaseRef.current;
+        const period = Math.min(4, Math.max(1.2, speed / 1000 * 2.5));
+        const ph = T < 0 ? 0.5 : (((T % period) + period) % period) / period;
+        const tri = smooth01(ph < 0.5 ? ph * 2 : 2 - ph * 2);
+        // flight across pair changes: the same track number eases from its
+        // old spot to the new one along its measured path (~1.4 s), so jumps
+        // read as travel. Patrol (ping-pong around the pair dipole) resumes
+        // on arrival; labels ride the traveler.
+        if (glideCands.current !== candidates) {
+          const prev = new Map<number, { x: number; y: number }>();
+          for (const p of glideCands.current ?? []) prev.set(p.n, { x: p.x, y: p.y });
+          glideRef.current = { map: prev, t0: performance.now() };
+          glideCands.current = candidates;
+          // prune trails of vanished tracks (bounded memory, no stale streaks)
+          for (const k of [...trailRef.current.keys()]) {
+            if (!candidates.some((c) => c.n === k)) trailRef.current.delete(k);
+          }
+        }
+        const gk = smooth01((performance.now() - (glideRef.current?.t0 ?? 0)) / 1400);
+        // full measured paths: every track's initial → last place, faint
+        ctx.lineWidth = 1.2;
+        for (const t of tracks) {
+          if (t.points.length < 2) continue;
+          ctx.strokeStyle = t.kind === 'mover' ? 'rgba(240,187,82,.22)' : 'rgba(90,169,230,.20)';
+          ctx.beginPath();
+          t.points.forEach((p, k) => {
+            const px = p.x * w;
+            const py = p.y * h;
+            if (k === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+          });
+          ctx.stroke();
+        }
+        const labels: Array<{ x: number; y: number; text: string; color: string }> = [];
+        candidates.forEach((c, i) => {
+          const gp = glideRef.current?.map.get(c.n);
+          const fx = gp ? gp.x + (c.x - gp.x) * gk : c.x;
+          const fy = gp ? gp.y + (c.y - gp.y) * gk : c.y;
+          const isMover = c.kind === 'mover';
+          const col = isMover ? '#f0bb52' : '#5aa9e6';
+          if (isMover) {
+            const ax = fx * w - (c.dx * w) / 2;
+            const ay = fy * h - (c.dy * h) / 2;
+            const bx = fx * w + (c.dx * w) / 2;
+            const by = fy * h + (c.dy * h) / 2;
+            // faint measured-vector rail
+            ctx.strokeStyle = 'rgba(240,187,82,.28)';
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.moveTo(ax - (bx - ax) * 0.2, ay - (by - ay) * 0.2);
+            ctx.lineTo(bx + (bx - ax) * 0.2, by + (by - ay) * 0.2);
+            ctx.stroke();
+            // comet flying the dipole: eased patrol around the flight base
+            const tx = ax + (bx - ax) * tri;
+            const ty = ay + (by - ay) * tri;
+            const ang = Math.atan2(by - ay, bx - ax);
+            const size = 2.6 + Math.min(2.4, c.sigma / 40);
+            drawComet(ctx, tx, ty, ang, size, 'rgba(240,187,82,.85)');
+            // fading motion trail behind the traveler
+            const trail = trailRef.current.get(c.n) ?? [];
+            trail.push({ x: tx, y: ty });
+            if (trail.length > 22) trail.shift();
+            trailRef.current.set(c.n, trail);
+            for (let s = 1; s < trail.length; s++) {
+              ctx.strokeStyle = `rgba(240,187,82,${(0.35 * s / trail.length).toFixed(3)})`;
+              ctx.lineWidth = 1.4;
+              ctx.beginPath();
+              ctx.moveTo(trail[s - 1].x, trail[s - 1].y);
+              ctx.lineTo(trail[s].x, trail[s].y);
+              ctx.stroke();
+            }
+            // arrowhead at the measured destination
+            ctx.strokeStyle = col;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(bx, by);
+            ctx.lineTo(bx - 9 * Math.cos(ang - 0.42), by - 9 * Math.sin(ang - 0.42));
+            ctx.moveTo(bx, by);
+            ctx.lineTo(bx - 9 * Math.cos(ang + 0.42), by - 9 * Math.sin(ang + 0.42));
+            ctx.stroke();
+            labels.push({ x: tx, y: ty - 18, text: `M${c.n || i + 1} ${c.sigma.toFixed(0)}σ`, color: col });
+          } else {
+            const X = fx * w;
+            const Y = fy * h;
+            // variable star: measured brightness drives the pulse (ba→bb)
+            const bv = Math.max(0.12, Math.min(1, c.ba + (c.bb - c.ba) * tri));
+            drawStarSprite(ctx, X, Y, 1.6 + bv * 1.8, '#dfe9ff', 'rgba(90,169,230,.8)', 0.35 + 0.65 * bv);
+            labels.push({ x: X, y: Y - 16, text: `V${c.n || i + 1} ${c.sigma.toFixed(0)}σ`, color: col });
+          }
+        });
+        // de-collided labels: single vertical pass, 15px minimum pitch
+        labels.sort((a, b) => a.y - b.y);
+        for (let i = 1; i < labels.length; i++) {
+          if (labels[i].y < labels[i - 1].y + 15) labels[i].y = labels[i - 1].y + 15;
+        }
+        ctx.font = '600 11px ui-monospace, monospace';
+        for (const l of labels) {
+          const lx = Math.min(w - 8, Math.max(8, l.x));
+          ctx.textAlign = 'center';
+          ctx.lineWidth = 3;
+          ctx.strokeStyle = 'rgba(2,3,10,.9)';
+          ctx.strokeText(l.text, lx, Math.min(h - 30, Math.max(14, l.y)));
+          ctx.fillStyle = l.color;
+          ctx.fillText(l.text, lx, Math.min(h - 30, Math.max(14, l.y)));
+          ctx.textAlign = 'left';
+        }
+      }
+      // captions: pair progress + honesty tag (y=40 clears the DOM viewer tags)
+      ctx.font = '600 10px ui-monospace, monospace';
+      ctx.fillStyle = 'rgba(232,195,74,.9)';
+      ctx.textAlign = 'center';
+      ctx.fillText(`PAIR ${idx + 1}/${n} · ${motionCount} WITH MOTION`, w / 2, 40);
+      ctx.fillStyle = 'rgba(138,144,171,.85)';
+      ctx.font = '10px ui-monospace, monospace';
+      ctx.fillText('SIMULATED FROM ≥5σ DETECTIONS — NOT SKY PIXELS', w / 2, h - 12);
+      ctx.textAlign = 'left';
+    };
+
+    if (reduce) {
+      draw(performance.now(), true);
+      return;
+    }
+    let raf = requestAnimationFrame(function loop(t) {
+      const dt = Math.min(0.1, (t - last) / 1000);
+      last = t;
+      if (playingRef.current) phaseRef.current += dt;
+      draw();
+      raf = requestAnimationFrame(loop);
+    });
+    return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, pairMotion, candidates, tracks, chartStars, knownNames, center, fovArcmin, speed, idx, n, totalFrames, doneFrames]);
   // render main canvas + histogram + diff stats (DOM-direct, no react state)
   useEffect(() => {
     const canvas = mainRef.current;
     if (!canvas) return;
+    // replay owns its canvas via a dedicated rAF loop — stay out so pixels
+    // (and the rail histogram below) never mix capture with simulation.
+    if (mode === 'replay') return;
     const host = canvas.parentElement;
     if (!host) return;
     const w = host.clientWidth;
@@ -514,6 +907,102 @@ export default function BlinkComparator({
         ctx.lineWidth = 1.5;
         ctx.beginPath(); ctx.moveTo(swipe * w, 0); ctx.lineTo(swipe * w, h); ctx.stroke();
       }
+    } else if (mode === 'chart') {
+      // Clean schematic beside the capture: left half real frame, right half
+      // rendered interpretation (Gaia stars + measured detections). The right
+      // half is drawn AFTER stylize so pixels never masquerade as data.
+      const mid = Math.round(w / 2);
+      const cw = w - mid;
+      if (curImg) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, 0, mid, h);
+        ctx.clip();
+        drawCover(ctx, curImg, mid, h, pan, zoom);
+        ctx.restore();
+        stylize(canvas, stretch, vmin, vmax, invert, cmap, false, diffScale);
+      } else {
+        ctx.fillStyle = '#aab0c8';
+        ctx.font = '12px ui-monospace, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(cur?.png ? 'loading frame…' : 'Cutout pending.', mid / 2, h / 2);
+        ctx.textAlign = 'left';
+      }
+      ctx.fillStyle = 'rgba(255,255,255,.22)';
+      ctx.fillRect(mid - 1, 0, 2, h);
+      const cx = (fx: number) => mid + fx * cw;
+      const cy = (fy: number) => fy * h;
+      // graticule whisper
+      ctx.strokeStyle = 'rgba(255,255,255,.07)';
+      ctx.lineWidth = 1;
+      for (const f of [1 / 3, 2 / 3]) {
+        ctx.beginPath(); ctx.moveTo(mid + f * cw, 0); ctx.lineTo(mid + f * cw, h); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(mid, f * h); ctx.lineTo(w, f * h); ctx.stroke();
+      }
+      // Gaia stars through the same linear field mapping (frame FOV across
+      // its width; screen-right is −RA, matching the probe readout)
+      if (center && chartStars.length) {
+        const F = Math.max(1e-6, fovArcmin / 60);
+        const cosd = Math.cos((center.dec * Math.PI) / 180);
+        for (const s of chartStars) {
+          const dx = (-(s.ra - center.ra) * cosd) / F;
+          const dy = (s.dec - center.dec) / F;
+          if (Math.abs(dx) > 0.55 || Math.abs(dy) > 0.55) continue;
+          const sx = mid + cw / 2 + dx * cw;
+          const sy = h / 2 - dy * h;
+          const g = s.g_mag ?? 14;
+          const r = Math.min(2.6, Math.max(0.6, 2.8 - (g - 6) * 0.26));
+          ctx.fillStyle = g < 11 ? '#e8efff' : 'rgba(220,228,245,.7)';
+          ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+      // measured detections: movers get dipole arrows, variables get rings
+      candidates.forEach((c, i) => {
+        const X = cx(c.x);
+        const Y = cy(c.y);
+        if (X < mid - 20 || X > w + 20 || Y < -20 || Y > h + 20) return;
+        const isMover = c.kind === 'mover';
+        ctx.strokeStyle = isMover ? '#f0bb52' : '#5aa9e6';
+        ctx.fillStyle = isMover ? '#f0bb52' : '#5aa9e6';
+        ctx.lineWidth = 1.8;
+        if (isMover) {
+          ctx.strokeRect(X - 8, Y - 8, 16, 16);
+          const x0 = X - (c.dx * cw) / 2;
+          const y0 = Y - (c.dy * h) / 2;
+          const x1 = X + (c.dx * cw) / 2;
+          const y1 = Y + (c.dy * h) / 2;
+          ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+          ctx.beginPath(); ctx.arc(x1, y1, 2.5, 0, Math.PI * 2); ctx.fill();
+        } else {
+          ctx.beginPath(); ctx.arc(X, Y, 7, 0, Math.PI * 2); ctx.stroke();
+          ctx.beginPath(); ctx.arc(X, Y, 2, 0, Math.PI * 2); ctx.fill();
+        }
+        const tag = `${isMover ? 'M' : 'V'}${c.n || i + 1} ${c.sigma.toFixed(0)}σ`;
+        ctx.font = '600 10px ui-monospace, monospace';
+        ctx.textAlign = X + 52 > w ? 'right' : 'left';
+        ctx.fillText(tag, X + (X + 52 > w ? -11 : 11), Y - 9);
+        ctx.textAlign = 'left';
+      });
+      // honesty captions (short: the half is narrow on phones)
+      ctx.textAlign = 'center';
+      ctx.font = '600 10px ui-monospace, monospace';
+      ctx.fillStyle = 'rgba(232,195,74,.9)';
+      ctx.fillText('RENDERED CHART', mid + cw / 2, 16);
+      if (knownNames?.length) {
+        ctx.fillStyle = '#5fcf9a';
+        ctx.fillText(`KNOWN: ${knownNames[0].slice(0, 26)}`, mid + cw / 2, 32);
+      }
+      const note = !curImg
+        ? (cur?.png ? null : 'Cutout pending.')
+        : !candidates.length ? 'Quiet field — no ≥5σ pair.'
+        : !center ? 'Stars need coordinates.'
+        : !chartStars.length ? 'Star layer needs live API.' : null;
+      if (note) {
+        ctx.fillStyle = '#8a90ab';
+        ctx.font = '11px ui-monospace, monospace';
+        ctx.fillText(note, mid + cw / 2, h - 20);
+      }
+      ctx.textAlign = 'left';
     } else if (curImg) {
       drawCover(ctx, curImg, w, h, pan, zoom);
       stylize(canvas, stretch, vmin, vmax, invert, cmap, false, diffScale);
@@ -571,7 +1060,7 @@ export default function BlinkComparator({
           ctx.fill();
         }
         ctx.font = '600 10px ui-monospace, monospace';
-        ctx.fillText(`${isMover ? 'M' : 'V'}${i + 1} ${c.sigma.toFixed(0)}σ`, X + 11, Y - 9);
+        ctx.fillText(`${isMover ? 'M' : 'V'}${c.n || i + 1} ${c.sigma.toFixed(0)}σ`, X + 11, Y - 9);
       });
     }
     ctx.fillStyle = 'rgba(238,240,248,.85)';
@@ -617,7 +1106,7 @@ export default function BlinkComparator({
           : '';
       }
     } catch { /* tainted or tiny canvas */ }
-  }, [curImg, prevImg, mode, stretch, vmin, vmax, invert, cmap, diffScale, swipe, pan, zoom, showMarkers, showRgb, falseColor, loadedBand, rgb, bandPngs, fovArcmin, candidates, sizeTick, failed, loaded, cur?.png]);
+  }, [curImg, prevImg, mode, stretch, vmin, vmax, invert, cmap, diffScale, swipe, pan, zoom, showMarkers, showRgb, falseColor, loadedBand, rgb, bandPngs, fovArcmin, candidates, sizeTick, failed, loaded, chartStars, knownNames, center, cur?.png]);
 
   // side-by-side render (synchronized pan/zoom + linked cursor)
   useEffect(() => {
@@ -740,6 +1229,9 @@ export default function BlinkComparator({
     const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const x = (e.clientX - r.left) / r.width;
     const y = (e.clientY - r.top) / r.height;
+    // chart's right half is schematic and replay is a simulation: taps there
+    // don't measure pixels (chart measures on its captured half).
+    if (mode === 'replay' || (mode === 'chart' && x > 0.5)) return;
     const values = frames.map((f) => {
       const img = f.png ? loaded[f.png] : undefined;
       if (!img) return 0;
@@ -871,7 +1363,7 @@ export default function BlinkComparator({
     setChannel(ch[Math.floor(ch.length / 2)]?.idx ?? 0);
   };
 
-  const modeLabel = mode === 'diff' ? 'Difference B−A' : mode === 'swipe' ? 'Swipe A | B' : mode === 'side' ? 'Side-by-side' : falseColor ? 'False color' : showRgb ? 'Motion color' : 'Blink';
+  const modeLabel = mode === 'replay' ? 'Replay · simulated motion' : mode === 'diff' ? 'Difference B−A' : mode === 'swipe' ? 'Swipe A | B' : mode === 'side' ? 'Side-by-side' : mode === 'chart' ? 'Chart · rendered interpretation' : falseColor ? 'False color' : showRgb ? 'Motion color' : 'Blink';
 
   interface Cmd { name: string; hint: string; run: () => void }
   const commands: Cmd[] = [
@@ -879,7 +1371,7 @@ export default function BlinkComparator({
       { name: 'Next epoch', hint: '→', run: () => step(1) },
       { name: 'Previous epoch', hint: '←', run: () => step(-1) },
       ...frames.map((f, i) => ({ name: `Go to ${f.label}`, hint: `E${i + 1}`, run: () => { setPlaying(false); onEpochChange(i); } })),
-      ...(['blink', 'side', 'swipe', 'diff'] as CompareMode[]).map((m) => ({
+      ...(['blink', 'side', 'swipe', 'diff', 'chart', 'replay'] as CompareMode[]).map((m) => ({
         name: `Mode: ${m}`, hint: '', run: () => onModeChangeWrap(m),
       })),
       { name: 'Toggle motion color', hint: '', run: () => setShowRgb((v) => !v) },
@@ -979,12 +1471,18 @@ export default function BlinkComparator({
           </div>
 
           <div className="filmstrip" role="group" aria-label="Epoch filmstrip">
-            {frames.map((f, i) => (
+            {frames.map((f, i) => {
+              // replay dims pairs with no measured motion (both decoded, zero
+              // candidates): the transport skips them, the strip shows why.
+              const a = frames[(i - 1 + n) % n];
+              const pairDone = !!(a.png && f.png && loaded[a.png] && loaded[f.png]);
+              const blank = mode === 'replay' && pairDone && !pairMotion[i];
+              return (
               <button key={`${f.label}::${i}`} type="button"
                 onClick={() => { setPlaying(false); onEpochChange(i); if (f.png && failed[f.png]) retryUrl(f.png); }}
-                className={`film${i === idx ? ' active' : ''}${f.png && failed[f.png] ? ' failed' : ''}`}
+                className={`film${i === idx ? ' active' : ''}${f.png && failed[f.png] ? ' failed' : ''}${blank ? ' blank' : ''}`}
                 aria-pressed={i === idx}
-                title={f.png && failed[f.png] ? `${f.label} · load failed — click to retry` : (f.mjd ? `${f.label} · MJD ${f.mjd}` : f.label)}>
+                title={f.png && failed[f.png] ? `${f.label} · load failed — click to retry` : (f.mjd ? `${f.label} · MJD ${f.mjd}` : f.label) + (blank ? ' · no motion in this pair' : '')}>
                 {f.png && loaded[f.png] ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={f.png} alt="" draggable={false} />
@@ -992,7 +1490,8 @@ export default function BlinkComparator({
                   <span className="film-empty">{f.png && failed[f.png] ? '↻' : (f.mjd ? String(Math.round(f.mjd)).slice(2) : `E${i + 1}`)}</span>
                 )}
               </button>
-            ))}
+              );
+            })}
             <label className="rate">Rate
               <input type="range" min={150} max={1200} step={10} value={speed} onChange={(e) => setSpeed(Number(e.target.value))} aria-label="Blink rate" />
             </label>
@@ -1006,15 +1505,21 @@ export default function BlinkComparator({
           <section className="ws-sec" aria-label="View">
             <h3 className="ws-title">View</h3>
             <div className="seg seg-full" role="group" aria-label="Compare mode">
-              {(['blink', 'side', 'swipe', 'diff'] as CompareMode[]).map((m) => (
+              {(['blink', 'side', 'swipe', 'diff', 'chart', 'replay'] as CompareMode[]).map((m) => (
                 <button key={m} type="button" className={`seg-btn${mode === m ? ' active' : ''}`} aria-pressed={mode === m}
                   onClick={() => onModeChangeWrap(m)}>
-                  {m === 'blink' ? 'Blink' : m === 'side' ? 'Side' : m === 'swipe' ? 'Swipe' : 'Diff'}
+                  {m === 'blink' ? 'Blink' : m === 'side' ? 'Side' : m === 'swipe' ? 'Swipe' : m === 'diff' ? 'Diff' : m === 'chart' ? 'Chart' : 'Replay'}
                 </button>
               ))}
               <button type="button" className={`seg-btn${showRgb ? ' active' : ''}`} aria-pressed={showRgb}
                 onClick={() => setShowRgb((v) => !v)} title="False-color: epoch B red, epoch A green">Color</button>
             </div>
+            {mode === 'chart' && (
+              <p className="ws-hint">Clean schematic beside the capture: Gaia stars plus measured ≥5σ detections. Interpretation — measure on the captured half.</p>
+            )}
+            {mode === 'replay' && (
+              <p className="ws-hint">Simulated replay: detected movers fly their measured vectors, blanks auto-skipped. Rendered — not pixels.</p>
+            )}
             {mode === 'diff' && (
               <label className="ws-level"><span>Gain</span>
                 <input type="range" min={1} max={8} step={0.5} value={diffScale} onChange={(e) => setDiffScale(Number(e.target.value))} aria-label="Difference gain" />
