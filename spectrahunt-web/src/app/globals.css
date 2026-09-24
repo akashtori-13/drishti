@@ -200,6 +200,15 @@ main:focus{outline:none;}
 }
 @keyframes menu-in{from{opacity:0; transform:translateY(-6px);} to{opacity:1; transform:none;}}
 @media (prefers-reduced-motion: reduce){ .menu-sheet{animation:none;} .collapsible{transition:none;} }
+@media(min-width:641px){
+  /* desktop: sheet spans the full navbar width, links in two columns */
+  .island .menu-sheet{
+    left:0; right:0; width:auto;
+    display:grid; grid-template-columns:1fr 1fr; align-items:start;
+  }
+  .island .menu-sheet .menu-div,
+  .island .menu-sheet .menu-action{grid-column:1 / -1;}
+}
 /* menu rows: one uniform style — icon tile left, label/desc stack, chevron
    right. Active page gets the same row with a highlight tint, not a
    different box. The Surprise action shares the row after a divider. */
