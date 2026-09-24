@@ -18,7 +18,7 @@ const PRESET_CMAP: Record<Preset, Colormap> = {
 const PRESETS: Array<{ id: Preset; label: string; hint: string; sw: string }> = [
   { id: 'grayscale', label: 'Grayscale', hint: 'Neutral luminance view', sw: 'linear-gradient(135deg,#111,#eee)' },
   { id: 'color', label: 'Color', hint: 'Full-range color view', sw: 'linear-gradient(135deg,#440154,#21918c,#fde725)' },
-  { id: 'colorblind', label: 'Colorblind-friendly', hint: 'Perceptually uniform, color-vision-deficiency safe', sw: 'linear-gradient(135deg,#00224e,#7ad151,#fee838)' },
+  { id: 'colorblind', label: 'Colorblind', hint: 'Colorblind-friendly: perceptually uniform, color-vision-deficiency safe', sw: 'linear-gradient(135deg,#00224e,#7ad151,#fee838)' },
 ];
 
 function drawCover(ctx: CanvasRenderingContext2D, img: HTMLImageElement, w: number, h: number, pan: { x: number; y: number }, zoom: number) {
@@ -345,10 +345,12 @@ export default function ArtifactPreview() {
                   </button>
                 ))}
               </div>
-              <button type="button" className="btn primary pv-cta" onClick={goAdvanced}>
-                Explore advanced analysis
-              </button>
-              <p className="fine">Full blink workspace: all modes, measure, spectra, exports.</p>
+              <div className="pv-cta-box">
+                <p className="fine">Full blink workspace: all modes, measure, spectra, exports.</p>
+                <button type="button" className="btn primary pv-cta" onClick={goAdvanced}>
+                  Explore advanced analysis
+                </button>
+              </div>
             </div>
           </div>
         )}
