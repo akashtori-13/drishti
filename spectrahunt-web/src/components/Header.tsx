@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from 'react';
 import Icon from '@/components/Icon';
 import SearchBox, { type SearchTarget } from '@/components/SearchBox';
 import SurpriseButton from '@/components/SurpriseButton';
+import { FeaturedCycle } from '@/components/FeaturedCarousel';
+import { SHOWCASE_IDS, getShowcase, type Showcase } from '@/lib/showcases';
 import { useAppStore } from '@/lib/store';
 import { nearestShowcase } from '@/lib/sky';
 
@@ -16,22 +18,13 @@ const LINKS = [
   { href: '/about', label: 'About' },
 ];
 
-/** Suggested fields shown in the collapsed island when nothing is open. */
-const SUGGESTED = [
-  { id: '3i-atlas', label: '3I/ATLAS' },
-  { id: 'crab-field', label: 'Crab Nebula' },
-  { id: 'm31-field', label: 'Andromeda' },
-  { id: 'orion-field', label: 'Orion' },
-];
-
 /**
  * Dynamic-island navbar.
  *
- * Two presentations, one shell (Apple's compact/expanded split):
- * - Collapsed: brand + live suggested-field ticker + icon buttons.
- * - Expanded: shell morphs (width/radius spring) and the menus + search
- *   render *inside* the island. Opens on menu/search tap (all screens) or
- *   hover (fine pointers only); ticker runs only while collapsed.
+ * Collapsed: brand + nav links + icon buttons (classic pill).
+ * Expanded: shell morphs (radius spring) and search + featured carousel
+ * render *inside* the island. Opens on menu/search tap (all screens) or
+ * hover (fine pointers only).
  */
 export default function Header() {
   const pathname = usePathname();
@@ -39,12 +32,11 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const [menu, setMenu] = useState(false);
   const [hovered, setHovered] = useState(false);
-  const [tick, setTick] = useState(0);
+  const [fields, setFields] = useState<Showcase[] | null>(null);
   const openPreview = useAppStore((s) => s.openPreview);
   const islandRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
   const expanded = open || menu || hovered;
-  const suggestion = SUGGESTED[tick % SUGGESTED.length];
 
   useEffect(() => {
     document.title = pathname === '/'
@@ -114,16 +106,15 @@ export default function Header() {
     };
   }, [open]);
 
-  // Suggested-field ticker: advances only while collapsed, never under
-  // reduced motion. The island shows it until something is clicked.
+  // Featured carousel data: fetched once, the first time the island expands.
   useEffect(() => {
-    if (expanded) return;
-    try {
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    } catch { /* autoplay anyway */ }
-    const t = window.setInterval(() => setTick((v) => v + 1), 4500);
-    return () => window.clearInterval(t);
-  }, [expanded]);
+    if (!expanded || fields) return;
+    let alive = true;
+    void Promise.all(SHOWCASE_IDS.map((id) => getShowcase(id).catch(() => null))).then((docs) => {
+      if (alive) setFields(docs.filter((d): d is Showcase => d !== null));
+    });
+    return () => { alive = false; };
+  }, [expanded, fields]);
 
   const fineHover = () => {
     try {
@@ -167,27 +158,13 @@ export default function Header() {
           <Icon name="logo" className="logo icon" />
           <span className="brand-name">STELLAR</span>
         </Link>
-        {!expanded && (
-          <button
-            key={tick}
-            type="button"
-            className="island-live"
-            aria-label={`Suggested field: ${suggestion.label}`}
-            title={`Suggested field: ${suggestion.label}`}
-            onClick={() => openPreview(suggestion.id)}
-          >
-            <span className="pulse-dot" aria-hidden="true" />
-            <span className="island-live-text">{suggestion.label}</span>
-          </button>
-        )}
         <nav className="island-links" aria-label="Views">
           {LINKS.map((item) => {
             const on = isActive(item.href, item.match);
             return (
               <Link key={item.href} href={item.href}
                 className={on ? 'active' : undefined}
-                aria-current={on ? 'page' : undefined}
-                tabIndex={expanded ? undefined : -1}>
+                aria-current={on ? 'page' : undefined}>
                 {item.label}
               </Link>
             );
@@ -229,7 +206,7 @@ export default function Header() {
                   : l.label === 'Blink' ? 'Compare epochs'
                   : l.label === 'Candidates' ? 'Measured fields' : 'Mission and method',
               }))].map((item) => (
-                <Link key={item.href} href={item.href} onClick={() => { setOpen(false); setMenu(false); }} tabIndex={expanded ? undefined : -1}>
+                <Link key={item.href} href={item.href} onClick={() => { setOpen(false); setMenu(false); }}>
                   <span className="cmd-link-label">{item.label}</span>
                   <span className="cmd-link-desc">{item.desc}</span>
                 </Link>
@@ -237,6 +214,11 @@ export default function Header() {
             </nav>
           )}
           <SearchBox id="nav-search" placeholder="Jump to an object, field, or coordinates" onPick={pick} />
+          {fields && fields.length > 0 && (
+            <div className="island-carousel">
+              <FeaturedCycle fields={fields} consoleMode={false} />
+            </div>
+          )}
           <div className="cmd-foot">
             <SurpriseButton onPick={(t) => {
               setOpen(false); setMenu(false);
