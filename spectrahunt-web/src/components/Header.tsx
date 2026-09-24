@@ -6,42 +6,36 @@ import { useEffect, useRef, useState } from 'react';
 import Icon from '@/components/Icon';
 import SearchBox, { type SearchTarget } from '@/components/SearchBox';
 import SurpriseButton from '@/components/SurpriseButton';
-import { FeaturedCycle } from '@/components/FeaturedCarousel';
-import { SHOWCASE_IDS, getShowcase, type Showcase } from '@/lib/showcases';
 import { useAppStore } from '@/lib/store';
 import { nearestShowcase } from '@/lib/sky';
 
 const LINKS = [
-  { href: '/sky', label: 'Sky' },
-  { href: '/blink/3i-atlas', label: 'Blink', match: '/blink' },
-  { href: '/candidates', label: 'Candidates' },
-  { href: '/about', label: 'About' },
+  { href: '/sky', label: 'Sky', desc: 'Observer and all-sky views' },
+  { href: '/blink/3i-atlas', label: 'Blink', match: '/blink', desc: 'Compare epochs' },
+  { href: '/candidates', label: 'Candidates', desc: 'Measured fields' },
+  { href: '/about', label: 'About', desc: 'Mission and method' },
 ];
 
 /**
- * Dynamic-island navbar.
- *
- * Collapsed: brand + nav links + icon buttons (classic pill).
- * Expanded: shell morphs and ONE panel renders inside — menu sheet on menu
- * tap, search (+carousel when idle) on search tap or desktop hover. Panels
- * are exclusive so the island never clutters.
+ * Plain navbar: one fixed-height row, no morphing, no resizing panels.
+ * Desktop row: brand, Sky link, search input (flex), Fields link, menu.
+ * Mobile row: brand, sky/search/fields icons, menu (bottom dock); the
+ * search icon swaps in a full-width input row at the same height.
+ * Typing hides every sibling control (logo stays) with a width animation.
+ * Suggestions and the menu sheet are absolutely positioned overlays —
+ * page content never shifts.
  */
 export default function Header() {
   const rawPathname = usePathname();
   // Trailing-slash URLs (/sky/) must match route checks (/sky).
   const pathname = rawPathname.length > 1 ? rawPathname.replace(/\/+$/, '') : rawPathname;
   const router = useRouter();
-  const [panel, setPanel] = useState<'menu' | 'search' | null>(null);
-  const [hovered, setHovered] = useState(false);
-  const [searching, setSearching] = useState(false);
-  const [miniQ, setMiniQ] = useState('');
-  const [fields, setFields] = useState<Showcase[] | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [mSearch, setMSearch] = useState(false);
+  const [typing, setTyping] = useState(false);
   const openPreview = useAppStore((s) => s.openPreview);
   const islandRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
-  const expanded = panel !== null || hovered;
-  const showSearch = panel === 'search' || (hovered && panel === null);
-  const showCarousel = expanded && panel !== 'menu' && !searching;
 
   useEffect(() => {
     document.title = pathname === '/'
@@ -51,43 +45,45 @@ export default function Header() {
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPanel(null);
+    setMenuOpen(false);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMSearch(false);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setTyping(false);
   }, [pathname]);
 
-  useEffect(() => {
-    // Clear the mini-bar text once the panel closes.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (panel === null) setMiniQ('');
-  }, [panel]);
-
-  // Single Ctrl+K toggle listener (mounted once).
+  // Ctrl+K: focus the desktop input, or open the mobile input row.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        setPanel((p) => (p === 'search' ? null : 'search'));
+        const desktop = document.querySelector<HTMLInputElement>('#nav-search-input');
+        if (desktop && getComputedStyle(desktop).display !== 'none') {
+          desktop.focus();
+        } else {
+          setMSearch(true);
+          requestAnimationFrame(() => {
+            document.querySelector<HTMLInputElement>('#nav-msearch-input')?.focus();
+          });
+        }
       }
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, []);
 
-  // Veil dialog: Escape close, outside click, focus trap + initial/return focus.
-  // Anchored to the island body. Runs only for click-opened panels, never
-  // for hover previews (which must not steal focus).
+  // Menu sheet: Escape closes, outside click closes, focus trap + return focus.
   useEffect(() => {
-    if (!panel) return;
+    if (!menuOpen) return;
     triggerRef.current = document.activeElement as HTMLElement | null;
-    const panelEl = islandRef.current?.querySelector<HTMLElement>('.island-body');
-    const first = panelEl?.querySelector<HTMLElement>('input, a[href], button:not([disabled])');
+    const sheet = islandRef.current?.querySelector<HTMLElement>('.menu-sheet');
+    const first = sheet?.querySelector<HTMLElement>('a[href], button:not([disabled])');
     (first ?? undefined)?.focus?.();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setPanel(null);
-      }
-      if (e.key === 'Tab' && panelEl) {
-        const items = panelEl.querySelectorAll<HTMLElement>(
-          'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      if (e.key === 'Escape') setMenuOpen(false);
+      if (e.key === 'Tab' && sheet) {
+        const items = sheet.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
         );
         if (items.length === 0) return;
         const firstEl = items[0];
@@ -102,8 +98,9 @@ export default function Header() {
       }
     };
     const onDown = (e: MouseEvent) => {
-      if (panelEl && !panelEl.contains(e.target as Node)) {
-        setPanel(null);
+      if (islandRef.current && !islandRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+        setMSearch(false);
       }
     };
     document.addEventListener('keydown', onKey);
@@ -113,28 +110,10 @@ export default function Header() {
       document.removeEventListener('mousedown', onDown);
       triggerRef.current?.focus?.();
     };
-  }, [panel]);
+  }, [menuOpen]);
 
-  // Featured carousel data: fetched once, the first time the island expands.
-  useEffect(() => {
-    if (!expanded || fields) return;
-    let alive = true;
-    void Promise.all(SHOWCASE_IDS.map((id) => getShowcase(id).catch(() => null))).then((docs) => {
-      if (alive) setFields(docs.filter((d): d is Showcase => d !== null));
-    });
-    return () => { alive = false; };
-  }, [expanded, fields]);
-
-  const fineHover = () => {
-    try {
-      return window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-    } catch {
-      return false;
-    }
-  };
   const pick = (t: SearchTarget) => {
-    setPanel(null);
-    setSearching(false);
+    setMSearch(false);
     if (t.showcaseId) {
       openPreview(t.showcaseId);
       return;
@@ -150,11 +129,8 @@ export default function Header() {
     router.push('/sky');
   };
 
-  // Five destinations max, thumb-zone ordered: home, sky, search, dice, menu.
-  const skyActive = pathname === '/sky';
-  const candActive = pathname.startsWith('/candidates');
   const surprisePick = (t: SearchTarget) => {
-    setPanel(null);
+    setMenuOpen(false);
     if (t.showcaseId) openPreview(t.showcaseId);
     else {
       try {
@@ -163,106 +139,108 @@ export default function Header() {
       router.push('/sky');
     }
   };
+
+  // Typing mode: any navbar input holding text collapses the sibling controls.
+  // Bubble phase (not capture): capture-phase parent setState would flush
+  // before the input's own onChange runs, resetting the controlled value and
+  // eating the keystroke.
+  const onNavInput = (e: React.FormEvent) => {
+    const el = e.target as HTMLElement;
+    if (el.tagName === 'INPUT') {
+      setTyping((el as HTMLInputElement).value.trim().length > 0);
+    }
+  };
+
+  const skyActive = pathname === '/sky';
+  const candActive = pathname.startsWith('/candidates');
+
   return (
     <div
       ref={islandRef}
       className="island glass"
       role="navigation"
       aria-label="Primary"
-      data-expanded={expanded || undefined}
-      onMouseEnter={() => { if (fineHover()) setHovered(true); }}
-      onMouseLeave={() => setHovered(false)}
+      data-typing={typing || undefined}
+      onInput={onNavInput}
+      onKeyUp={onNavInput}
     >
       <div className="island-row">
         <Link className="island-brand island-iconbtn" href="/" aria-label="STELLAR home"
           aria-current={pathname === '/' ? 'page' : undefined}>
           <Icon name="logo" className="logo icon" />
-          <span className="brand-name" aria-hidden="true">STELLAR</span>
+          <span className="brand-name collapsible" aria-hidden="true">STELLAR</span>
         </Link>
         <Link href="/sky" aria-label="Sky map"
           aria-current={skyActive ? 'page' : undefined}
-          className={`island-iconbtn${skyActive ? ' active' : ''}`}>
+          className={`nav-textlink collapsible${skyActive ? ' active' : ''}`}>
+          Sky
+        </Link>
+        <Link href="/sky" aria-label="Sky map"
+          aria-current={skyActive ? 'page' : undefined}
+          className={`island-iconbtn nav-icononly collapsible${skyActive ? ' active' : ''}`}>
           <Icon name="skymap" className="icon" />
           <span className="ibtn-label" aria-hidden="true">Sky</span>
         </Link>
-        {pathname !== '/' && pathname !== '/sky' && (
-          <form
-            className="island-mini"
-            role="search"
-            onSubmit={(e) => {
-              e.preventDefault();
-              setPanel('search');
-            }}
-          >
-            <Icon name="search" className="icon" />
-            <input
-              value={miniQ}
-              onChange={(e) => { setMiniQ(e.target.value); setPanel('search'); }}
-              onFocus={() => setPanel('search')}
-              placeholder="Jump to an object or field…"
-              aria-label="Jump to an object or field"
-              autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} enterKeyHint="search"
-            />
-          </form>
-        )}
-        {pathname !== '/' && pathname !== '/sky' && (
-          <button type="button" className="island-iconbtn" aria-label="Search and navigate (Ctrl+K)"
-            title="Search and navigate (Ctrl+K)" onClick={() => { setHovered(false); setPanel((p) => (p === 'search' ? null : 'search')); }}>
-            <Icon name="search" className="icon" />
-            <span className="ibtn-label" aria-hidden="true">Search</span>
-          </button>
-        )}
+        <div
+          className="nav-search"
+          role="search"
+        >
+          <Icon name="search" className="icon" />
+          <SearchBox key={pathname} id="nav-search" placeholder="Jump to an object or field…" onPick={pick} />
+          <kbd className="kbd-hint" aria-hidden="true">⌘K</kbd>
+        </div>
+        <button type="button" className="island-iconbtn nav-msearch-toggle collapsible" aria-label="Search and navigate (Ctrl+K)"
+          title="Search and navigate (Ctrl+K)" onClick={() => setMSearch(true)}>
+          <Icon name="search" className="icon" />
+          <span className="ibtn-label" aria-hidden="true">Search</span>
+        </button>
         <Link href="/candidates" aria-label="Candidate fields"
           aria-current={candActive ? 'page' : undefined}
-          className={`island-iconbtn${candActive ? ' active' : ''}`}>
+          className={`nav-textlink collapsible${candActive ? ' active' : ''}`}>
+          Fields
+        </Link>
+        <Link href="/candidates" aria-label="Candidate fields"
+          aria-current={candActive ? 'page' : undefined}
+          className={`island-iconbtn nav-icononly collapsible${candActive ? ' active' : ''}`}>
           <Icon name="target" className="icon" />
           <span className="ibtn-label" aria-hidden="true">Fields</span>
         </Link>
-        <button type="button" className="island-iconbtn" aria-label={panel === 'menu' ? 'Close menu' : 'Open menu'}
-          aria-expanded={expanded} aria-controls="island-body"
-          onClick={() => {
-            setHovered(false);
-            setPanel((p) => (p === 'menu' ? null : 'menu'));
-          }}>
-          <Icon name={panel === 'menu' ? 'x' : 'menu'} className="icon" />
+        <button type="button" className="island-iconbtn collapsible" aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={menuOpen} aria-controls={menuOpen ? 'menu-sheet' : undefined}
+          onClick={() => setMenuOpen((o) => !o)}>
+          <Icon name={menuOpen ? 'x' : 'menu'} className="icon" />
           <span className="ibtn-label" aria-hidden="true">Menu</span>
         </button>
       </div>
-      <div className="island-body-wrap" aria-hidden={!expanded}>
+      <div className="island-mrow" data-open={mSearch || undefined}>
+        <button type="button" className="island-iconbtn" aria-label="Back to navigation"
+          onClick={() => setMSearch(false)}>
+          <Icon name="back" className="icon" />
+        </button>
         <div
-          id="island-body"
-          className="island-body"
-          onFocusCapture={(e) => {
-            if ((e.target as HTMLElement).tagName === 'INPUT') setSearching(true);
-          }}
-          onBlurCapture={() => setSearching(false)}
+          className="nav-search"
+          role="search"
         >
-          {panel === 'menu' && (
-            <nav className="cmd-links sheet island-sheet" aria-label="Views">
-              <SurpriseButton className="cmd-surprise" onPick={surprisePick} />
-              {[{ href: '/', label: 'Home', desc: 'Front door' }, ...LINKS.map((l) => ({
-                ...l,
-                desc: l.label === 'Sky' ? 'Observer and all-sky views'
-                  : l.label === 'Blink' ? 'Compare epochs'
-                  : l.label === 'Candidates' ? 'Measured fields' : 'Mission and method',
-              }))].map((item) => (
-                <Link key={item.href} href={item.href} onClick={() => setPanel(null)}>
-                  <span className="cmd-link-label">{item.label}</span>
-                  <span className="cmd-link-desc">{item.desc}</span>
-                </Link>
-              ))}
-            </nav>
-          )}
-          {showSearch && (
-            <SearchBox id="nav-search" placeholder="Jump to an object or field…" defaultValue={miniQ} onPick={pick} />
-          )}
-          {showCarousel && fields && fields.length > 0 && (
-            <div className="island-carousel">
-              <FeaturedCycle fields={fields} consoleMode={false} />
-            </div>
-          )}
+          <Icon name="search" className="icon" />
+          <SearchBox key={pathname} id="nav-msearch" placeholder="Jump to an object or field…" onPick={pick} />
         </div>
       </div>
+      {menuOpen && (
+        <nav id="menu-sheet" className="menu-sheet glass" aria-label="Views">
+          <SurpriseButton className="cmd-surprise" onPick={surprisePick} />
+          {[{ href: '/', label: 'Home', desc: 'Front door' }, ...LINKS.map((l) => ({
+            ...l,
+            desc: l.label === 'Sky' ? 'Observer and all-sky views'
+              : l.label === 'Blink' ? 'Compare epochs'
+              : l.label === 'Candidates' ? 'Measured fields' : 'Mission and method',
+          }))].map((item) => (
+            <Link key={item.href} href={item.href} onClick={() => setMenuOpen(false)}>
+              <span className="cmd-link-label">{item.label}</span>
+              <span className="cmd-link-desc">{item.desc}</span>
+            </Link>
+          ))}
+        </nav>
+      )}
     </div>
   );
 }

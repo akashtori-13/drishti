@@ -119,7 +119,7 @@ export default function SearchBox({
       setOpen(true);
       return;
     }
-    const pick = hl >= 0 ? list[Math.min(hl, list.length - 1)] : list[0];
+    const pick = hl >= 0 && hl < list.length ? list[hl] : list[0];
     setBusy(true);
     try {
       const t = await pick.run();
@@ -141,12 +141,16 @@ export default function SearchBox({
         <input
           id={`${id}-input`}
           value={q}
-          onChange={(e) => { setQ(e.target.value); setOpts(build(e.target.value)); setHl(-1); setErr(null); setOpen(true); }}
-          onFocus={() => { setOpts(build(q)); setOpen(true); }}
+          onChange={(e) => { const v = e.target.value; const list = build(v); setQ(v); setOpts(list); setHl(list.length ? 0 : -1); setErr(null); setOpen(true); }}
+          onFocus={() => { const list = build(q); setOpts(list); setHl(list.length && q.trim() ? 0 : -1); setOpen(true); }}
           onKeyDown={(e) => {
             if (e.key === 'ArrowDown') { e.preventDefault(); setHl((h) => Math.min(h + 1, opts.length - 1)); }
             else if (e.key === 'ArrowUp') { e.preventDefault(); setHl((h) => Math.max(h - 1, -1)); }
-            else if (e.key === 'Escape') { setOpen(false); }
+            else if (e.key === 'Escape') {
+              // Two-stage: first close the list, second clears the input.
+              if (open) setOpen(false);
+              else { setQ(''); setHl(-1); setErr(null); }
+            }
           }}
           role="combobox" aria-expanded={open} aria-controls={`${id}-list`} aria-autocomplete="list"
           aria-activedescendant={hl >= 0 && opts[hl] ? `${id}-opt-${hl}` : undefined}
