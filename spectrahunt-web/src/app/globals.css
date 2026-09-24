@@ -218,6 +218,17 @@ main:focus{outline:none;}
 .cmd-link-label{color:var(--ink); font-size:.9375rem; font-weight:600;}
 .cmd-link-desc{color:var(--ink-3); font-size:.75rem;}
 .cmd-foot{display:flex; justify-content:center; padding-top:2px;}
+/* surprise as a menu-sheet row */
+.cmd-surprise{
+  display:flex; align-items:center; gap:10px; width:100%;
+  padding:12px 14px; border-radius:12px; border:1px solid transparent;
+  background:transparent; color:var(--ink); font-size:.9375rem; font-weight:600;
+  cursor:pointer; text-align:left;
+  transition:background .15s, border-color .15s;
+}
+.cmd-surprise:hover{background:rgba(255,255,255,.06); border-color:var(--line);}
+.cmd-surprise:disabled{opacity:.6; cursor:wait;}
+.cmd-surprise .icon{width:19px; height:19px; color:#a5acff; flex-shrink:0;}
 @media(max-width:640px){
   .island{gap:0;}
   .island-row{min-width:min(300px, calc(100vw - 60px));}

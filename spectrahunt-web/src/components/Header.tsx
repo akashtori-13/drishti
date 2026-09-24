@@ -150,6 +150,17 @@ export default function Header() {
 
   // Five destinations max, thumb-zone ordered: home, sky, search, dice, menu.
   const skyActive = pathname === '/sky';
+  const candActive = pathname.startsWith('/candidates');
+  const surprisePick = (t: SearchTarget) => {
+    setPanel(null);
+    if (t.showcaseId) openPreview(t.showcaseId);
+    else {
+      try {
+        sessionStorage.setItem('sh-target', JSON.stringify({ ra: t.ra, dec: t.dec }));
+      } catch { /* noop */ }
+      router.push('/sky');
+    }
+  };
   return (
     <div
       ref={islandRef}
@@ -199,21 +210,12 @@ export default function Header() {
             <span className="ibtn-label" aria-hidden="true">Search</span>
           </button>
         )}
-        <SurpriseButton
-          compact
-          label="Surprise"
-          className="island-iconbtn"
-          onPick={(t) => {
-            setPanel(null);
-            if (t.showcaseId) openPreview(t.showcaseId);
-            else {
-              try {
-                sessionStorage.setItem('sh-target', JSON.stringify({ ra: t.ra, dec: t.dec }));
-              } catch { /* noop */ }
-              router.push('/sky');
-            }
-          }}
-        />
+        <Link href="/candidates" aria-label="Candidate fields"
+          aria-current={candActive ? 'page' : undefined}
+          className={`island-iconbtn${candActive ? ' active' : ''}`}>
+          <Icon name="target" className="icon" />
+          <span className="ibtn-label" aria-hidden="true">Fields</span>
+        </Link>
         <button type="button" className="island-iconbtn" aria-label={panel === 'menu' ? 'Close menu' : 'Open menu'}
           aria-expanded={expanded} aria-controls="island-body"
           onClick={() => {
@@ -235,6 +237,7 @@ export default function Header() {
         >
           {panel === 'menu' && (
             <nav className="cmd-links sheet island-sheet" aria-label="Views">
+              <SurpriseButton className="cmd-surprise" onPick={surprisePick} />
               {[{ href: '/', label: 'Home', desc: 'Front door' }, ...LINKS.map((l) => ({
                 ...l,
                 desc: l.label === 'Sky' ? 'Observer and all-sky views'
