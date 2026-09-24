@@ -259,7 +259,6 @@ export default function Header() {
                 <span className="menu-label">{item.label}</span>
                 <span className="menu-desc">{item.desc}</span>
               </span>
-              <Icon name="fwd" className="icon m-chev" />
             </Link>
           ))}
           <div className="menu-div" role="separator" aria-hidden="true" />
