@@ -196,7 +196,7 @@ main:focus{outline:none;}
 }
 .island-iconbtn:active{background:rgba(255,255,255,.12); color:#fff;}
 .island-brand{padding:0;}
-.island-brand.island-iconbtn{width:auto; padding:0 16px 0 12px; gap:8px; display:inline-flex; flex-direction:row; align-items:center;}
+.island-brand.island-iconbtn{width:auto; padding:0 16px 0 12px; gap:8px; display:inline-flex; flex-direction:row; align-items:center; border-radius:999px;}
 .island-brand .brand-name{font-size:.9375rem; color:var(--ink); font-weight:650; white-space:nowrap;}
 /* mobile icon row lives in the row; desktop text links + inline form hide.
    Icon captions are mobile-only. */
