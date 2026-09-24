@@ -129,6 +129,11 @@ main:focus{outline:none;}
 .nav-search .search-shell{flex:1; min-width:0; display:flex; align-items:center; background:none; border:0; box-shadow:none; border-radius:0; padding:0; height:auto;
   -webkit-backdrop-filter:none; backdrop-filter:none;}
 .nav-search .search-shell::before{display:none;}
+/* kill the base :focus-within ring (same specificity, later in file):
+   focus shows on the pill border instead — no inner rectangle */
+.nav-search .search-shell:focus-within{box-shadow:none;}
+.nav-search .search-shell:focus-within::before{display:none;}
+.nav-search:focus-within{border-color:rgba(165,172,255,.55);}
 .nav-search .search-shell input{font-size:.9375rem; padding:0;}
 .nav-search .search-shell .s-icon, .nav-search .search-shell .s-go, .nav-search .search-shell .s-kbd{display:none;}
 .nav-search .kbd-hint{
@@ -138,10 +143,12 @@ main:focus{outline:none;}
 }
 .nav-search:focus-within .kbd-hint{opacity:0;}
 @media(hover:none){ .nav-search .kbd-hint{display:none;} }
-/* suggestions popover: absolute overlay, never moves layout */
+/* suggestions popover: anchored to the island (wrappers are static), so it
+   spans the full navbar width directly below the bar — like the menu sheet */
+.island .nav-search{position:static;}
+.island .nav-search .search-shell{position:static;}
 .nav-search .s-list{
-  position:absolute; top:calc(100% + 8px); left:0;
-  width:max(420px, 100%); max-width:calc(100vw - 32px);
+  position:absolute; top:calc(100% + 8px); left:0; right:0; width:auto;
   max-height:min(252px, 34dvh); overflow-y:auto; scrollbar-width:none;
   background:var(--glass-strong); border:1px solid var(--line-strong); border-radius:14px;
   -webkit-backdrop-filter:blur(24px); backdrop-filter:blur(24px);
