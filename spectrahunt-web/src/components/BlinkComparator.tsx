@@ -39,7 +39,7 @@ function drawCover(ctx: CanvasRenderingContext2D, img: HTMLImageElement, w: numb
   const dh = img.height * scale;
   const dx = (w - dw) / 2 + pan.x;
   const dy = (h - dh) / 2 + pan.y;
-  ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingEnabled = true;
   ctx.drawImage(img, dx, dy, dw, dh);
 }
 
@@ -208,6 +208,9 @@ export default function BlinkComparator({
   const histRef = useRef<HTMLCanvasElement>(null);
   const diffStatRef = useRef<HTMLSpanElement>(null);
   const drag = useRef<{ x: number; y: number; pan: { x: number; y: number }; moved: boolean } | null>(null);
+  // multi-touch pinch zoom: live pointer positions + touchdown baseline
+  const pointers = useRef(new Map<number, { x: number; y: number }>());
+  const pinch = useRef<{ dist: number; zoom: number } | null>(null);
   // Orbital `suppressClick` pattern: a pointer travel past the drag
   // hysteresis is a pan, never a tap — the trailing click must not sample.
   const suppressClick = useRef(false);
@@ -888,7 +891,15 @@ export default function BlinkComparator({
             out.data[i + 2] = Math.round(norm(lumOf(B, i)) * 255);
             out.data[i + 3] = 255;
           }
-          ctx.putImageData(out, 0, 0);
+          // putImageData ignores the DPR transform: composite through scratch
+          // so processed modes fill the whole stage on hidpi phones too.
+          const comp = getScratch(3, Math.round(w), Math.round(h));
+          const cctx = comp.getContext('2d');
+          if (cctx) {
+            cctx.putImageData(out, 0, 0);
+            ctx.imageSmoothingEnabled = true;
+            ctx.drawImage(comp, 0, 0, w, h);
+          } else ctx.putImageData(out, 0, 0);
         }
       } else {
         ctx.fillStyle = '#aab0c8';
@@ -915,7 +926,15 @@ export default function BlinkComparator({
           out.data[i + 2] = Math.round(Math.min(1, Math.abs(lb - la) * 2.5) * 255);
           out.data[i + 3] = 255;
         }
-        ctx.putImageData(out, 0, 0);
+        // putImageData ignores the DPR transform: composite through scratch
+        // so processed modes fill the whole stage on hidpi phones too.
+        const comp = getScratch(3, Math.round(w), Math.round(h));
+        const cctx = comp.getContext('2d');
+        if (cctx) {
+          cctx.putImageData(out, 0, 0);
+          ctx.imageSmoothingEnabled = true;
+          ctx.drawImage(comp, 0, 0, w, h);
+        } else ctx.putImageData(out, 0, 0);
       }
     } else if (mode === 'diff' && curImg && prevImg) {
       diffMode = true;
@@ -929,7 +948,15 @@ export default function BlinkComparator({
           const g = Math.round(((lb - la) * 0.5 + 0.5) * 255);
           out.data[i] = g; out.data[i + 1] = g; out.data[i + 2] = g; out.data[i + 3] = 255;
         }
-        ctx.putImageData(out, 0, 0);
+        // putImageData ignores the DPR transform: composite through scratch
+        // so processed modes fill the whole stage on hidpi phones too.
+        const comp = getScratch(3, Math.round(w), Math.round(h));
+        const cctx = comp.getContext('2d');
+        if (cctx) {
+          cctx.putImageData(out, 0, 0);
+          ctx.imageSmoothingEnabled = true;
+          ctx.drawImage(comp, 0, 0, w, h);
+        } else ctx.putImageData(out, 0, 0);
         stylize(canvas, stretch, vmin, vmax, invert, cmap, true, diffScale);
       }
     } else if (mode === 'swipe' && curImg && prevImg) {
@@ -1124,10 +1151,36 @@ export default function BlinkComparator({
 
   const onPointerDown = (e: React.PointerEvent) => {
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+    pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pointers.current.size === 2) {
+      // second finger down: park the pan, pinch takes over
+      const pts = [...pointers.current.values()];
+      pinch.current = {
+        dist: Math.max(20, Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y)), zoom,
+      };
+      drag.current = null;
+      return;
+    }
     drag.current = { x: e.clientX, y: e.clientY, pan: { ...pan }, moved: false };
     suppressClick.current = false;
   };
   const onPointerMove = (e: React.PointerEvent) => {
+    if (pointers.current.has(e.pointerId)) {
+      pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    }
+    if (pointers.current.size >= 2) {
+      // pinch zoom: ratio against the two-finger touchdown distance
+      const pts = [...pointers.current.values()];
+      const dist = Math.max(20, Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y));
+      if (pinch.current) {
+        const ratio = dist / Math.max(20, pinch.current.dist);
+        setZoom(Math.min(6, Math.max(0.2, pinch.current.zoom * ratio)));
+        suppressClick.current = true; // pinch never counts as a tap
+      } else {
+        pinch.current = { dist, zoom };
+      }
+      return;
+    }
     if (mode === 'swipe' && e.pointerType === 'mouse' && e.buttons === 0) {
       const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
       setSwipe(Math.min(0.98, Math.max(0.02, (e.clientX - r.left) / r.width)));
@@ -1182,7 +1235,17 @@ export default function BlinkComparator({
       setProbe(null);
     }
   };
-  const onPointerUp = () => { drag.current = null; };
+  const onPointerUp = (e: React.PointerEvent) => {
+    pointers.current.delete(e.pointerId);
+    if (pointers.current.size < 2) pinch.current = null;
+    if (pointers.current.size === 1) {
+      // back to one finger: re-anchor the pan on the remaining touch
+      const [, pt] = [...pointers.current.entries()][0];
+      drag.current = { x: pt.x, y: pt.y, pan: { ...pan }, moved: true };
+      return;
+    }
+    drag.current = null;
+  };
   const onClickSample = (e: React.MouseEvent) => {
     if (suppressClick.current) { suppressClick.current = false; return; }
     if (drag.current?.moved) return;
@@ -1397,12 +1460,12 @@ export default function BlinkComparator({
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, width: '100%', height: '100%' }}>
                 <div style={{ position: 'relative' }}>
                   <canvas ref={leftRef} style={{ width: '100%', height: '100%', display: 'block', cursor: 'crosshair' }} aria-label={`${title} — ${prev?.label}`}
-                    onMouseMove={onSideMove} onMouseLeave={() => setSideHover(null)} />
+                    onMouseMove={onSideMove} onMouseLeave={() => setSideHover(null)} onClick={onSideMove} />
                   <span className="viewer-tag mono">{prev?.label ?? '—'}</span>
                 </div>
                 <div style={{ position: 'relative' }}>
                   <canvas ref={rightRef} style={{ width: '100%', height: '100%', display: 'block', cursor: 'crosshair' }} aria-label={`${title} — ${cur?.label}`}
-                    onMouseMove={onSideMove} onMouseLeave={() => setSideHover(null)} />
+                    onMouseMove={onSideMove} onMouseLeave={() => setSideHover(null)} onClick={onSideMove} />
                   <span className="viewer-tag epoch mono">{cur?.label ?? '—'}</span>
                 </div>
               </div>
@@ -1417,6 +1480,7 @@ export default function BlinkComparator({
                   onPointerDown={onPointerDown}
                   onPointerMove={onPointerMove}
                   onPointerUp={onPointerUp}
+                  onPointerCancel={onPointerUp}
                   onClick={onClickSample}
                 />
                 <span className="viewer-tag mono">{modeLabel}</span>
