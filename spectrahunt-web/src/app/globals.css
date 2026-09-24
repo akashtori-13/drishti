@@ -91,9 +91,25 @@ main:focus{outline:none;}
   overflow-y:auto;
   scrollbar-width:thin;
 }
-.island-row{display:flex; align-items:center; gap:2px; width:100%;}
-/* desktop links: always visible in the classic pill */
-.island-links{display:flex; align-items:center; gap:2px;}
+.island-row{display:flex; align-items:center; justify-content:space-evenly; gap:4px; width:100%;}
+/* one button shape for all five destinations: 48px touch target, icon 20px */
+.island-iconbtn{
+  width:48px; height:48px; flex-shrink:0; border-radius:50%;
+  display:grid; place-items:center; text-decoration:none;
+  background:transparent; border:1px solid transparent; color:var(--ink-2);
+  transition:color .15s, background .15s, border-color .15s;
+}
+.island-iconbtn .icon{width:21px; height:21px;}
+.island-iconbtn .logo{width:24px; height:24px;}
+.island-iconbtn.active{color:#fff; background:rgba(255,255,255,.14); box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);}
+@media (hover:hover) and (pointer:fine){
+  .island-iconbtn:hover{color:#fff; background:rgba(255,255,255,.07); border-color:var(--line);}
+}
+.island-iconbtn:active{background:rgba(255,255,255,.12); color:#fff;}
+.island-brand{padding:0;}
+@media(max-width:640px){
+  .island-row{gap:2px;}
+}
 /* expanded body: smooth height via grid-rows, visibility-gated for tab order */
 .island-body-wrap{display:grid; grid-template-rows:0fr; transition:grid-template-rows .42s cubic-bezier(.32,.72,0,1);}
 .island[data-expanded] .island-body-wrap{grid-template-rows:1fr;}
@@ -114,23 +130,8 @@ main:focus{outline:none;}
 .island-carousel .feat-dots{justify-content:center;}
 .island-body .search-shell{flex-wrap:wrap;}
 .island-body .s-list{position:static; flex:1 1 100%; margin-top:8px; max-height:32dvh;}
-.island-brand{display:flex; align-items:center; gap:9px; text-decoration:none; padding:6px 10px 6px 4px; border-radius:999px; flex-shrink:0;}
+.island-brand{text-decoration:none; border-radius:999px; flex-shrink:0;}
 .island-brand .logo{width:24px; height:24px;}
-.island-brand .brand-name{font-size:.9375rem; color:var(--ink); font-weight:650;}
-.island-links{display:flex; align-items:center; gap:2px;}
-.island-links a{
-  color:var(--ink-2); font-size:.8125rem; font-weight:600; text-decoration:none;
-  padding:8px 13px; border-radius:999px; white-space:nowrap; transition:color .15s, background var(--dur-ui) var(--ease-spring);
-}
-.island-links a:hover{color:var(--ink); background:rgba(255,255,255,.06);}
-.island-links a.active, .island-links a[aria-current="page"]{color:#fff; background:rgba(255,255,255,.14); box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);}
-.island-icon{
-  width:44px; height:44px; flex-shrink:0; border-radius:50%; display:grid; place-items:center;
-  background:transparent; border:1px solid transparent; color:var(--ink-2);
-}
-.island-icon:hover{color:#fff; background:rgba(255,255,255,.07); border-color:var(--line);}
-.island-icon .icon{width:19px; height:19px;}
-.island-menu{display:none;}
 .cmd-veil{position:fixed; inset:0; z-index:90; background:rgba(4,5,10,.6); display:grid; justify-items:center; align-items:start; padding:12vh 16px 16px;}
 .cmd-panel{width:min(560px,100%); min-width:0; max-width:calc(100vw - 32px); max-height:calc(100dvh - 24px); overflow-y:auto; border-radius:20px; padding:14px; display:flex; flex-direction:column; gap:10px; animation:cmd-in var(--dur-ui) var(--ease-out-expo);}
 @keyframes cmd-in{from{opacity:0; transform:scale(.97);} to{opacity:1; transform:none;}}
@@ -157,17 +158,6 @@ main:focus{outline:none;}
   .island{
     top:auto; bottom:calc(12px + env(safe-area-inset-bottom,0px));
   }
-  .island-brand .brand-name{display:none;}
-  .island-links{display:none;}
-  .island-menu{
-    width:44px; height:44px; flex-shrink:0; border-radius:50%; display:grid; place-items:center;
-    background:transparent; border:1px solid transparent; color:var(--ink-2);
-  }
-  .island-menu:hover{color:#fff; background:rgba(255,255,255,.07);}
-  .island-menu .icon{width:18px; height:18px;}
-}
-@media(min-width:641px){
-  .island-menu{display:none;}
 }
 /* ---------- tutorial bottom sheet (small screens) ---------- */
 @media(max-width:640px){

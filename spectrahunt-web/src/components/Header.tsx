@@ -140,9 +140,8 @@ export default function Header() {
     router.push('/sky');
   };
 
-  const isActive = (href: string, match?: string) =>
-    match !== undefined ? pathname.startsWith(match) : pathname === href;
-
+  // Five destinations max, thumb-zone ordered: home, sky, search, dice, menu.
+  const skyActive = pathname === '/sky';
   return (
     <div
       ref={islandRef}
@@ -154,29 +153,22 @@ export default function Header() {
       onMouseLeave={() => setHovered(false)}
     >
       <div className="island-row">
-        <Link className="island-brand" href="/" aria-label="STELLAR home">
+        <Link className="island-brand island-iconbtn" href="/" aria-label="STELLAR home"
+          aria-current={pathname === '/' ? 'page' : undefined}>
           <Icon name="logo" className="logo icon" />
-          <span className="brand-name">STELLAR</span>
         </Link>
-        <nav className="island-links" aria-label="Views">
-          {LINKS.map((item) => {
-            const on = isActive(item.href, item.match);
-            return (
-              <Link key={item.href} href={item.href}
-                className={on ? 'active' : undefined}
-                aria-current={on ? 'page' : undefined}>
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-        <button type="button" className="island-icon" aria-label="Search and navigate (Ctrl+K)"
+        <Link href="/sky" aria-label="Sky map"
+          aria-current={skyActive ? 'page' : undefined}
+          className={`island-iconbtn${skyActive ? ' active' : ''}`}>
+          <Icon name="skymap" className="icon" />
+        </Link>
+        <button type="button" className="island-iconbtn" aria-label="Search and navigate (Ctrl+K)"
           title="Search and navigate (Ctrl+K)" onClick={() => { setMenu(false); setOpen(true); }}>
           <Icon name="search" className="icon" />
         </button>
         <SurpriseButton
           compact
-          className="island-icon"
+          className="island-iconbtn"
           onPick={(t) => {
             if (t.showcaseId) openPreview(t.showcaseId);
             else {
@@ -187,7 +179,7 @@ export default function Header() {
             }
           }}
         />
-        <button type="button" className="island-menu" aria-label={menu && open ? 'Close menu' : 'Open menu'}
+        <button type="button" className="island-iconbtn" aria-label={menu && open ? 'Close menu' : 'Open menu'}
           aria-expanded={expanded} aria-controls="island-body"
           onClick={() => {
             if (open && menu) { setOpen(false); setMenu(false); }
@@ -219,18 +211,6 @@ export default function Header() {
               <FeaturedCycle fields={fields} consoleMode={false} />
             </div>
           )}
-          <div className="cmd-foot">
-            <SurpriseButton onPick={(t) => {
-              setOpen(false); setMenu(false);
-              if (t.showcaseId) openPreview(t.showcaseId);
-              else {
-                try {
-                  sessionStorage.setItem('sh-target', JSON.stringify({ ra: t.ra, dec: t.dec }));
-                } catch { /* noop */ }
-                router.push('/sky');
-              }
-            }} />
-          </div>
         </div>
       </div>
     </div>

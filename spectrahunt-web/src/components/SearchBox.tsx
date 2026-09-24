@@ -91,6 +91,13 @@ export default function SearchBox({
         },
       });
     }
+    // Touch viewports: cap the list so every suggestion fits without an
+    // inner scrollbar (4–8 items per mobile autocomplete guidance).
+    try {
+      if (typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches) {
+        return out.slice(0, 8);
+      }
+    } catch { /* fall through uncut */ }
     return out;
   };
 
