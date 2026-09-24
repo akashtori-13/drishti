@@ -14,11 +14,13 @@ import type { SearchTarget } from '@/components/SearchBox';
  * waiting for a second "open blink" click.
  */
 export default function SurpriseButton({
-  onPick, compact = false, className = 'chip lucky',
+  onPick, compact = false, className = 'chip lucky', label,
 }: {
   onPick: (t: SearchTarget) => void;
   compact?: boolean;
   className?: string;
+  /** Optional always-visible label (e.g. inside the expanded island). */
+  label?: string;
 }) {
   const pathname = usePathname();
   const [rolling, setRolling] = useState(false);
@@ -55,6 +57,7 @@ export default function SurpriseButton({
       title="Roll a random field and open its blink" aria-label="Surprise me: open a random blink">
       <Icon name="dice" className="icon" />
       {!compact && <span>{rolling ? 'Rolling…' : 'Surprise me'}</span>}
+      {compact && label && <span className="ibtn-label" aria-hidden="true">{label}</span>}
     </button>
   );
 }

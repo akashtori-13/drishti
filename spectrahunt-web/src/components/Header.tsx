@@ -156,18 +156,22 @@ export default function Header() {
         <Link className="island-brand island-iconbtn" href="/" aria-label="STELLAR home"
           aria-current={pathname === '/' ? 'page' : undefined}>
           <Icon name="logo" className="logo icon" />
+          <span className="brand-name" aria-hidden="true">STELLAR</span>
         </Link>
         <Link href="/sky" aria-label="Sky map"
           aria-current={skyActive ? 'page' : undefined}
           className={`island-iconbtn${skyActive ? ' active' : ''}`}>
           <Icon name="skymap" className="icon" />
+          <span className="ibtn-label" aria-hidden="true">Sky</span>
         </Link>
         <button type="button" className="island-iconbtn" aria-label="Search and navigate (Ctrl+K)"
           title="Search and navigate (Ctrl+K)" onClick={() => { setMenu(false); setOpen(true); }}>
           <Icon name="search" className="icon" />
+          <span className="ibtn-label" aria-hidden="true">Search</span>
         </button>
         <SurpriseButton
           compact
+          label="Surprise"
           className="island-iconbtn"
           onPick={(t) => {
             if (t.showcaseId) openPreview(t.showcaseId);
@@ -186,6 +190,7 @@ export default function Header() {
             else { setMenu(true); setOpen(true); }
           }}>
           <Icon name={menu && open ? 'x' : 'menu'} className="icon" />
+          <span className="ibtn-label" aria-hidden="true">Menu</span>
         </button>
       </div>
       <div className="island-body-wrap" aria-hidden={!expanded}>
