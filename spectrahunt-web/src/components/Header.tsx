@@ -22,21 +22,23 @@ const LINKS = [
  * Dynamic-island navbar.
  *
  * Collapsed: brand + nav links + icon buttons (classic pill).
- * Expanded: shell morphs (radius spring) and search + featured carousel
- * render *inside* the island. Opens on menu/search tap (all screens) or
- * hover (fine pointers only).
+ * Expanded: shell morphs and ONE panel renders inside — menu sheet on menu
+ * tap, search (+carousel when idle) on search tap or desktop hover. Panels
+ * are exclusive so the island never clutters.
  */
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
-  const [open, setOpen] = useState(false);
-  const [menu, setMenu] = useState(false);
+  const [panel, setPanel] = useState<'menu' | 'search' | null>(null);
   const [hovered, setHovered] = useState(false);
+  const [searching, setSearching] = useState(false);
   const [fields, setFields] = useState<Showcase[] | null>(null);
   const openPreview = useAppStore((s) => s.openPreview);
   const islandRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
-  const expanded = open || menu || hovered;
+  const expanded = panel !== null || hovered;
+  const showSearch = panel === 'search' || (hovered && panel === null);
+  const showCarousel = expanded && panel !== 'menu' && !searching;
 
   useEffect(() => {
     document.title = pathname === '/'
@@ -46,8 +48,7 @@ export default function Header() {
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setOpen(false);
-    setMenu(false);
+    setPanel(null);
   }, [pathname]);
 
   // Single Ctrl+K toggle listener (mounted once).
@@ -55,7 +56,7 @@ export default function Header() {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        setOpen((o) => !o);
+        setPanel((p) => (p === 'search' ? null : 'search'));
       }
     };
     document.addEventListener('keydown', onKey);
@@ -63,20 +64,20 @@ export default function Header() {
   }, []);
 
   // Veil dialog: Escape close, outside click, focus trap + initial/return focus.
-  // Now anchored to the island body (menus render inside the island itself).
+  // Anchored to the island body. Runs only for click-opened panels, never
+  // for hover previews (which must not steal focus).
   useEffect(() => {
-    if (!open) return;
+    if (!panel) return;
     triggerRef.current = document.activeElement as HTMLElement | null;
-    const panel = islandRef.current?.querySelector<HTMLElement>('.island-body');
-    const first = panel?.querySelector<HTMLElement>('input, a[href], button:not([disabled])');
+    const panelEl = islandRef.current?.querySelector<HTMLElement>('.island-body');
+    const first = panelEl?.querySelector<HTMLElement>('input, a[href], button:not([disabled])');
     (first ?? undefined)?.focus?.();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setOpen(false);
-        setMenu(false);
+        setPanel(null);
       }
-      if (e.key === 'Tab' && panel) {
-        const items = panel.querySelectorAll<HTMLElement>(
+      if (e.key === 'Tab' && panelEl) {
+        const items = panelEl.querySelectorAll<HTMLElement>(
           'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])',
         );
         if (items.length === 0) return;
@@ -92,9 +93,8 @@ export default function Header() {
       }
     };
     const onDown = (e: MouseEvent) => {
-      if (panel && !panel.contains(e.target as Node)) {
-        setOpen(false);
-        setMenu(false);
+      if (panelEl && !panelEl.contains(e.target as Node)) {
+        setPanel(null);
       }
     };
     document.addEventListener('keydown', onKey);
@@ -104,7 +104,7 @@ export default function Header() {
       document.removeEventListener('mousedown', onDown);
       triggerRef.current?.focus?.();
     };
-  }, [open]);
+  }, [panel]);
 
   // Featured carousel data: fetched once, the first time the island expands.
   useEffect(() => {
@@ -124,7 +124,8 @@ export default function Header() {
     }
   };
   const pick = (t: SearchTarget) => {
-    setOpen(false);
+    setPanel(null);
+    setSearching(false);
     if (t.showcaseId) {
       openPreview(t.showcaseId);
       return;
@@ -165,7 +166,7 @@ export default function Header() {
           <span className="ibtn-label" aria-hidden="true">Sky</span>
         </Link>
         <button type="button" className="island-iconbtn" aria-label="Search and navigate (Ctrl+K)"
-          title="Search and navigate (Ctrl+K)" onClick={() => { setMenu(false); setOpen(true); }}>
+          title="Search and navigate (Ctrl+K)" onClick={() => setPanel((p) => (p === 'search' ? null : 'search'))}>
           <Icon name="search" className="icon" />
           <span className="ibtn-label" aria-hidden="true">Search</span>
         </button>
@@ -183,19 +184,23 @@ export default function Header() {
             }
           }}
         />
-        <button type="button" className="island-iconbtn" aria-label={menu && open ? 'Close menu' : 'Open menu'}
+        <button type="button" className="island-iconbtn" aria-label={panel === 'menu' ? 'Close menu' : 'Open menu'}
           aria-expanded={expanded} aria-controls="island-body"
-          onClick={() => {
-            if (open && menu) { setOpen(false); setMenu(false); }
-            else { setMenu(true); setOpen(true); }
-          }}>
-          <Icon name={menu && open ? 'x' : 'menu'} className="icon" />
+          onClick={() => setPanel((p) => (p === 'menu' ? null : 'menu'))}>
+          <Icon name={panel === 'menu' ? 'x' : 'menu'} className="icon" />
           <span className="ibtn-label" aria-hidden="true">Menu</span>
         </button>
       </div>
       <div className="island-body-wrap" aria-hidden={!expanded}>
-        <div id="island-body" className="island-body">
-          {menu && (
+        <div
+          id="island-body"
+          className="island-body"
+          onFocusCapture={(e) => {
+            if ((e.target as HTMLElement).tagName === 'INPUT') setSearching(true);
+          }}
+          onBlurCapture={() => setSearching(false)}
+        >
+          {panel === 'menu' && (
             <nav className="cmd-links sheet island-sheet" aria-label="Views">
               {[{ href: '/', label: 'Home', desc: 'Front door' }, ...LINKS.map((l) => ({
                 ...l,
@@ -203,15 +208,17 @@ export default function Header() {
                   : l.label === 'Blink' ? 'Compare epochs'
                   : l.label === 'Candidates' ? 'Measured fields' : 'Mission and method',
               }))].map((item) => (
-                <Link key={item.href} href={item.href} onClick={() => { setOpen(false); setMenu(false); }}>
+                <Link key={item.href} href={item.href} onClick={() => setPanel(null)}>
                   <span className="cmd-link-label">{item.label}</span>
                   <span className="cmd-link-desc">{item.desc}</span>
                 </Link>
               ))}
             </nav>
           )}
-          <SearchBox id="nav-search" placeholder="Jump to an object, field, or coordinates" onPick={pick} />
-          {fields && fields.length > 0 && (
+          {showSearch && (
+            <SearchBox id="nav-search" placeholder="Jump to an object, field, or coordinates" onPick={pick} />
+          )}
+          {showCarousel && fields && fields.length > 0 && (
             <div className="island-carousel">
               <FeaturedCycle fields={fields} consoleMode={false} />
             </div>
