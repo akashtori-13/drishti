@@ -219,10 +219,11 @@ main:focus{outline:none;}
 @keyframes menu-in{from{opacity:0; transform:translateY(-6px);} to{opacity:1; transform:none;}}
 @media (prefers-reduced-motion: reduce){ .menu-sheet{animation:none;} .collapsible{transition:none;} }
 @media(min-width:641px){
-  /* desktop: sheet spans the full navbar width, links in two columns */
+  /* desktop: sheet spans the full navbar width; columns collapse to one
+     when two cannot fit without truncating (auto-fit, no overflow) */
   .island .menu-sheet{
     left:0; right:0; width:auto;
-    display:grid; grid-template-columns:1fr 1fr; align-items:start;
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); align-items:start;
   }
   .island .menu-sheet .menu-div,
   .island .menu-sheet .menu-action{grid-column:1 / -1;}
