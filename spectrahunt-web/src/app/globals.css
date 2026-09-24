@@ -119,12 +119,12 @@ main:focus{outline:none;}
 .island-iconbtn .ibtn-label{display:none;}
 .island[data-expanded] .island-row{flex-wrap:wrap;}
 .island[data-expanded] .island-iconbtn{
-  width:auto; padding:0 18px; border-radius:16px; gap:8px;
+  width:auto; padding:0 12px; border-radius:16px; gap:6px;
   display:inline-flex; align-items:center; justify-content:center;
 }
 .island[data-expanded] .island-iconbtn .ibtn-label,
 .island[data-expanded] .island-brand .brand-name{
-  display:inline; font-size:.8125rem; font-weight:600; white-space:nowrap;
+  display:inline; font-size:.75rem; font-weight:600; white-space:nowrap;
   animation:island-label-in .25s ease .08s backwards;
 }
 @keyframes island-label-in{from{opacity:0; transform:translateX(-4px);} to{opacity:1; transform:none;}}
@@ -181,9 +181,19 @@ main:focus{outline:none;}
 .cmd-foot{display:flex; justify-content:center; padding-top:2px;}
 @media(max-width:640px){
   .island{gap:0;}
-  /* bottom-mounted dock island on phones: same pill, same behavior */
+  /* bottom-mounted dock island on phones: same pill, same behavior.
+     Ground-up flow: icon row hugs the bottom (thumb), content stacks
+     above it, and suggestions pop UP from the search field. */
   .island{
     top:auto; bottom:calc(12px + env(safe-area-inset-bottom,0px));
+    flex-direction:column-reverse;
+  }
+  .island-body nav.cmd-links{order:2;}
+  .island-body .island-carousel{order:1;}
+  .island-body .search-shell{order:3; flex-wrap:nowrap;}
+  .island-body .s-list{
+    position:absolute; top:auto; bottom:calc(100% + 8px); left:0; right:0;
+    flex:none; margin-top:0; max-height:28dvh;
   }
 }
 /* ---------- tutorial bottom sheet (small screens) ---------- */
