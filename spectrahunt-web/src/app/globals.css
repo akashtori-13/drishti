@@ -155,19 +155,6 @@ main:focus{outline:none;}
   box-shadow:0 30px 70px -10px rgba(0,0,0,.85);
   padding:12px 0 8px; margin:0;
 }
-/* edge fades only where content hides — list ends stay fully opaque */
-.nav-search .s-list[data-more-below]{
-  -webkit-mask-image:linear-gradient(to bottom, #000 calc(100% - 22px), transparent);
-  mask-image:linear-gradient(to bottom, #000 calc(100% - 22px), transparent);
-}
-.nav-search .s-list[data-more-above]{
-  -webkit-mask-image:linear-gradient(to bottom, transparent, #000 22px);
-  mask-image:linear-gradient(to bottom, transparent, #000 22px);
-}
-.nav-search .s-list[data-more-above][data-more-below]{
-  -webkit-mask-image:linear-gradient(to bottom, transparent, #000 22px, #000 calc(100% - 22px), transparent);
-  mask-image:linear-gradient(to bottom, transparent, #000 22px, #000 calc(100% - 22px), transparent);
-}
 .nav-search .s-list::-webkit-scrollbar{display:none;}
 .nav-search .s-group{
   padding:12px 24px 4px; font-size:.75rem; font-weight:600;
@@ -273,6 +260,8 @@ main:focus{outline:none;}
   a.island-iconbtn.active .ibtn-label,
   button.island-iconbtn.active .ibtn-label{color:#fff;}
   a.island-brand.island-iconbtn{flex:0 0 auto; width:auto; flex-direction:row;}
+  /* off-home the dock keeps the logo alone; home keeps logo + wordmark */
+  .island:not([data-home]) .brand-name{display:none;}
   /* desktop inline form + text links hide; icon variants show */
   .island .nav-search{display:none;}
   .island .nav-textlink{display:none;}
@@ -296,21 +285,6 @@ main:focus{outline:none;}
     position:absolute; left:50%; right:auto; top:auto;
     bottom:calc(100% + 8px); transform:translateX(-50%);
     width:calc(100vw - 32px); min-width:0;
-  }
-  .island-mrow .nav-search .s-list[data-more-below],
-  .island .nav-search .s-list[data-more-below]{
-    -webkit-mask-image:linear-gradient(to bottom, #000 calc(100% - 22px), transparent);
-    mask-image:linear-gradient(to bottom, #000 calc(100% - 22px), transparent);
-  }
-  .island-mrow .nav-search .s-list[data-more-above],
-  .island .nav-search .s-list[data-more-above]{
-    -webkit-mask-image:linear-gradient(to bottom, transparent, #000 22px);
-    mask-image:linear-gradient(to bottom, transparent, #000 22px);
-  }
-  .island-mrow .nav-search .s-list[data-more-above][data-more-below],
-  .island .nav-search .s-list[data-more-above][data-more-below]{
-    -webkit-mask-image:linear-gradient(to bottom, transparent, #000 22px, #000 calc(100% - 22px), transparent);
-    mask-image:linear-gradient(to bottom, transparent, #000 22px, #000 calc(100% - 22px), transparent);
   }
   .island-mrow .island-iconbtn{flex:0 0 auto; min-height:48px;}
   /* menu sheet rises above the docked bar, freed from the dock width:
