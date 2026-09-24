@@ -15,7 +15,7 @@ export default function NotFound() {
         <p style={{ color: 'var(--ink-2)', marginTop: 12 }}>No field at these coordinates. The sky is big — here are some visited ones:</p>
         <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginTop: 20, flexWrap: 'wrap' }}>
           <Link href="/" className="btn primary">Home</Link>
-          <Link href="/sky" className="btn">Sky map</Link>
+          <Link href="/sky" className="btn">SkyMap</Link>
           <button type="button" className="btn" onClick={() => openPreview('3i-atlas')}>3I/ATLAS blink</button>
         </div>
       </div>

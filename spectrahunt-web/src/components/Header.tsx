@@ -10,7 +10,7 @@ import { useAppStore } from '@/lib/store';
 import { nearestShowcase } from '@/lib/sky';
 
 const LINKS = [
-  { href: '/sky', label: 'Sky', desc: 'Observer and all-sky views' },
+  { href: '/sky', label: 'SkyMap', desc: 'Observer and all-sky views' },
   { href: '/blink/3i-atlas', label: 'Blink', match: '/blink', desc: 'Compare epochs' },
   { href: '/candidates', label: 'Featured', desc: 'Measured fields' },
   { href: '/about', label: 'About', desc: 'Mission and method' },
@@ -163,7 +163,7 @@ export default function Header() {
 
   const skyActive = pathname === '/sky';
   const candActive = pathname.startsWith('/candidates');
-  // Home and Sky have their own search surfaces (hero, map tools):
+  // Home and SkyMap have their own search surfaces (hero, map tools):
   // the navbar carries no search affordance there.
   const bare = pathname === '/' || skyActive;
 
@@ -171,7 +171,7 @@ export default function Header() {
   // then the Surprise action separated below. Labels match the navbar.
   const MENU: { href: string; label: string; desc: string; icon: IconName; active: boolean }[] = [
     { href: '/', label: 'Home', desc: 'Front door', icon: 'home', active: pathname === '/' },
-    { href: '/sky', label: 'Sky', desc: 'Observer and all-sky views', icon: 'skymap', active: skyActive },
+    { href: '/sky', label: 'SkyMap', desc: 'Observer and all-sky views', icon: 'skymap', active: skyActive },
     { href: '/blink/3i-atlas', label: 'Blink', desc: 'Compare epochs', icon: 'split', active: pathname.startsWith('/blink') },
     { href: '/candidates', label: 'Featured', desc: 'Measured fields', icon: 'target', active: candActive },
     { href: '/about', label: 'About', desc: 'Mission and method', icon: 'info', active: pathname === '/about' },
@@ -195,16 +195,16 @@ export default function Header() {
           <Icon name="logo" className="logo icon" />
           <span className="brand-name collapsible" aria-hidden="true">STELLAR</span>
         </Link>
-        <Link href="/sky" aria-label="Sky map"
+        <Link href="/sky" aria-label="SkyMap"
           aria-current={skyActive ? 'page' : undefined}
           className={`nav-textlink collapsible${skyActive ? ' active' : ''}`}>
-          Sky
+          SkyMap
         </Link>
-        <Link href="/sky" aria-label="Sky map"
+        <Link href="/sky" aria-label="SkyMap"
           aria-current={skyActive ? 'page' : undefined}
           className={`island-iconbtn nav-icononly collapsible${skyActive ? ' active' : ''}`}>
           <Icon name="skymap" className="icon" />
-          <span className="ibtn-label" aria-hidden="true">Sky</span>
+          <span className="ibtn-label" aria-hidden="true">SkyMap</span>
         </Link>
         {!bare && (
           <div

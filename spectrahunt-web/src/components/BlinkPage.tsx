@@ -419,7 +419,7 @@ export default function BlinkPage({ id }: { id: string }) {
   return (
     <div className="blink-workspace">
       <div className="bw-bar">
-        <Link href="/sky" className="back"><Icon name="back" /><span>Sky</span></Link>
+        <Link href="/sky" className="back"><Icon name="back" /><span>SkyMap</span></Link>
         <div className="bw-toggles">
           <span id="markLabel">Movers</span>
           <button type="button" className="switch" role="switch" aria-checked={showMarkers} aria-labelledby="markLabel" onClick={() => setShowMarkers(!showMarkers)} />
