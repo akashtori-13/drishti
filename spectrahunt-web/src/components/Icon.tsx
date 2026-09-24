@@ -2,7 +2,8 @@
 
 export type IconName =
   | 'logo' | 'search' | 'skymap' | 'back' | 'fwd' | 'down' | 'x'
-  | 'play' | 'pause' | 'ext' | 'menu' | 'dice' | 'target';
+  | 'play' | 'pause' | 'ext' | 'menu' | 'dice' | 'target'
+  | 'home' | 'split' | 'info';
 
 /** Single-copy SVG sprite (render once in layout). */
 export function Sprite() {
@@ -26,6 +27,9 @@ export function Sprite() {
         <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></symbol>
         <symbol id="i-dice" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4" fill="none" stroke="currentColor" strokeWidth="1.8" /><circle cx="8.3" cy="8.3" r="1.4" fill="currentColor" /><circle cx="15.7" cy="15.7" r="1.4" fill="currentColor" /><circle cx="15.7" cy="8.3" r="1.4" fill="currentColor" /><circle cx="8.3" cy="15.7" r="1.4" fill="currentColor" /></symbol>
         <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" strokeWidth="1.8" /><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" strokeWidth="1.8" /><circle cx="12" cy="12" r="1.6" fill="currentColor" /></symbol>
+        <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11.2 12 4l8 7.2" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /><path d="M6.2 9.8V20h11.6V9.8" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></symbol>
+        <symbol id="i-split" viewBox="0 0 24 24"><rect x="3.5" y="5" width="7" height="14" rx="2" fill="none" stroke="currentColor" strokeWidth="1.8" /><rect x="13.5" y="5" width="7" height="14" rx="2" fill="none" stroke="currentColor" strokeWidth="1.8" /></symbol>
+        <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" strokeWidth="1.8" /><path d="M12 11v5.2" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /><circle cx="12" cy="7.8" r="1.3" fill="currentColor" /></symbol>
       </defs>
     </svg>
   );
