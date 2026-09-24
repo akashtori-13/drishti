@@ -171,7 +171,13 @@ main:focus{outline:none;}
 .island-carousel .featured-wrap{align-items:stretch;}
 .island-carousel .featured{width:100%;}
 .island-carousel .feat-dots{justify-content:center;}
-.island-body .search-shell{flex-wrap:wrap; height:auto; min-height:66px; row-gap:0;}
+.island-body .search-shell{flex-wrap:wrap; height:auto; min-height:66px; row-gap:0;
+  border:1px solid var(--line); background:rgba(255,255,255,.04); border-radius:18px;}
+.island-body .search-shell::before{display:none;}
+.island .island-body .search-shell:focus-within{
+  border-color:rgba(165,172,255,.55);
+  box-shadow:0 0 0 4px rgba(165,172,255,.12), 0 18px 44px -18px rgba(0,0,0,.8);
+}
 .island-body .search-shell input{height:auto; padding:10px 0;}
 /* single-surface suggestions: no box of its own — the shell's gradient ring
    wraps input + list together. Hairline separates list from input row. */
