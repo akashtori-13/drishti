@@ -113,7 +113,6 @@ main:focus{outline:none;}
 .island-brand .brand-name{font-size:.9375rem; color:var(--ink); font-weight:650; white-space:nowrap;}
 @media(max-width:640px){
   .island-brand.island-iconbtn{width:48px; padding:0;}
-  .island-brand .brand-name{display:none;}
 }
 /* expanded labels: icon buttons bloom into labeled pills */
 .island-iconbtn .ibtn-label{display:none;}
@@ -182,6 +181,7 @@ main:focus{outline:none;}
 .cmd-foot{display:flex; justify-content:center; padding-top:2px;}
 @media(max-width:640px){
   .island{gap:0;}
+  .island-row{min-width:min(300px, calc(100vw - 60px));}
   /* bottom-mounted dock island on phones: same pill, same behavior.
      Ground-up flow: icon row hugs the bottom (thumb), content stacks
      above it, and suggestions sit ABOVE the input (order:-1) so the
@@ -190,6 +190,29 @@ main:focus{outline:none;}
     top:auto; bottom:calc(12px + env(safe-area-inset-bottom,0px));
     flex-direction:column-reverse;
   }
+  /* captioned dock: label below every icon, collapsed and expanded.
+     STELLAR is the exception — its name sits beside the logo, and only
+     once expanded. */
+  .island-row{flex:1 1 auto;}
+  a.island-iconbtn:not(.island-brand),
+  button.island-iconbtn{
+    flex:1 1 0; min-width:0; width:auto; height:auto; min-height:56px;
+    border-radius:14px; flex-direction:column; gap:3px; padding:4px 2px;
+    background:none; border-color:transparent;
+  }
+  .island[data-expanded] a.island-iconbtn:not(.island-brand),
+  .island[data-expanded] button.island-iconbtn{
+    width:auto; padding:4px 2px; border-radius:14px;
+  }
+  a.island-iconbtn .ibtn-label,
+  button.island-iconbtn .ibtn-label{
+    display:inline; font-size:.625rem; font-weight:600; color:var(--ink-2);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
+  }
+  a.island-iconbtn.active .ibtn-label,
+  button.island-iconbtn.active .ibtn-label{color:#fff;}
+  a.island-brand.island-iconbtn{flex:0 0 auto; width:auto; flex-direction:row;}
+  .island:not([data-expanded]) .island-brand .brand-name{display:none;}
   .island-body nav.cmd-links{order:2;}
   .island-body .island-carousel{order:1;}
   .island-body .search-shell{order:3; flex-wrap:wrap;}
