@@ -87,8 +87,12 @@ export default function Tutorial() {
         ref={panelRef}
         tabIndex={-1}
         className="glass"
-        style={{ maxWidth: 480, width: '100%', borderRadius: 20, padding: 28, outline: 'none' }}
+        style={{ position: 'relative', maxWidth: 480, width: '100%', borderRadius: 20, padding: 28, outline: 'none' }}
       >
+        <button type="button" onClick={() => setTutorialDone(true)} aria-label="Skip tutorial"
+          style={{ position: 'absolute', top: 10, right: 12, background: 'none', border: 0, padding: '6px 8px', fontSize: 12, color: '#8a90ab', cursor: 'pointer' }}>
+          Skip
+        </button>
         <div
           key={i}
           className="xfade"
@@ -102,11 +106,12 @@ export default function Tutorial() {
           <p style={{ color: '#aab0c8', lineHeight: 1.6 }}>{STEPS[i].p}</p>
         </div>
         <div style={{ display: 'flex', gap: 8, marginTop: 20 }}>
-          {i > 0 && <button type="button" className="btn" onClick={() => go(i - 1)}>Back</button>}
+          {i > 0
+            ? <button type="button" className="btn" onClick={() => go(i - 1)}>Back</button>
+            : <span />}
           {i < STEPS.length - 1
-            ? <button type="button" className="btn primary" onClick={() => go(i + 1)}>Next</button>
-            : <button type="button" className="btn primary" onClick={() => setTutorialDone(true)}>Start hunting</button>}
-          <button type="button" className="btn" onClick={() => setTutorialDone(true)} style={{ marginLeft: 'auto' }}>Skip</button>
+            ? <button type="button" className="btn primary" onClick={() => go(i + 1)} style={{ marginLeft: 'auto' }}>Next</button>
+            : <button type="button" className="btn primary" onClick={() => setTutorialDone(true)} style={{ marginLeft: 'auto' }}>Start hunting</button>}
         </div>
       </div>
     </div>
