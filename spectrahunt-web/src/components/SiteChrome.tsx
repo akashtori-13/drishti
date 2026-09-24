@@ -38,7 +38,7 @@ export default function SiteChrome({ children, showTutorial = false }: { childre
               <div className="foot-col">
                 <span className="foot-h">Explore</span>
                 <Link href="/sky">SkyMap</Link>
-                <Link href="/candidates">Candidates</Link>
+                <Link href="/candidates">Featured</Link>
                 <button type="button" className="linklike" onClick={() => openPreview('3i-atlas')}>3I/ATLAS blink</button>
               </div>
               <div className="foot-col">
