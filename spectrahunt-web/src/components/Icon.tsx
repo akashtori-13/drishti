@@ -15,7 +15,7 @@ export function Sprite() {
           <path d="M320.06 154.37A10.97 10.97 0 0 1 318 141.71L384.53 8.66A15.67 15.67 0 0 1 409.62 4.58L507.42 102.38A15.67 15.67 0 0 1 503.34 127.47L370.29 194A10.97 10.97 0 0 1 357.63 191.94Z" fill="currentColor" />
         </symbol>
         <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" strokeWidth="1.8" /><path d="M20 20l-4.9-4.9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" fill="none" /></symbol>
-        <symbol id="i-skymap" viewBox="0 0 24 24"><path d="M12 3.5l2.7 5.8 6.3.6-4.6 4.2 1.3 6.3L12 17.2l-5.7 3.2 1.3-6.3L3 9.9l6.3-.6z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /></symbol>
+        <symbol id="i-skymap" viewBox="0 0 24 24"><path d="M12 2.5c.9 6.3 2.7 8.1 9 9-6.3.9-8.1 2.7-9 9-.9-6.3-2.7-8.1-9-9 6.3-.9 8.1-2.7 9-9z" fill="currentColor" /><path d="M19 3.5c.3 2.1.9 2.7 3 3-2.1.3-2.7.9-3 3-.3-2.1-.9-2.7-3-3 2.1-.3 2.7-.9 3-3z" fill="currentColor" opacity=".7" /></symbol>
         <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></symbol>
         <symbol id="i-fwd" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></symbol>
         <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></symbol>
