@@ -208,7 +208,8 @@ export default function BlinkPage({ id }: { id: string }) {
         const qb = parseInt(q.get('band') ?? '', 10);
         if (qb >= 1 && qb <= 6) setBand(qb);
         const qe = parseInt(q.get('epoch') ?? '', 10);
-        if (Number.isInteger(qe) && qe >= 0) setEpochIdx(qe);
+        // clamp both ends: negative or past-the-last shared links land on an edge
+        if (Number.isInteger(qe)) setEpochIdx(Math.min(Math.max(0, qe), Math.max(0, d.epochs.length - 1)));
         const qm = q.get('mode');
         if (qm === 'side' || qm === 'swipe' || qm === 'diff' || qm === 'blink') setCompareMode(qm);
       } catch { /* keep defaults */ }
@@ -323,6 +324,24 @@ export default function BlinkPage({ id }: { id: string }) {
     return window.location.origin + blinkURL(id, { band, epoch: epochIdx, mode: compareMode });
   };
 
+  // Space/WaitGame double-handling guard (capture phase, runs before the
+  // game and viewer handlers): editable targets keep their keys — neither the
+  // invaders game nor blink transport may steal Space/arrows from a field.
+  useEffect(() => {
+    const guard = (e: KeyboardEvent) => {
+      if (e.key !== ' ' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      const t = e.target as HTMLElement | null;
+      if (!t || typeof t.tagName !== 'string') return;
+      const tag = t.tagName;
+      if (['INPUT', 'SELECT', 'TEXTAREA'].includes(tag)
+        || t.getAttribute?.('role') === 'combobox' || t.isContentEditable) {
+        e.stopPropagation();
+      }
+    };
+    document.addEventListener('keydown', guard, { capture: true });
+    return () => document.removeEventListener('keydown', guard, { capture: true });
+  }, []);
+
   useEffect(() => {
     try {
       const raw = localStorage.getItem(`sh-flags-${id}`);
@@ -344,15 +363,22 @@ export default function BlinkPage({ id }: { id: string }) {
   const copyLink = async () => {
     const url = shareURL();
     try {
-      await navigator.clipboard.writeText(url);
-    } catch {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+        return;
+      }
+    } catch { /* fall through to the legacy path */ }
+    try {
       const ta = document.createElement('textarea');
       ta.value = url;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
       document.body.appendChild(ta);
       ta.select();
       document.execCommand('copy');
       ta.remove();
-    }
+    } catch { /* clipboard unavailable — link stays in the address bar */ }
   };
 
   const exportJSON = () => {

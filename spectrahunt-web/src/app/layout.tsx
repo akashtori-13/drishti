@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import "./reveal.css";
 import { Sprite } from "@/components/Icon";
 import SwRegister from "@/components/SwRegister";
 import NativeShell from "@/components/NativeShell";

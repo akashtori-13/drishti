@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import Icon from '@/components/Icon';
 import SpectrumPlot from '@/components/Plots';
 import { BANDS } from '@/lib/sky';
@@ -208,6 +208,19 @@ export default function BlinkComparator({
   const histRef = useRef<HTMLCanvasElement>(null);
   const diffStatRef = useRef<HTMLSpanElement>(null);
   const drag = useRef<{ x: number; y: number; pan: { x: number; y: number }; moved: boolean } | null>(null);
+  // Orbital `suppressClick` pattern: a pointer travel past the drag
+  // hysteresis is a pan, never a tap — the trailing click must not sample.
+  const suppressClick = useRef(false);
+  // Scratch-canvas pool: cover-fit staging reuses canvases across renders
+  // (zero per-frame allocation) instead of `document.createElement` churn.
+  const scratchPool = useRef<HTMLCanvasElement[]>([]);
+  const sampleScratch = useRef<HTMLCanvasElement | null>(null);
+  const getScratch = useCallback((slot: number, w: number, h: number): HTMLCanvasElement => {
+    let c = scratchPool.current[slot];
+    if (!c) { c = document.createElement('canvas'); scratchPool.current[slot] = c; }
+    if (c.width !== w || c.height !== h) { c.width = w; c.height = h; }
+    return c;
+  }, []);
   const panRaf = useRef(0);
   const panPending = useRef<{ x: number; y: number } | null>(null);
   const probeSrc = useRef<{ img: HTMLImageElement; w: number; h: number } | null>(null);
@@ -283,6 +296,7 @@ export default function BlinkComparator({
   // /api/frame.png renders stay throttled so IBE isn't thundered.
   useEffect(() => {
     const pump = () => {
+      if (document.hidden) return; // visibility pause: heartbeat skips while hidden
       const urls = [...new Set(frames.map((f) => f.png).filter((u): u is string => !!u))];
       const ordered = [frames[idx]?.png, n ? frames[(idx - 1 + n) % n]?.png : undefined, ...urls];
       const now = Date.now();
@@ -403,6 +417,13 @@ export default function BlinkComparator({
     return () => { if (timer.current) clearInterval(timer.current); };
   }, [playing, speed, availIdx, idx, onEpochChange, mode, motionIdx]);
 
+  // visibility pause: a hidden tab never advances the blink
+  useEffect(() => {
+    const onVis = () => { if (document.hidden) setPlaying(false); };
+    document.addEventListener('visibilitychange', onVis);
+    return () => document.removeEventListener('visibilitychange', onVis);
+  }, []);
+
   // reduced motion: never autoplay
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -442,7 +463,25 @@ export default function BlinkComparator({
   }, [mode, curLbl]);
 
   const copyLink = useCallback(() => {
-    void navigator.clipboard?.writeText(window.location.href).catch(() => undefined);
+    const url = window.location.href;
+    const legacyCopy = () => {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+      } catch { /* clipboard unavailable — link stays in the address bar */ }
+    };
+    try {
+      const pending = navigator.clipboard?.writeText(url);
+      if (pending && typeof pending.catch === 'function') void pending.catch(legacyCopy);
+      else legacyCopy();
+    } catch { legacyCopy(); }
   }, []);
 
   // keyboard: transport + palette
@@ -464,8 +503,15 @@ export default function BlinkComparator({
         return;
       }
       if (mod || e.altKey) return;
-      const tag = (e.target as HTMLElement).tagName;
-      if (['INPUT', 'BUTTON', 'A', 'SELECT', 'TEXTAREA'].includes(tag)) return;
+      const el = e.target as HTMLElement;
+      const tag = el.tagName;
+      // Roving scope: the timeline scrub keeps transport keys (arrows step,
+      // Space toggles) with preventDefault so the native slider does not
+      // double-step beneath us. Every other field keeps its native keys.
+      const isScrub = el instanceof HTMLInputElement
+        && (el.classList.contains('scrub') || el.getAttribute('aria-label') === 'Timeline scrub');
+      if (!isScrub && (['INPUT', 'BUTTON', 'A', 'SELECT', 'TEXTAREA'].includes(tag)
+        || el.getAttribute('role') === 'combobox' || el.isContentEditable)) return;
       if (e.key === ' ') { e.preventDefault(); setPlaying((p) => (n > 1 ? !p : p)); }
       else if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
       else if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
@@ -797,15 +843,14 @@ export default function BlinkComparator({
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = Math.round(w * dpr);
     canvas.height = Math.round(h * dpr);
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
     if (!ctx) return;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = '#04050a';
     ctx.fillRect(0, 0, w, h);
 
-    const mk = (img: HTMLImageElement) => {
-      const c = document.createElement('canvas');
-      c.width = Math.round(w); c.height = Math.round(h);
+    const mk = (img: HTMLImageElement, slot: number) => {
+      const c = getScratch(slot, Math.round(w), Math.round(h));
       const cctx = c.getContext('2d', { willReadFrequently: true });
       if (cctx) drawCover(cctx, img, w, h, pan, zoom);
       return cctx?.getImageData(0, 0, c.width, c.height);
@@ -821,9 +866,8 @@ export default function BlinkComparator({
         return url ? loadedBand[url] : undefined;
       });
       if (chImgs[0] && chImgs[1] && chImgs[2]) {
-        const chans = (chImgs as HTMLImageElement[]).map((img) => {
-          const c = document.createElement('canvas');
-          c.width = Math.round(w); c.height = Math.round(h);
+        const chans = (chImgs as HTMLImageElement[]).map((img, ci) => {
+          const c = getScratch(ci, Math.round(w), Math.round(h));
           const cctx = c.getContext('2d', { willReadFrequently: true });
           if (cctx) drawCover(cctx, img, w, h, pan, zoom);
           return cctx?.getImageData(0, 0, c.width, c.height);
@@ -853,8 +897,8 @@ export default function BlinkComparator({
         ctx.fillText('Band images still indexing — false color arrives with them.', w / 2, h / 2);
       }
     } else if (showRgb && curImg && prevImg) {
-      const A = mk(prevImg);
-      const B = mk(curImg);
+      const A = mk(prevImg, 0);
+      const B = mk(curImg, 1);
       if (A && B) {
         const out = ctx.createImageData(Math.round(w), Math.round(h));
         const span = Math.max(1e-6, vmax - vmin);
@@ -875,8 +919,8 @@ export default function BlinkComparator({
       }
     } else if (mode === 'diff' && curImg && prevImg) {
       diffMode = true;
-      const A = mk(prevImg);
-      const B = mk(curImg);
+      const A = mk(prevImg, 0);
+      const B = mk(curImg, 1);
       if (A && B) {
         const out = ctx.createImageData(Math.round(w), Math.round(h));
         for (let i = 0; i < out.data.length; i += 4) {
@@ -889,8 +933,7 @@ export default function BlinkComparator({
         stylize(canvas, stretch, vmin, vmax, invert, cmap, true, diffScale);
       }
     } else if (mode === 'swipe' && curImg && prevImg) {
-      const off = document.createElement('canvas');
-      off.width = canvas.width; off.height = canvas.height;
+      const off = getScratch(3, canvas.width, canvas.height);
       const octx = off.getContext('2d');
       if (octx) {
         octx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -1106,7 +1149,7 @@ export default function BlinkComparator({
           : '';
       }
     } catch { /* tainted or tiny canvas */ }
-  }, [curImg, prevImg, mode, stretch, vmin, vmax, invert, cmap, diffScale, swipe, pan, zoom, showMarkers, showRgb, falseColor, loadedBand, rgb, bandPngs, fovArcmin, candidates, sizeTick, failed, loaded, chartStars, knownNames, center, cur?.png]);
+  }, [curImg, prevImg, mode, stretch, vmin, vmax, invert, cmap, diffScale, swipe, pan, zoom, showMarkers, showRgb, falseColor, loadedBand, rgb, bandPngs, fovArcmin, candidates, sizeTick, failed, loaded, chartStars, knownNames, center, getScratch, cur?.png]);
 
   // side-by-side render (synchronized pan/zoom + linked cursor)
   useEffect(() => {
@@ -1153,7 +1196,8 @@ export default function BlinkComparator({
   const sampleAt = (img: HTMLImageElement | undefined, x: number, y: number): number => {
     if (!img) return 0;
     try {
-      const c = document.createElement('canvas');
+      let c = sampleScratch.current;
+      if (!c) { c = document.createElement('canvas'); sampleScratch.current = c; }
       c.width = 32; c.height = 32;
       const cctx = c.getContext('2d', { willReadFrequently: true });
       if (!cctx) return 0;
@@ -1177,17 +1221,28 @@ export default function BlinkComparator({
   const onPointerDown = (e: React.PointerEvent) => {
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
     drag.current = { x: e.clientX, y: e.clientY, pan: { ...pan }, moved: false };
+    suppressClick.current = false;
   };
   const onPointerMove = (e: React.PointerEvent) => {
-    if (mode === 'swipe' && e.buttons === 0 && e.pointerType === 'mouse') {
+    if (mode === 'swipe' && e.pointerType === 'mouse' && e.buttons === 0) {
       const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
       setSwipe(Math.min(0.98, Math.max(0.02, (e.clientX - r.left) / r.width)));
+    } else if (mode === 'swipe' && e.pointerType !== 'mouse' && e.isPrimary !== false) {
+      // touch/pen path: the curtain follows the finger while swiping
+      const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      setSwipe(Math.min(0.98, Math.max(0.02, (e.clientX - r.left) / r.width)));
+      return;
     }
     if (drag.current) {
       const dx = e.clientX - drag.current.x;
       const dy = e.clientY - drag.current.y;
-      if (Math.hypot(dx, dy) > 4) drag.current.moved = true;
-      else return;
+      // unified 5px hysteresis with the Orbital surfaces: inside it, hold
+      // still (hover probe keeps working); past it, this is a pan and the
+      // trailing click must not sample.
+      if (Math.hypot(dx, dy) > 5) {
+        drag.current.moved = true;
+        suppressClick.current = true;
+      } else return;
       // rAF-throttle: full-res restyle runs at most once per frame while dragging
       panPending.current = { x: drag.current.pan.x + dx, y: drag.current.pan.y + dy };
       if (!panRaf.current) {
@@ -1225,6 +1280,7 @@ export default function BlinkComparator({
   };
   const onPointerUp = () => { drag.current = null; };
   const onClickSample = (e: React.MouseEvent) => {
+    if (suppressClick.current) { suppressClick.current = false; return; }
     if (drag.current?.moved) return;
     const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const x = (e.clientX - r.left) / r.width;
@@ -1235,9 +1291,10 @@ export default function BlinkComparator({
     const values = frames.map((f) => {
       const img = f.png ? loaded[f.png] : undefined;
       if (!img) return 0;
-      const c = document.createElement('canvas');
+      let c = sampleScratch.current;
+      if (!c) { c = document.createElement('canvas'); sampleScratch.current = c; }
       c.width = 32; c.height = 32;
-      const cctx = c.getContext('2d');
+      const cctx = c.getContext('2d', { willReadFrequently: true });
       if (!cctx) return 0;
       cctx.drawImage(img, 0, 0, 32, 32);
       try {
@@ -1302,10 +1359,24 @@ export default function BlinkComparator({
     a.click();
   };
 
-  const recordWebM = async () => {    const canvas = mode === 'side' ? rightRef.current : mainRef.current;
+  const recordWebM = async () => {
+    const canvas = mode === 'side' ? rightRef.current : mainRef.current;
     if (!canvas || !canvas.width || n < 2 || recording) return;
-    const stream = canvas.captureStream(30);
-    const rec = new MediaRecorder(stream, { mimeType: 'video/webm' });
+    if (typeof MediaRecorder === 'undefined') return;
+    if (typeof canvas.captureStream !== 'function') return;
+    const mime = 'video/webm';
+    try {
+      if (typeof MediaRecorder.isTypeSupported === 'function'
+        && !MediaRecorder.isTypeSupported(mime)) return;
+    } catch { return; }
+    let stream: MediaStream;
+    try {
+      stream = canvas.captureStream(30);
+    } catch { return; }
+    let rec: MediaRecorder;
+    try {
+      rec = new MediaRecorder(stream, { mimeType: mime });
+    } catch { return; }
     const chunks: Blob[] = [];
     rec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
     const done = new Promise<Blob>((resolve) => {
@@ -1313,12 +1384,16 @@ export default function BlinkComparator({
     });
     setRecording(true);
     setPlaying(false);
-    rec.start();
+    try {
+      rec.start();
+    } catch { setRecording(false); return; }
     for (let i = 0; i < n; i++) {
       onEpochChange(i);
       await new Promise((r) => setTimeout(r, Math.max(250, speed)));
     }
-    rec.stop();
+    try {
+      rec.stop();
+    } catch { setRecording(false); return; }
     const blob = await done;
     setRecording(false);
     const a = document.createElement('a');
@@ -1356,11 +1431,22 @@ export default function BlinkComparator({
     if (p === 'balanced') { setVmin(0.05); setVmax(0.98); }
     if (p === 'bright') { setVmin(0.15); setVmax(1); }
   };
+  const activePreset: 'faint' | 'balanced' | 'bright' | null =
+    vmin === 0.02 && vmax === 0.9 ? 'faint'
+    : vmin === 0.05 && vmax === 0.98 ? 'balanced'
+    : vmin === 0.15 && vmax === 1 ? 'bright' : null;
+  const scrubPct = n > 1 ? Math.round((idx / (n - 1)) * 100) : 0;
 
   const setBandAndChannel = (b: number) => {
     onBandChange(b);
     const ch = CHANNELS.filter((c) => c.detector === b);
     setChannel(ch[Math.floor(ch.length / 2)]?.idx ?? 0);
+  };
+  // Bands with no epochs in this field stay disabled: `bandPngs` carries the
+  // newest-epoch PNG per detector, so a missing entry means nothing to blink.
+  const hasBandData = (id: number) => {
+    if (!bandPngs || Object.keys(bandPngs).length === 0) return true;
+    return !!bandPngs[id];
   };
 
   const modeLabel = mode === 'replay' ? 'Replay · simulated motion' : mode === 'diff' ? 'Difference B−A' : mode === 'swipe' ? 'Swipe A | B' : mode === 'side' ? 'Side-by-side' : mode === 'chart' ? 'Chart · rendered interpretation' : falseColor ? 'False color' : showRgb ? 'Motion color' : 'Blink';
@@ -1397,11 +1483,6 @@ export default function BlinkComparator({
     <div className="deck">
       <div className="blink-grid">
         <div className="stage-col">
-          {mode === 'side' && sideHover && (
-            <p className="mono side-readout">
-              A {sideHover.a} · B {sideHover.b} · Δ {(sideHover.b - sideHover.a) >= 0 ? '+' : ''}{sideHover.b - sideHover.a}
-            </p>
-          )}
           {mode === 'side' && sideHover && (
             <p className="mono side-readout" aria-live="off">
               A {sideHover.a} · B {sideHover.b} · Δ {(sideHover.b - sideHover.a) >= 0 ? '+' : ''}{sideHover.b - sideHover.a}
@@ -1454,17 +1535,18 @@ export default function BlinkComparator({
           </div>
         <div className="controls-zone">
           <div className="transport-row glass" role="group" aria-label="Blink transport">
-            <button type="button" className="icon-btn" onClick={() => step(-1)} aria-label="Previous epoch">
+            <button type="button" className="icon-btn pressable" onClick={() => step(-1)} aria-label="Previous epoch">
               <Icon name="back" />
             </button>
-            <button type="button" className="play mini" onClick={() => setPlaying((pp) => (n > 1 ? !pp : pp))}
+            <button type="button" className="play mini pressable" onClick={() => setPlaying((pp) => (n > 1 ? !pp : pp))}
               aria-label={playing ? 'Pause blink' : 'Play blink'}>
               <Icon name={playing ? 'pause' : 'play'} />
             </button>
-            <button type="button" className="icon-btn" onClick={() => step(1)} aria-label="Next epoch">
+            <button type="button" className="icon-btn pressable" onClick={() => step(1)} aria-label="Next epoch">
               <Icon name="fwd" />
             </button>
             <input className="scrub" type="range" min={0} max={Math.max(0, n - 1)} step={1} value={idx}
+              style={{ '--val': `${scrubPct}%` } as CSSProperties}
               onChange={(e) => { setPlaying(false); onEpochChange(Number(e.target.value)); }}
               aria-label="Timeline scrub" aria-valuetext={cur?.label ?? ''} />
             <span className="mono epoch-name">{cur?.label ?? '—'}</span>
@@ -1558,7 +1640,8 @@ export default function BlinkComparator({
             <div className="ws-sub">Presets</div>
             <div className="ws-row" role="group" aria-label="Brightness presets">
               {(['faint', 'balanced', 'bright'] as const).map((pp) => (
-                <button key={pp} type="button" className="ws-btn" onClick={() => setPreset(pp)}>{pp}</button>
+                <button key={pp} type="button" className={`ws-btn pressable${activePreset === pp ? ' active' : ''}`}
+                  aria-pressed={activePreset === pp} onClick={() => setPreset(pp)}>{pp}</button>
               ))}
             </div>
             <div className="ws-sub">Levels</div>
@@ -1576,8 +1659,12 @@ export default function BlinkComparator({
             <h3 className="ws-title">Bands</h3>
             <div className="band-grid" role="group" aria-label="Detector band">
               {BANDS.map((b) => (
-                <button key={b.id} type="button" className={`band-cell${b.id === band ? ' active' : ''}`}
-                  aria-pressed={b.id === band} title={`${b.label}: ${b.range}`} onClick={() => setBandAndChannel(b.id)}>
+                <button key={b.id} type="button" className={`band-cell pressable${b.id === band ? ' active' : ''}`}
+                  aria-pressed={b.id === band}
+                  disabled={!hasBandData(b.id)}
+                  style={{ '--band-color': b.color } as CSSProperties}
+                  title={hasBandData(b.id) ? `${b.label}: ${b.range}` : `${b.label}: no epochs in this field`}
+                  onClick={() => setBandAndChannel(b.id)}>
                   <span className="sw" style={{ background: b.color }} />
                   <span>Band {b.id}</span>
                 </button>

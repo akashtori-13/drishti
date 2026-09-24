@@ -48,11 +48,14 @@ export default function GlitchTransition({ source, focus, onDone, durationMs = 1
     let alive = true;
     let raf = 0;
     let done = false;
+    // Ends on the app background, never a white flash: the route swaps
+    // under this veil, so the last painted frame must match --space.
+    const BG = '#05060c';
     const finish = () => {
       if (done) return;
       done = true;
       ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.fillStyle = '#fff';
+      ctx.fillStyle = BG;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       window.setTimeout(() => {
         if (alive) cb.current();
@@ -89,6 +92,28 @@ export default function GlitchTransition({ source, focus, onDone, durationMs = 1
     const chR = separated(snap, 'r');
     const chG = separated(snap, 'g');
 
+    // Veil focus management: take focus so Enter/Space can skip without a
+    // pointer; return focus to the previously focused element on unmount.
+    const prevFocus = document.activeElement as HTMLElement | null;
+    try {
+      canvas.focus({ preventScroll: true });
+    } catch {
+      /* noop */
+    }
+    const restoreFocus = () => {
+      try {
+        if (prevFocus && document.contains(prevFocus)) prevFocus.focus({ preventScroll: true });
+      } catch {
+        /* noop */
+      }
+    };
+    const veilKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
+        if (e.key === ' ') e.preventDefault();
+        finish();
+      }
+    };
+
     if (reduced) {
       const t0 = performance.now();
       const fade = (t: number) => {
@@ -105,20 +130,34 @@ export default function GlitchTransition({ source, focus, onDone, durationMs = 1
         else finish();
       };
       raf = requestAnimationFrame(fade);
-      const onKey = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') finish();
-      };
+      const onKey = veilKey;
       document.addEventListener('keydown', onKey);
+      canvas.addEventListener('keydown', onKey);
       return () => {
         alive = false;
         cancelAnimationFrame(raf);
         document.removeEventListener('keydown', onKey);
+        canvas.removeEventListener('keydown', onKey);
+        restoreFocus();
       };
     }
 
     const easeOut = (x: number) => 1 - Math.pow(1 - x, 3);
     const t0 = performance.now();
-    // deterministic-ish slice rows per frame would strobe; reseed each frame
+    // Temporally coherent slices: seeded once per transition so rows persist
+    // across frames and only wobble, instead of strobing from per-frame
+    // Math.random() reseeds.
+    let seed = 0x2f6e2b1;
+    const srand = () => {
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      return seed / 0xffffffff;
+    };
+    const slices = Array.from({ length: 14 }, () => ({
+      y: srand(),
+      h: 0.004 + srand() * 0.022,
+      dx: (srand() - 0.5) * 0.05,
+      ph: srand() * Math.PI * 2,
+    }));
     const draw = (now: number) => {
       if (!alive) return;
       const t = now - t0;
@@ -141,26 +180,25 @@ export default function GlitchTransition({ source, focus, onDone, durationMs = 1
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.globalAlpha = 1;
       ctx.globalCompositeOperation = 'source-over';
-      // micro-jitter during the tear
-      const jx = p > 0.32 && p < 0.73 ? (Math.random() - 0.5) * 7 * dpr : 0;
-      const jy = p > 0.32 && p < 0.73 ? (Math.random() - 0.5) * 5 * dpr : 0;
+      // micro-jitter during the tear: deterministic wobble, no random strobe
+      const jx = p > 0.32 && p < 0.73 ? Math.sin(t / 47) * 3.5 * dpr : 0;
+      const jy = p > 0.32 && p < 0.73 ? Math.cos(t / 61) * 2.5 * dpr : 0;
       ctx.drawImage(snap, sx, sy, sw, sh, jx, jy, W, H);
 
       if (p >= 0.32 && p < 0.8) {
-        // RGB channel split, oscillating
-        const d = (2 + 3 * Math.abs(Math.sin(t / 90)) + Math.random() * 3) * dpr;
+        // RGB channel split, oscillating deterministically
+        const d = (2 + 3 * Math.abs(Math.sin(t / 90)) + 1.5 * (0.5 + 0.5 * Math.sin(t / 170))) * dpr;
         ctx.globalCompositeOperation = 'lighter';
         ctx.globalAlpha = 0.65;
         ctx.drawImage(chR, sx, sy, sw, sh, -d + jx, jy, W, H);
         ctx.drawImage(chG, sx, sy, sw, sh, d + jx, jy, W, H);
         ctx.globalAlpha = 1;
         ctx.globalCompositeOperation = 'source-over';
-        // horizontal slice displacement: 8-16 rows shift ±x
-        const rows = 8 + Math.floor(Math.random() * 9);
-        for (let i = 0; i < rows; i++) {
-          const ry = Math.random() * H;
-          const rh = (3 + Math.random() * 14) * dpr;
-          const dx = (Math.random() - 0.5) * 34 * dpr;
+        // horizontal slice displacement: seeded rows drift coherently
+        for (const s of slices) {
+          const ry = s.y * H;
+          const rh = Math.max(1, s.h * H);
+          const dx = s.dx * W + Math.sin(t / 130 + s.ph) * 2 * dpr;
           try {
             ctx.drawImage(canvas, 0, ry, W, rh, dx, ry, W, rh);
           } catch {
@@ -211,17 +249,18 @@ export default function GlitchTransition({ source, focus, onDone, durationMs = 1
     };
 
     const onPointer = () => finish(); // second click = skip to end
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') finish();
-    };
+    const onKey = veilKey;
     canvas.addEventListener('pointerdown', onPointer);
+    canvas.addEventListener('keydown', onKey);
     document.addEventListener('keydown', onKey);
     raf = requestAnimationFrame(draw);
     return () => {
       alive = false;
       cancelAnimationFrame(raf);
       canvas.removeEventListener('pointerdown', onPointer);
+      canvas.removeEventListener('keydown', onKey);
       document.removeEventListener('keydown', onKey);
+      restoreFocus();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -230,8 +269,9 @@ export default function GlitchTransition({ source, focus, onDone, durationMs = 1
     <canvas
       ref={canvasRef}
       className="orbital-tear"
-      role="img"
-      aria-label="Passing through the spacecraft aperture into its view."
+      role="button"
+      tabIndex={0}
+      aria-label="Passing through the spacecraft aperture into its view. Press Enter to continue."
       style={{ position: 'fixed', inset: 0, zIndex: 80, display: 'block', cursor: 'wait' }}
     />
   );

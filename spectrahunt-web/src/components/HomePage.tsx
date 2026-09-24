@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { Reveal } from '@/lib/reveal';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { SHOWCASE_IDS, getCoverage, getShowcase, useLive, type RealCell, type Showcase } from '@/lib/showcases';
@@ -13,6 +14,8 @@ import SurpriseButton from '@/components/SurpriseButton';
 import InstallButton from '@/components/InstallButton';
 import OrbitHero from '@/components/orbital/OrbitHero';
 import Inspector, { type InspectorField } from '@/components/Inspector';
+import SpaceBackdrop from '@/components/SpaceBackdrop';
+import FlickerNumber from '@/components/FlickerNumber';
 
 function fieldFromRaDec(ra: number, dec: number, grid: number[][], real?: Map<string, RealCell>): InspectorField {
   const i = Math.min(GRID_W - 1, Math.max(0, Math.floor((ra / 360) * GRID_W)));
@@ -70,6 +73,7 @@ export function FeaturedCycle({ fields, consoleMode }: { fields: Showcase[]; con
         type="button"
         onClick={() => openPreview(f.id)}
         className="featured"
+        data-tilt="4"
         aria-label={`Featured real detection: ${f.title}`}
       >
         <span className="feat-imgs" aria-hidden="true">
@@ -117,9 +121,11 @@ function SourcesSection() {
   return (
     <section className="sources" aria-labelledby="sources-h">
       <div className="sources-inner">
-        <p className="hero-kicker">Where every pixel comes from</p>
-        <h2 id="sources-h">Eight sources, one sky</h2>
-        <p className="sources-lead">Every image, number, and candidate traces to these archives — live where possible, honestly labeled where degraded.</p>
+        <Reveal index={0}>
+          <p className="hero-kicker">Where every pixel comes from</p>
+          <h2 id="sources-h">Eight sources, one sky</h2>
+          <p className="sources-lead">Every image, number, and candidate traces to these archives — live where possible, honestly labeled where degraded.</p>
+        </Reveal>
         <ul className="source-grid">
           {sources.map((s) => (
             <li key={s.name} className="source-card">
@@ -142,6 +148,9 @@ export default function HomePage() {  const router = useRouter();
   const [, setConsoleMode] = useState(false);
   const [wake, setWake] = useState(false);
   const [toast, setToast] = useState(false);
+  const heroRef = useRef<HTMLElement | null>(null);
+  const copyRef = useRef<HTMLDivElement | null>(null);
+  const orbitRef = useRef<HTMLDivElement | null>(null);
 
   // Onboarding gate: exactly one thing happens per arrival, in order.
   // - Entry is persistent (localStorage): mobile OSes wipe session storage
@@ -234,6 +243,51 @@ export default function HomePage() {  const router = useRouter();
     return () => { alive = false; };
   }, [grid]);
 
+  // Hero parallax: pointer steers .hero-copy ±6px and .hero-orbit ∓4px.
+  // translate-only (wake choreography owns transform), rAF-coalesced,
+  // fine pointers only, off under reduced-motion.
+  useEffect(() => {
+    const hero = heroRef.current;
+    const copy = copyRef.current;
+    const orbit = orbitRef.current;
+    if (!hero || !copy || !orbit) return;
+    try {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    } catch {
+      return;
+    }
+    let raf = 0;
+    let nx = 0;
+    let ny = 0;
+    const render = () => {
+      raf = 0;
+      copy.style.translate = `${(nx * 6).toFixed(2)}px ${(ny * 6).toFixed(2)}px`;
+      orbit.style.translate = `${(nx * -4).toFixed(2)}px ${(ny * -4).toFixed(2)}px`;
+    };
+    const onMove = (e: PointerEvent) => {
+      const r = hero.getBoundingClientRect();
+      if (r.width < 1 || r.height < 1) return;
+      nx = ((e.clientX - r.left) / r.width) * 2 - 1;
+      ny = ((e.clientY - r.top) / r.height) * 2 - 1;
+      if (!raf) raf = requestAnimationFrame(render);
+    };
+    const onLeave = () => {
+      nx = 0;
+      ny = 0;
+      if (!raf) raf = requestAnimationFrame(render);
+    };
+    hero.addEventListener('pointermove', onMove, { passive: true });
+    hero.addEventListener('pointerleave', onLeave);
+    return () => {
+      hero.removeEventListener('pointermove', onMove);
+      hero.removeEventListener('pointerleave', onLeave);
+      if (raf) cancelAnimationFrame(raf);
+      copy.style.translate = '';
+      orbit.style.translate = '';
+    };
+  }, []);
+
   // '/' focuses search anywhere on the page (unless typing already)
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -282,7 +336,8 @@ export default function HomePage() {  const router = useRouter();
 
   return (
     <div>
-      <section className={wake ? 'hero wake' : 'hero'} id="hero">
+      <SpaceBackdrop />
+      <section ref={heroRef} className={wake ? 'hero wake' : 'hero'} id="hero">
         <HeroSky grid={grid} coverage={coverage}
           markers={SHOWCASE_POINTS}
           onMarker={(id) => openPreview(id)}
@@ -290,7 +345,7 @@ export default function HomePage() {  const router = useRouter();
         <div className="hero-scrim" />
 
         <div className="hero-columns">
-          <div className="hero-copy">
+          <div ref={copyRef} className="hero-copy">
             <h1>Hunt what moves in the infrared sky</h1>
 
             <SearchBox
@@ -308,7 +363,7 @@ export default function HomePage() {  const router = useRouter();
             </div>
           </div>
 
-          <div className="hero-orbit">
+          <div ref={orbitRef} className="hero-orbit">
             <OrbitHero />
           </div>
         </div>
@@ -324,11 +379,11 @@ export default function HomePage() {  const router = useRouter();
       <section className="fields" id="fields" aria-labelledby="fields-h">
         <div className="fields-inner">
           <div className="fields-head">
-            <div>
+            <Reveal index={0}><div>
               <h2 id="fields-h">{SHOWCASE_IDS.length} fields, ready to blink</h2>
               <p>Every card is real SPHEREx data — two or more visits, same band. Pick one and press play.</p>
-            </div>
-            <Link href="/sky" className="btn">Open the sky map</Link>
+            </div></Reveal>
+            <Reveal index={1}><Link href="/sky" className="btn">Open the sky map</Link></Reveal>
           </div>
           <div className="fields-rail" role="list">
             {fields.map((f) => {
@@ -363,22 +418,22 @@ export default function HomePage() {  const router = useRouter();
 
       <section className="nums" aria-label="By the numbers">
         <div className="nums-inner">
-          <div className="num">
-            <span className="num-n">{real ? real.size.toLocaleString() : '—'}</span>
+          <Reveal index={0}><div className="num">
+            <span className="num-n"><FlickerNumber value={real ? real.size : '—'} /></span>
             <span className="num-l">sky cells measured</span>
-          </div>
-          <div className="num">
-            <span className="num-n">{fields.length ? String(cutouts) : '—'}</span>
+          </div></Reveal>
+          <Reveal index={1}><div className="num">
+            <span className="num-n"><FlickerNumber value={fields.length ? cutouts : '—'} /></span>
             <span className="num-l">epoch cutouts rendered</span>
-          </div>
-          <div className="num">
-            <span className="num-n">{CHANNELS.length}</span>
+          </div></Reveal>
+          <Reveal index={2}><div className="num">
+            <span className="num-n"><FlickerNumber value={CHANNELS.length} /></span>
             <span className="num-l">spectral bands, 0.75–5 µm</span>
-          </div>
-          <div className="num">
-            <span className="num-n">{BANDS.length}</span>
+          </div></Reveal>
+          <Reveal index={3}><div className="num">
+            <span className="num-n"><FlickerNumber value={BANDS.length} /></span>
             <span className="num-l">detectors, same-band blinks</span>
-          </div>
+          </div></Reveal>
         </div>
       </section>
 
@@ -389,41 +444,47 @@ export default function HomePage() {  const router = useRouter();
 
           <ol className="steps">
             <li>
-              <figure className="step-fig">
-                <svg viewBox="0 0 240 150" role="img" aria-label="Two sets of stars, offset slightly, being lined up">
-                  <g fill="#dfe3f2"><circle cx="40" cy="40" r="3" /><circle cx="90" cy="98" r="2.2" /><circle cx="150" cy="52" r="3.2" /><circle cx="196" cy="112" r="2.4" /><circle cx="122" cy="26" r="1.8" /><circle cx="62" cy="118" r="2.6" /></g>
-                  <g fill="none" stroke="#5aa9e6" strokeWidth="1.4"><circle cx="49" cy="46" r="4.6" /><circle cx="99" cy="104" r="4" /><circle cx="159" cy="58" r="4.8" /><circle cx="205" cy="118" r="4.2" /><circle cx="131" cy="32" r="3.6" /><circle cx="71" cy="124" r="4.4" /></g>
-                  <g stroke="rgba(238,240,248,.3)" strokeWidth="1" strokeDasharray="2 3"><path d="M43 42l3 2M92 100l4 3M153 54l4 3M198 113l4 3M124 28l4 3M65 120l4 3" /></g>
-                </svg>
-              </figure>
-              <div className="step-head"><span className="step-n">1</span><h3>Align the passes</h3></div>
-              <p>Each visit to a field is registered to a common pixel grid and background-subtracted.</p>
+              <Reveal index={0}>
+                <figure className="step-fig">
+                  <svg viewBox="0 0 240 150" role="img" aria-label="Two sets of stars, offset slightly, being lined up">
+                    <g fill="#dfe3f2"><circle cx="40" cy="40" r="3" /><circle cx="90" cy="98" r="2.2" /><circle cx="150" cy="52" r="3.2" /><circle cx="196" cy="112" r="2.4" /><circle cx="122" cy="26" r="1.8" /><circle cx="62" cy="118" r="2.6" /></g>
+                    <g fill="none" stroke="#5aa9e6" strokeWidth="1.4"><circle cx="49" cy="46" r="4.6" /><circle cx="99" cy="104" r="4" /><circle cx="159" cy="58" r="4.8" /><circle cx="205" cy="118" r="4.2" /><circle cx="131" cy="32" r="3.6" /><circle cx="71" cy="124" r="4.4" /></g>
+                    <g stroke="rgba(238,240,248,.3)" strokeWidth="1" strokeDasharray="2 3"><path d="M43 42l3 2M92 100l4 3M153 54l4 3M198 113l4 3M124 28l4 3M65 120l4 3" /></g>
+                  </svg>
+                </figure>
+                <div className="step-head"><span className="step-n">1</span><h3>Align the passes</h3></div>
+                <p>Each visit to a field is registered to a common pixel grid and background-subtracted.</p>
+              </Reveal>
             </li>
             <li>
-              <figure className="step-fig">
-                <svg viewBox="0 0 240 150" role="img" aria-label="Faded stars with one bright spot paired with a dark spot">
-                  <g fill="#dfe3f2" opacity=".16"><circle cx="40" cy="40" r="3" /><circle cx="90" cy="98" r="2.2" /><circle cx="150" cy="52" r="3.2" /><circle cx="196" cy="112" r="2.4" /><circle cx="62" cy="118" r="2.6" /></g>
-                  <circle cx="146" cy="70" r="16" fill="#f08a4b" opacity=".22" />
-                  <circle cx="146" cy="70" r="5.5" fill="#fff" />
-                  <circle cx="102" cy="88" r="5.5" fill="#04050a" stroke="rgba(238,240,248,.6)" strokeWidth="1.4" strokeDasharray="3 3" />
-                  <path d="M110 85l28-12" stroke="rgba(238,240,248,.4)" strokeWidth="1.2" strokeDasharray="2 4" />
-                </svg>
-              </figure>
-              <div className="step-head"><span className="step-n">2</span><h3>Subtract one from the other</h3></div>
-              <p>Stationary stars cancel out. A mover leaves a paired bright and dark spot: where it is, and where it was.</p>
+              <Reveal index={1}>
+                <figure className="step-fig">
+                  <svg viewBox="0 0 240 150" role="img" aria-label="Faded stars with one bright spot paired with a dark spot">
+                    <g fill="#dfe3f2" opacity=".16"><circle cx="40" cy="40" r="3" /><circle cx="90" cy="98" r="2.2" /><circle cx="150" cy="52" r="3.2" /><circle cx="196" cy="112" r="2.4" /><circle cx="62" cy="118" r="2.6" /></g>
+                    <circle cx="146" cy="70" r="16" fill="#f08a4b" opacity=".22" />
+                    <circle cx="146" cy="70" r="5.5" fill="#fff" />
+                    <circle cx="102" cy="88" r="5.5" fill="#04050a" stroke="rgba(238,240,248,.6)" strokeWidth="1.4" strokeDasharray="3 3" />
+                    <path d="M110 85l28-12" stroke="rgba(238,240,248,.4)" strokeWidth="1.2" strokeDasharray="2 4" />
+                  </svg>
+                </figure>
+                <div className="step-head"><span className="step-n">2</span><h3>Subtract one from the other</h3></div>
+                <p>Stationary stars cancel out. A mover leaves a paired bright and dark spot: where it is, and where it was.</p>
+              </Reveal>
             </li>
             <li>
-              <figure className="step-fig">
-                <svg viewBox="0 0 240 150" role="img" aria-label="A bright dot inside a dashed circle marking a catalog match radius">
-                  <g fill="#dfe3f2" opacity=".16"><circle cx="40" cy="40" r="3" /><circle cx="190" cy="34" r="2.2" /><circle cx="200" cy="112" r="3" /><circle cx="52" cy="112" r="2.4" /></g>
-                  <circle cx="120" cy="75" r="15" fill="#f08a4b" opacity=".22" />
-                  <circle cx="120" cy="75" r="5" fill="#fff" />
-                  <circle cx="120" cy="75" r="26" fill="none" stroke="#5fcf9a" strokeWidth="1.4" strokeDasharray="4 4" />
-                  <path d="M120 40v9M120 101v9M85 75h9M146 75h9" stroke="rgba(238,240,248,.55)" strokeWidth="1.3" strokeLinecap="round" />
-                </svg>
-              </figure>
-              <div className="step-head"><span className="step-n">3</span><h3>Check the catalogs</h3></div>
-              <p>Every candidate is cross-matched against Gaia stars and known solar-system objects. Anything without a match goes to a person for review.</p>
+              <Reveal index={2}>
+                <figure className="step-fig">
+                  <svg viewBox="0 0 240 150" role="img" aria-label="A bright dot inside a dashed circle marking a catalog match radius">
+                    <g fill="#dfe3f2" opacity=".16"><circle cx="40" cy="40" r="3" /><circle cx="190" cy="34" r="2.2" /><circle cx="200" cy="112" r="3" /><circle cx="52" cy="112" r="2.4" /></g>
+                    <circle cx="120" cy="75" r="15" fill="#f08a4b" opacity=".22" />
+                    <circle cx="120" cy="75" r="5" fill="#fff" />
+                    <circle cx="120" cy="75" r="26" fill="none" stroke="#5fcf9a" strokeWidth="1.4" strokeDasharray="4 4" />
+                    <path d="M120 40v9M120 101v9M85 75h9M146 75h9" stroke="rgba(238,240,248,.55)" strokeWidth="1.3" strokeLinecap="round" />
+                  </svg>
+                </figure>
+                <div className="step-head"><span className="step-n">3</span><h3>Check the catalogs</h3></div>
+                <p>Every candidate is cross-matched against Gaia stars and known solar-system objects. Anything without a match goes to a person for review.</p>
+              </Reveal>
             </li>
           </ol>
 
