@@ -3,16 +3,165 @@
   "title": "Carina Nebula \u2014 massive star factory",
   "ra": 161.26,
   "dec": -59.68,
-  "measured_at": "2026-09-23T13:09:42.412705+00:00",
-  "detail": "pipeline-error: 'NoneType' object has no attribute 'get'",
-  "movers": 0,
-  "variables": 0,
-  "top_sigma": 0.0,
-  "n_epochs": 0,
+  "measured_at": "2026-09-24T01:43:19.957577+00:00",
+  "detail": "ok",
+  "movers": 12,
+  "variables": 24,
+  "top_sigma": 171.2,
+  "n_epochs": 5,
   "span_days": 160.2,
   "variable_flag": false,
   "known": null,
-  "objects": [],
-  "lightcurve": [],
-  "spectrum": []
+  "objects": [
+    {
+      "kind": "variable",
+      "sigma": 171.2,
+      "x": 26.0,
+      "y": 8.0,
+      "label": "Known star"
+    },
+    {
+      "kind": "variable",
+      "sigma": 163.9,
+      "x": 28.0,
+      "y": 16.0,
+      "label": "Known star"
+    },
+    {
+      "kind": "variable",
+      "sigma": 157.8,
+      "x": 25.0,
+      "y": 22.0,
+      "label": "Known star"
+    },
+    {
+      "kind": "variable",
+      "sigma": 150.2,
+      "x": 22.0,
+      "y": 4.0,
+      "label": "Known star"
+    },
+    {
+      "kind": "variable",
+      "sigma": 147.9,
+      "x": 7.0,
+      "y": 8.0,
+      "label": "Known star"
+    },
+    {
+      "kind": "variable",
+      "sigma": 144.6,
+      "x": 5.0,
+      "y": 14.0,
+      "label": "Known star"
+    },
+    {
+      "kind": "variable",
+      "sigma": 144.1,
+      "x": 6.0,
+      "y": 19.0,
+      "label": "Known star"
+    },
+    {
+      "kind": "variable",
+      "sigma": 141.4,
+      "x": 9.0,
+      "y": 23.0,
+      "label": "Known star"
+    },
+    {
+      "kind": "variable",
+      "sigma": 137.6,
+      "x": 18.0,
+      "y": 26.0,
+      "label": "Known star"
+    },
+    {
+      "kind": "variable",
+      "sigma": 125.2,
+      "x": 10.0,
+      "y": 3.0,
+      "label": "Known star"
+    },
+    {
+      "kind": "variable",
+      "sigma": 121.4,
+      "x": 26.0,
+      "y": 4.0,
+      "label": "Known star"
+    },
+    {
+      "kind": "variable",
+      "sigma": 114.6,
+      "x": 22.0,
+      "y": 26.0,
+      "label": "Known star"
+    }
+  ],
+  "lightcurve": [
+    {
+      "mjd": 60844.799208,
+      "flux": 0.0
+    },
+    {
+      "mjd": 61052.028818,
+      "flux": 0.0
+    },
+    {
+      "mjd": 61084.891556,
+      "flux": 0.0
+    },
+    {
+      "mjd": 61198.051041,
+      "flux": 0.0
+    },
+    {
+      "mjd": 61212.238335,
+      "flux": -55.274349212646484
+    }
+  ],
+  "spectrum": [
+    {
+      "band": 1,
+      "wavelength_um": 0.92,
+      "flux": -72.60128784179688,
+      "flux_err": 58.6817500499989,
+      "mjd": 61045.103299
+    },
+    {
+      "band": 2,
+      "wavelength_um": 1.36,
+      "flux": 0.0,
+      "flux_err": 63.489437876546404,
+      "mjd": 61041.982693
+    },
+    {
+      "band": 3,
+      "wavelength_um": 2.02,
+      "flux": -55.274349212646484,
+      "flux_err": 60.40783347327637,
+      "mjd": 61212.238335
+    },
+    {
+      "band": 4,
+      "wavelength_um": 3.12,
+      "flux": 0.0,
+      "flux_err": 0.0,
+      "mjd": 61216.239639
+    },
+    {
+      "band": 5,
+      "wavelength_um": 4.12,
+      "flux": 0.0,
+      "flux_err": 0.0,
+      "mjd": 61045.918728
+    },
+    {
+      "band": 6,
+      "wavelength_um": 4.71,
+      "flux": 0.0,
+      "flux_err": 0.0,
+      "mjd": 61194.178994
+    }
+  ]
 }

@@ -3,16 +3,165 @@
   "title": "Dorado Deep Field \u2014 southern stare",
   "ra": 92.5,
   "dec": -57.5,
-  "measured_at": "2026-09-23T14:04:23.246646+00:00",
-  "detail": "pipeline-error: 'NoneType' object has no attribute 'get'",
-  "movers": 0,
-  "variables": 0,
-  "top_sigma": 0.0,
-  "n_epochs": 0,
+  "measured_at": "2026-09-24T03:20:14.124724+00:00",
+  "detail": "ok",
+  "movers": 1,
+  "variables": 18,
+  "top_sigma": 27.5,
+  "n_epochs": 5,
   "span_days": 35.9,
   "variable_flag": false,
   "known": null,
-  "objects": [],
-  "lightcurve": [],
-  "spectrum": []
+  "objects": [
+    {
+      "kind": "mover",
+      "sigma": 27.5,
+      "x": 20.5,
+      "y": 26.5,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "variable",
+      "sigma": 11.6,
+      "x": 9.0,
+      "y": 3.0,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "variable",
+      "sigma": 11.4,
+      "x": 3.0,
+      "y": 27.0,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "variable",
+      "sigma": 11.0,
+      "x": 3.0,
+      "y": 22.0,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "variable",
+      "sigma": 9.5,
+      "x": 9.0,
+      "y": 11.0,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "variable",
+      "sigma": 8.6,
+      "x": 17.0,
+      "y": 21.0,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "variable",
+      "sigma": 8.5,
+      "x": 25.0,
+      "y": 14.0,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "variable",
+      "sigma": 8.4,
+      "x": 17.0,
+      "y": 7.0,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "variable",
+      "sigma": 7.4,
+      "x": 23.0,
+      "y": 0.0,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "variable",
+      "sigma": 7.4,
+      "x": 28.0,
+      "y": 24.0,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "variable",
+      "sigma": 7.4,
+      "x": 24.0,
+      "y": 20.0,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "variable",
+      "sigma": 6.6,
+      "x": 5.0,
+      "y": 0.0,
+      "label": "Unidentified \u2013 possible discovery"
+    }
+  ],
+  "lightcurve": [
+    {
+      "mjd": 60951.190088,
+      "flux": 0.03970199078321457
+    },
+    {
+      "mjd": 60953.160308,
+      "flux": 0.4007769152522087
+    },
+    {
+      "mjd": 60961.175476,
+      "flux": 0.21039734035730362
+    },
+    {
+      "mjd": 60988.874517,
+      "flux": 0.14599550515413284
+    },
+    {
+      "mjd": 61056.16462,
+      "flux": 0.25324828177690506
+    }
+  ],
+  "spectrum": [
+    {
+      "band": 1,
+      "wavelength_um": 0.92,
+      "flux": 0.05988618731498718,
+      "flux_err": 0.2318601846811642,
+      "mjd": 60885.706218
+    },
+    {
+      "band": 2,
+      "wavelength_um": 1.36,
+      "flux": 0.19759680330753326,
+      "flux_err": 0.27816747500091543,
+      "mjd": 61097.107082
+    },
+    {
+      "band": 3,
+      "wavelength_um": 2.02,
+      "flux": 0.25324828177690506,
+      "flux_err": 0.18190315436647772,
+      "mjd": 61056.16462
+    },
+    {
+      "band": 4,
+      "wavelength_um": 3.12,
+      "flux": 0.3350882865488529,
+      "flux_err": 0.13853471695733596,
+      "mjd": 60885.706218
+    },
+    {
+      "band": 5,
+      "wavelength_um": 4.12,
+      "flux": 0.11788162961602211,
+      "flux_err": 0.20399633881360424,
+      "mjd": 61104.437908
+    },
+    {
+      "band": 6,
+      "wavelength_um": 4.71,
+      "flux": 0.1632506549358368,
+      "flux_err": 0.4294621517788694,
+      "mjd": 61056.163128
+    }
+  ]
 }

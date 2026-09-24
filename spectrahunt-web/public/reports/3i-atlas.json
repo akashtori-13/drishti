@@ -3,12 +3,12 @@
   "title": "3I/ATLAS \u2014 interstellar comet, Aug vs Dec 2025",
   "ra": 252.6633,
   "dec": -17.4904,
-  "measured_at": "2026-09-23T15:06:15.902836+00:00",
-  "detail": "pipeline-error: 'NoneType' object has no attribute 'get'",
-  "movers": 0,
-  "variables": 0,
-  "top_sigma": 0.0,
-  "n_epochs": 0,
+  "measured_at": "2026-09-24T01:16:32.067650+00:00",
+  "detail": "ok",
+  "movers": 13,
+  "variables": 9,
+  "top_sigma": 143.4,
+  "n_epochs": 5,
   "span_days": 135.1,
   "variable_flag": false,
   "known": {
@@ -16,7 +16,156 @@
     "kind": "interstellar comet",
     "citation": "Lisse et al. RNAAS 9:242; SPHEREx obscore_3I_Atlas.vot"
   },
-  "objects": [],
-  "lightcurve": [],
-  "spectrum": []
+  "objects": [
+    {
+      "kind": "mover",
+      "sigma": 143.4,
+      "x": 10.0,
+      "y": 25.0,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "mover",
+      "sigma": 26.6,
+      "x": 16.0,
+      "y": 25.5,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "mover",
+      "sigma": 26.1,
+      "x": 10.0,
+      "y": 4.5,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "mover",
+      "sigma": 24.6,
+      "x": 20.0,
+      "y": 11.5,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "mover",
+      "sigma": 24.2,
+      "x": 11.5,
+      "y": 9.5,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "mover",
+      "sigma": 15.1,
+      "x": 24.0,
+      "y": 4.5,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "mover",
+      "sigma": 14.2,
+      "x": 2.0,
+      "y": 1.5,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "mover",
+      "sigma": 12.2,
+      "x": 10.5,
+      "y": 19.0,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "mover",
+      "sigma": 10.1,
+      "x": 11.0,
+      "y": 11.0,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "mover",
+      "sigma": 9.7,
+      "x": 22.5,
+      "y": 24.5,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "mover",
+      "sigma": 9.2,
+      "x": 2.0,
+      "y": 25.5,
+      "label": "Unidentified \u2013 possible discovery"
+    },
+    {
+      "kind": "mover",
+      "sigma": 7.9,
+      "x": 2.5,
+      "y": 14.5,
+      "label": "Unidentified \u2013 possible discovery"
+    }
+  ],
+  "lightcurve": [
+    {
+      "mjd": 60888.33344,
+      "flux": 3.2895868569612503
+    },
+    {
+      "mjd": 60898.456487,
+      "flux": 4.107525199651718
+    },
+    {
+      "mjd": 60901.104014,
+      "flux": 3.0544171929359436
+    },
+    {
+      "mjd": 61106.018418,
+      "flux": 3.30228328704834
+    },
+    {
+      "mjd": 61112.604449,
+      "flux": 4.297384470701218
+    }
+  ],
+  "spectrum": [
+    {
+      "band": 1,
+      "wavelength_um": 0.92,
+      "flux": 0.8839185982942581,
+      "flux_err": 3.1266256515115147,
+      "mjd": 61104.726712
+    },
+    {
+      "band": 2,
+      "wavelength_um": 1.36,
+      "flux": 3.0375034511089325,
+      "flux_err": 3.550481461654223,
+      "mjd": 61259.333673
+    },
+    {
+      "band": 3,
+      "wavelength_um": 2.02,
+      "flux": 4.297384470701218,
+      "flux_err": 3.901506252599151,
+      "mjd": 61112.604449
+    },
+    {
+      "band": 4,
+      "wavelength_um": 3.12,
+      "flux": 1.6047274619340897,
+      "flux_err": 1.4981982416211679,
+      "mjd": 61104.726712
+    },
+    {
+      "band": 5,
+      "wavelength_um": 4.12,
+      "flux": 0.9284972250461578,
+      "flux_err": 0.9080356664127853,
+      "mjd": 61259.335165
+    },
+    {
+      "band": 6,
+      "wavelength_um": 4.71,
+      "flux": 0.6341693997383118,
+      "flux_err": 0.7199606194039081,
+      "mjd": 61112.604449
+    }
+  ]
 }

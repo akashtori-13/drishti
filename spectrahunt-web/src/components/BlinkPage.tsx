@@ -438,6 +438,7 @@ export default function BlinkPage({ id }: { id: string }) {
               onToggleMarkers={() => setShowMarkers(!showMarkers)}
               onSample={setSample}
               center={{ ra: viewing.ra, dec: viewing.dec }}
+              knownNames={skybot?.map((m) => m.name) ?? []}
               onStats={setDetStats}
               bandPngs={Object.fromEntries(
                 Object.entries(viewing.bands ?? {}).map(([k, b]) => [Number(k), b.png ?? null]),
