@@ -309,6 +309,11 @@ main:focus{outline:none;}
      carries the centering transform so it never jumps sideways. */
   .island .menu-sheet{position:absolute; top:auto; bottom:calc(100% + 8px); left:50%; right:auto;
     transform:translateX(-50%); width:calc(100vw - 32px);
+    /* overlay needs its own glass: nothing blurred behind it out here.
+       Near-opaque so busy page content cannot ghost through. */
+    background:rgba(11,13,24,.97); border-color:var(--line-strong);
+    -webkit-backdrop-filter:blur(24px); backdrop-filter:blur(24px);
+    box-shadow:0 30px 70px -10px rgba(0,0,0,.85);
     /* fit all rows without inner scroll; only scroll past real space */
     max-height:calc(100dvh - 96px - env(safe-area-inset-bottom,0px));
     animation-name:menu-in-m;}
@@ -1131,8 +1136,8 @@ body::after {
 .pv-cta-box{border:1px solid var(--line-strong); border-radius:16px; padding:16px;
   background:linear-gradient(135deg, rgba(124,131,253,.12), rgba(79,201,168,.08));
   display:flex; flex-direction:column; gap:12px;}
-.pv-cta-box .fine{margin:0;}
-.pv-cta-box .pv-cta{margin-top:0;}
+.pv-cta-box .fine{margin:0; font-size:.8125rem; line-height:1.5; color:var(--ink-3);}
+.pv-cta-box .pv-cta{margin-top:0; white-space:nowrap; font-size:.875rem;}
 .pv-side .fine{margin:0;}
 .pv-loading{aspect-ratio:16/10; min-height:320px; margin:24px; border-radius:14px;
   background:linear-gradient(100deg,rgba(255,255,255,.04) 40%,rgba(255,255,255,.1) 50%,rgba(255,255,255,.04) 60%);
