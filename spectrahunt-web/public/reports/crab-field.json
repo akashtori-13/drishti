@@ -3,23 +3,16 @@
   "title": "Crab Nebula \u2014 supernova remnant",
   "ra": 83.63,
   "dec": 22.01,
-  "measured_at": "2026-09-21T23:21:43.868270+00:00",
-  "detail": "ok",
-  "movers": 6,
-  "variables": 20,
-  "top_sigma": 33.7,
+  "measured_at": "2026-09-23T13:38:32.515140+00:00",
+  "detail": "pipeline-error: 'NoneType' object has no attribute 'get'",
+  "movers": 0,
+  "variables": 0,
+  "top_sigma": 0.0,
   "n_epochs": 0,
-  "span_days": null,
+  "span_days": 170.0,
   "variable_flag": false,
   "known": null,
+  "objects": [],
   "lightcurve": [],
-  "spectrum": [
-    {
-      "band": 2,
-      "wavelength_um": 1.36,
-      "flux": 66.66595125198364,
-      "flux_err": 12.768193524525088,
-      "mjd": 61112.223409
-    }
-  ]
+  "spectrum": []
 }

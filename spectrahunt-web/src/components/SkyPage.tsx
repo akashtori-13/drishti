@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { blinkURL } from '@/lib/store';
+import { useAppStore } from '@/lib/store';
 import { LEVEL_COLORS } from '@/lib/sky';
 import { buildGrid, GRID_H, GRID_W } from '@/lib/sky';
 import { getCoverage, type RealCell } from '@/lib/showcases';
@@ -12,41 +12,8 @@ import SearchBox, { type SearchTarget } from '@/components/SearchBox';
 import SurpriseButton from '@/components/SurpriseButton';
 import Inspector, { type InspectorField } from '@/components/Inspector';
 import type { SkyHover } from '@/components/HeroSky';
-import { fmtDec, fmtRa } from '@/lib/sky';
+import { fmtDec, fmtRa, nearestShowcase } from '@/lib/sky';
 import { useLive } from '@/lib/showcases';
-
-const SHOWCASE_POINTS = [
-  { id: '3i-atlas', ra: 252.6633, dec: -17.4904 },
-  { id: 'ecliptic-mover', ra: 180, dec: 0 },
-  { id: 'nep-deep', ra: 270, dec: 66.5 },
-  { id: 'orion-field', ra: 83.82, dec: -5.39 },
-  { id: 'galactic-center', ra: 266.42, dec: -29.01 },
-  { id: 'm31-field', ra: 10.68, dec: 41.27 },
-  { id: 'lmc-field', ra: 80.89, dec: -69.76 },
-  { id: 'virgo-field', ra: 200, dec: 0 },
-  { id: 'eros-field', ra: 210.32, dec: 9.11 },
-  { id: 'crab-field', ra: 83.63, dec: 22.01 },
-  { id: 'omega-cen-field', ra: 201.69, dec: -47.48 },
-  { id: 'carina-field', ra: 161.26, dec: -59.68 },
-  { id: 'm51-field', ra: 202.47, dec: 47.2 },
-  { id: 'm101-field', ra: 210.8, dec: 54.35 },
-  { id: 'smc-field', ra: 13.18, dec: -72.83 },
-  { id: 'dorado-deep', ra: 92.5, dec: -57.5 },
-  { id: 'draco-field', ra: 267.5, dec: 57.5 },
-  { id: 'ophiuchus-field', ra: 247.5, dec: -7.5 },
-  { id: 'libra-field', ra: 212.5, dec: -2.5 },
-  { id: 'hercules-field', ra: 252.5, dec: 12.5 },
-];
-
-function nearestShowcase(ra: number, dec: number): string | null {
-  let best: string | null = null;
-  let bestD = 3.0;
-  for (const s of SHOWCASE_POINTS) {
-    const d = Math.hypot(s.ra - ra, s.dec - dec);
-    if (d < bestD) { bestD = d; best = s.id; }
-  }
-  return best;
-}
 
 function fieldFromRaDec(ra: number, dec: number, grid: number[][], real?: Map<string, RealCell>): InspectorField {
   const i = Math.min(GRID_W - 1, Math.max(0, Math.floor((ra / 360) * GRID_W)));
@@ -73,6 +40,7 @@ function fieldFromRaDec(ra: number, dec: number, grid: number[][], real?: Map<st
 /** Full-page sky map view: search tools, coverage canvas, legend, inspector. */
 export default function SkyPage() {
   const router = useRouter();
+  const openPreview = useAppStore((s) => s.openPreview);
   const grid = useMemo(() => {
     const g = buildGrid();
     return g;
@@ -84,8 +52,55 @@ export default function SkyPage() {
   const [field, setField] = useState<InspectorField | null>(null);
   const [focus, setFocus] = useState<StelFocus | null>(null);
   const [real, setReal] = useState<Map<string, RealCell> | null>(null);
+  // Observer<->All-sky crossfade: `shown` (rendered view) lags `observer`
+  // (target) through a fade-out / swap / fade-in. Consumes the motion tokens
+  // with local fallbacks until the shared .xfade class lands in globals.css.
+  const [shown, setShown] = useState(true);
+  const [fading, setFading] = useState(false);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const swapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wantFocus = useRef(false);
+  const reduced = useMemo(
+    () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    [],
+  );
+  useEffect(() => () => {
+    if (swapTimer.current) clearTimeout(swapTimer.current);
+  }, []);
+  // focus continuity: if focus was inside the sky stage at swap time, carry it
+  // to the incoming canvas once mounted.
+  useEffect(() => {
+    if (wantFocus.current) {
+      wantFocus.current = false;
+      stageRef.current?.querySelector('canvas')?.focus();
+    }
+  }, [shown]);
+  const setView = (next: boolean) => {
+    if (next === observer) return;
+    if (swapTimer.current) clearTimeout(swapTimer.current);
+    // sel continuity: arriving in Observer centers it on the map selection
+    if (next && sel) setFocus({ ra: sel.ra, dec: sel.dec, key: Date.now() });
+    wantFocus.current = !!stageRef.current?.contains(document.activeElement);
+    setObserver(next);
+    if (reduced) {
+      setShown(next); // instant cut under reduced motion
+      return;
+    }
+    setFading(true);
+    swapTimer.current = setTimeout(() => {
+      setShown(next);
+      requestAnimationFrame(() => requestAnimationFrame(() => setFading(false)));
+    }, 220);
+  };
 
-  // cross-page jump target (from the command bar): focus + inspect on arrival
+  // inspector selection (declared before effects: the arrival-target effect calls it)
+  const inspect = (ra: number, dec: number) => {
+    setSel({ nx: ra / 360, ny: (90 - dec) / 180, ra, dec });
+    setField(fieldFromRaDec(ra, dec, grid, real ?? undefined));
+  };
+
+  // cross-page jump target (from the command bar): focus marker on arrival.
+  // The inspector panel opens only on map taps, never on arrival.
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem('sh-target');
@@ -95,10 +110,9 @@ export default function SkyPage() {
       if (Number.isFinite(t.ra) && Number.isFinite(t.dec)) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setFocus({ ra: t.ra, dec: t.dec, key: Date.now() });
-        inspect(t.ra, t.dec);
+        setSel({ nx: t.ra / 360, ny: (90 - t.dec) / 180, ra: t.ra, dec: t.dec });
       }
     } catch { /* noop */ }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -116,35 +130,44 @@ export default function SkyPage() {
     return () => { alive = false; };
   }, [grid]);
 
-  const inspect = (ra: number, dec: number) => {
-    setSel({ nx: ra / 360, ny: (90 - dec) / 180, ra, dec });
-    setField(fieldFromRaDec(ra, dec, grid, real ?? undefined));
-  };
-
   const pick = (t: SearchTarget) => {
-    if (t.showcaseId) { router.push(blinkURL(t.showcaseId)); return; }
+    if (t.showcaseId) { openPreview(t.showcaseId); return; }
+    const near = nearestShowcase(t.ra, t.dec);
+    if (near) { openPreview(near); return; }
+    // search arrivals focus the map only — the inspector panel belongs to
+    // map clicks, so it stays closed until the user taps the sky itself
     if (observer) setFocus({ ra: t.ra, dec: t.dec, key: Date.now() });
-    inspect(t.ra, t.dec);
+    setSel({ nx: t.ra / 360, ny: (90 - t.dec) / 180, ra: t.ra, dec: t.dec });
   };
 
   return (
     <div id="view-sky">
       <h1 className="sr-only">Sky map</h1>
-      {observer ? (
-        <StellariumView
-          focus={focus}
-          onInspect={inspect}
-          initial={{ ra: 83.8, dec: -5.4 }}
-          liveStars={useLive}
-        />
-      ) : (
-        <CoverageMap
-          grid={grid} coverage={coverage} selected={sel}
-          onHover={setHover}
-          onInspect={inspect}
-        />
-      )}
-      {!observer && (
+      <div
+        ref={stageRef}
+        className="xfade"
+        style={{
+          position: 'absolute', inset: 0,
+          opacity: fading ? 0 : 1,
+          transition: reduced ? 'none' : 'opacity var(--dur-ui, 220ms) var(--ease-out, cubic-bezier(.23,1,.32,1))',
+        }}
+      >
+        {shown ? (
+          <StellariumView
+            focus={focus}
+            onInspect={inspect}
+            initial={{ ra: 83.8, dec: -5.4 }}
+            liveStars={useLive}
+          />
+        ) : (
+          <CoverageMap
+            grid={grid} coverage={coverage} selected={sel}
+            onHover={setHover}
+            onInspect={inspect}
+          />
+        )}
+      </div>
+      {!shown && (
         <>
           {/* compass + FOV indicator overlays */}
           <div aria-hidden="true" style={{ position: 'absolute', top: 'calc(var(--nav-total) + 170px)', right: 18, zIndex: 5, width: 56, height: 56, borderRadius: '50%', background: 'rgba(5,6,12,.78)', border: '1px solid var(--line)', display: 'grid', placeItems: 'center', fontSize: 12, color: '#eef0f8', fontFamily: 'monospace' }}>
@@ -166,11 +189,11 @@ export default function SkyPage() {
         </div>
         <div className="tool-row">
           <div className="segment" role="group" aria-label="Sky view">
-            <button type="button" aria-pressed={observer} onClick={() => setObserver(true)}>Observer</button>
-            <button type="button" aria-pressed={!observer} onClick={() => setObserver(false)}>All-sky map</button>
+            <button type="button" className={observer ? 'active' : ''} aria-pressed={observer} onClick={() => setView(true)}>Observer</button>
+            <button type="button" className={!observer ? 'active' : ''} aria-pressed={!observer} onClick={() => setView(false)}>All-sky map</button>
           </div>
         </div>
-        {!observer && (
+        {!shown && (
           <div className="tool-row">
             <span id="covLabel">Coverage overlay</span>
             <button
@@ -179,12 +202,12 @@ export default function SkyPage() {
             />
           </div>
         )}
-        <p className="map-help">{observer
+        <p className="map-help">{shown
           ? 'Drag to look around, scroll to zoom. Click any point to inspect its SPHEREx visits.'
           : 'Click any field to see how many times SPHEREx has visited it and whether anything moved.'}</p>
       </div>
 
-      {!observer && (
+      {!shown && (
         <div className="map-bar glass">
           <div className="legend">
             <span>Epochs observed</span>
@@ -195,7 +218,7 @@ export default function SkyPage() {
             </span>
             <span>1 to 5+</span>
             <span className="sep" aria-hidden="true" />
-            <span title="Asteroids stream through the ecliptic band" style={{ color: '#e8c34a' }}>◆ ecliptic</span>
+            <span title="Approximate ecliptic search zone — the dashed gold curve on the map is the true plane" style={{ color: '#e8c34a' }}>◆ ecliptic</span>
           </div>
           <span className="sep" aria-hidden="true" />
           <span className="mono" id="skyReadout" aria-hidden="true">
@@ -210,7 +233,7 @@ export default function SkyPage() {
         onOpenBlink={() => {
           if (field) {
             const id = nearestShowcase(field.ra, field.dec);
-            if (id) router.push(blinkURL(id));
+            if (id) openPreview(id);
             else if (useLive && field.epochs >= 2) router.push(`/blink/live?ra=${field.ra.toFixed(3)}&dec=${field.dec.toFixed(3)}&band=3`);
           }
           setField(null);

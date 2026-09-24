@@ -4,24 +4,30 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Header from '@/components/Header';
 import Tutorial from '@/components/Tutorial';
+import ArtifactPreview from '@/components/ArtifactPreview';
+import { useAppStore } from '@/lib/store';
 
 /** Site chrome: nav + footer on every real page (footer hidden on fullscreen sky). */
 export default function SiteChrome({ children, showTutorial = false }: { children: React.ReactNode; showTutorial?: boolean }) {
   const pathname = usePathname();
+  const openPreview = useAppStore((s) => s.openPreview);
   const isSky = pathname === '/sky';
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen relative">
       <a className="skip" href="#main">Skip to content</a>
       <Header />
       {showTutorial && <Tutorial />}
+      <ArtifactPreview />
       <main id="main" tabIndex={-1} className="flex-1">
-        {children}
+        <div key={pathname} className="xfade xfade-route">
+          {children}
+        </div>
       </main>
       {!isSky && (
         <footer className="site-foot">
           <div className="foot-inner">
             <div className="foot-brand">
-              <span className="brand-name">SpectraHunt</span>
+              <span className="brand-name">STELLAR</span>
               <p className="foot-note">A public blink comparator for the SPHEREx sky. NASA Space Apps Challenge 2026.</p>
             </div>
             <nav className="foot-cols" aria-label="Footer">
@@ -29,7 +35,7 @@ export default function SiteChrome({ children, showTutorial = false }: { childre
                 <span className="foot-h">Explore</span>
                 <Link href="/sky">Sky map</Link>
                 <Link href="/candidates">Candidates</Link>
-                <Link href="/blink/3i-atlas">3I/ATLAS blink</Link>
+                <button type="button" className="linklike" onClick={() => openPreview('3i-atlas')}>3I/ATLAS blink</button>
               </div>
               <div className="foot-col">
                 <span className="foot-h">Learn</span>

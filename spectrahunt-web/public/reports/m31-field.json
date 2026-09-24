@@ -1,0 +1,81 @@
+{
+  "id": "m31-field",
+  "title": "Andromeda Galaxy \u2014 next door",
+  "ra": 10.68,
+  "dec": 41.27,
+  "measured_at": "2026-09-22T22:34:48.685925+00:00",
+  "detail": "ok",
+  "movers": 8,
+  "variables": 35,
+  "top_sigma": 110.8,
+  "n_epochs": 5,
+  "span_days": 366.1,
+  "variable_flag": false,
+  "known": null,
+  "lightcurve": [
+    {
+      "mjd": 60874.312391,
+      "flux": 0.0
+    },
+    {
+      "mjd": 60877.918993,
+      "flux": 0.0
+    },
+    {
+      "mjd": 61028.776824,
+      "flux": 0.0
+    },
+    {
+      "mjd": 61240.234887,
+      "flux": 0.0
+    },
+    {
+      "mjd": 61243.836178,
+      "flux": 0.0
+    }
+  ],
+  "spectrum": [
+    {
+      "band": 1,
+      "wavelength_um": 0.92,
+      "flux": -202.28841018676758,
+      "flux_err": 60.94804693166728,
+      "mjd": 61231.748984
+    },
+    {
+      "band": 2,
+      "wavelength_um": 1.36,
+      "flux": 0.0,
+      "flux_err": 37.96324515207735,
+      "mjd": 61235.894077
+    },
+    {
+      "band": 3,
+      "wavelength_um": 2.02,
+      "flux": 0.0,
+      "flux_err": 42.27809145036867,
+      "mjd": 61243.836178
+    },
+    {
+      "band": 4,
+      "wavelength_um": 3.12,
+      "flux": -198.1803436279297,
+      "flux_err": 34.46438822617621,
+      "mjd": 61231.748984
+    },
+    {
+      "band": 5,
+      "wavelength_um": 4.12,
+      "flux": 1231.6872634887695,
+      "flux_err": 38.422089113516876,
+      "mjd": 61236.300042
+    },
+    {
+      "band": 6,
+      "wavelength_um": 4.71,
+      "flux": 762.4608268737793,
+      "flux_err": 26.581313842635037,
+      "mjd": 61243.836178
+    }
+  ]
+}

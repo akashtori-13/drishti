@@ -1,11 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import Icon from '@/components/Icon';
 import SpectrumPlot from '@/components/Plots';
 import { BANDS } from '@/lib/sky';
 import { CHANNELS, applyStretch, colormap, type Colormap, type Stretch } from '@/lib/astro';
 import { detectMotion, sampleGray, type MotionCandidate } from '@/lib/motion';
+import { loadCachedImage } from '@/lib/skycache';
 
 export interface BlinkFrame {
   label: string;
@@ -17,14 +18,17 @@ export interface BlinkFrame {
 
 export type CompareMode = 'blink' | 'side' | 'swipe' | 'diff';
 
-/** Load an image element with CORS-clean pixels for canvas sampling. */
-function loadImage(src: string): Promise<HTMLImageElement> {
+/** Load an image through the device cache (memory → IndexedDB → network).
+ * First visit fetches from the web; every later visit serves cache and never
+ * touches the network for that URL. Bounded by `timeoutMs` (a late arrival
+ * still warms the cache in the background for next time). */
+function loadImage(src: string, timeoutMs = 20000): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error(`Cannot load ${src}`));
-    img.src = src;
+    const timer = setTimeout(() => reject(new Error(`Timed out loading ${src}`)), timeoutMs);
+    void loadCachedImage(src).then(
+      (img) => { clearTimeout(timer); resolve(img); },
+      (e: unknown) => { clearTimeout(timer); reject(e instanceof Error ? e : new Error(`Cannot load ${src}`)); },
+    );
   });
 }
 
@@ -114,6 +118,20 @@ export default function BlinkComparator({
   const [sideHover, setSideHover] = useState<{ x: number; y: number; a: number; b: number } | null>(null);
   const [measureChip, setMeasureChip] = useState<{ x: number; y: number; lum: number; label: string } | null>(null);
 
+  // Reset per-frame measurement when the frame set actually changes (effect
+  // boundary — never setState during render: `frames` gets a fresh identity
+  // on every parent render, so this only fires when PNG contents change).
+  const [framesSig, setFramesSig] = useState<string | null>(null);
+  const nextSig = frames.map((f) => f.png ?? '').join('|');
+  useEffect(() => {
+    if (framesSig !== nextSig) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setFramesSig(nextSig);
+      setSpecVals(null);
+      setMeasureChip(null);
+    }
+  }, [framesSig, nextSig]);
+
   const mainRef = useRef<HTMLCanvasElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const [sizeTick, setSizeTick] = useState(0);
@@ -122,35 +140,126 @@ export default function BlinkComparator({
   const histRef = useRef<HTMLCanvasElement>(null);
   const diffStatRef = useRef<HTMLSpanElement>(null);
   const drag = useRef<{ x: number; y: number; pan: { x: number; y: number }; moved: boolean } | null>(null);
+  // Orbital `suppressClick` pattern: a pointer travel past the drag
+  // hysteresis is a pan, never a tap — the trailing click must not sample.
+  const suppressClick = useRef(false);
+  // Scratch-canvas pool: cover-fit staging reuses canvases across renders
+  // (zero per-frame allocation) instead of `document.createElement` churn.
+  const scratchPool = useRef<HTMLCanvasElement[]>([]);
+  const sampleScratch = useRef<HTMLCanvasElement | null>(null);
+  const getScratch = useCallback((slot: number, w: number, h: number): HTMLCanvasElement => {
+    let c = scratchPool.current[slot];
+    if (!c) { c = document.createElement('canvas'); scratchPool.current[slot] = c; }
+    if (c.width !== w || c.height !== h) { c.width = w; c.height = h; }
+    return c;
+  }, []);
   const panRaf = useRef(0);
   const panPending = useRef<{ x: number; y: number } | null>(null);
   const probeSrc = useRef<{ img: HTMLImageElement; w: number; h: number } | null>(null);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // preload frames progressively (each arrival re-renders; no blank wait).
-  // The cache is NEVER cleared: cached URLs stay instantly available and only
-  // genuinely new frames show a loading state (no placeholder flash).
-  const startedLoads = useRef(new Set<string>());
+  // staged preloading that heals itself (the project norm: preview first,
+  // refine after). A pump reconciles desired-vs-actual on EVERY render: any
+  // frame URL that is neither loaded, failed, nor in flight gets started —
+  // current pair first, one new start per pump, ~350ms apart so IBE renders
+  // don't thunder the archive. Timer chains, generation counters, and
+  // started-sets all proved fragile across autoplay re-renders, StrictMode
+  // remounts, and HMR swaps (frames stranded at 1/5 with zero errors); this
+  // converges under all of them because it never assumes past scheduling
+  // happened. Failed loads auto-retry with backoff (3 attempts); exhausted
+  // URLs land in `failed` and render a Retry affordance.
+  const MAX_FRAME_ATTEMPTS = 3;
+  const [failed, setFailed] = useState<Record<string, true>>({});
+  const inflight = useRef(new Set<string>());
+  const lastStart = useRef(0);
+  const retryTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  // Refs survive hot-module swaps positionally: an older loader revision's
+  // ref objects can land in these slots (stale in-flight marks, a string
+  // timestamp). Reset + validate on mount so no past revision can wedge the
+  // pump. Declared before the pump so it runs first. (A duplicate start from
+  // a dropped mark is harmless: loaded/failed guards dedupe on settle.)
   useEffect(() => {
-    let alive = true;
-    const urls = [...new Set(frames.map((f) => f.png).filter((u): u is string => !!u))];
-    for (const u of urls) {
-      if (startedLoads.current.has(u)) continue;
-      startedLoads.current.add(u);
+    inflight.current = new Set<string>();
+    if (typeof lastStart.current !== 'number') lastStart.current = 0;
+    if (!Array.isArray(retryTimers.current)) retryTimers.current = [];
+  }, []);
+  useEffect(() => () => {
+    retryTimers.current.forEach(clearTimeout);
+    retryTimers.current = [];
+  }, []);
+  const loadFrame = useCallback((u: string, attempt = 1) => {
+    if (inflight.current.has(u)) return;
+    inflight.current.add(u);
+    const attemptLoad = (a: number): void => {
       void loadImage(u).then((img) => {
-        if (alive) setLoaded((m) => (m[u] ? m : { ...m, [u]: img }));
-      }).catch(() => undefined);
-    }
-    setSpecVals(null);
-    setMeasureChip(null);
-    return () => { alive = false; };
-  }, [frames]);
+        inflight.current.delete(u);
+        setLoaded((m) => (m[u] ? m : { ...m, [u]: img }));
+        setFailed((m) => {
+          if (!(u in m)) return m;
+          const next = { ...m };
+          delete next[u];
+          return next;
+        });
+      }).catch(() => {
+        if (a < MAX_FRAME_ATTEMPTS) {
+          const t = setTimeout(() => attemptLoad(a + 1), a * 1000);
+          retryTimers.current.push(t);
+        } else {
+          inflight.current.delete(u);
+          setFailed((m) => (m[u] ? m : { ...m, [u]: true }));
+          console.warn(`[blink] frame failed to load after ${a} attempts: ${u}`);
+        }
+      });
+    };
+    attemptLoad(attempt);
+  }, []);
+  const retryUrl = useCallback((u: string) => {
+    setFailed((m) => {
+      if (!(u in m)) return m;
+      const next = { ...m };
+      delete next[u];
+      return next;
+    });
+    loadFrame(u, 1);
+  }, [loadFrame]);
+  // pump on every render + a heartbeat for settled pages (autoplay ticks
+  // re-render constantly; a paused static page relies on the interval).
+  // Local showcase PNGs all start at once (same-origin, instant); live
+  // /api/frame.png renders stay throttled so IBE isn't thundered.
+  useEffect(() => {
+    const pump = () => {
+      if (document.hidden) return; // visibility pause: heartbeat skips while hidden
+      const urls = [...new Set(frames.map((f) => f.png).filter((u): u is string => !!u))];
+      const ordered = [frames[idx]?.png, n ? frames[(idx - 1 + n) % n]?.png : undefined, ...urls];
+      const now = Date.now();
+      let remoteStarted = false;
+      for (const u of ordered) {
+        if (!u || loaded[u] || failed[u] || inflight.current.has(u)) continue;
+        if (u.includes('/api/')) {
+          if (remoteStarted || now - lastStart.current < 350) continue;
+          remoteStarted = true;
+          lastStart.current = now;
+        }
+        loadFrame(u, 1);
+      }
+    };
+    pump();
+    const t = setInterval(pump, 350);
+    return () => clearInterval(t);
+  });
 
-  // preload band PNGs for true false-color
+  // preload band PNGs for true false-color (one retry; still silent-graceful:
+  // false color simply stays disabled until they arrive)
   useEffect(() => {
     let alive = true;
     const urls = [...new Set(Object.values(bandPngs ?? {}).filter((u): u is string => !!u))];
-    void Promise.all(urls.map((u) => loadImage(u).then((img) => ({ u, img })).catch(() => null))).then((arr) => {
+    const load = (u: string, attempt = 1): Promise<{ u: string; img: HTMLImageElement } | null> =>
+      loadImage(u).then((img) => ({ u, img })).catch(() => {
+        if (attempt < 2) return load(u, attempt + 1);
+        console.warn(`[blink] band image failed to load: ${u}`);
+        return null;
+      });
+    void Promise.all(urls.map((u) => load(u))).then((arr) => {
       if (!alive) return;
       const map: Record<string, HTMLImageElement> = {};
       for (const e of arr) if (e) map[e.u] = e.img;
@@ -159,12 +268,29 @@ export default function BlinkComparator({
     return () => { alive = false; };
   }, [bandPngs]);
 
+  // autoplay rides only decoded frames: stepping onto a pending/failed frame
+  // would flash "loading" or "cutout pending" mid-blink. Manual transport
+  // (steps, scrub, filmstrip) keeps full agency and shows each frame's state.
+  const availIdx = useMemo(
+    () => frames.map((f, i) => (f.png && loaded[f.png] ? i : -1)).filter((i) => i >= 0),
+    [frames, loaded],
+  );
   // autoplay
   useEffect(() => {
-    if (!playing || n < 2) return;
-    timer.current = setInterval(() => onEpochChange((idx + 1) % n), speed);
+    if (!playing || availIdx.length < 2) return;
+    timer.current = setInterval(() => {
+      const pos = availIdx.indexOf(idx);
+      onEpochChange(pos >= 0 ? availIdx[(pos + 1) % availIdx.length] : availIdx[0]);
+    }, speed);
     return () => { if (timer.current) clearInterval(timer.current); };
-  }, [playing, speed, n, idx, onEpochChange]);
+  }, [playing, speed, availIdx, idx, onEpochChange]);
+
+  // visibility pause: a hidden tab never advances the blink
+  useEffect(() => {
+    const onVis = () => { if (document.hidden) setPlaying(false); };
+    document.addEventListener('visibilitychange', onVis);
+    return () => document.removeEventListener('visibilitychange', onVis);
+  }, []);
 
   // reduced motion: never autoplay
   useEffect(() => {
@@ -193,12 +319,30 @@ export default function BlinkComparator({
     if (!canvas || curLbl === '—') return;
     const a = document.createElement('a');
     a.href = canvas.toDataURL('image/png');
-    a.download = `spectrahunt-${curLbl.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.png`;
+    a.download = `stellar-${curLbl.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.png`;
     a.click();
   }, [mode, curLbl]);
 
   const copyLink = useCallback(() => {
-    void navigator.clipboard?.writeText(window.location.href).catch(() => undefined);
+    const url = window.location.href;
+    const legacyCopy = () => {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+      } catch { /* clipboard unavailable — link stays in the address bar */ }
+    };
+    try {
+      const pending = navigator.clipboard?.writeText(url);
+      if (pending && typeof pending.catch === 'function') void pending.catch(legacyCopy);
+      else legacyCopy();
+    } catch { legacyCopy(); }
   }, []);
 
   // keyboard: transport + palette
@@ -220,8 +364,15 @@ export default function BlinkComparator({
         return;
       }
       if (mod || e.altKey) return;
-      const tag = (e.target as HTMLElement).tagName;
-      if (['INPUT', 'BUTTON', 'A', 'SELECT', 'TEXTAREA'].includes(tag)) return;
+      const el = e.target as HTMLElement;
+      const tag = el.tagName;
+      // Roving scope: the timeline scrub keeps transport keys (arrows step,
+      // Space toggles) with preventDefault so the native slider does not
+      // double-step beneath us. Every other field keeps its native keys.
+      const isScrub = el instanceof HTMLInputElement
+        && (el.classList.contains('scrub') || el.getAttribute('aria-label') === 'Timeline scrub');
+      if (!isScrub && (['INPUT', 'BUTTON', 'A', 'SELECT', 'TEXTAREA'].includes(tag)
+        || el.getAttribute('role') === 'combobox' || el.isContentEditable)) return;
       if (e.key === ' ') { e.preventDefault(); setPlaying((p) => (n > 1 ? !p : p)); }
       else if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
       else if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
@@ -236,7 +387,7 @@ export default function BlinkComparator({
     if (!stage) return;
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-      setZoom((z) => Math.min(6, Math.max(0.6, z * (e.deltaY > 0 ? 0.92 : 1.09))));
+      setZoom((z) => Math.min(6, Math.max(0.2, z * (e.deltaY > 0 ? 0.92 : 1.09))));
     };
     stage.addEventListener('wheel', onWheel, { passive: false });
     const ro = new ResizeObserver(() => setSizeTick((t) => t + 1));
@@ -249,6 +400,8 @@ export default function BlinkComparator({
 
   const curImg = cur?.png ? loaded[cur.png] : undefined;
   const prevImg = prev?.png ? loaded[prev.png] : undefined;
+  const totalFrames = frames.filter((f) => f.png).length;
+  const doneFrames = frames.filter((f) => f.png && loaded[f.png]).length;
   // real motion candidates from the actual pixels (recomputed when frames arrive)
   const candidates: MotionCandidate[] = useMemo(() => {
     if (!curImg || !prevImg) return [];
@@ -299,15 +452,14 @@ export default function BlinkComparator({
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = Math.round(w * dpr);
     canvas.height = Math.round(h * dpr);
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
     if (!ctx) return;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = '#04050a';
     ctx.fillRect(0, 0, w, h);
 
-    const mk = (img: HTMLImageElement) => {
-      const c = document.createElement('canvas');
-      c.width = Math.round(w); c.height = Math.round(h);
+    const mk = (img: HTMLImageElement, slot: number) => {
+      const c = getScratch(slot, Math.round(w), Math.round(h));
       const cctx = c.getContext('2d', { willReadFrequently: true });
       if (cctx) drawCover(cctx, img, w, h, pan, zoom);
       return cctx?.getImageData(0, 0, c.width, c.height);
@@ -323,9 +475,8 @@ export default function BlinkComparator({
         return url ? loadedBand[url] : undefined;
       });
       if (chImgs[0] && chImgs[1] && chImgs[2]) {
-        const chans = (chImgs as HTMLImageElement[]).map((img) => {
-          const c = document.createElement('canvas');
-          c.width = Math.round(w); c.height = Math.round(h);
+        const chans = (chImgs as HTMLImageElement[]).map((img, ci) => {
+          const c = getScratch(ci, Math.round(w), Math.round(h));
           const cctx = c.getContext('2d', { willReadFrequently: true });
           if (cctx) drawCover(cctx, img, w, h, pan, zoom);
           return cctx?.getImageData(0, 0, c.width, c.height);
@@ -355,8 +506,8 @@ export default function BlinkComparator({
         ctx.fillText('Band images still indexing — false color arrives with them.', w / 2, h / 2);
       }
     } else if (showRgb && curImg && prevImg) {
-      const A = mk(prevImg);
-      const B = mk(curImg);
+      const A = mk(prevImg, 0);
+      const B = mk(curImg, 1);
       if (A && B) {
         const out = ctx.createImageData(Math.round(w), Math.round(h));
         const span = Math.max(1e-6, vmax - vmin);
@@ -377,8 +528,8 @@ export default function BlinkComparator({
       }
     } else if (mode === 'diff' && curImg && prevImg) {
       diffMode = true;
-      const A = mk(prevImg);
-      const B = mk(curImg);
+      const A = mk(prevImg, 0);
+      const B = mk(curImg, 1);
       if (A && B) {
         const out = ctx.createImageData(Math.round(w), Math.round(h));
         for (let i = 0; i < out.data.length; i += 4) {
@@ -391,8 +542,7 @@ export default function BlinkComparator({
         stylize(canvas, stretch, vmin, vmax, invert, cmap, true, diffScale);
       }
     } else if (mode === 'swipe' && curImg && prevImg) {
-      const off = document.createElement('canvas');
-      off.width = canvas.width; off.height = canvas.height;
+      const off = getScratch(3, canvas.width, canvas.height);
       const octx = off.getContext('2d');
       if (octx) {
         octx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -414,17 +564,19 @@ export default function BlinkComparator({
       stylize(canvas, stretch, vmin, vmax, invert, cmap, false, diffScale);
     } else if (cur?.png) {
       // frame exists but is still decoding: hold the last loaded frame dimmed
-      // with a small loading tag (never flash the pending message for real data)
+      // with a small loading tag (never flash the pending message for real data).
+      // Exhausted loads (see `failed`) name the failure instead of spinning forever.
+      const isFailed = !!failed[cur.png];
       const hold = prevImg ?? Object.values(loaded)[0];
       if (hold) {
         ctx.globalAlpha = 0.45;
         drawCover(ctx, hold, w, h, pan, zoom);
         ctx.globalAlpha = 1;
       }
-      ctx.fillStyle = 'rgba(238,240,248,.85)';
+      ctx.fillStyle = isFailed ? '#e8c34a' : 'rgba(238,240,248,.85)';
       ctx.font = '12px ui-monospace, monospace';
       ctx.textAlign = 'center';
-      ctx.fillText('loading frame…', w / 2, h - 30);
+      ctx.fillText(isFailed ? 'frame failed to load — use Retry' : 'loading frame…', w / 2, h - 30);
     } else {
       ctx.fillStyle = '#aab0c8';
       ctx.font = '13px system-ui';
@@ -510,7 +662,7 @@ export default function BlinkComparator({
           : '';
       }
     } catch { /* tainted or tiny canvas */ }
-  }, [curImg, prevImg, mode, stretch, vmin, vmax, invert, cmap, diffScale, swipe, pan, zoom, showMarkers, showRgb, falseColor, loadedBand, rgb, bandPngs, fovArcmin, candidates, sizeTick]);
+  }, [curImg, prevImg, mode, stretch, vmin, vmax, invert, cmap, diffScale, swipe, pan, zoom, showMarkers, showRgb, falseColor, loadedBand, rgb, bandPngs, fovArcmin, candidates, sizeTick, failed, loaded, getScratch, cur?.png]);
 
   // side-by-side render (synchronized pan/zoom + linked cursor)
   useEffect(() => {
@@ -557,7 +709,8 @@ export default function BlinkComparator({
   const sampleAt = (img: HTMLImageElement | undefined, x: number, y: number): number => {
     if (!img) return 0;
     try {
-      const c = document.createElement('canvas');
+      let c = sampleScratch.current;
+      if (!c) { c = document.createElement('canvas'); sampleScratch.current = c; }
       c.width = 32; c.height = 32;
       const cctx = c.getContext('2d', { willReadFrequently: true });
       if (!cctx) return 0;
@@ -581,17 +734,28 @@ export default function BlinkComparator({
   const onPointerDown = (e: React.PointerEvent) => {
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
     drag.current = { x: e.clientX, y: e.clientY, pan: { ...pan }, moved: false };
+    suppressClick.current = false;
   };
   const onPointerMove = (e: React.PointerEvent) => {
-    if (mode === 'swipe' && e.buttons === 0 && e.pointerType === 'mouse') {
+    if (mode === 'swipe' && e.pointerType === 'mouse' && e.buttons === 0) {
       const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
       setSwipe(Math.min(0.98, Math.max(0.02, (e.clientX - r.left) / r.width)));
+    } else if (mode === 'swipe' && e.pointerType !== 'mouse' && e.isPrimary !== false) {
+      // touch/pen path: the curtain follows the finger while swiping
+      const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      setSwipe(Math.min(0.98, Math.max(0.02, (e.clientX - r.left) / r.width)));
+      return;
     }
     if (drag.current) {
       const dx = e.clientX - drag.current.x;
       const dy = e.clientY - drag.current.y;
-      if (Math.hypot(dx, dy) > 4) drag.current.moved = true;
-      else return;
+      // unified 5px hysteresis with the Orbital surfaces: inside it, hold
+      // still (hover probe keeps working); past it, this is a pan and the
+      // trailing click must not sample.
+      if (Math.hypot(dx, dy) > 5) {
+        drag.current.moved = true;
+        suppressClick.current = true;
+      } else return;
       // rAF-throttle: full-res restyle runs at most once per frame while dragging
       panPending.current = { x: drag.current.pan.x + dx, y: drag.current.pan.y + dy };
       if (!panRaf.current) {
@@ -629,6 +793,7 @@ export default function BlinkComparator({
   };
   const onPointerUp = () => { drag.current = null; };
   const onClickSample = (e: React.MouseEvent) => {
+    if (suppressClick.current) { suppressClick.current = false; return; }
     if (drag.current?.moved) return;
     const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const x = (e.clientX - r.left) / r.width;
@@ -636,9 +801,10 @@ export default function BlinkComparator({
     const values = frames.map((f) => {
       const img = f.png ? loaded[f.png] : undefined;
       if (!img) return 0;
-      const c = document.createElement('canvas');
+      let c = sampleScratch.current;
+      if (!c) { c = document.createElement('canvas'); sampleScratch.current = c; }
       c.width = 32; c.height = 32;
-      const cctx = c.getContext('2d');
+      const cctx = c.getContext('2d', { willReadFrequently: true });
       if (!cctx) return 0;
       cctx.drawImage(img, 0, 0, 32, 32);
       try {
@@ -696,17 +862,31 @@ export default function BlinkComparator({
     ctx.font = '12px ui-monospace, monospace';
     ctx.fillText('1′', 110, HEAD + PH + 28);
     ctx.fillStyle = '#8a90ab';
-    ctx.fillText('NASA/JPL–Caltech SPHEREx via IRSA (IPAC) · DOI 10.26131/IRSA652 · SpectraHunt', 16, HEAD + PH + 48);
+    ctx.fillText('NASA/JPL–Caltech SPHEREx via IRSA (IPAC) · DOI 10.26131/IRSA652 · STELLAR', 16, HEAD + PH + 48);
     const a = document.createElement('a');
     a.href = c.toDataURL('image/png');
-    a.download = 'spectrahunt-figure.png';
+    a.download = 'stellar-figure.png';
     a.click();
   };
 
-  const recordWebM = async () => {    const canvas = mode === 'side' ? rightRef.current : mainRef.current;
+  const recordWebM = async () => {
+    const canvas = mode === 'side' ? rightRef.current : mainRef.current;
     if (!canvas || !canvas.width || n < 2 || recording) return;
-    const stream = canvas.captureStream(30);
-    const rec = new MediaRecorder(stream, { mimeType: 'video/webm' });
+    if (typeof MediaRecorder === 'undefined') return;
+    if (typeof canvas.captureStream !== 'function') return;
+    const mime = 'video/webm';
+    try {
+      if (typeof MediaRecorder.isTypeSupported === 'function'
+        && !MediaRecorder.isTypeSupported(mime)) return;
+    } catch { return; }
+    let stream: MediaStream;
+    try {
+      stream = canvas.captureStream(30);
+    } catch { return; }
+    let rec: MediaRecorder;
+    try {
+      rec = new MediaRecorder(stream, { mimeType: mime });
+    } catch { return; }
     const chunks: Blob[] = [];
     rec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
     const done = new Promise<Blob>((resolve) => {
@@ -714,17 +894,21 @@ export default function BlinkComparator({
     });
     setRecording(true);
     setPlaying(false);
-    rec.start();
+    try {
+      rec.start();
+    } catch { setRecording(false); return; }
     for (let i = 0; i < n; i++) {
       onEpochChange(i);
       await new Promise((r) => setTimeout(r, Math.max(250, speed)));
     }
-    rec.stop();
+    try {
+      rec.stop();
+    } catch { setRecording(false); return; }
     const blob = await done;
     setRecording(false);
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'spectrahunt-blink.webm';
+    a.download = 'stellar-blink.webm';
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 5000);
   };
@@ -757,11 +941,22 @@ export default function BlinkComparator({
     if (p === 'balanced') { setVmin(0.05); setVmax(0.98); }
     if (p === 'bright') { setVmin(0.15); setVmax(1); }
   };
+  const activePreset: 'faint' | 'balanced' | 'bright' | null =
+    vmin === 0.02 && vmax === 0.9 ? 'faint'
+    : vmin === 0.05 && vmax === 0.98 ? 'balanced'
+    : vmin === 0.15 && vmax === 1 ? 'bright' : null;
+  const scrubPct = n > 1 ? Math.round((idx / (n - 1)) * 100) : 0;
 
   const setBandAndChannel = (b: number) => {
     onBandChange(b);
     const ch = CHANNELS.filter((c) => c.detector === b);
     setChannel(ch[Math.floor(ch.length / 2)]?.idx ?? 0);
+  };
+  // Bands with no epochs in this field stay disabled: `bandPngs` carries the
+  // newest-epoch PNG per detector, so a missing entry means nothing to blink.
+  const hasBandData = (id: number) => {
+    if (!bandPngs || Object.keys(bandPngs).length === 0) return true;
+    return !!bandPngs[id];
   };
 
   const modeLabel = mode === 'diff' ? 'Difference B−A' : mode === 'swipe' ? 'Swipe A | B' : mode === 'side' ? 'Side-by-side' : falseColor ? 'False color' : showRgb ? 'Motion color' : 'Blink';
@@ -799,11 +994,6 @@ export default function BlinkComparator({
       <div className="blink-grid">
         <div className="stage-col">
           {mode === 'side' && sideHover && (
-            <p className="mono side-readout">
-              A {sideHover.a} · B {sideHover.b} · Δ {(sideHover.b - sideHover.a) >= 0 ? '+' : ''}{sideHover.b - sideHover.a}
-            </p>
-          )}
-          {mode === 'side' && sideHover && (
             <p className="mono side-readout" aria-live="off">
               A {sideHover.a} · B {sideHover.b} · Δ {(sideHover.b - sideHover.a) >= 0 ? '+' : ''}{sideHover.b - sideHover.a}
             </p>
@@ -837,6 +1027,11 @@ export default function BlinkComparator({
                 />
                 <span className="viewer-tag mono">{modeLabel}</span>
                 <span className="viewer-tag epoch mono">{cur?.label ?? '—'}</span>
+                {cur?.png && !curImg && failed[cur.png] && (
+                  <button type="button" className="frame-retry" onClick={() => retryUrl(cur.png as string)}>
+                    ↻ Retry frame
+                  </button>
+                )}
                 {measureChip && (
                   <div className="measure-chip mono"
                     style={{ left: `${measureChip.x * 100}%`, top: `${measureChip.y * 100}%` }}>
@@ -850,17 +1045,18 @@ export default function BlinkComparator({
           </div>
         <div className="controls-zone">
           <div className="transport-row glass" role="group" aria-label="Blink transport">
-            <button type="button" className="icon-btn" onClick={() => step(-1)} aria-label="Previous epoch">
+            <button type="button" className="icon-btn pressable" onClick={() => step(-1)} aria-label="Previous epoch">
               <Icon name="back" />
             </button>
-            <button type="button" className="play mini" onClick={() => setPlaying((pp) => (n > 1 ? !pp : pp))}
+            <button type="button" className="play mini pressable" onClick={() => setPlaying((pp) => (n > 1 ? !pp : pp))}
               aria-label={playing ? 'Pause blink' : 'Play blink'}>
               <Icon name={playing ? 'pause' : 'play'} />
             </button>
-            <button type="button" className="icon-btn" onClick={() => step(1)} aria-label="Next epoch">
+            <button type="button" className="icon-btn pressable" onClick={() => step(1)} aria-label="Next epoch">
               <Icon name="fwd" />
             </button>
             <input className="scrub" type="range" min={0} max={Math.max(0, n - 1)} step={1} value={idx}
+              style={{ '--val': `${scrubPct}%` } as CSSProperties}
               onChange={(e) => { setPlaying(false); onEpochChange(Number(e.target.value)); }}
               aria-label="Timeline scrub" aria-valuetext={cur?.label ?? ''} />
             <span className="mono epoch-name">{cur?.label ?? '—'}</span>
@@ -868,19 +1064,25 @@ export default function BlinkComparator({
 
           <div className="filmstrip" role="group" aria-label="Epoch filmstrip">
             {frames.map((f, i) => (
-              <button key={f.label} type="button" onClick={() => { setPlaying(false); onEpochChange(i); }}
-                className={`film${i === idx ? ' active' : ''}`} aria-pressed={i === idx} title={f.mjd ? `${f.label} · MJD ${f.mjd}` : f.label}>
+              <button key={`${f.label}::${i}`} type="button"
+                onClick={() => { setPlaying(false); onEpochChange(i); if (f.png && failed[f.png]) retryUrl(f.png); }}
+                className={`film${i === idx ? ' active' : ''}${f.png && failed[f.png] ? ' failed' : ''}`}
+                aria-pressed={i === idx}
+                title={f.png && failed[f.png] ? `${f.label} · load failed — click to retry` : (f.mjd ? `${f.label} · MJD ${f.mjd}` : f.label)}>
                 {f.png && loaded[f.png] ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={f.png} alt="" draggable={false} />
                 ) : (
-                  <span className="film-empty">{f.mjd ? String(Math.round(f.mjd)).slice(2) : `E${i + 1}`}</span>
+                  <span className="film-empty">{f.png && failed[f.png] ? '↻' : (f.mjd ? String(Math.round(f.mjd)).slice(2) : `E${i + 1}`)}</span>
                 )}
               </button>
             ))}
             <label className="rate">Rate
               <input type="range" min={150} max={1200} step={10} value={speed} onChange={(e) => setSpeed(Number(e.target.value))} aria-label="Blink rate" />
             </label>
+            {doneFrames < totalFrames && (
+              <span className="mono film-count" role="status">loading frames {doneFrames}/{totalFrames}</span>
+            )}
           </div>
         </div>
         </div>
@@ -935,7 +1137,8 @@ export default function BlinkComparator({
             <div className="ws-sub">Presets</div>
             <div className="ws-row" role="group" aria-label="Brightness presets">
               {(['faint', 'balanced', 'bright'] as const).map((pp) => (
-                <button key={pp} type="button" className="ws-btn" onClick={() => setPreset(pp)}>{pp}</button>
+                <button key={pp} type="button" className={`ws-btn pressable${activePreset === pp ? ' active' : ''}`}
+                  aria-pressed={activePreset === pp} onClick={() => setPreset(pp)}>{pp}</button>
               ))}
             </div>
             <div className="ws-sub">Levels</div>
@@ -953,8 +1156,12 @@ export default function BlinkComparator({
             <h3 className="ws-title">Bands</h3>
             <div className="band-grid" role="group" aria-label="Detector band">
               {BANDS.map((b) => (
-                <button key={b.id} type="button" className={`band-cell${b.id === band ? ' active' : ''}`}
-                  aria-pressed={b.id === band} title={`${b.label}: ${b.range}`} onClick={() => setBandAndChannel(b.id)}>
+                <button key={b.id} type="button" className={`band-cell pressable${b.id === band ? ' active' : ''}`}
+                  aria-pressed={b.id === band}
+                  disabled={!hasBandData(b.id)}
+                  style={{ '--band-color': b.color } as CSSProperties}
+                  title={hasBandData(b.id) ? `${b.label}: ${b.range}` : `${b.label}: no epochs in this field`}
+                  onClick={() => setBandAndChannel(b.id)}>
                   <span className="sw" style={{ background: b.color }} />
                   <span>Band {b.id}</span>
                 </button>
@@ -1056,8 +1263,8 @@ export default function BlinkComparator({
                 if (e.key === 'Enter' && palHits[0]) { palHits[0].run(); setPalette(false); }
               }} />
             <div className="pal-list" role="listbox" aria-label="Commands">
-              {palHits.map((c) => (
-                <button key={c.name} type="button" role="option" aria-selected={false}
+              {palHits.map((c, i) => (
+                <button key={`${c.name}::${i}`} type="button" role="option" aria-selected={false}
                   onClick={() => { c.run(); setPalette(false); }}>
                   <span>{c.name}</span>{c.hint && <kbd>{c.hint}</kbd>}
                 </button>

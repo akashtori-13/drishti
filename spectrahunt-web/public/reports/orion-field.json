@@ -1,0 +1,81 @@
+{
+  "id": "orion-field",
+  "title": "Orion Complex \u2014 star factory",
+  "ra": 83.82,
+  "dec": -5.39,
+  "measured_at": "2026-09-22T22:37:19.040399+00:00",
+  "detail": "ok",
+  "movers": 1,
+  "variables": 40,
+  "top_sigma": 96.8,
+  "n_epochs": 5,
+  "span_days": 173.4,
+  "variable_flag": false,
+  "known": null,
+  "lightcurve": [
+    {
+      "mjd": 60931.504707,
+      "flux": 0.0
+    },
+    {
+      "mjd": 60933.26992,
+      "flux": 0.0
+    },
+    {
+      "mjd": 60933.605233,
+      "flux": 0.0
+    },
+    {
+      "mjd": 61105.440436,
+      "flux": 0.0
+    },
+    {
+      "mjd": 61106.667656,
+      "flux": 0.0
+    }
+  ],
+  "spectrum": [
+    {
+      "band": 1,
+      "wavelength_um": 0.92,
+      "flux": 0.0,
+      "flux_err": 73.83576785099459,
+      "mjd": 61117.320826
+    },
+    {
+      "band": 2,
+      "wavelength_um": 1.36,
+      "flux": 0.0,
+      "flux_err": 31.101759354042397,
+      "mjd": 61111.147386
+    },
+    {
+      "band": 3,
+      "wavelength_um": 2.02,
+      "flux": 0.0,
+      "flux_err": 44.30577120950119,
+      "mjd": 61106.667656
+    },
+    {
+      "band": 4,
+      "wavelength_um": 3.12,
+      "flux": 0.0,
+      "flux_err": 23.056699948717227,
+      "mjd": 61117.320826
+    },
+    {
+      "band": 5,
+      "wavelength_um": 4.12,
+      "flux": 0.0,
+      "flux_err": 40.12562505278989,
+      "mjd": 61111.145894
+    },
+    {
+      "band": 6,
+      "wavelength_um": 4.71,
+      "flux": 0.0,
+      "flux_err": 138.28831854575486,
+      "mjd": 61106.667656
+    }
+  ]
+}

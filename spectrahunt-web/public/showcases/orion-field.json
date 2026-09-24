@@ -50,6 +50,17 @@
       "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W10_2B/l2b-v24-2026-094/3/level2_2026W10_2B_0177_3D3_spx_l2b-v24-2026-094.fits?center=83.82,-5.39&size=0.15"
     },
     {
+      "label": "2026-03-07 \u00b7 D3",
+      "band": 3,
+      "wavelength_um": null,
+      "mjd": 61106.667656,
+      "ra": 83.82,
+      "dec": -5.39,
+      "size_deg": 0.15,
+      "png": "/cutouts/orion-field_2026-03-07.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W10_2B/l2b-v24-2026-094/3/level2_2026W10_2B_0408_4D3_spx_l2b-v24-2026-094.fits?center=83.82,-5.39&size=0.15"
+    },
+    {
       "label": "Survey 1 \u00b7 D3",
       "band": 3,
       "wavelength_um": 2.02,
@@ -88,6 +99,36 @@
       "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2025W37_2A/l2b-v20-2025-267/3/level2_2025W37_2A_0452_1D3_spx_l2b-v20-2025-267.fits?center=83.82,-5.39&size=0.15",
       "mjd": null,
       "wavelength_um": 2.02
+    },
+    "1": {
+      "png": "/cutouts/orion-field_D1.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W12_1A/l2b-v24-2026-082/1/level2_2026W12_1A_0417_1D1_spx_l2b-v24-2026-082.fits?center=83.82,-5.39&size=0.15",
+      "mjd": 61117.320826,
+      "wavelength_um": 0.92
+    },
+    "2": {
+      "png": "/cutouts/orion-field_D2.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W11_1A/l2b-v24-2026-094/2/level2_2026W11_1A_0682_4D2_spx_l2b-v24-2026-094.fits?center=83.82,-5.39&size=0.15",
+      "mjd": 61111.147386,
+      "wavelength_um": 1.36
+    },
+    "4": {
+      "png": "/cutouts/orion-field_D4.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W12_1A/l2b-v24-2026-082/4/level2_2026W12_1A_0417_1D4_spx_l2b-v24-2026-082.fits?center=83.82,-5.39&size=0.15",
+      "mjd": 61117.320826,
+      "wavelength_um": 3.12
+    },
+    "5": {
+      "png": "/cutouts/orion-field_D5.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W11_1A/l2b-v24-2026-094/5/level2_2026W11_1A_0682_3D5_spx_l2b-v24-2026-094.fits?center=83.82,-5.39&size=0.15",
+      "mjd": 61111.145894,
+      "wavelength_um": 4.12
+    },
+    "6": {
+      "png": "/cutouts/orion-field_D6.png",
+      "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2026W10_2B/l2b-v24-2026-094/6/level2_2026W10_2B_0408_4D6_spx_l2b-v24-2026-094.fits?center=83.82,-5.39&size=0.15",
+      "mjd": 61106.667656,
+      "wavelength_um": 4.71
     }
   }
 }

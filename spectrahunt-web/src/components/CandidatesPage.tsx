@@ -3,9 +3,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { SHOWCASE_IDS, getShowcase, type Showcase } from '@/lib/showcases';
 import { BANDS } from '@/lib/sky';
-import { useRouter } from 'next/navigation';
-import { blinkURL } from '@/lib/store';
+import { useAppStore } from '@/lib/store';
 import { arcsecPerDay, toCSV } from '@/lib/astro';
+import { Reveal } from '@/lib/reveal';
+import { useTiltGroup } from '@/lib/tilt';
+
+interface ReportObject {
+  kind: string; sigma: number; x: number; y: number; label: string | null;
+}
 
 interface Report {
   id: string;
@@ -13,6 +18,7 @@ interface Report {
   span_days: number | null; variable_flag: boolean;
   known: { name: string; kind: string } | null;
   detail: string;
+  objects?: ReportObject[];
 }
 
 type Kind = 'known' | 'mover' | 'variable' | 'unidentified' | 'pending';
@@ -22,6 +28,7 @@ interface Card {
   kind: Kind; knownName: string;
   stat: string; date: string; png: string | null;
   motion: number | null; mjds: Array<number | undefined>;
+  objects: ReportObject[];
 }
 
 type Filter = 'all' | 'unknown' | 'known';
@@ -68,6 +75,7 @@ function cardsFrom(showcases: Showcase[], reports: Map<string, Report>): Card[] 
       kind, knownName, stat,
       date: (s.epochs[0]?.mjd ? `MJD ${s.epochs[0].mjd}` : 'QR2'),
       png: s.epochs[0]?.png ?? null, motion, mjds,
+      objects: rep?.objects ?? [],
     };
   });
   const rank: Record<Kind, number> = { known: 0, mover: 1, variable: 2, unidentified: 3, pending: 4 };
@@ -81,9 +89,15 @@ const KIND_LABEL: Record<Kind, string> = {
 
 function Thumb({ card }: { card: Card }) {
   const band = BANDS[card.band - 1];
-  if (card.png) {
+  const [broken, setBroken] = useState(false);
+  // reset when the card's image changes (navigation, revalidation swap-in)
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setBroken(false);
+  }, [card.png]);
+  if (card.png && !broken) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={card.png} alt="" width={260} height={260} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} draggable={false} />;
+    return <img src={card.png} alt="" width={260} height={260} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} draggable={false} onError={() => setBroken(true)} />;
   }
   return (
     <div
@@ -95,17 +109,20 @@ function Thumb({ card }: { card: Card }) {
         color: '#8a90ab', fontSize: 12,
       }}
     >
-      cutout pending
+      {card.png ? 'image failed to load' : 'cutout pending'}
     </div>
   );
 }
 
 export default function CandidatesPage() {
-  const router = useRouter();
+  const openPreview = useAppStore((s) => s.openPreview);
   const [cards, setCards] = useState<Card[]>([]);
   const [filter, setFilter] = useState<Filter>('all');
+  const [openId, setOpenId] = useState<string | null>(null);
   const docsRef = useRef(new Map<string, Showcase>());
   const repsRef = useRef(new Map<string, Report>());
+  const gridRef = useRef<HTMLDivElement>(null);
+  useTiltGroup(gridRef);
 
   useEffect(() => {
     let alive = true;
@@ -156,7 +173,7 @@ export default function CandidatesPage() {
       : new Blob([JSON.stringify(rows, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `spectrahunt-candidates.${fmt}`;
+    a.download = `stellar-candidates.${fmt}`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 4000);
   };
@@ -186,23 +203,28 @@ export default function CandidatesPage() {
       </div>
 
       {!list.length && <p className="empty">No candidates match this filter.</p>}
-      <div className="cand-grid">
-        {list.map((c) => {
+      <div className="cand-grid" ref={gridRef}>
+        {list.map((c, i) => {
           const band = BANDS[c.band - 1];
+          const open = openId === c.id;
           return (
+            <Reveal key={c.id} index={i}>
+            <div className="cand-wrap">
             <button
-              key={c.id} type="button" className="cand"
+              type="button" className="cand" data-tilt
               aria-label={`${c.name}, ${KIND_LABEL[c.kind]}, ${c.stat}, ${band.label}`}
-              onClick={() => router.push(blinkURL(c.id))}
+              onClick={() => openPreview(c.id)}
             >
               <div className="cand-thumb">
                 <Thumb card={c} />
-                <span className={`badge ${c.kind === 'known' ? 'known' : c.kind === 'pending' ? '' : 'unknown'}`}>
-                  <span className="dot" />{c.kind === 'known' && c.knownName ? `Known · ${c.knownName}` : KIND_LABEL[c.kind]}
-                </span>
-                <span className="cand-score mono">{c.stat}</span>
               </div>
               <div className="cand-body">
+                <span className="cand-badges">
+                  <span className={`badge ${c.kind === 'known' ? 'known' : c.kind === 'pending' ? '' : 'unknown'}`}>
+                    <span className="dot" />{c.kind === 'known' && c.knownName ? `Known · ${c.knownName}` : KIND_LABEL[c.kind]}
+                  </span>
+                  <span className="cand-score mono">{c.stat}</span>
+                </span>
                 <div className="cand-name">{c.name}</div>
                 <div className="cand-meta mono"><span>{band.label}</span><span>{c.date}</span></div>
                 <div className="cand-meta mono">
@@ -211,6 +233,31 @@ export default function CandidatesPage() {
                 </div>
               </div>
             </button>
+            {c.objects.length > 0 && (
+              <>
+                <button
+                  type="button" className="epoch-chip cand-objects-toggle" aria-expanded={open}
+                  onClick={() => setOpenId(open ? null : c.id)}
+                >
+                  {open ? 'Hide objects' : `Objects (${c.objects.length})`}
+                </button>
+                {open && (
+                  <ul className="cand-objects" aria-label={`Measured objects in ${c.name}`}>
+                    {c.objects.map((o, i) => (
+                      <li key={i} className="mono">
+                        <span className={o.kind === 'mover' ? 'tag-mover' : 'tag-var'}>
+                          {o.kind === 'mover' ? 'MOVER' : 'VARIABLE'}
+                        </span>{' '}
+                        #{i + 1} · {o.sigma.toFixed(1)}σ · x={o.x} y={o.y}
+                        {o.label && o.label !== 'Unidentified – possible discovery' ? ` · ${o.label}` : ''}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </>
+            )}
+            </div>
+            </Reveal>
           );
         })}
       </div>

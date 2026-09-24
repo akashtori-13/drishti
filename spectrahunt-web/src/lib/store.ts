@@ -8,6 +8,10 @@ interface AppState {
   band: number;
   showMarkers: boolean;
   tutorialDone: boolean;
+  /** Artifact preview modal: showcase id or null. Null = closed. */
+  previewId: string | null;
+  openPreview: (id: string) => void;
+  closePreview: () => void;
   setCompareMode: (m: CompareMode) => void;
   setEpochIdx: (i: number) => void;
   setBand: (b: number) => void;
@@ -36,6 +40,9 @@ export const useAppStore = create<AppState>((set) => ({
     set({ tutorialDone: v });
     try { localStorage.setItem('sh-tutorial', v ? '1' : '0'); } catch { /* noop */ }
   },
+  previewId: null,
+  openPreview: (id: string) => set({ previewId: id }),
+  closePreview: () => set({ previewId: null }),
 }));
 
 /** Shareable blink URL: /blink/<id>?band=&epoch=&mode= */

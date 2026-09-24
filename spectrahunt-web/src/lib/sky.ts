@@ -95,3 +95,38 @@ export function drawBracket(ctx: CanvasRenderingContext2D, x: number, y: number,
   });
   ctx.stroke();
 }
+
+/** Curated field centers (single source; Home/Sky markers + matching use this). */
+export const SHOWCASE_POINTS = [
+  { id: '3i-atlas', ra: 252.6633, dec: -17.4904 },
+  { id: 'ecliptic-mover', ra: 180, dec: 0 },
+  { id: 'nep-deep', ra: 270, dec: 66.5 },
+  { id: 'orion-field', ra: 83.82, dec: -5.39 },
+  { id: 'galactic-center', ra: 266.42, dec: -29.01 },
+  { id: 'm31-field', ra: 10.68, dec: 41.27 },
+  { id: 'lmc-field', ra: 80.89, dec: -69.76 },
+  { id: 'virgo-field', ra: 200, dec: 0 },
+  { id: 'eros-field', ra: 210.32, dec: 9.11 },
+  { id: 'crab-field', ra: 83.63, dec: 22.01 },
+  { id: 'omega-cen-field', ra: 201.69, dec: -47.48 },
+  { id: 'carina-field', ra: 161.26, dec: -59.68 },
+  { id: 'm51-field', ra: 202.47, dec: 47.2 },
+  { id: 'm101-field', ra: 210.8, dec: 54.35 },
+  { id: 'smc-field', ra: 13.18, dec: -72.83 },
+  { id: 'dorado-deep', ra: 92.5, dec: -57.5 },
+  { id: 'draco-field', ra: 267.5, dec: 57.5 },
+  { id: 'ophiuchus-field', ra: 247.5, dec: -7.5 },
+  { id: 'libra-field', ra: 212.5, dec: -2.5 },
+  { id: 'hercules-field', ra: 252.5, dec: 12.5 },
+];
+
+/** Nearest curated field within 3°, or null (search routing helper). */
+export function nearestShowcase(ra: number, dec: number): string | null {
+  let best: string | null = null;
+  let bestD = 3.0;
+  for (const s of SHOWCASE_POINTS) {
+    const d = Math.hypot(s.ra - ra, s.dec - dec);
+    if (d < bestD) { bestD = d; best = s.id; }
+  }
+  return best;
+}

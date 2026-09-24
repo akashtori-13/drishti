@@ -3,13 +3,13 @@
   "title": "Draco \u2014 high-latitude stare",
   "ra": 267.5,
   "dec": 57.5,
-  "measured_at": "2026-09-22T01:45:00.349322+00:00",
+  "measured_at": "2026-09-22T22:19:55.905005+00:00",
   "detail": "ok",
   "movers": 2,
   "variables": 1,
   "top_sigma": 22.3,
   "n_epochs": 5,
-  "span_days": 40.6,
+  "span_days": 42.2,
   "variable_flag": false,
   "known": null,
   "lightcurve": [
@@ -55,6 +55,13 @@
       "flux": -0.04270472005009651,
       "flux_err": 1.3345636022964833,
       "mjd": 60840.221365
+    },
+    {
+      "band": 4,
+      "wavelength_um": 3.12,
+      "flux": 0.1481892354786396,
+      "flux_err": 1.0119882902429969,
+      "mjd": 60986.738709
     },
     {
       "band": 5,
