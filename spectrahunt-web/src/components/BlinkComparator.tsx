@@ -17,7 +17,7 @@ export interface BlinkFrame {
   mjd?: number;
 }
 
-export type CompareMode = 'blink' | 'side' | 'swipe' | 'diff' | 'chart' | 'replay';
+export type CompareMode = 'blink' | 'side' | 'swipe' | 'diff' | 'replay';
 
 /** Load an image through the device cache (memory → IndexedDB → network).
  * First visit fetches from the web; every later visit serves cache and never
@@ -546,13 +546,13 @@ export default function BlinkComparator({
     () => pairCands[Math.min(idx, Math.max(0, n - 1))] ?? [],
     [pairCands, idx],
   );
-  // chart-mode star layer: Gaia points around the field center (cached
+  // replay star layer: Gaia points around the field center (cached
   // server-side 30d). Empty without the live API — the chart still draws
   // detections, with an on-canvas note. Primitive deps: center is an inline
   // literal upstream, so object identity would refetch every render.
   const [chartStars, setChartStars] = useState<Array<{ ra: number; dec: number; g_mag: number | null }>>([]);
   useEffect(() => {
-    if (mode !== 'chart' || !center || !API_BASE) {
+    if (mode !== 'replay' || !center || !API_BASE) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setChartStars((prev) => (prev.length ? [] : prev));
       return;
@@ -950,102 +950,6 @@ export default function BlinkComparator({
         ctx.lineWidth = 1.5;
         ctx.beginPath(); ctx.moveTo(swipe * w, 0); ctx.lineTo(swipe * w, h); ctx.stroke();
       }
-    } else if (mode === 'chart') {
-      // Clean schematic beside the capture: left half real frame, right half
-      // rendered interpretation (Gaia stars + measured detections). The right
-      // half is drawn AFTER stylize so pixels never masquerade as data.
-      const mid = Math.round(w / 2);
-      const cw = w - mid;
-      if (curImg) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(0, 0, mid, h);
-        ctx.clip();
-        drawCover(ctx, curImg, mid, h, pan, zoom);
-        ctx.restore();
-        stylize(canvas, stretch, vmin, vmax, invert, cmap, false, diffScale);
-      } else {
-        ctx.fillStyle = '#aab0c8';
-        ctx.font = '12px ui-monospace, monospace';
-        ctx.textAlign = 'center';
-        ctx.fillText(cur?.png ? 'loading frame…' : 'Cutout pending.', mid / 2, h / 2);
-        ctx.textAlign = 'left';
-      }
-      ctx.fillStyle = 'rgba(255,255,255,.22)';
-      ctx.fillRect(mid - 1, 0, 2, h);
-      const cx = (fx: number) => mid + fx * cw;
-      const cy = (fy: number) => fy * h;
-      // graticule whisper
-      ctx.strokeStyle = 'rgba(255,255,255,.07)';
-      ctx.lineWidth = 1;
-      for (const f of [1 / 3, 2 / 3]) {
-        ctx.beginPath(); ctx.moveTo(mid + f * cw, 0); ctx.lineTo(mid + f * cw, h); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(mid, f * h); ctx.lineTo(w, f * h); ctx.stroke();
-      }
-      // Gaia stars through the same linear field mapping (frame FOV across
-      // its width; screen-right is −RA, matching the probe readout)
-      if (center && chartStars.length) {
-        const F = Math.max(1e-6, fovArcmin / 60);
-        const cosd = Math.cos((center.dec * Math.PI) / 180);
-        for (const s of chartStars) {
-          const dx = (-(s.ra - center.ra) * cosd) / F;
-          const dy = (s.dec - center.dec) / F;
-          if (Math.abs(dx) > 0.55 || Math.abs(dy) > 0.55) continue;
-          const sx = mid + cw / 2 + dx * cw;
-          const sy = h / 2 - dy * h;
-          const g = s.g_mag ?? 14;
-          const r = Math.min(2.6, Math.max(0.6, 2.8 - (g - 6) * 0.26));
-          ctx.fillStyle = g < 11 ? '#e8efff' : 'rgba(220,228,245,.7)';
-          ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI * 2); ctx.fill();
-        }
-      }
-      // measured detections: movers get dipole arrows, variables get rings
-      candidates.forEach((c, i) => {
-        const X = cx(c.x);
-        const Y = cy(c.y);
-        if (X < mid - 20 || X > w + 20 || Y < -20 || Y > h + 20) return;
-        const isMover = c.kind === 'mover';
-        ctx.strokeStyle = isMover ? '#f0bb52' : '#5aa9e6';
-        ctx.fillStyle = isMover ? '#f0bb52' : '#5aa9e6';
-        ctx.lineWidth = 1.8;
-        if (isMover) {
-          ctx.strokeRect(X - 8, Y - 8, 16, 16);
-          const x0 = X - (c.dx * cw) / 2;
-          const y0 = Y - (c.dy * h) / 2;
-          const x1 = X + (c.dx * cw) / 2;
-          const y1 = Y + (c.dy * h) / 2;
-          ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
-          ctx.beginPath(); ctx.arc(x1, y1, 2.5, 0, Math.PI * 2); ctx.fill();
-        } else {
-          ctx.beginPath(); ctx.arc(X, Y, 7, 0, Math.PI * 2); ctx.stroke();
-          ctx.beginPath(); ctx.arc(X, Y, 2, 0, Math.PI * 2); ctx.fill();
-        }
-        const tag = `${isMover ? 'M' : 'V'}${c.n || i + 1} ${c.sigma.toFixed(0)}σ`;
-        ctx.font = '600 10px ui-monospace, monospace';
-        ctx.textAlign = X + 52 > w ? 'right' : 'left';
-        ctx.fillText(tag, X + (X + 52 > w ? -11 : 11), Y - 9);
-        ctx.textAlign = 'left';
-      });
-      // honesty captions (short: the half is narrow on phones)
-      ctx.textAlign = 'center';
-      ctx.font = '600 10px ui-monospace, monospace';
-      ctx.fillStyle = 'rgba(232,195,74,.9)';
-      ctx.fillText('RENDERED CHART', mid + cw / 2, 16);
-      if (knownNames?.length) {
-        ctx.fillStyle = '#5fcf9a';
-        ctx.fillText(`KNOWN: ${knownNames[0].slice(0, 26)}`, mid + cw / 2, 32);
-      }
-      const note = !curImg
-        ? (cur?.png ? null : 'Cutout pending.')
-        : !candidates.length ? 'Quiet field — no ≥5σ pair.'
-        : !center ? 'Stars need coordinates.'
-        : !chartStars.length ? 'Star layer needs live API.' : null;
-      if (note) {
-        ctx.fillStyle = '#8a90ab';
-        ctx.font = '11px ui-monospace, monospace';
-        ctx.fillText(note, mid + cw / 2, h - 20);
-      }
-      ctx.textAlign = 'left';
     } else if (curImg) {
       drawCover(ctx, curImg, w, h, pan, zoom);
       stylize(canvas, stretch, vmin, vmax, invert, cmap, false, diffScale);
@@ -1287,7 +1191,7 @@ export default function BlinkComparator({
     const y = (e.clientY - r.top) / r.height;
     // chart's right half is schematic and replay is a simulation: taps there
     // don't measure pixels (chart measures on its captured half).
-    if (mode === 'replay' || (mode === 'chart' && x > 0.5)) return;
+    if (mode === 'replay') return; // simulation taps don't measure pixels
     const values = frames.map((f) => {
       const img = f.png ? loaded[f.png] : undefined;
       if (!img) return 0;
@@ -1449,7 +1353,7 @@ export default function BlinkComparator({
     return !!bandPngs[id];
   };
 
-  const modeLabel = mode === 'replay' ? 'Replay · simulated motion' : mode === 'diff' ? 'Difference B−A' : mode === 'swipe' ? 'Swipe A | B' : mode === 'side' ? 'Side-by-side' : mode === 'chart' ? 'Chart · rendered interpretation' : falseColor ? 'False color' : showRgb ? 'Motion color' : 'Blink';
+  const modeLabel = mode === 'replay' ? 'Replay · simulated motion' : mode === 'diff' ? 'Difference B−A' : mode === 'swipe' ? 'Swipe A | B' : mode === 'side' ? 'Side-by-side' : falseColor ? 'False color' : showRgb ? 'Motion color' : 'Blink';
 
   interface Cmd { name: string; hint: string; run: () => void }
   const commands: Cmd[] = [
@@ -1457,7 +1361,7 @@ export default function BlinkComparator({
       { name: 'Next epoch', hint: '→', run: () => step(1) },
       { name: 'Previous epoch', hint: '←', run: () => step(-1) },
       ...frames.map((f, i) => ({ name: `Go to ${f.label}`, hint: `E${i + 1}`, run: () => { setPlaying(false); onEpochChange(i); } })),
-      ...(['blink', 'side', 'swipe', 'diff', 'chart', 'replay'] as CompareMode[]).map((m) => ({
+      ...(['blink', 'side', 'swipe', 'diff', 'replay'] as CompareMode[]).map((m) => ({
         name: `Mode: ${m}`, hint: '', run: () => onModeChangeWrap(m),
       })),
       { name: 'Toggle motion color', hint: '', run: () => setShowRgb((v) => !v) },
@@ -1587,18 +1491,15 @@ export default function BlinkComparator({
           <section className="ws-sec" aria-label="View">
             <h3 className="ws-title">View</h3>
             <div className="seg seg-full" role="group" aria-label="Compare mode">
-              {(['blink', 'side', 'swipe', 'diff', 'chart', 'replay'] as CompareMode[]).map((m) => (
+              {(['blink', 'side', 'swipe', 'diff', 'replay'] as CompareMode[]).map((m) => (
                 <button key={m} type="button" className={`seg-btn${mode === m ? ' active' : ''}`} aria-pressed={mode === m}
                   onClick={() => onModeChangeWrap(m)}>
-                  {m === 'blink' ? 'Blink' : m === 'side' ? 'Side' : m === 'swipe' ? 'Swipe' : m === 'diff' ? 'Diff' : m === 'chart' ? 'Chart' : 'Replay'}
+                  {m === 'blink' ? 'Blink' : m === 'side' ? 'Side' : m === 'swipe' ? 'Swipe' : m === 'diff' ? 'Diff' : 'Replay'}
                 </button>
               ))}
               <button type="button" className={`seg-btn${showRgb ? ' active' : ''}`} aria-pressed={showRgb}
                 onClick={() => setShowRgb((v) => !v)} title="False-color: epoch B red, epoch A green">Color</button>
             </div>
-            {mode === 'chart' && (
-              <p className="ws-hint">Clean schematic beside the capture: Gaia stars plus measured ≥5σ detections. Interpretation — measure on the captured half.</p>
-            )}
             {mode === 'replay' && (
               <p className="ws-hint">Simulated replay: detected movers fly their measured vectors, blanks auto-skipped. Rendered — not pixels.</p>
             )}

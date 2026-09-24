@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type CompareMode = 'blink' | 'side' | 'swipe' | 'diff' | 'chart' | 'replay';
+export type CompareMode = 'blink' | 'side' | 'swipe' | 'diff' | 'replay';
 
 interface AppState {
   compareMode: CompareMode;

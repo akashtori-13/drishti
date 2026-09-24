@@ -12,10 +12,10 @@ def ksKeyPass = ksProps.getProperty('keyPassword') ?: System.getenv('STELLAR_KEY
 def ksReady = ksPath && ksPass && ksKeyPass && new File(ksPath).exists()
 
 android {
-    namespace = "org.stellar.app.offline"
+    namespace = "stellar.akashtori.space"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "org.stellar.app.offline"
+        applicationId "stellar.akashtori.space"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 10000
