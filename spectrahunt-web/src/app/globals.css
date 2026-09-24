@@ -246,7 +246,6 @@ main:focus{outline:none;}
   background:rgba(255,255,255,.06); border:1px solid var(--line); color:var(--ink-2);
 }
 .menu-link.active > .icon{color:#fff;}
-.menu-link .m-chev{width:18px; height:18px; flex-shrink:0; margin-left:auto; color:var(--ink-3);}
 .menu-text{flex:1; min-width:0; display:flex; flex-direction:column; gap:2px;}
 .menu-label{font-size:.9375rem; font-weight:600; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 .menu-desc{font-size:.8125rem; color:var(--ink-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
@@ -313,9 +312,14 @@ main:focus{outline:none;}
     mask-image:linear-gradient(to bottom, transparent, #000 22px, #000 calc(100% - 22px), transparent);
   }
   .island-mrow .island-iconbtn{flex:0 0 auto; min-height:48px;}
-  /* menu sheet rises above the docked bar */
-  .island .menu-sheet{top:auto; bottom:calc(100% + 8px); left:0; right:0; width:auto;}
+  /* menu sheet rises above the docked bar, freed from the dock width:
+     viewport-wide and centered like the search popover. The open animation
+     carries the centering transform so it never jumps sideways. */
+  .island .menu-sheet{top:auto; bottom:calc(100% + 8px); left:50%; right:auto;
+    transform:translateX(-50%); width:calc(100vw - 32px);
+    animation-name:menu-in-m;}
 }
+@keyframes menu-in-m{from{opacity:0; transform:translateX(-50%) translateY(-6px);} to{opacity:1; transform:translateX(-50%);}}
 /* ---------- tutorial bottom sheet (small screens) ---------- */
 @media(max-width:640px){
   .tut-veil{place-items:end center !important; padding:0 0 env(safe-area-inset-bottom,0px) !important;}
