@@ -1,6 +1,7 @@
 'use client';
 
 import { applyStretch, colormap } from '@/lib/astro';
+import { loadCachedImage } from '@/lib/skycache';
 
 /** Preview-modal presets, reused verbatim for card thumbnails. */
 export type TonePreset = 'grayscale' | 'viridis' | 'cividis';
@@ -13,13 +14,9 @@ export const TONE_PRESET: Record<Tone, TonePreset> = {
 
 const cache = new Map<string, string>();
 
+/** Decoded source image via the shared IndexedDB tile cache (offline-first). */
 function loadImage(url: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error('tone load failed'));
-    img.src = url;
-  });
+  return loadCachedImage(url);
 }
 
 /** Render a cutout through the exact preview colormap pipeline. Cached. */
