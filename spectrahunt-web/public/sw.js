@@ -5,7 +5,7 @@
  *  - /showcases|reports|coverage|tle JSON: stale-while-revalidate
  *  - images + _next/static + fonts: cache-first (bounded image cache)
  */
-const SW_VERSION = 'drishti-v1';
+const SW_VERSION = 'drishti-v2';
 const STATIC_CACHE = `${SW_VERSION}-static`;
 const DATA_CACHE = `${SW_VERSION}-data`;
 const IMG_CACHE = `${SW_VERSION}-img`;
@@ -21,6 +21,15 @@ const OFFLINE_HTML = `<!doctype html><html lang="en"><head><meta charset="utf-8"
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(STATIC_CACHE).then((c) => c.addAll(['/', '/manifest.webmanifest'])).catch(() => undefined)
+      .then(() => caches.open(DATA_CACHE))
+      // Pin the full curated bundle (precache.json lists every data URL,
+      // ~2.5MB): chunked so one missing file can't fail the whole install.
+      .then((c) => fetch('/precache.json').then((r) => (r.ok ? r.json() : [])).catch(() => [])
+        .then((urls) => (async () => {
+          for (let i = 0; i < urls.length; i += 40) {
+            try { await c.addAll(urls.slice(i, i + 40)); } catch { /* keep going */ }
+          }
+        })()))
       .then(() => self.skipWaiting()),
   );
 });

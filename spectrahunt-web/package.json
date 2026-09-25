@@ -1,9 +1,10 @@
 {
   "name": "stellar-web",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "private": true,
   "scripts": {
     "dev": "NEXT_PUBLIC_DISABLE_SW=1 next dev",
+    "prebuild": "python3 ../../scripts/gen_precache.py",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
