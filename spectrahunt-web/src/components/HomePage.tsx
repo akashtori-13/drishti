@@ -288,22 +288,10 @@ export default function HomePage() {  const router = useRouter();
           <div ref={copyRef} className="hero-copy">
             <h1>Hunt what moves in the infrared sky</h1>
 
-            <div
-              onPointerDownCapture={(e) => {
-                // coarse pointers: never focus here — hand straight to the
-                // nav search row so the dock morphs with the keyboard
-                if (e.target instanceof HTMLInputElement
-                  && window.matchMedia('(pointer: coarse)').matches) {
-                  e.preventDefault();
-                  window.dispatchEvent(new CustomEvent('sh-nav-search'));
-                }
-              }}
-            >
-              <SearchBox
-                id="hs" placeholder="Search an object, field, or coordinates"
-                onPick={pick}
-              />
-            </div>
+            <SearchBox
+              id="hs" placeholder="Search an object, field, or coordinates"
+              onPick={pick} handoff
+            />
 
             <div className="quick">
               <button type="button" className="chip" onClick={() => openPreview('3i-atlas')}>3I/ATLAS</button>
