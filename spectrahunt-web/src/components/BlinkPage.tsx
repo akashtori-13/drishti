@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';import BlinkComparator from '@/components/BlinkComparator';
 import Icon from '@/components/Icon';
 import WaitGame from '@/components/WaitGame';
-import SpectrumPlot, { LightCurve, SedPlot } from '@/components/Plots';
+import { LightCurve, SedPlot } from '@/components/Plots';
 import {
   fetchLiveShowcase, getShowcase, isLiveId, parseLiveId,
   skybotMatches, useLive, type Showcase,
@@ -79,61 +79,6 @@ function OtherEyes({ id }: { id: string }) {
       ))}
     </div>
   );
-}
-
-/** Real mini-spectrum: center brightness of each detector-band cutout. */
-function BandSpectrum({ viewing, sample, liveSpec, band }: {
-  viewing: Showcase;
-  sample: { x: number; y: number; values: number[] } | null;
-  liveSpec: Array<{ wavelength_um: number; flux: number }> | null;
-  band: number;
-}) {
-  const [pts, setPts] = useState<{ wave: number; flux: number }[] | null>(null);
-  useEffect(() => {
-    let alive = true;
-    const entries = Object.entries(viewing.bands ?? {})
-      .filter(([, b]) => b.png)
-      .map(([, b]) => ({ png: b.png as string, wave: b.wavelength_um ?? 0 }));
-    if (!entries.length) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setPts(null); return;
-    }
-    void Promise.all(entries.map(({ png, wave }) => new Promise<{ wave: number; flux: number } | null>((resolve) => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        try {
-          const c = document.createElement('canvas');
-          c.width = 24; c.height = 24;
-          const ctx = c.getContext('2d');
-          if (!ctx) return resolve(null);
-          ctx.drawImage(img, 0, 0, 24, 24);
-          const d = ctx.getImageData(10, 10, 4, 4).data;
-          let s = 0;
-          for (let i = 0; i < d.length; i += 4) s += d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114;
-          resolve({ wave, flux: Math.round((s / 16) * 10) / 10 });
-        } catch { resolve(null); }
-      };
-      img.onerror = () => resolve(null);
-      img.src = png;
-    }))).then((arr) => {
-      if (!alive) return;
-      const good = arr.filter((p): p is { wave: number; flux: number } => p !== null)
-        .sort((a, b) => a.wave - b.wave);
-      setPts(good.length >= 2 ? good : null);
-    });
-    return () => { alive = false; };
-  }, [viewing]);
-  if (liveSpec?.length) {
-    return <SpectrumPlot values={liveSpec.map((p) => p.flux)} band={band} waves={liveSpec.map((p) => p.wavelength_um)} />;
-  }
-  if (pts) {
-    return <SpectrumPlot values={pts.map((p) => p.flux)} band={band} waves={pts.map((p) => p.wave)} />;
-  }
-  if (sample) {
-    return <SpectrumPlot values={sample.values} band={band} />;
-  }
-  return <p className="fine">Band images still indexing — click the image for an epoch proxy, or wait for live pipeline spectra.</p>;
 }
 
 /** Blink workspace: fixed-viewport viewer + tabbed data rail. No page scroll on desktop. */
@@ -530,7 +475,6 @@ export default function BlinkPage({ id }: { id: string }) {
                     <p className="fine">No brightness samples yet — arm Measure on the image and click a spot, or wait for live pipeline photometry.</p>
                   )}
                   <h3>Spectrum</h3>
-                  <BandSpectrum viewing={viewing} sample={sample} liveSpec={liveSpec} band={band} />
                   {report?.spectrum?.length ? (
                     <SedPlot points={report.spectrum.map((s) => ({
                       wl: s.wavelength_um, flux: s.flux, err: s.flux_err,
