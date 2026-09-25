@@ -3,7 +3,8 @@
 export type IconName =
   | 'logo' | 'search' | 'skymap' | 'back' | 'fwd' | 'down' | 'x'
   | 'play' | 'pause' | 'ext' | 'menu' | 'dice' | 'target'
-  | 'home' | 'split' | 'info' | 'dl' | 'clock' | 'sliders' | 'arrow' | 'team';
+  | 'home' | 'split' | 'info' | 'dl' | 'clock' | 'sliders' | 'arrow' | 'team'
+  | 'globe' | 'mail' | 'code';
 
 /** Single-copy SVG sprite (render once in layout). */
 export function Sprite() {
@@ -35,6 +36,9 @@ export function Sprite() {
         <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7.5h16M4 16.5h16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /><circle cx="15" cy="7.5" r="2.3" fill="currentColor" /><circle cx="9" cy="16.5" r="2.3" fill="currentColor" /></symbol>
         <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M12 3.5 19 20.5 12 16.8 5 20.5Z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /></symbol>
         <symbol id="i-team" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.2" fill="none" stroke="currentColor" strokeWidth="1.8" /><path d="M3.5 19.5c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /><circle cx="16.8" cy="9.5" r="2.5" fill="none" stroke="currentColor" strokeWidth="1.8" /><path d="M15.4 14.7c2.3.3 4 1.9 4.5 4.3" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></symbol>
+        <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" strokeWidth="1.8" /><path d="M3.5 12h17M12 3.5c2.6 2.3 3.9 5.2 3.9 8.5s-1.3 6.2-3.9 8.5c-2.6-2.3-3.9-5.2-3.9-8.5S9.4 5.8 12 3.5Z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /></symbol>
+        <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5" fill="none" stroke="currentColor" strokeWidth="1.8" /><path d="M4.5 7.5 12 13l7.5-5.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></symbol>
+        <symbol id="i-code" viewBox="0 0 24 24"><path d="M8.5 6.5 3.5 12l5 5.5M15.5 6.5l5 5.5-5 5.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></symbol>
       </defs>
     </svg>
   );
