@@ -124,8 +124,8 @@ IRSA playbook (slow/flaky upstream): raise timeouts before parallelism; serial (
 
 ## 13. Data inventory (verified 2026-09-23)
 
-20 fields · **108 epochs, all PNG-backed** · 20/20 reports · 2,590 census cells ·
-208 cutouts · 40 DSS2/2MASS context frames · `out/` 7.2 MB (budget <10 MB).
+20 fields · **143 epochs, all PNG-backed** · 20/20 reports · 2,590 census cells ·
+240 cutouts · 40 DSS2/2MASS context frames · `out/` 11 MB.
 
 Per-field bands: 19 fields 6/6 detectors; galactic-center 3/3 (coverage limit).
 Notables: 3I/ATLAS (13 movers, top 143σ, literature-cited), galactic-center (20 movers),
@@ -162,7 +162,7 @@ OpenAPI auto-generated at `/docs` when the dev server runs.
   (`skyposture.test.ts`); sign convention documented (south-based A flips cosine signs).
 - **Honesty as architecture**: `png:null` → metadata + "pending"; empty sky → dark +
   "not yet surveyed"; degraded upstreams → labeled, never faked.
-- **Test envelope**: 16 backend (pytest) + 43 frontend (vitest) + tsc + eslint (0 errors)
+- **Test envelope**: 24 backend (pytest) + 58 frontend (vitest) + tsc + eslint (0 errors)
   + production build + Playwright narrow-viewport scans (360/320 clean).
 
 ## 16. Third-party credits (ship list)
@@ -212,8 +212,8 @@ a real measurement pipeline, and published everything back as open, reusable dat
 
 | Stage | Script/module | Input → output | Volume today |
 |---|---|---|---|
-| Discovery | `epochs.py` | coords → covering-image hit lists | 108 epochs across 20 fields |
-| Fetch | `cutouts.py` | FITS → parsed arrays (IMAGE/FLAGS/VARIANCE/WCS-WAVE) | 208 cutouts rendered |
+| Discovery | `epochs.py` | coords → covering-image hit lists | 143 epochs across 20 fields |
+| Fetch | `cutouts.py` | FITS → parsed arrays (IMAGE/FLAGS/VARIANCE/WCS-WAVE) | 240 cutouts rendered |
 | Clean | `mask_bad_pixels` | flags+variance → science-ready pixels | every PNG |
 | Render | `render_png` (zscale+asinh) | arrays → ≤100 KB PNGs | 7.2 MB total bundle |
 | Align | `align.py` | WCS reproject, correlation fallback | every multi-epoch field |

@@ -1,8 +1,10 @@
 #!/bin/bash
 # Overnight build-check loop: merge census -> indexer follow-up -> rebuild ->
-# verify -> commit-if-changed. 6 passes x ~10 min. Logs to overnight.log.
-cd /home/himel/Documents/spectrahunt || exit 1
-LOG=/tmp/opencode/spectrahunt-logs/overnight.log
+# verify -> commit-if-changed. 6 passes x ~10 min. Logs to data/logs/.
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT" || exit 1
+mkdir -p data/logs
+LOG="$ROOT/data/logs/overnight.log"
 export NEXT_PUBLIC_DATA_MODE=live NEXT_PUBLIC_API_URL=http://localhost:8000
 
 for i in $(seq 1 6); do
@@ -10,12 +12,12 @@ for i in $(seq 1 6); do
 
   # 1. merge census shards -> coverage.json (never regress cell count)
   BEFORE=$(.venv/bin/python -c "import json; print(len(json.load(open('spectrahunt-web/public/coverage.json'))['cells']))" 2>/dev/null || echo 0)
-  cp spectrahunt-web/public/coverage.json /tmp/opencode/coverage.bak 2>/dev/null
+  cp spectrahunt-web/public/coverage.json data/logs/coverage.bak 2>/dev/null
   .venv/bin/python scripts/sky_census.py --merge 2>&1 | tail -2 | tee -a "$LOG"
   AFTER=$(.venv/bin/python -c "import json; print(len(json.load(open('spectrahunt-web/public/coverage.json'))['cells']))" 2>/dev/null || echo 0)
   if [ "$AFTER" -lt "$BEFORE" ]; then
     echo "merge regressed ($BEFORE -> $AFTER); restoring backup" | tee -a "$LOG"
-    cp /tmp/opencode/coverage.bak spectrahunt-web/public/coverage.json
+    cp data/logs/coverage.bak spectrahunt-web/public/coverage.json
   fi
 
   # 2. indexer follow-up: fill any png:null fields if indexer idle

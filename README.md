@@ -260,14 +260,14 @@ spectrahunt-web/
   src/lib/astro.ts  # coordinates, 88 constellations, 102 channels, stretch/colormaps
   src/lib/skyposture.ts # point-at-sky math (sensors -> RA/Dec)
   src/              # pages + viewers (HeroSky, StellariumView, Blink deck, rail) + store
-data/               # git-ignored scratch (SQLite cache, census shards)
+data/               # local caches (SQLite, shards, FITS — ignored) plus committed evidence JSONs (tracks/pairfits/ranking/forensics)
 dist/               # git-ignored release artifacts (APK, AppImage, installers)
 ```
 
 ## Checks
 
 ```bash
-.venv/bin/python -m pytest backend/tests/ -q   # 18 collected
+.venv/bin/python -m pytest backend/tests/ -q   # 24 collected
 cd spectrahunt-web && npm test                 # 58 passed (vitest)
 cd spectrahunt-web && npx tsc --noEmit && npx eslint src  # 0 errors
 cd spectrahunt-web && npm run build            # static export to out/
