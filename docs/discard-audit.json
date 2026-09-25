@@ -1,0 +1,188 @@
+{
+  "kept": 466,
+  "rejected": 0,
+  "unknown": 0,
+  "rule": "|d\u03bb| < factor \u00d7 mean bandwidth (cutouts.wavelengths_match)",
+  "fields": [
+    {
+      "id": "3i-atlas",
+      "epochs": 2,
+      "pairs": 1,
+      "kept": 1,
+      "rejected": 0,
+      "unknown": 0,
+      "rejected_bands": []
+    },
+    {
+      "id": "carina-field",
+      "epochs": 8,
+      "pairs": 28,
+      "kept": 28,
+      "rejected": 0,
+      "unknown": 0,
+      "rejected_bands": []
+    },
+    {
+      "id": "crab-field",
+      "epochs": 8,
+      "pairs": 28,
+      "kept": 28,
+      "rejected": 0,
+      "unknown": 0,
+      "rejected_bands": []
+    },
+    {
+      "id": "dorado-deep",
+      "epochs": 8,
+      "pairs": 28,
+      "kept": 28,
+      "rejected": 0,
+      "unknown": 0,
+      "rejected_bands": []
+    },
+    {
+      "id": "draco-field",
+      "epochs": 8,
+      "pairs": 28,
+      "kept": 28,
+      "rejected": 0,
+      "unknown": 0,
+      "rejected_bands": []
+    },
+    {
+      "id": "ecliptic-mover",
+      "epochs": 6,
+      "pairs": 15,
+      "kept": 15,
+      "rejected": 0,
+      "unknown": 0,
+      "rejected_bands": []
+    },
+    {
+      "id": "eros-field",
+      "epochs": 8,
+      "pairs": 28,
+      "kept": 28,
+      "rejected": 0,
+      "unknown": 0,
+      "rejected_bands": []
+    },
+    {
+      "id": "galactic-center",
+      "epochs": 4,
+      "pairs": 6,
+      "kept": 6,
+      "rejected": 0,
+      "unknown": 0,
+      "rejected_bands": []
+    },
+    {
+      "id": "hercules-field",
+      "epochs": 8,
+      "pairs": 28,
+      "kept": 28,
+      "rejected": 0,
+      "unknown": 0,
+      "rejected_bands": []
+    },
+    {
+      "id": "libra-field",
+      "epochs": 8,
+      "pairs": 28,
+      "kept": 28,
+      "rejected": 0,
+      "unknown": 0,
+      "rejected_bands": []
+    },
+    {
+      "id": "lmc-field",
+      "epochs": 7,
+      "pairs": 21,
+      "kept": 21,
+      "rejected": 0,
+      "unknown": 0,
+      "rejected_bands": []
+    },
+    {
+      "id": "m101-field",
+      "epochs": 8,
+      "pairs": 28,
+      "kept": 28,
+      "rejected": 0,
+      "unknown": 0,
+      "rejected_bands": []
+    },
+    {
+      "id": "m31-field",
+      "epochs": 8,
+      "pairs": 28,
+      "kept": 28,
+      "rejected": 0,
+      "unknown": 0,
+      "rejected_bands": []
+    },
+    {
+      "id": "m51-field",
+      "epochs": 8,
+      "pairs": 28,
+      "kept": 28,
+      "rejected": 0,
+      "unknown": 0,
+      "rejected_bands": []
+    },
+    {
+      "id": "nep-deep",
+      "epochs": 5,
+      "pairs": 10,
+      "kept": 10,
+      "rejected": 0,
+      "unknown": 0,
+      "rejected_bands": []
+    },
+    {
+      "id": "omega-cen-field",
+      "epochs": 8,
+      "pairs": 28,
+      "kept": 28,
+      "rejected": 0,
+      "unknown": 0,
+      "rejected_bands": []
+    },
+    {
+      "id": "ophiuchus-field",
+      "epochs": 8,
+      "pairs": 28,
+      "kept": 28,
+      "rejected": 0,
+      "unknown": 0,
+      "rejected_bands": []
+    },
+    {
+      "id": "orion-field",
+      "epochs": 7,
+      "pairs": 21,
+      "kept": 21,
+      "rejected": 0,
+      "unknown": 0,
+      "rejected_bands": []
+    },
+    {
+      "id": "smc-field",
+      "epochs": 8,
+      "pairs": 28,
+      "kept": 28,
+      "rejected": 0,
+      "unknown": 0,
+      "rejected_bands": []
+    },
+    {
+      "id": "virgo-field",
+      "epochs": 8,
+      "pairs": 28,
+      "kept": 28,
+      "rejected": 0,
+      "unknown": 0,
+      "rejected_bands": []
+    }
+  ]
+}
