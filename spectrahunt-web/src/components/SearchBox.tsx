@@ -22,10 +22,12 @@ interface Suggestion {
 
 /** Combobox search: showcases, coordinates (decimal + sexagesimal), constellations, Sesame names. */
 export default function SearchBox({
-  id, placeholder, compact = false, defaultValue = '', onPick,
+  id, placeholder, compact = false, defaultValue = '', onPick, handoff = false,
 }: {
   id: string; placeholder: string; compact?: boolean; defaultValue?: string;
   onPick: (t: SearchTarget) => void;
+  /** Coarse pointers: taps hand off to the nav search row (same gesture). */
+  handoff?: boolean;
 }) {
   const [q, setQ] = useState(defaultValue);
   const [open, setOpen] = useState(false);
@@ -136,13 +138,35 @@ export default function SearchBox({
       ref={boxRef} className="search-shell" role="search" noValidate
       onSubmit={(e) => { e.preventDefault(); void submit(q); }}
       onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setOpen(false); }}
+      onPointerDownCapture={handoff ? (e) => {
+        // coarse pointers never type here: the dock morphs into the
+        // search bar instead, carrying this pick handler with it
+        if (e.target instanceof HTMLInputElement
+          && window.matchMedia('(pointer: coarse)').matches) {
+          e.preventDefault();
+          (window as unknown as { __shLast?: number }).__shLast = Date.now();
+          window.dispatchEvent(new CustomEvent('sh-nav-search', { detail: { onPick } }));
+        }
+      } : undefined}
     >
         <Icon name="search" className="s-icon icon" />
         <input
           id={`${id}-input`}
           value={q}
           onChange={(e) => { const v = e.target.value; const list = build(v); setQ(v); setOpts(list); setHl(list.length ? 0 : -1); setErr(null); setOpen(true); }}
-          onFocus={() => { const list = build(q); setOpts(list); setHl(list.length && q.trim() ? 0 : -1); setOpen(true); }}
+          onFocus={(e) => {
+            // backstop: if a tap slipped past pointerdown interception,
+            // hand off here instead of opening the inline list
+            if (handoff && window.matchMedia('(pointer: coarse)').matches) {
+              const last = (window as unknown as { __shLast?: number }).__shLast ?? 0;
+              e.target.blur();
+              if (Date.now() - last > 500) {
+                window.dispatchEvent(new CustomEvent('sh-nav-search', { detail: { onPick } }));
+              }
+              return;
+            }
+            const list = build(q); setOpts(list); setHl(list.length && q.trim() ? 0 : -1); setOpen(true);
+          }}
           onKeyDown={(e) => {
             if (e.key === 'ArrowDown') { e.preventDefault(); setHl((h) => Math.min(h + 1, opts.length - 1)); }
             else if (e.key === 'ArrowUp') { e.preventDefault(); setHl((h) => Math.max(h - 1, -1)); }
