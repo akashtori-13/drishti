@@ -13,10 +13,13 @@ zustand, canvas 2D (no WebGL, no Aladin). Styling: `src/app/globals.css`
 | `/sky` | `app/sky/page.tsx` | Observer (default) / all-sky map toggle |
 | `/blink/[id]` | `app/blink/[id]/page.tsx` | 15 IDs via `generateStaticParams`; unknown → branded 404 |
 | `/blink/live?ra=&dec=&band=` | `app/blink/live/page.tsx` | Any visited field (Suspense + searchParams) |
-| `/candidates`, `/about` | … | Cards, mission + tours + glossary |
+| `/candidates` | `app/candidates/page.tsx` | Full-bleed cards, objects modal, rotating colormap tones |
+| `/about` | `app/about/page.tsx` | Team AKASHTORI photocards |
+| `/mission` | `app/mission/page.tsx` | Mission + tours + glossary |
 | `/sitemap.xml`, `/robots.txt`, `/manifest.webmanifest` | `*.ts` routes | `force-static` (required for export) |
 
-Shared chrome (`SiteChrome`): `Header` (real `Link`s, active states),
+Shared chrome (`SiteChrome`): `Header` island navbar (morphs around the
+menu sheet, real `Link`s, active states), global `SpaceBackdrop` starfield,
 footer (hidden on `/sky`), `Tutorial` (home only, localStorage once).
 
 **Export gotcha:** nothing server-side may `await searchParams` — query state
@@ -27,7 +30,8 @@ only under `Suspense`).
 
 UI-only zustand store: `compareMode`, `epochIdx`, `band`, `showMarkers`,
 `tutorialDone`. No routing state (that's URLs now). `blinkURL(id, opts)` builds
-`/blink/<id>?band=&epoch=&mode=`; live fields use `/blink/live?ra=&dec=&band=`.
+`/blink/<id>?band=&epoch=&mode=` (modes: blink/side/swipe/diff/replay/color;
+color is exclusive); live fields use `/blink/live?ra=&dec=&band=` or `/blink/<live:ra:dec:band>`.
 
 ## The two sky engines
 
@@ -64,7 +68,8 @@ epochIdx, onEpochChange, showMarkers, onToggleMarkers?, fovArcmin?, onSample?,
 center?, bandPngs?`. Internals:
 
 - Canvas engine: cover-fit draw → stretch/colormap/invert (`lib/astro.ts`
-  mirrors the backend render); modes blink/side/swipe/true-diff/motion-color.
+  mirrors the backend render); modes blink/side/swipe/true-diff/motion-color/false-color,
+all exclusive via `CompareMode` (color joined the union; the old RGB toggle is gone).
 - Preload is **progressive** (each arrival re-renders; placeholders meanwhile).
 - `lib/motion.ts` — real in-browser differencing (MAD-noise ±5σ dipoles +
   vectors + variables) drives markers + Measure list. Offline-capable.

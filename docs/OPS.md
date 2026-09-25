@@ -34,6 +34,7 @@ default is **static**: the site never needs the backend at runtime.
 - Version truth: `spectrahunt-web/package.json` (+ mirrors: `desktop/.../Cargo.toml`, `tauri.conf.json`, Android `versionCode/versionName`). Bump via `scripts/release.py --version X.Y.Z`.
 - `scripts/release.py`: builds web → stamps `out/build-info.json` (version, commit, data counts) → optional Android/desktop → collects versioned files into `dist/` (git-ignored).
 - Flow: commit to `main` → tag `vX.Y.Z` → push tag → `release.yml` builds all platforms (~35 min) → `publish` job creates the GitHub Release.
+- **Local ship (no CI minutes):** `scripts/release.py --version X.Y.Z` builds web + debug APK + Linux bundles on this machine (needs JDK 17–23 via `~/jdks`, Tauri system deps); signed APK via `STELLAR_KEYSTORE_*` env; Windows NSIS via the `cargo-xwin` + home-built `makensis` recipe in TROUBLESHOOTING; AppImage via raw `appimagetool` on the finished AppDir. Publish with `gh release create vX.Y.Z dist/*` (or `gh release upload` to amend).
 - **Tags move only before any release exists.** Once published, never force-move; cut a patch version instead.
 - After CI publishes: upload the locally signed APK (`gh release upload vX.Y.Z dist/stellar-*.apk --clobber`) since CI has no keystore secrets yet.
 - Stable download links: `github.com/akashtori-13/stellar/releases/latest/download/<file>`.
