@@ -64,7 +64,7 @@ export default function TeamPage() {
                 <a href={m.web} target="_blank" rel="noreferrer"
                   aria-label={`Portfolio: ${contactLabel(m.web, 'website')}`}
                   title={contactLabel(m.web, 'Website')}>
-                  <Icon name="briefcase" className="icon" />
+                  <Icon name="profile" className="icon" />
                 </a>
               )}
               {m.github && (
