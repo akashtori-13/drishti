@@ -18,6 +18,9 @@ spectrahunt-web/*.tsbuildinfo
 .cache/
 *.fits
 data/cutouts/
+data/fits-cache/
+data/logs/
+data/census_progress.json
 data/img/
 data/reports/
 data/census_*.json
@@ -46,3 +49,4 @@ spectrahunt-web/android/app/keystore.properties
 *.keystore
 *.jks
 desktop/src-tauri/gen/schemas/
+data/census_progress.json

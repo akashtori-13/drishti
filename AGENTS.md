@@ -7,8 +7,11 @@
   downloads that delete after measuring.
 - Shipped pages must read **precomputed JSONs** (`spectrahunt-web/public/`,
   `data/*.json`), never live external fetches. A fresh clone with no
-  network must still build, test (backend suite is network-free via
-  `data/horizons_cache.json`), and serve every data panel.
+  network must still build, serve every data panel, and run the backend
+  suite (which is network-free against the committed caches; a test that
+  needs live IRSA must stub the DB layer — see docs/TROUBLESHOOTING.md).
+- Note: `spectrahunt-web/AGENTS.md` is auto-generated Next.js boilerplate;
+  follow it only when editing web code (vendored guide discipline).
 - Evidence over re-derivation: track/pairfit/forensics JSONs are committed;
   large binaries (FITS) stay on disk, never in git (`*.fits` is ignored).
 

@@ -288,7 +288,15 @@ export default function BlinkComparator({
     const attemptLoad = (a: number): void => {
       void loadImage(u).then((img) => {
         inflight.current.delete(u);
-        setLoaded((m) => (m[u] ? m : { ...m, [u]: img }));
+        // bounded: decoded frames cap at 24 URLs (re-decode from IDB on
+        // revisit — cheap). Unbounded growth was flagged in audit F11.
+        setLoaded((m) => {
+          if (m[u]) return m;
+          const next = { ...m, [u]: img };
+          const keys = Object.keys(next);
+          for (const k of keys.slice(0, Math.max(0, keys.length - 24))) delete next[k];
+          return next;
+        });
         setFailed((m) => {
           if (!(u in m)) return m;
           const next = { ...m };

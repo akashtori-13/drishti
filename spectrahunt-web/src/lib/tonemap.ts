@@ -48,5 +48,10 @@ export async function renderTone(url: string, tone: Tone, side = 260): Promise<s
   ctx.putImageData(data, 0, 0);
   const out = cv.toDataURL('image/png');
   cache.set(key, out);
+  // bounded: 40 rendered thumbs max (audit F10); dataURLs are ~100KB each
+  if (cache.size > 40) {
+    const oldest = cache.keys().next().value as string | undefined;
+    if (oldest !== undefined) cache.delete(oldest);
+  }
   return out;
 }

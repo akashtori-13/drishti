@@ -37,17 +37,13 @@ def diagnose(parsed: dict) -> dict:
     dist = np.hypot(xx - x, yy - y)
     ap = (dist <= R_APER) & np.isfinite(img)
     an = (dist > R_IN) & (dist <= R_OUT) & np.isfinite(img)
-    an_vals = img[an]
-    ap_vals = img[ap]
-    flags = parsed.get("flags")
-    flagfrac = None
-    if flags is not None:
-        try:
-            from backend.cutouts import FLAGS_BAD_MASK
-            f = np.asarray(flags)
-            flagfrac = float(((f[ap] & FLAGS_BAD_MASK) != 0).sum() / max(1, ap.sum()))
-        except Exception:
-            flagfrac = None
+    # same bad-pixel definition as the pipeline (audit B12): forensics sums
+    # must reproduce aperture_flux, so exclude masked pixels here too
+    from backend.cutouts import FLAGS_BAD_MASK, mask_bad_pixels
+    _filled, badmask = mask_bad_pixels(img, parsed.get("flags"), parsed.get("variance"))
+    ap_vals = img[ap & ~badmask]
+    an_vals = img[an & ~badmask]
+    flagfrac = float(badmask[ap].sum() / max(1, ap.sum()))
     try:
         sky = parsed["wcs"].all_pix2world([[float(x), float(y)]], 0)[0]
     except Exception:
@@ -70,11 +66,12 @@ def diagnose(parsed: dict) -> dict:
     }
 
 
-def overlay(src_png: Path, dst_png: Path, cx: float, cy: float) -> None:
+def overlay(src_png: Path, dst_png: Path, cx: float, cy: float,
+              cut_w: int = 29, cut_h: int = 29) -> None:
     from PIL import Image, ImageDraw
     im = Image.open(src_png).convert("RGB")
     W, H = im.size
-    sx, sy = W / 29.0, H / 29.0  # cutouts are 29x29
+    sx, sy = W / cut_w, H / cut_h
     d = ImageDraw.Draw(im)
     for r, col in ((R_APER, "lime"), (R_IN, "yellow"), (R_OUT, "red")):
         d.ellipse([ (cx - r) * sx, (cy - r) * sy,
@@ -104,7 +101,8 @@ async def main() -> None:
             render_png(parsed["image"], raw_png)
             overlay(raw_png,
                     OUT / f"flip_b{p['band']}_{p['mjd']:.6f}_overlay.png",
-                    diag["cut_pix"][0], diag["cut_pix"][1])
+                    diag["cut_pix"][0], diag["cut_pix"][1],
+                    diag["cut_size"][0], diag["cut_size"][1])
             rec = {"band": p["band"], "mjd": p["mjd"], "flux": p["flux"],
                    "flux_err": p["flux_err"], **diag}
             recs.append(rec)

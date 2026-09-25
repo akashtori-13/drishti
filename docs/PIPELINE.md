@@ -28,6 +28,7 @@ Design context: `SYSTEM_DESIGN.md` §§4–6, 9. API shapes: `docs/API.md`.
 | `classify_fields.py` | Detection + light curves → `public/reports/{id}.json` | `--only`, `--force`; skips fresh reports; conservative rules |
 | `process_field.py` | One position → `data/reports/field_*.json` | `--ra --dec --band`; ad-hoc analysis |
 | `serve.py` | Static server | no-store HTML (auto hard-refresh), immutable hashed assets |
+| `promote_orbital.py` | Orbital-intro webp assets → `public/orbital/` | idempotent; refuses totals over the 2 MB intro budget |
 | `warm_cache.py` | Cold-start warmer | `--bands`, `--detect N`; front-loads slow IRSA queries with retries |
 | `nightly.sh` / `watch_push.sh` / `audit_loop.sh` | Ops loops | merge → fill → build → verify → commit / commit-on-data / 50-pass verify |
 

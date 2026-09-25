@@ -90,7 +90,7 @@ def build_web(version: str) -> None:
         rev = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True, cwd=ROOT).stdout.strip()
     except Exception:
         rev = "unknown"
-    info = {"app": "STELLAR", "version": version, "commit": rev, **data_counts()}
+    info = {"app": "DRISHTI", "version": version, "commit": rev, **data_counts()}
     (WEB / "out" / "build-info.json").write_text(json.dumps(info, indent=2))
     print(f"web built: {info}")
 
@@ -123,6 +123,30 @@ def build_android(version: str) -> None:
         dest = DIST / f"drishti-{version}-debug.apk"
         shutil.copy(apk, dest)
         print(f"android APK -> {dest} ({dest.stat().st_size // 1024} KB)")
+    # signed release when the keystore env is present (played manually for
+    # v3.1.0; scripted so future ships don't rediscover it — audit O5).
+    # DRISHTI_* primary (rebrand), STELLAR_* fallback (legacy + CI docs).
+    def _env(*names):
+        for n in names:
+            v = env.get(n) or os.environ.get(n)
+            if v:
+                return v
+        return None
+    ks = {"STELLAR_KEYSTORE_FILE": _env("DRISHTI_KEYSTORE_FILE", "STELLAR_KEYSTORE_FILE"),
+          "STELLAR_KEYSTORE_PASSWORD": _env("DRISHTI_KEYSTORE_PASSWORD", "STELLAR_KEYSTORE_PASSWORD"),
+          "STELLAR_KEY_ALIAS": _env("DRISHTI_KEY_ALIAS", "STELLAR_KEY_ALIAS") or "stellar",
+          "STELLAR_KEY_PASSWORD": _env("DRISHTI_KEY_PASSWORD", "STELLAR_KEY_PASSWORD")}
+    if ks["STELLAR_KEYSTORE_FILE"] and ks["STELLAR_KEYSTORE_PASSWORD"] \
+            and ks["STELLAR_KEY_PASSWORD"] \
+            and Path(str(ks["STELLAR_KEYSTORE_FILE"])).exists():
+        env.update({k: v for k, v in ks.items() if v})
+        run(["./gradlew", "assembleRelease", "--no-daemon"], cwd=WEB / "android", env=env)
+        for apk in (WEB / "android" / "app" / "build" / "outputs" / "apk" / "release").glob("*.apk"):
+            dest = DIST / f"drishti-{version}.apk"
+            shutil.copy(apk, dest)
+            print(f"android signed APK -> {dest} ({dest.stat().st_size // 1024} KB)")
+    else:
+        print("android: no keystore env, skipping signed release (debug only)")
 
 
 def build_desktop(version: str) -> None:
@@ -158,7 +182,7 @@ def main() -> None:
     if args.version:
         bump_version(args.version)
     version = read_version()
-    print(f"=== STELLAR release {version} ===", flush=True)
+    print(f"=== DRISHTI release {version} ===", flush=True)
     if not args.skip_www:
         build_web(version)
     if not args.skip_android:

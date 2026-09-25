@@ -81,7 +81,7 @@ async function cacheFirst(request, cacheName, trimTo) {
     const res = await fetch(request);
     if (res && res.ok) {
       cache.put(request, res.clone()).catch(() => undefined);
-      if (trimTo) void trim(cacheName, trimTo);
+      if (trimTo > 0) void trim(cacheName, trimTo);
     }
     return res;
   } catch {
