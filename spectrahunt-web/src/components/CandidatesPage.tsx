@@ -38,14 +38,15 @@ interface Card {
 
 type Filter = 'all' | 'unknown' | 'known';
 
+import { getReport as getCachedReport } from '@/lib/reports';
+
 async function getReport(id: string): Promise<Report | null> {
-  try {
-    const r = await fetch(`/reports/${id}.json`);
-    if (!r.ok) return null;
-    return (await r.json()) as Report;
-  } catch {
-    return null;
-  }
+  const doc = await getCachedReport(id);
+  if (!doc) return null;
+  return { id, detail: doc.detail ?? '', movers: doc.movers ?? 0,
+    variables: doc.variables ?? 0, top_sigma: doc.top_sigma ?? 0,
+    span_days: doc.span_days ?? null, variable_flag: doc.variable_flag ?? false,
+    known: doc.known ?? null } as Report;
 }
 
 function cardsFrom(showcases: Showcase[], reports: Map<string, Report>): Card[] {

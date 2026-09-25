@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';import BlinkCompara
 import Icon from '@/components/Icon';
 import WaitGame from '@/components/WaitGame';
 import { LightCurve, SedPlot } from '@/components/Plots';
+import { getReport } from '@/lib/reports';
 import {
   fetchLiveShowcase, getShowcase, isLiveId, parseLiveId,
   skybotMatches, useLive, type Showcase,
@@ -139,9 +140,7 @@ export default function BlinkPage({ id }: { id: string }) {
       if (!alive) return;
       setProg((p) => (done > p.done ? { done, total: 3, label } : p));
     };
-    void fetch(`/reports/${id}.json`).then((r) => (r.ok ? r.json() : null))
-      .then((j) => { if (alive && j && j.detail === 'ok') setReport(j); })
-      .catch(() => undefined)
+    void getReport(id).then((j) => { if (alive && j && j.detail === 'ok') setReport(j); })
       .finally(() => mark(1, 'Measurement report checked — fetching SPHEREx frames…'));
     const done = (d: Showcase, readyLabel?: string) => {
       if (!alive) return;

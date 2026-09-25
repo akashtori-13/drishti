@@ -1559,7 +1559,7 @@ export default function BlinkComparator({
                 title={f.png && failed[f.png] ? `${f.label} · load failed — click to retry` : (f.mjd ? `${f.label} · MJD ${f.mjd}` : f.label) + (blank ? ' · no motion in this pair' : '')}>
                 {f.png && loaded[f.png] ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={f.png} alt="" draggable={false} />
+                  <img src={loaded[f.png].src} alt="" draggable={false} />
                 ) : (
                   <span className="film-empty">{f.png && failed[f.png] ? '↻' : (f.mjd ? String(Math.round(f.mjd)).slice(2) : `E${i + 1}`)}</span>
                 )}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { swr } from '@/lib/cachefirst';
 
 interface PairTest {
   family: string;
@@ -34,9 +35,8 @@ export default function PairVerdicts({ pairId, title }: {
   const [doc, setDoc] = useState<PairDoc | null>(null);
   useEffect(() => {
     let alive = true;
-    void fetch(`/pairs/${pairId}.json`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((j) => { if (alive && j && Array.isArray(j.tests)) setDoc(j); })
+    void swr<PairDoc>(`sh-pair:${pairId}`, `/pairs/${pairId}.json`, Infinity)
+      .then((r) => { if (alive && r?.data && Array.isArray(r.data.tests)) setDoc(r.data); })
       .catch(() => undefined);
     return () => { alive = false; };
   }, [pairId]);

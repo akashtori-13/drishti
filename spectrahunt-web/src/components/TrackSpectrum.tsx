@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { SedPlot } from '@/components/Plots';
+import { swr } from '@/lib/cachefirst';
 
 interface TrackPoint {
   band: number;
@@ -28,9 +29,8 @@ export default function TrackSpectrum({ trackId, title, note }: {
   const [doc, setDoc] = useState<TrackDoc | null>(null);
   useEffect(() => {
     let alive = true;
-    void fetch(`/tracks/${trackId}.json`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((j) => { if (alive && j && Array.isArray(j.points)) setDoc(j); })
+    void swr<TrackDoc>(`sh-track:${trackId}`, `/tracks/${trackId}.json`, Infinity)
+      .then((r) => { if (alive && r?.data && Array.isArray(r.data.points)) setDoc(r.data); })
       .catch(() => undefined);
     return () => { alive = false; };
   }, [trackId]);

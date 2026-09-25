@@ -18,17 +18,15 @@ interface LineFile { features: Array<{ id: string; geometry: { coordinates: numb
 
 const normRa = (ra: number) => ((ra % 360) + 360) % 360;
 
+import { swr } from '@/lib/cachefirst';
+
 let starsP: Promise<CatStar[]> | null = null;
 let linesP: Promise<LineFile> | null = null;
 
 export function loadBrightStars(): Promise<CatStar[]> {
   if (!starsP) {
-    starsP = fetch('/data/bright-stars.json')
-      .then((r) => {
-        if (!r.ok) throw new Error(`stars ${r.status}`);
-        return r.json() as Promise<BrightFile>;
-      })
-      .then((j) => j.stars.map(([ra, dec, mag, bv]) => ({ ra, dec, mag, bv })))
+    starsP = swr<BrightFile>('sh-stars', '/data/bright-stars.json', Infinity)
+      .then((r) => (r?.data.stars ?? []).map(([ra, dec, mag, bv]) => ({ ra, dec, mag, bv })))
       .catch(() => []);
   }
   return starsP;
@@ -36,11 +34,8 @@ export function loadBrightStars(): Promise<CatStar[]> {
 
 export function loadConstellationLines(): Promise<LineFile> {
   if (!linesP) {
-    linesP = fetch('/data/constellations.lines.json')
-      .then((r) => {
-        if (!r.ok) throw new Error(`lines ${r.status}`);
-        return r.json() as Promise<LineFile>;
-      })
+    linesP = swr<LineFile>('sh-lines', '/data/constellations.lines.json', Infinity)
+      .then((r) => r?.data ?? { features: [] })
       .catch(() => ({ features: [] }));
   }
   return linesP;

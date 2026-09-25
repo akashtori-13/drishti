@@ -9,6 +9,7 @@ import { getShowcase, type Showcase } from '@/lib/showcases';
 import { loadCachedImage } from '@/lib/skycache';
 import { blinkURL, useAppStore } from '@/lib/store';
 import { SedPlot } from '@/components/Plots';
+import { getReport } from '@/lib/reports';
 
 type Preset = 'grayscale' | 'color' | 'colorblind';
 const PRESET_CMAP: Record<Preset, Colormap> = {
@@ -61,10 +62,8 @@ export default function ArtifactPreview() {
     let alive = true;
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setRepSpec(null);
-    void fetch(`/reports/${previewId}.json`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((j) => { if (alive) setRepSpec(Array.isArray(j?.spectrum) ? j.spectrum : null); })
-      .catch(() => undefined);
+    void getReport(previewId)
+      .then((j) => { if (alive) setRepSpec(Array.isArray(j?.spectrum) ? j.spectrum : null); });
     return () => { alive = false; };
   }, [previewId]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
