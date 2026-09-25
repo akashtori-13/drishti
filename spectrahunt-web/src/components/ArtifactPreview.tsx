@@ -60,6 +60,32 @@ export default function ArtifactPreview() {
   const pointers = useRef(new Map<number, { x: number; y: number }>());
   const pinch = useRef<{ dist: number; zoom: number } | null>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const imgRef = useRef<HTMLImageElement | undefined>(undefined);
+  // view mirror for clamping (zoom/pan always keep the frame covering)
+  const vpRef = useRef({ zoom: 1, x: 0, y: 0 });
+
+  /** Zoom never goes below cover (no empty canvas); pan never leaves the frame. */
+  const clampView = (zoom: number, px: number, py: number) => {
+    const z = Math.min(8, Math.max(1, zoom));
+    const canvas = canvasRef.current;
+    const img = imgRef.current;
+    if (!canvas || !img || !img.naturalWidth) return { z, x: 0, y: 0 };
+    const host = canvas.parentElement;
+    if (!host) return { z, x: 0, y: 0 };
+    const w = host.clientWidth;
+    const h = host.clientHeight;
+    if (!w || !h) return { z, x: 0, y: 0 };
+    const scale = Math.max(w / img.naturalWidth, h / img.naturalHeight) * z;
+    const mx = Math.max(0, (img.naturalWidth * scale - w) / 2);
+    const my = Math.max(0, (img.naturalHeight * scale - h) / 2);
+    return { z, x: Math.min(mx, Math.max(-mx, px)), y: Math.min(my, Math.max(-my, py)) };
+  };
+  const applyView = (zoom: number, px: number, py: number) => {
+    const c = clampView(zoom, px, py);
+    vpRef.current = { zoom: c.z, x: c.x, y: c.y };
+    setZoom(c.z);
+    setPan({ x: c.x, y: c.y });
+  };
 
   // load showcase per open
   useEffect(() => {
@@ -74,6 +100,7 @@ export default function ArtifactPreview() {
     setFailed({});
     setZoom(1);
     setPan({ x: 0, y: 0 });
+    vpRef.current = { zoom: 1, x: 0, y: 0 };
     void getShowcase(previewId)
       .then((d) => { if (alive) setData(d.id === previewId ? d : null); })
       .catch((e: unknown) => {
@@ -122,6 +149,7 @@ export default function ArtifactPreview() {
   }, [epochs, previewId]);
 
   const curImg = cur?.png ? loaded[cur.png] : undefined;
+  imgRef.current = curImg;
 
   // autoplay (still image when reduced motion or single frame)
   useEffect(() => {
@@ -221,9 +249,10 @@ export default function ArtifactPreview() {
       // Plain wheel steps a fixed notch. deltaY 0 = no-op (synthetic events).
       const factor = e.ctrlKey ? Math.exp(-e.deltaY * 0.003) : e.deltaY > 0 ? 0.92 : 1.09;
       if (factor === 1) return;
-      setZoom((z) => Math.min(8, Math.max(0.2, z * factor)));
+      const v = vpRef.current;
+      applyView(v.zoom * factor, v.x, v.y);
     };
-    const onDbl = () => { setZoom(1); setPan({ x: 0, y: 0 }); };
+    const onDbl = () => applyView(1, 0, 0);
     stage.addEventListener('wheel', onWheel, { passive: false });
     stage.addEventListener('dblclick', onDbl);
     return () => {
@@ -236,7 +265,7 @@ export default function ArtifactPreview() {
     (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (pointers.current.size === 1) {
-      drag.current = { x: e.clientX, y: e.clientY, pan: { ...pan }, moved: false };
+      drag.current = { x: e.clientX, y: e.clientY, pan: { x: vpRef.current.x, y: vpRef.current.y }, moved: false };
     } else {
       drag.current = null; // multi-touch: pinch takes over
       const pts = [...pointers.current.values()];
@@ -254,7 +283,7 @@ export default function ArtifactPreview() {
       const dist = Math.max(20, Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y));
       if (pinch.current) {
         const ratio = dist / Math.max(20, pinch.current.dist);
-        setZoom(Math.min(8, Math.max(0.2, pinch.current.zoom * ratio)));
+        applyView(pinch.current.zoom * ratio, vpRef.current.x, vpRef.current.y);
       } else {
         pinch.current = { dist, zoom };
       }
@@ -265,14 +294,14 @@ export default function ArtifactPreview() {
     const dy = e.clientY - drag.current.y;
     if (Math.hypot(dx, dy) > 4) drag.current.moved = true;
     else return;
-    setPan({ x: drag.current.pan.x + dx, y: drag.current.pan.y + dy });
+    applyView(vpRef.current.zoom, drag.current.pan.x + dx, drag.current.pan.y + dy);
   };
   const onPointerUp = (e: React.PointerEvent) => {
     pointers.current.delete(e.pointerId);
     if (pointers.current.size < 2) pinch.current = null;
     if (pointers.current.size === 1) {
       const [, pt] = [...pointers.current.entries()][0];
-      drag.current = { x: pt.x, y: pt.y, pan: { ...pan }, moved: true };
+      drag.current = { x: pt.x, y: pt.y, pan: { x: vpRef.current.x, y: vpRef.current.y }, moved: true };
       return;
     }
     drag.current = null;
