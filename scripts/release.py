@@ -103,7 +103,7 @@ def build_android(version: str) -> None:
     env["ANDROID_HOME"] = env["ANDROID_SDK_ROOT"] = sdk
     # Gradle 8.x needs a Java 17-23 runtime; system Java may be newer.
     if not env.get("JAVA_HOME"):
-        cands = sorted(Path.home().glob("jdks/jdk-21*")) + sorted(Path.home().glob("jdks/jdk-17*"))
+        cands = sorted(Path.home().glob("jdks/jdk-2*")) or sorted(Path.home().glob("jdks/jdk-17*"))
         if cands:
             env["JAVA_HOME"] = str(cands[-1])
             env["PATH"] = f"{env['JAVA_HOME']}/bin:{env['PATH']}"
