@@ -121,7 +121,7 @@ export default function WaitGame({ headline = 'Fetching live sky data', onSkipHr
       keys: { left: false, right: false },
       phase: 'countdown' as 'countdown' | 'playing' | 'dying' | 'over',
       phaseT: 0, lastCount: -1,
-      w: 0, h: 0,
+      w: 0, h: 0, k: 1,
     };
     const syncHud = () => setHud({ score: S.score, wave: S.wave, shields: S.shields, best: Math.max(best, S.score) });
     const saveBest = () => {
@@ -194,8 +194,12 @@ export default function WaitGame({ headline = 'Fetching live sky data', onSkipHr
 
     const size = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      S.w = canvas.width / dpr;
-      S.h = canvas.height / dpr;
+      const cssW = canvas.width / dpr;
+      // small screens play a virtually larger field scaled down: identical
+      // gameplay proportions, smaller sprites, slower apparent motion
+      S.k = Math.min(1, Math.max(0.62, cssW / 520));
+      S.w = cssW / S.k;
+      S.h = canvas.height / dpr / S.k;
     };
     size();
     // Refit when the stage card resizes (panel above reflows, viewport rotates).
@@ -237,7 +241,7 @@ export default function WaitGame({ headline = 'Fetching live sky data', onSkipHr
           }
         }
         const live = S.phase === 'playing';
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.setTransform(dpr * S.k, 0, 0, dpr * S.k, 0, 0);
         // shake (skipped under reduced motion)
         const shx = !reduce.matches && S.shake > 0 ? (Math.random() - 0.5) * S.shake * 14 : 0;
         const shy = !reduce.matches && S.shake > 0 ? (Math.random() - 0.5) * S.shake * 14 : 0;
