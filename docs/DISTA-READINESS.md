@@ -68,6 +68,18 @@ What this means for the brief's questions:
   Undiagnosed: background systematics vs genuine variability (SIMBAD type
   Pe*). Visit repeatability is therefore the next systematics to chase
   before any residual-ranking engine (Step 7) can be trusted.
+- **Pair-colour joint constraint (2026-09-26)**: `scripts/pairfit.py`
+  reparameterizes each simultaneous D1+D4/D2+D5/D3+D6 pair (confirmed in our
+  data: paired bands share MJDs to ~1e-3 d from the same weekly directory)
+  into amplitude A=fa+fb and colour R=fa/fb with propagated errors, then
+  tests cross-epoch (dA/dR in σ). Control star: D1+D4 across two visits
+  2 min apart gives dA=0.22σ but dR=28.9σ — an amplitude-conserving colour
+  flip no star performs in 2 minutes. The method works as built: it caught
+  an inconsistency, and on a control target the only honest reading is
+  instrumental systematics between consecutive exposures, i.e. the "or
+  simply an artifact" branch. Comet: 3 pairs, one per family — the failed
+  visits broke simultaneity, so no cross-epoch verdict yet; needs the
+  counterpart exposures, not more model.
 - **Experiment 2** (what the same-band rule discards): measured
   (`scripts/audit_discard.py`, `docs/discard-audit.json`): **466/466 pairs
   kept, 0 rejected** — every field is single-band, so the bundle cannot
