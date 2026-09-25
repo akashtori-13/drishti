@@ -1,14 +1,14 @@
 ---
 name: spectrahunt-ui
-description: Design system and component architecture of the STELLAR web app (spectrahunt-web). Use when editing any route, component, style, or interaction in F:\NSAC-2026\stellar\spectrahunt-web — codifies design tokens, component APIs, layout patterns, honesty rules, accessibility gates, and project footguns.
+description: Design system and component architecture of the DRISHTI web app (spectrahunt-web). Use when editing any route, component, style, or interaction in F:\NSAC-2026\stellar\spectrahunt-web — codifies design tokens, component APIs, layout patterns, honesty rules, accessibility gates, and project footguns.
 license: MIT
 compatibility: Next.js 16.3.5 static export, React 19.2, TypeScript, Tailwind v4 (tokens in globals.css only), zustand 5. No component library, no animation library, no WebGL.
 metadata:
   version: "1.0"
-  skill-author: STELLAR team
+  skill-author: DRISHTI team
 ---
 
-# STELLAR UI
+# DRISHTI UI
 
 The app is a public blink comparator for NASA SPHEREx data. Every pixel must trace to
 IRSA data or a cache of it. The UI already scores high on honesty, accessibility, and

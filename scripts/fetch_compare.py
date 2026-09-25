@@ -49,7 +49,7 @@ def main() -> bool:
                    "&width=512&height=512&projection=SIN&coordsys=icrs&rotation=0&format=jpg")
             try:
                 with httpx.Client(timeout=90) as client:
-                    r = client.get(url, headers={"User-Agent": "STELLAR/1.0"})
+                    r = client.get(url, headers={"User-Agent": "DRISHTI/2.0"})
                     r.raise_for_status()
                     if len(r.content) < 5000 or not r.content.startswith(b"\xff\xd8"):
                         print(f"[{doc['id']}] {key}: bad payload ({len(r.content)}B)")

@@ -12,7 +12,7 @@ export default function Error({
 }) {
   useEffect(() => {
     try {
-      console.error('[stellar] route error:', error.message);
+      console.error('[drishti] route error:', error.message);
     } catch { /* noop */ }
   }, [error]);
   return (

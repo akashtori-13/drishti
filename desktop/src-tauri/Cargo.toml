@@ -1,8 +1,8 @@
 [package]
-name = "stellar"
+name = "drishti"
 version = "2.9.0"
-description = "STELLAR: hunt what moves in the infrared sky"
-authors = ["STELLAR"]
+description = "DRISHTI: hunt what moves in the infrared sky"
+authors = ["DRISHTI"]
 edition = "2021"
 
 [build-dependencies]

@@ -25,7 +25,7 @@ const LINKS = [
  * platform-aware store links — keep all routing here.
  */
 function appLink(): string {
-  return 'https://github.com/akashtori-13/stellar/releases';
+  return 'https://github.com/akashtori-13/drishti/releases';
 }
 
 /**
@@ -63,8 +63,8 @@ export default function Header() {
 
   useEffect(() => {
     document.title = pathname === '/'
-      ? 'STELLAR: hunt what moves in the infrared sky'
-      : `${LINKS.find((n) => pathname === n.href || (n.match && pathname.startsWith(n.match)))?.label ?? 'STELLAR'} — STELLAR`;
+      ? 'DRISHTI: hunt what moves in the infrared sky'
+      : `${LINKS.find((n) => pathname === n.href || (n.match && pathname.startsWith(n.match)))?.label ?? 'DRISHTI'} — DRISHTI`;
   }, [pathname]);
 
   // Animated close: flag first (CSS plays the exit), unmount after.
@@ -247,10 +247,10 @@ export default function Header() {
         onKeyUp={onNavInput}
       >
       <div className="island-row">
-        <Link className="island-brand island-iconbtn" href="/" aria-label="STELLAR home"
+        <Link className="island-brand island-iconbtn" href="/" aria-label="DRISHTI home"
           aria-current={pathname === '/' ? 'page' : undefined}>
           <Icon name="logo" className="logo icon" />
-          <span className="brand-name collapsible" aria-hidden="true">STELLAR</span>
+          <span className="brand-name collapsible" aria-hidden="true">DRISHTI</span>
         </Link>
         <Link href="/sky" aria-label="SkyMap"
           aria-current={skyActive ? 'page' : undefined}

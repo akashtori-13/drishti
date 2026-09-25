@@ -1,4 +1,4 @@
-# STELLAR — Content Production Team Knowledge
+# DRISHTI — Content Production Team Knowledge
 
 Hand this file plus `docs/VIDEO.md` (240s beats), `DEMO.md` (demo script),
 `docs/CLASSROOM.md`, `docs/ONEPAGER.md`, and `README.md` to anyone filming,
@@ -11,10 +11,10 @@ facts behind it. `README.md` = the full project brief if you want depth.
 
 ## 1. Say these exact things
 
-- **Full name:** STELLAR — SPHEREx Transient Explorer & Light-spectrum
+- **Full name:** DRISHTI — SPHEREx Transient Explorer & Light-spectrum
   Large-scale Archival Repository. Team AKASHTORI, NASA Space Apps Challenge 2026.
 - **One line:** "NASA's SPHEREx telescope re-photographs the entire sky every six
-  months in 102 infrared colors. STELLAR lines up each visit so anyone can blink
+  months in 102 infrared colors. DRISHTI lines up each visit so anyone can blink
   between them."
 - **Category line:** "Best Use of Data: we don't just consume open data — we
   measure it, publish every number back as open JSON, and hand the universe to

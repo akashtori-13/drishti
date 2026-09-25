@@ -1,4 +1,4 @@
-# STELLAR — 240-second video beat sheet
+# DRISHTI — 240-second video beat sheet
 
 Hard limits (per event guide): under 240 seconds (over-length gets cut, not excused).
 Name every team member. Credit third-party assets. English subtitles required.
@@ -8,7 +8,7 @@ Test the link in a private window. Name the 2026 challenge and the NASA datasets
 ## Beats (30s each)
 
 **0:00–0:30 — Hook.** Team AKASHTORI, one line each (names on screen). "NASA's SPHEREx
-photographs the entire sky every six months in 102 infrared colors. STELLAR lines up
+photographs the entire sky every six months in 102 infrared colors. DRISHTI lines up
 each visit so anyone can blink between them." Say the challenge name + "SPHEREx Quick
 Release 2 from the NASA/IPAC Infrared Science Archive."
 

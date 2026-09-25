@@ -1,4 +1,4 @@
-// STELLAR Invaders: pixel sprites, bitmap font, wave/scoring/collision logic.
+// DRISHTI Invaders: pixel sprites, bitmap font, wave/scoring/collision logic.
 // DOM-free and unit-tested; the canvas shell lives in WaitGame.tsx.
 
 export type Row = string[];

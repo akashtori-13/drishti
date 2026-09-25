@@ -10,7 +10,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
-  return { title: `Blink ${id} — STELLAR` };
+  return { title: `Blink ${id} — DRISHTI` };
 }
 
 export default async function BlinkRoute({ params }: { params: Promise<{ id: string }> }) {

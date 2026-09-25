@@ -1,13 +1,13 @@
-# STELLAR
+# DRISHTI
 
-**STELLAR: SPHEREx Transient Explorer & Light-spectrum Large-scale Archival Repository**
+**DRISHTI: Dynamic Repository for Infrared Spectral History and Transient Inspection**
 
 **NASA Space Apps Challenge 2026 · Advanced · Astrophysics / Planets & Moons / Software · built by team AKASHTORI**
 
 > Since 2025, NASA's SPHEREx mission maps the entire sky every six months in 102 bands
 > of near-infrared light. Comets, asteroids, stars, brown dwarfs — and maybe new planets —
 > reveal themselves by shifting between visits. No one person can sift a billion objects alone.
-> STELLAR is the public front door: search any object or sky position, then blink
+> DRISHTI is the public front door: search any object or sky position, then blink
 > between SPHEREx epochs to see what changed.
 
 **Live rule:** every pixel, number, and field traces to IRSA data or a local cache of it.
@@ -34,7 +34,7 @@ Nothing is fabricated — unmeasured sky renders dark and says so. See § Data r
 
 ## What it is
 
-STELLAR turns SPHEREx Quick Release 2 (QR2) — the all-sky near-infrared survey —
+DRISHTI turns SPHEREx Quick Release 2 (QR2) — the all-sky near-infrared survey —
 into something a human can explore in three clicks: **Home → field → drag the blink
 slider**. Underneath, a Python pipeline discovers repeat visits (epochs) at any sky
 position via IRSA, renders cutouts, aligns them, measures movers/variables with
@@ -239,8 +239,8 @@ Windows NSIS via `cargo-xwin` + home-built `makensis` — see TROUBLESHOOTING.
 | Shell | Tech | Notes |
 |---|---|---|
 | PWA | manifest + `sw.js` + install chip | Offline after first visit; installable from the browser |
-| Android | Capacitor (`org.stellar.app.offline`) | Bundled `out/` = fully offline; `_blank` links → system browser; hardware back walks history. Build: `npx cap sync android` + gradle (JDK 21) |
-| Windows / Linux | Tauri v2 (`org.stellar.app`) | Targets: `nsis`, `appimage`, `deb`; external links via opener plugin. Linux builds locally; Windows via CI |
+| Android | Capacitor (`org.drishti.app.offline`) | Bundled `out/` = fully offline; `_blank` links → system browser; hardware back walks history. Build: `npx cap sync android` + gradle (JDK 21) |
+| Windows / Linux | Tauri v2 (`org.drishti.app`) | Targets: `nsis`, `appimage`, `deb`; external links via opener plugin. Linux builds locally; Windows via CI |
 | Point-at-sky | `StellariumView` + `lib/skyposture.ts` | Device compass + tilt + GPS + clock → live RA/Dec camera with heading/elevation HUD, figure-8 calibration hint, ±45° compass trim, pause-on-drag. Round-trip-tested (100+ cases) |
 
 ## Repository map

@@ -380,7 +380,7 @@ export default function HomePage() {  const router = useRouter();
 
       <section className="how" id="how" aria-labelledby="how-h">
         <div className="how-inner">
-          <h2 id="how-h">How STELLAR spots something that moves</h2>
+          <h2 id="how-h">How DRISHTI spots something that moves</h2>
           <p className="how-lead">Every field is compared with itself across visits. Stars stay put. Anything else shows up in the difference.</p>
 
           <ol className="steps">

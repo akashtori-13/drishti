@@ -1,4 +1,4 @@
-# STELLAR — System Design
+# DRISHTI — System Design
 
 Public time-machine for the SPHEREx sky: pick any patch of sky, blink its
 repeated visits, spot what moved. No login. Every pixel traces to IRSA.
@@ -16,7 +16,7 @@ flowchart LR
         AM[Amateur astronomers]
         RES[Researchers / educators]
     end
-    subgraph STELLAR
+    subgraph DRISHTI
         APP[Static web app]
         API[Dev API + indexers]
     end

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- STELLAR theme colors: deep-space surfaces + spectrum accents.
+    <!-- DRISHTI theme colors: deep-space surfaces + spectrum accents.
          Status/navigation bars use the app background so system chrome
          melts into the content on every API level. -->
     <color name="colorPrimary">#7c83fd</color>
     <color name="colorPrimaryDark">#05060c</color>
     <color name="colorAccent">#4fc9a8</color>
-    <color name="stellarBackground">#05060c</color>
-    <color name="stellarSurface">#0a0c16</color>
-    <color name="stellarStatusBar">#05060c</color>
-    <color name="stellarNavigationBar">#05060c</color>
+    <color name="drishtiBackground">#05060c</color>
+    <color name="drishtiSurface">#0a0c16</color>
+    <color name="drishtiStatusBar">#05060c</color>
+    <color name="drishtiNavigationBar">#05060c</color>
 </resources>

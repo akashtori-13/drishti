@@ -1,4 +1,4 @@
-# STELLAR Architecture (v2)
+# DRISHTI Architecture (v2)
 
 Public blink comparator for the SPHEREx sky: **same sky, different time.**
 

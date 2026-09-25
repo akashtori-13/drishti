@@ -3,7 +3,7 @@ import SiteChrome from '@/components/SiteChrome';
 import TeamPage from '@/components/TeamPage';
 
 export const metadata: Metadata = {
-  title: 'Crew — STELLAR',
+  title: 'Crew — DRISHTI',
 };
 
 export default function Crew() {

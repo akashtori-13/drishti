@@ -3,7 +3,7 @@ import SiteChrome from '@/components/SiteChrome';
 import SettingsPage from '@/components/SettingsPage';
 
 export const metadata: Metadata = {
-  title: 'Settings — STELLAR',
+  title: 'Settings — DRISHTI',
 };
 
 export default function About() {

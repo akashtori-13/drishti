@@ -112,7 +112,7 @@ def build_android(version: str) -> None:
     run(["./gradlew", "assembleDebug", "--no-daemon"], cwd=WEB / "android", env=env)
     DIST.mkdir(exist_ok=True)
     for apk in (WEB / "android" / "app" / "build" / "outputs" / "apk" / "debug").glob("*.apk"):
-        dest = DIST / f"stellar-{version}-debug.apk"
+        dest = DIST / f"drishti-{version}-debug.apk"
         shutil.copy(apk, dest)
         print(f"android APK -> {dest} ({dest.stat().st_size // 1024} KB)")
 
@@ -132,7 +132,7 @@ def build_desktop(version: str) -> None:
     found = 0
     for f in bundle.rglob("*"):
         if f.is_file() and (f.suffix in exts or ".AppImage" in f.name):
-            dest = DIST / f"stellar-{version}-{f.name}"
+            dest = DIST / f"drishti-{version}-{f.name}"
             shutil.copy(f, dest)
             print(f"desktop -> {dest}")
             found += 1

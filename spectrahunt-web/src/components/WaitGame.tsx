@@ -67,7 +67,7 @@ function useBleeps(mutedRef: React.MutableRefObject<boolean>) {
   return { tone, noise };
 }
 
-/** STELLAR Invaders: hold the line while IRSA frames load.
+/** DRISHTI Invaders: hold the line while IRSA frames load.
  *  Auto-dismisses the moment data arrives. Full arcade loop rendered as a
  *  cabinet: pixel-font 3-2-1-GO countdown, endless waves, 3 shields, death
  *  explosion into a canvas GAME OVER screen (score/wave/best, blinking
@@ -533,7 +533,7 @@ export default function WaitGame({ headline = 'Fetching live sky data', onSkipHr
       </div>
       <div className="waitgame-stage">
         <div className="waitgame-stage-head">
-          <span className="waitgame-stage-tag">Stellar invaders · while you wait</span>
+          <span className="waitgame-stage-tag">Drishti invaders · while you wait</span>
           <span className="mono waitgame-score">
             {hud.score} pts · W{hud.wave} · {'●'.repeat(Math.max(0, hud.shields))}{'○'.repeat(Math.max(0, 3 - hud.shields))} · best {hud.best}
           </span>

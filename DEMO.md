@@ -24,7 +24,7 @@ Goal: a first-time visitor finds and watches a moving object in under 60 seconds
 ## What to say
 
 > "SPHEREx photographs the entire sky every six months in 102 infrared colors.
-> STELLAR lines up each visit so anyone can blink between them. Stars stay
+> DRISHTI lines up each visit so anyone can blink between them. Stars stay
 > put; anything that moves or flares stands out in the difference. Every pixel
 > traces to NASA/IRSA — links to the original FITS are in the metadata panel.
 > Say out loud: SPHEREx Quick Release 2 from the NASA/IPAC Infrared Science

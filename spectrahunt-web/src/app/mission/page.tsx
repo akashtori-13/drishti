@@ -3,7 +3,7 @@ import SiteChrome from '@/components/SiteChrome';
 import MissionPage from '@/components/MissionPage';
 
 export const metadata: Metadata = {
-  title: 'Mission — STELLAR',
+  title: 'Mission — DRISHTI',
 };
 
 export default function Mission() {

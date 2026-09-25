@@ -336,7 +336,7 @@ main:focus{outline:none;}
   }
   .island-row{gap:2px;}
   .island-row{min-width:min(300px, calc(100vw - 60px));}
-  /* captioned dock: label below every icon. STELLAR keeps logo-only. */
+  /* captioned dock: label below every icon. DRISHTI keeps logo-only. */
   a.island-iconbtn:not(.island-brand),
   button.island-iconbtn{
     flex:1 1 0; min-width:0; width:auto; height:auto; min-height:56px;

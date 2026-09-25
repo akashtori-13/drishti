@@ -485,7 +485,7 @@ export default function BlinkComparator({
     if (!canvas || curLbl === '—') return;
     const a = document.createElement('a');
     a.href = canvas.toDataURL('image/png');
-    a.download = `stellar-${curLbl.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.png`;
+    a.download = `drishti-${curLbl.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.png`;
     a.click();
   }, [mode, curLbl]);
 
@@ -1344,10 +1344,10 @@ export default function BlinkComparator({
     ctx.font = '12px ui-monospace, monospace';
     ctx.fillText('1′', 110, HEAD + PH + 28);
     ctx.fillStyle = '#8a90ab';
-    ctx.fillText('NASA/JPL–Caltech SPHEREx via IRSA (IPAC) · DOI 10.26131/IRSA652 · STELLAR', 16, HEAD + PH + 48);
+    ctx.fillText('NASA/JPL–Caltech SPHEREx via IRSA (IPAC) · DOI 10.26131/IRSA652 · DRISHTI', 16, HEAD + PH + 48);
     const a = document.createElement('a');
     a.href = c.toDataURL('image/png');
-    a.download = 'stellar-figure.png';
+    a.download = 'drishti-figure.png';
     a.click();
   };
 
@@ -1390,7 +1390,7 @@ export default function BlinkComparator({
     setRecording(false);
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'stellar-blink.webm';
+    a.download = 'drishti-blink.webm';
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 5000);
   };

@@ -43,10 +43,10 @@ jobs:
         run: |
           if [ -n "$KEYSTORE_B64" ]; then
             echo "$KEYSTORE_B64" | base64 -d > spectrahunt-web/android/app/release.keystore
-            echo "STELLAR_KEYSTORE_FILE=$GITHUB_WORKSPACE/spectrahunt-web/android/app/release.keystore" >> $GITHUB_ENV
-            echo "STELLAR_KEYSTORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
-            echo "STELLAR_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}" >> $GITHUB_ENV
-            echo "STELLAR_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}" >> $GITHUB_ENV
+            echo "DRISHTI_KEYSTORE_FILE=$GITHUB_WORKSPACE/spectrahunt-web/android/app/release.keystore" >> $GITHUB_ENV
+            echo "DRISHTI_KEYSTORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
+            echo "DRISHTI_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}" >> $GITHUB_ENV
+            echo "DRISHTI_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}" >> $GITHUB_ENV
           fi
       - run: |
           export ANDROID_HOME=$ANDROID_SDK_ROOT

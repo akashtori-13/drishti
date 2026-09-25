@@ -41,8 +41,8 @@ export default function MissionPage() {
     <>
     <div className="prose" style={{ position: 'relative', zIndex: 1 }}>
       <p className="hero-kicker">Mission · method · data</p>
-      <h1>About STELLAR</h1>
-      <p className="lede">STELLAR: SPHEREx Transient Explorer &amp; Light-spectrum Large-scale
+      <h1>About DRISHTI</h1>
+      <p className="lede">DRISHTI: SPHEREx Transient Explorer &amp; Light-spectrum Large-scale
         Archival Repository — a public blink comparator for the SPHEREx sky, built for the
         NASA Space Apps Challenge 2026 by team AKASHTORI.</p>
       {liveStrip ? <p className="mono" style={{ fontSize: 12, color: '#8a90ab', marginTop: 10 }}>{liveStrip}</p> : null}
@@ -146,7 +146,7 @@ export default function MissionPage() {
           Built by <strong style={{ color: '#fff' }}>Team AKASHTORI</strong> for the NASA
           Space Apps Challenge 2026 — build, research, and presenting split across the
           crew. Contributors and commit history are on{' '}
-          <a href="https://github.com/akashtori-13/stellar" target="_blank" rel="noopener">GitHub</a>.
+          <a href="https://github.com/akashtori-13/drishti" target="_blank" rel="noopener">GitHub</a>.
         </p>
       </Reveal>
 

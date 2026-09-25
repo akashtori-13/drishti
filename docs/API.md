@@ -1,4 +1,4 @@
-# STELLAR API Reference
+# DRISHTI API Reference
 
 Base URL (dev/live): `http://localhost:8000`. Production is static-only —
 these endpoints exist in `DATA_MODE=live` and power on-demand features.

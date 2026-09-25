@@ -1,4 +1,4 @@
-# STELLAR — Production Knowledge
+# DRISHTI — Production Knowledge
 
 Single ops bible for Team AKASHTORI: environments, secrets, releases, CI/CD,
 data ops, runbooks, and every environment quirk discovered the hard way.
@@ -11,7 +11,7 @@ Public repo — **no secrets in this file, only their locations.**
 | Local dev | `:3000` (`npm run dev`, live mode) | `:8000` (`python -m backend`) | `public/` + SQLite `data/spectrahunt.db` |
 | Production web | Netlify static export (`spectrahunt-web/out`) | none (static-only prod) | baked JSON/PNG in `out/` |
 | Live mode | `NEXT_PUBLIC_DATA_MODE=live` + `NEXT_PUBLIC_API_URL` | FastAPI IRSA proxy | on-demand + caches |
-| Android | `stellar-1.0.x.apk` (offline bundle) | none (bundled) | baked in |
+| Android | `drishti-1.0.x.apk` (offline bundle) | none (bundled) | baked in |
 | Desktop | AppImage / deb / nsis (Tauri) | none (bundled) | baked in |
 
 `make up | warm | check | web | down` (repo-root Makefile) drives local. Production
@@ -23,7 +23,7 @@ default is **static**: the site never needs the backend at runtime.
 |---|---|---|
 | Android release key | `~/.config/stellar/release.keystore` + `KEYSTORE-PASSWORDS.txt` (`chmod 600`) | Self-signed, 25y, Team AKASHTORI. **Loss = new Play identity, updates impossible.** Back up off-machine. Never committed (`.gitignore`: `*.keystore`, `keystore.properties`) |
 | Local signing link | `spectrahunt-web/android/app/keystore.properties` | Git-ignored. CI uses env vars instead |
-| CI signing | **NOT YET SET** — add `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD` as GitHub Secrets; `release.yml` already reads them (`STELLAR_KEYSTORE_*`). Until then CI APKs are unsigned; the signed APK is attached manually (see §4) |
+| CI signing | **NOT YET SET** — add `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD` as GitHub Secrets; `release.yml` already reads them (`DRISHTI_KEYSTORE_*`). Until then CI APKs are unsigned; the signed APK is attached manually (see §4) |
 | Play Console | future, $25 one-time, team account | TWA listing deferred; Capacitor sideload covers judging |
 | Apple | n/a (no iOS target) | $99/yr — explicitly out of scope |
 | Netlify | team token in Netlify dashboard | Deploys `spectrahunt-web/out` per `netlify.toml` |
@@ -34,10 +34,10 @@ default is **static**: the site never needs the backend at runtime.
 - Version truth: `spectrahunt-web/package.json` (+ mirrors: `desktop/.../Cargo.toml`, `tauri.conf.json`, Android `versionCode/versionName`). Bump via `scripts/release.py --version X.Y.Z`.
 - `scripts/release.py`: builds web → stamps `out/build-info.json` (version, commit, data counts) → optional Android/desktop → collects versioned files into `dist/` (git-ignored).
 - Flow: commit to `main` → tag `vX.Y.Z` → push tag → `release.yml` builds all platforms (~35 min) → `publish` job creates the GitHub Release.
-- **Local ship (no CI minutes):** `scripts/release.py --version X.Y.Z` builds web + debug APK + Linux bundles on this machine (needs JDK 17–23 via `~/jdks`, Tauri system deps); signed APK via `STELLAR_KEYSTORE_*` env; Windows NSIS via the `cargo-xwin` + home-built `makensis` recipe in TROUBLESHOOTING; AppImage via raw `appimagetool` on the finished AppDir. Publish with `gh release create vX.Y.Z dist/*` (or `gh release upload` to amend).
+- **Local ship (no CI minutes):** `scripts/release.py --version X.Y.Z` builds web + debug APK + Linux bundles on this machine (needs JDK 17–23 via `~/jdks`, Tauri system deps); signed APK via `DRISHTI_KEYSTORE_*` env; Windows NSIS via the `cargo-xwin` + home-built `makensis` recipe in TROUBLESHOOTING; AppImage via raw `appimagetool` on the finished AppDir. Publish with `gh release create vX.Y.Z dist/*` (or `gh release upload` to amend).
 - **Tags move only before any release exists.** Once published, never force-move; cut a patch version instead.
-- After CI publishes: upload the locally signed APK (`gh release upload vX.Y.Z dist/stellar-*.apk --clobber`) since CI has no keystore secrets yet.
-- Stable download links: `github.com/akashtori-13/stellar/releases/latest/download/<file>`.
+- After CI publishes: upload the locally signed APK (`gh release upload vX.Y.Z dist/drishti-*.apk --clobber`) since CI has no keystore secrets yet.
+- Stable download links: `github.com/akashtori-13/drishti/releases/latest/download/<file>`.
 
 ## 4. CI/CD
 
@@ -105,9 +105,9 @@ IRSA playbook (slow/flaky upstream): raise timeouts before parallelism; serial (
 
 ## 11. Brand & identity
 
-- **STELLAR** — *SPHEREx Transient Explorer & Light-spectrum Large-scale Archival Repository*, by **Team AKASHTORI**, NASA Space Apps Challenge 2026.
-- npm `stellar-web` · Tauri `org.stellar.app` · Android `org.stellar.app.offline` · IRSA user-agent `STELLAR/1.0` · CI bot `stellar-bot` · copyright Team AKASHTORI (MIT + SPHEREx/IRSA attribution).
-- Deliberately unchanged (invisible) identifiers: `spectrahunt-web/` dir, `spectrahunt:` DOM events, `sh-*` storage keys, `spectrahunt-sky` tile cache, `spectrahunt-ui` skill id, `data/spectrahunt.db`. GitHub repo itself renamed to `akashtori-13/stellar` (old URLs redirect).
+- **DRISHTI** — *SPHEREx Transient Explorer & Light-spectrum Large-scale Archival Repository*, by **Team AKASHTORI**, NASA Space Apps Challenge 2026.
+- npm `stellar-web` · Tauri `org.drishti.app` · Android `org.drishti.app.offline` · IRSA user-agent `DRISHTI/1.0` · CI bot `stellar-bot` · copyright Team AKASHTORI (MIT + SPHEREx/IRSA attribution).
+- Deliberately unchanged (invisible) identifiers: `spectrahunt-web/` dir, `spectrahunt:` DOM events, `sh-*` storage keys, `spectrahunt-sky` tile cache, `spectrahunt-ui` skill id, `data/spectrahunt.db`. GitHub repo itself renamed to `akashtori-13/drishti` (old URLs redirect).
 
 ## 12. Feature inventory (everything shipped)
 
@@ -231,7 +231,7 @@ Quality gates: LVF same-band rule enforced at index time; conservative classifie
 
 No server, key, or permission needed. Pin a commit hash for reproducibility.
 
-- Field bundles: `https://raw.githubusercontent.com/akashtori-13/stellar/main/spectrahunt-web/public/showcases/{3i-atlas,…,virgo-field}.json`
+- Field bundles: `https://raw.githubusercontent.com/akashtori-13/drishti/main/spectrahunt-web/public/showcases/{3i-atlas,…,virgo-field}.json`
   (coords, story, epochs with MJD/band/PNG/provenance, per-detector bands)
 - Measurements: `.../public/reports/{id}.json`
   (movers, variables, top σ, baselines, lightcurve[], 6-band spectrum[] ± err, known-object citations)

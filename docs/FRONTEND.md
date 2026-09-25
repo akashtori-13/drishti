@@ -1,4 +1,4 @@
-# STELLAR Frontend Guide
+# DRISHTI Frontend Guide
 
 Stack: Next.js 16 (App Router, **static export**), React 19, TypeScript,
 zustand, canvas 2D (no WebGL, no Aladin). Styling: `src/app/globals.css`

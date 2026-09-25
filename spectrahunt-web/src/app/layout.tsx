@@ -15,15 +15,15 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "STELLAR: hunt what moves in the infrared sky",
+  title: "DRISHTI: hunt what moves in the infrared sky",
   description:
-    "STELLAR compares repeated SPHEREx passes of the same patch of sky and flags what moved or changed: comets, asteroids and variable stars.",
+    "DRISHTI compares repeated SPHEREx passes of the same patch of sky and flags what moved or changed: comets, asteroids and variable stars.",
   openGraph: {
-    title: "STELLAR: hunt what moves in the infrared sky",
+    title: "DRISHTI: hunt what moves in the infrared sky",
     description:
       "Search any object or sky position, then blink between SPHEREx epochs to see what changed.",
     type: "website",
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'STELLAR' }],
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'DRISHTI' }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -66,7 +66,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <path d="M473.97 206.47A241.33 241.33 0 1 1 305.53 38.03A21.94 21.94 0 0 1 293.86 80.33A197.45 197.45 0 1 0 431.67 218.14A21.94 21.94 0 0 1 473.97 206.47Z" fill="currentColor" />
             <path className="trap" d="M320.06 154.37A10.97 10.97 0 0 1 318 141.71L384.53 8.66A15.67 15.67 0 0 1 409.62 4.58L507.42 102.38A15.67 15.67 0 0 1 503.34 127.47L370.29 194A10.97 10.97 0 0 1 357.63 191.94Z" fill="currentColor" />
           </svg>
-          <span className="splash-word">STELLAR</span>
+          <span className="splash-word">DRISHTI</span>
         </div>
         <SplashGate />
         <Sprite />
@@ -74,7 +74,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <NativeShell />
         <noscript>
           <div style={{ position: 'fixed', inset: 0, display: 'grid', placeItems: 'center', background: '#05060c', color: '#eef0f8', zIndex: 200, padding: 24, textAlign: 'center' }}>
-            STELLAR needs JavaScript to draw the sky and run searches. Please enable it and reload.
+            DRISHTI needs JavaScript to draw the sky and run searches. Please enable it and reload.
           </div>
         </noscript>
         {children}

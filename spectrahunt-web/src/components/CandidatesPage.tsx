@@ -201,7 +201,7 @@ export default function CandidatesPage() {
       : new Blob([JSON.stringify(rows, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `stellar-candidates.${fmt}`;
+    a.download = `drishti-candidates.${fmt}`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 4000);
   };
