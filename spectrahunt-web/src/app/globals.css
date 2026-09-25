@@ -242,6 +242,9 @@ main:focus{outline:none;}
 .menu-link.active{background:rgba(255,255,255,.08); border-color:var(--line);}
 .menu-link.active .menu-label{color:#fff;}
 .menu-link:disabled{opacity:.6; cursor:wait;}
+/* liquid-glass exit: settle back toward the bar */
+.menu-sheet[data-closing]{animation:menu-out .22s ease-in forwards;}
+@keyframes menu-out{to{opacity:0; transform:translateY(4px) scale(.99);}}
 .menu-link > .icon{
   width:40px; height:40px; flex-shrink:0; padding:9px; border-radius:12px;
   background:rgba(255,255,255,.06); border:1px solid var(--line); color:var(--ink-2);
@@ -309,14 +312,15 @@ main:focus{outline:none;}
      carries the centering transform so it never jumps sideways. */
   .island .menu-sheet{position:absolute; top:auto; bottom:calc(100% + 8px); left:50%; right:auto;
     transform:translateX(-50%); width:calc(100vw - 32px);
-    /* overlay needs its own glass: nothing blurred behind it out here.
-       Near-opaque so busy page content cannot ghost through. */
-    background:rgba(11,13,24,.97); border-color:var(--line-strong);
-    -webkit-backdrop-filter:blur(24px); backdrop-filter:blur(24px);
+    /* overlay needs full opacity: translucent compositing ghosts busy
+       page content through on this surface */
+    background:#0b0d18; border-color:var(--line-strong);
     box-shadow:0 30px 70px -10px rgba(0,0,0,.85);
     /* fit all rows without inner scroll; only scroll past real space */
     max-height:calc(100dvh - 96px - env(safe-area-inset-bottom,0px));
     animation-name:menu-in-m;}
+  .island .menu-sheet[data-closing]{animation-name:menu-out-m;}
+@keyframes menu-out-m{to{opacity:0; transform:translateX(-50%) translateY(10px) scale(.98);}}
 }
 @keyframes menu-in-m{from{opacity:0; transform:translateX(-50%) translateY(-6px);} to{opacity:1; transform:translateX(-50%);}}
 /* ---------- tutorial bottom sheet (small screens) ---------- */
@@ -895,6 +899,12 @@ kbd{font-family:var(--font-mono); font-size:.6875rem; border:1px solid var(--lin
 .segment button{border:0; background:transparent; color:var(--ink-2); font-size:.8125rem; font-weight:500; padding:8px 16px; border-radius:999px; transition:background .15s, color .15s; min-height:44px;}
 .segment button:hover{color:var(--ink);}
 .segment button[aria-pressed="true"], .segment button.active{background:rgba(255,255,255,.12); color:#fff; box-shadow:inset 0 0 0 1px var(--line-strong);}
+/* liquid-glass count badge: frosted pill, tabular numerals */
+.count-pill{display:inline-grid; place-items:center; min-width:26px; height:22px; padding:0 7px;
+  border-radius:999px; font-family:var(--font-mono); font-size:.6875rem; font-variant-numeric:tabular-nums;
+  color:var(--ink); background:rgba(255,255,255,.08); border:1px solid var(--line-strong);
+  -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14);}
 .cand-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:16px; margin-top:32px; grid-auto-rows:1fr;}
 .cand{
   display:flex; flex-direction:column; text-align:left; padding:0; border-radius:16px; overflow:hidden;
