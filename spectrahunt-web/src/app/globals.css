@@ -902,7 +902,7 @@ kbd{font-family:var(--font-mono); font-size:.6875rem; border:1px solid var(--lin
 /* liquid-glass count badge: frosted pill, tabular numerals */
 .count-pill{display:inline-grid; place-items:center; min-width:26px; height:22px; padding:0 7px;
   border-radius:999px; font-family:var(--font-mono); font-size:.6875rem; font-variant-numeric:tabular-nums;
-  color:var(--ink); background:rgba(255,255,255,.08); border:1px solid var(--line-strong);
+  color:#fff; background:rgba(255,255,255,.1); border:1px solid var(--line-strong);
   -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.14);}
 .cand-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:16px; margin-top:32px; grid-auto-rows:1fr;}
@@ -927,8 +927,8 @@ kbd{font-family:var(--font-mono); font-size:.6875rem; border:1px solid var(--lin
 .cand-count{position:absolute; top:10px; right:10px; z-index:2;
   min-width:44px; min-height:44px; padding:0 12px; border-radius:999px;
   display:inline-flex; align-items:center; justify-content:center;
-  font-family:var(--font-mono); font-size:.8125rem; color:var(--ink);
-  background:rgba(5,6,12,.82); border:1px solid var(--line-strong); cursor:pointer;
+  font-family:var(--font-mono); font-size:.8125rem; color:#fff;
+  background:rgba(5,6,12,.92); border:1px solid var(--line-strong); cursor:pointer;
   -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
   transition:border-color .15s, background .15s;}
 .cand-count:hover{border-color:#fff; background:rgba(20,23,40,.9);}
@@ -953,22 +953,28 @@ kbd{font-family:var(--font-mono); font-size:.6875rem; border:1px solid var(--lin
   background:rgba(255,255,255,.03); font-size:.75rem; color:var(--ink-2); overflow-wrap:anywhere;}
 .cand-thumb{position:absolute; inset:0; background:#04050a; min-width:0; min-height:0; overflow:hidden;}
 .cand-thumb canvas{width:100%; height:100%; display:block;}
-.cand-thumb img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;}
+.cand-thumb img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:filter .8s ease;}
+@media (prefers-reduced-motion: reduce){ .cand-thumb img{transition:none;} }
 /* thumbnail tone cycle (decorative variety; true presets live in preview) */
 .cand-thumb[data-tone="gray"] img{filter:grayscale(1) brightness(1.06);}
 .cand-thumb[data-tone="cb"] img{filter:sepia(.85) saturate(2.4) hue-rotate(-28deg) brightness(1.02);}
 .cand-thumb .badge{background:rgba(5,6,12,.82);}
 .cand-badges{position:absolute; top:12px; left:12px; right:12px; z-index:2; display:flex; flex-direction:column; align-items:flex-start; gap:5px; pointer-events:none;}
 .cand-badges .badge, .cand-badges .cand-score{position:static; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-.cand-score{font-size:.75rem; padding:4px 9px; border-radius:8px; background:rgba(5,6,12,.82); color:var(--ink-2);}
+.cand-badges .badge{background:rgba(5,6,12,.92); color:#fff; border-color:var(--line-strong);}
+.cand-badges .badge.known{background:rgba(95,207,154,.24);}
+.cand-badges .badge.unknown{background:rgba(240,187,82,.26);}
+.cand-score{font-size:.75rem; padding:4px 9px; border-radius:8px; background:rgba(5,6,12,.92); color:var(--ink);}
 .cand-body{position:absolute; left:0; right:0; bottom:0; z-index:1;
   padding:30px 14px 14px; display:flex; flex-direction:column; gap:6px;
-  background:linear-gradient(to bottom, transparent, rgba(4,5,10,.9) 46%);
+  background:linear-gradient(to bottom, transparent, rgba(3,4,9,.95) 46%);
   -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
   border-top:1px solid rgba(255,255,255,.08);}
 .cand-name{font-weight:600; font-size:1rem; line-height:1.35; letter-spacing:-.01em; color:var(--ink);
   display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; overflow-wrap:break-word; min-height:2.7em;}
 .cand-meta{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; font-size:.75rem; color:var(--ink-3);}
+.cand-body .cand-meta{color:var(--ink-2); text-shadow:0 1px 4px rgba(0,0,0,.8);}
+.cand-body .cand-name{text-shadow:0 1px 6px rgba(0,0,0,.8);}
 .cand-meta > span{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 .cand-meta > span:last-child{text-align:right;}
 .empty{color:var(--ink-2); padding:48px 0;}

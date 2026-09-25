@@ -123,6 +123,14 @@ export default function CandidatesPage() {
   const [cards, setCards] = useState<Card[]>([]);
   const [filter, setFilter] = useState<Filter>('all');
   const [objModal, setObjModal] = useState<Card | null>(null);
+  // thumbnail tones drift over time so the grid never sits static
+  // (frozen under reduced motion)
+  const [toneShift, setToneShift] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const t = setInterval(() => setToneShift((s) => (s + 1) % 3), 8000);
+    return () => clearInterval(t);
+  }, []);
   const docsRef = useRef(new Map<string, Showcase>());
   const repsRef = useRef(new Map<string, Report>());
   const gridRef = useRef<HTMLDivElement>(null);
@@ -212,7 +220,7 @@ export default function CandidatesPage() {
         {list.map((c, i) => {
           const band = BANDS[c.band - 1];
           // thumbnail tone cycles per position so neighbours never match
-          const tone = (['gray', 'color', 'cb'] as const)[i % 3];
+          const tone = (['gray', 'color', 'cb'] as const)[(i + toneShift) % 3];
           return (
             <Reveal key={c.id} index={i}>
             <div className="cand-wrap">
