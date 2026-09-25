@@ -60,7 +60,7 @@ export default function SettingsPage() {
             <span className="menu-desc">Team AKASHTORI members and contacts</span>
           </span>
         </Link>
-        <a className="menu-link" href="https://github.com/akashtori-13/stellar" target="_blank" rel="noreferrer">
+        <a className="menu-link" href="https://github.com/akashtori-13/drishti" target="_blank" rel="noreferrer">
           <Icon name="github" className="icon" />
           <span className="menu-text">
             <span className="menu-label">GitHub</span>
@@ -78,7 +78,7 @@ export default function SettingsPage() {
             <span className="menu-desc">Method, data, and citation</span>
           </span>
         </Link>
-        <p className="fine mono">STELLAR {(appPkg as { version: string }).version} · data: NASA/JPL–Caltech SPHEREx via IRSA</p>
+        <p className="fine mono">DRISHTI {(appPkg as { version: string }).version} · data: NASA/JPL–Caltech SPHEREx via IRSA</p>
       </section>
     </div>
   );

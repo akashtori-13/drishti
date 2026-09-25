@@ -32,7 +32,7 @@ export default function SiteChrome({ children, showTutorial = false }: { childre
             <div className="foot-brand">
               <span className="brand-row" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Icon name="logo" className="logo icon" />
-                <span className="brand-name">STELLAR</span>
+                <span className="brand-name">DRISHTI</span>
               </span>
               <p className="foot-note">A public blink comparator for the SPHEREx sky. NASA Space Apps Challenge 2026.</p>
             </div>

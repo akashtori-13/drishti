@@ -1,6 +1,6 @@
-# STELLAR Agent Skills
+# DRISHTI Agent Skills
 
-Project-local skills for UI work on STELLAR. Format follows the
+Project-local skills for UI work on DRISHTI. Format follows the
 `scientific-agent-skills` convention: one folder per skill, a `SKILL.md`
 with YAML frontmatter (`name`, `description`), optional `references/`.
 

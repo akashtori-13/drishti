@@ -1,4 +1,4 @@
-# STELLAR Netlify Configuration
+# DRISHTI Netlify Configuration
 # Frontend: Next.js (static export) served from spectrahunt-web/out
 # Backend/Python pipeline runs offline at build time or locally, NOT on Netlify.
 

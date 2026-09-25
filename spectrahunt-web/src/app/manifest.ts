@@ -4,8 +4,8 @@ export const dynamic = 'force-static';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'STELLAR: SPHEREx Transient Explorer & Light-spectrum Large-scale Archival Repository',
-    short_name: 'STELLAR',
+    name: 'DRISHTI: Dynamic Repository for Infrared Spectral History and Transient Inspection',
+    short_name: 'DRISHTI',
     description: 'Blink repeated SPHEREx passes of any sky patch; spot comets, asteroids, variables. Built by team AKASHTORI for NASA Space Apps Challenge 2026.',
     start_url: '/',
     display: 'standalone',

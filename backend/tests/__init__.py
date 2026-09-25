@@ -1,1 +1,1 @@
-"""STELLAR backend tests."""
+"""DRISHTI backend tests."""

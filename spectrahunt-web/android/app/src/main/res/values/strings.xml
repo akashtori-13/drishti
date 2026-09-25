@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">STELLAR</string>
-    <string name="title_activity_main">STELLAR</string>
-    <string name="package_name">stellar.akashtori.space</string>
-    <string name="custom_url_scheme">stellar.akashtori.space</string>
+    <string name="app_name">DRISHTI</string>
+    <string name="title_activity_main">DRISHTI</string>
+    <string name="package_name">drishti.akashtori.space</string>
+    <string name="custom_url_scheme">drishti.akashtori.space</string>
 </resources>

@@ -1,10 +1,10 @@
-# Resume — STELLAR work session
+# Resume — DRISHTI work session
 
 Saved: 2026-09-23 morning (main pushed; data jobs deliberately stopped for off-peak rerun).
 
-Repo: `akashtori-13/stellar` (renamed from spectrahunt). Local dir still
+Repo: `akashtori-13/drishti` (renamed from spectrahunt). Local dir still
 `~/Documents/spectrahunt` (rename when quiet — venv/paths break otherwise).
-Brand: STELLAR (Team AKASHTORI). Latest: on `main`, tag `v1.0.1` published with
+Brand: DRISHTI (Team AKASHTORI). Latest: on `main`, tag `v1.0.1` published with
 4 release assets (signed APK, exe, AppImage, deb).
 
 ## State snapshot

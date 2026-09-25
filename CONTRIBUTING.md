@@ -1,4 +1,4 @@
-# Contributing to STELLAR
+# Contributing to DRISHTI
 
 Welcome — this is a real NASA Space Apps codebase with real users. The bar:
 every pixel traceable, every failure graceful, every change verified.
@@ -9,7 +9,7 @@ Start with `README.md` (what/why), `SYSTEM_DESIGN.md` (whole design),
 ## Setup
 
 ```bash
-git clone https://github.com/akashtori-13/stellar.git && cd stellar
+git clone https://github.com/akashtori-13/drishti.git && cd spectrahunt
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 cd spectrahunt-web && npm install
 ```

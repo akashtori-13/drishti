@@ -1,5 +1,5 @@
 """
-STELLAR local cache (SQLite scratch).
+DRISHTI local cache (SQLite scratch).
 
 Stores SkyBoT responses, TAP discovery results, and pipeline status so repeated
 runs don't hammer IRSA. Git-ignored; the deployed site never reads this.

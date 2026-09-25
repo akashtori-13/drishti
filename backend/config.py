@@ -1,5 +1,5 @@
 """
-STELLAR configuration.
+DRISHTI configuration.
 
 Single place for releases, IRSA endpoints, bands, and pipeline tuning.
 """
@@ -44,7 +44,7 @@ PUBLIC_CUTOUT_DIR = "spectrahunt-web/public/cutouts"
 
 # Network
 API_TIMEOUT_SECONDS = 30
-USER_AGENT = "STELLAR/1.0 (NASA Space Apps 2026)"
+USER_AGENT = "DRISHTI/2.0 (NASA Space Apps 2026)"
 
 # Local scratch (git-ignored). Never required at runtime.
 DATABASE_PATH = "data/spectrahunt.db"

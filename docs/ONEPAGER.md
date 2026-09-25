@@ -1,11 +1,11 @@
-# STELLAR — one-page summary
+# DRISHTI — one-page summary
 
 ## Approach
 
 NASA's SPHEREx mission re-images the entire sky every ~6 months in 102
 near-infrared bands. Anything that moves or flares between visits — comets,
 asteroids, variable stars — reveals itself the moment two epochs are compared.
-STELLAR is the public front door to that comparison: pick any patch of
+DRISHTI is the public front door to that comparison: pick any patch of
 sky, blink its visits, and see what changed. No login, no background needed.
 
 The app has two faces. The static site (usable offline, on a phone) ships

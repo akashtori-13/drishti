@@ -1,4 +1,4 @@
-package stellar.akashtori.space;
+package drishti.akashtori.space;
 
 import com.getcapacitor.BridgeActivity;
 

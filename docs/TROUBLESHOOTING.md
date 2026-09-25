@@ -26,7 +26,7 @@ Symptom-first guide. Design context in `SYSTEM_DESIGN.md`; pipeline ops in
 | `asyncio.run() … running event loop` | Sync wrapper called from async request scope | `await` the coroutine; keep `asyncio.run` in scripts only |
 | `IndentationError` after scripted edits | Mechanical edit drift | `python -c "import ast; ast.parse(...)"` before running |
 | Gradle needs JDK 17–23 but system Java is newer | `Unsupported class file major version` | Point `JAVA_HOME` at `~/jdks/jdk-21*` (`release.py` does this automatically) |
-| Tauri AppImage `linuxdeploy` strip fails on `.relr.dyn` | Bundled binutils too old | Pack the finished `STELLAR.AppDir` directly with `appimagetool` |
+| Tauri AppImage `linuxdeploy` strip fails on `.relr.dyn` | Bundled binutils too old | Pack the finished `DRISHTI.AppDir` directly with `appimagetool` |
 | Tauri NSIS cross-build can't find `MUI2.nsh`/`nsDialogs.nsh` | Home-built makensis lacks data dirs | Copy `Contrib/`, `Include/`, `Plugins/` from the NSIS release zip next to it |
 | Windows `.exe` from Linux | WiX/MSI is Windows-only | NSIS path works: `cargo-xwin` + MSVC target + LLVM (`llvm-rc`, `lld-link`) + home-built `makensis` (see `tauri-win*.log` pattern in `/tmp/opencode/`) |
 | Coverage count drops after merge | Torn reads during worker rewrites, or mixed-era files | Regression guard restores backup; merges retry parses; check worker logs, re-merge |

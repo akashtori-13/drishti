@@ -43,12 +43,12 @@ function contactLabel(href: string, fallback: string): string {
   return href.replace(/^https?:\/\//, '').replace(/\/$/, '') || fallback;
 }
 
-/** Team AKASHTORI: the crew behind STELLAR. Photos slot into the monograms. */
+/** Team AKASHTORI: the crew behind DRISHTI. Photos slot into the monograms. */
 export default function TeamPage() {
   return (
     <div className="prose" style={{ position: 'relative', zIndex: 1 }}>
       <p className="hero-kicker">Team AKASHTORI · NASA Space Apps Challenge 2026</p>
-      <h1>The crew behind STELLAR</h1>
+      <h1>The crew behind DRISHTI</h1>
       <p className="lede">
         Six people, one infrared sky. We design the system, measure the fields,
         check the science, and tell the story — so anyone can hunt what moves.

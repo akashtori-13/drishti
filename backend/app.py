@@ -1,5 +1,5 @@
 """
-STELLAR dev API (local use only; production is fully static).
+DRISHTI dev API (local use only; production is fully static).
 
 Read-only proxy over IRSA: epoch discovery, cutout rendering, name resolution,
 SkyBoT cross-match. Every endpoint degrades gracefully (404/[] — never 500).
@@ -47,7 +47,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="STELLAR API", version=PIPELINE_VERSION, lifespan=lifespan)
+app = FastAPI(title="DRISHTI API", version=PIPELINE_VERSION, lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=CORS_ORIGINS, allow_credentials=True,
                    allow_methods=["*"], allow_headers=["*"])
 

@@ -1,4 +1,4 @@
-"""Generate all STELLAR icon/logo variations from the new brand mark.
+"""Generate all DRISHTI icon/logo variations from the new brand mark.
 
 Single source of truth:
   spectrahunt-web/public/icons/mark.svg           (currentColor, UI sprite / docs)

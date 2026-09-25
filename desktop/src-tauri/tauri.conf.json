@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "STELLAR",
+  "productName": "DRISHTI",
   "version": "2.9.0",
-  "identifier": "stellar.akashtori.space",
+  "identifier": "drishti.akashtori.space",
   "build": {
     "frontendDist": "../../spectrahunt-web/out",
     "devUrl": "http://localhost:3000",
@@ -10,7 +10,7 @@
     "beforeDevCommand": "npm run dev --prefix ../spectrahunt-web"
   },
   "app": {
-    "windows": [{ "title": "STELLAR", "width": 1280, "height": 860 }],
+    "windows": [{ "title": "DRISHTI", "width": 1280, "height": 860 }],
     "security": { "csp": null }
   },
   "bundle": {

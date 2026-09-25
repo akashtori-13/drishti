@@ -1,12 +1,12 @@
 # Classroom blink hunt (45 minutes, no install)
 
 **Goal:** every student finds something that moved or changed in the infrared sky,
-using only a browser (or the offline STELLAR app where bandwidth is scarce).
+using only a browser (or the offline DRISHTI app where bandwidth is scarce).
 
 ## You need
 
 - One device per pair, any phone or laptop from the last decade
-- This page open, or the STELLAR app installed (works fully offline after first visit)
+- This page open, or the DRISHTI app installed (works fully offline after first visit)
 - Nothing to install, no account, no command line
 
 ## The hunt (pairs, 30 min)
