@@ -1216,7 +1216,14 @@ body::after {
 /* ---------- stellarium view ---------- */
 .stel{position:absolute; inset:0; overflow:hidden; background:#04050a; touch-action:none;}
 .stel canvas{position:absolute; inset:0; width:100%; height:100%; display:block; cursor:grab; touch-action:none;}
-.stel-hud{position:absolute; left:0; right:0; bottom:0; z-index:5; display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:center; padding:8px 12px calc(10px + env(safe-area-inset-bottom,0px)); font-size:.75rem; color:var(--ink-2); background:linear-gradient(transparent, rgba(4,5,10,.85));}
+.stel-hud{position:absolute; left:50%; transform:translateX(-50%); bottom:0; z-index:5;
+  width:max-content; max-width:calc(100vw - 16px);
+  display:flex; flex-direction:column; gap:8px; align-items:center;
+  padding:8px 10px; border-radius:20px;
+  background:var(--glass); border:1px solid var(--line);
+  -webkit-backdrop-filter:blur(20px) saturate(1.5); backdrop-filter:blur(20px) saturate(1.5);
+  box-shadow:0 20px 50px -20px rgba(0,0,0,.75), inset 0 1px 0 rgba(255,255,255,.05);
+  font-size:.75rem; color:var(--ink-2);}
 .stel-hud .mono{color:var(--ink); background:rgba(5,6,12,.68);
   -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
   border:1px solid var(--line); border-radius:8px; padding:8px 10px;
@@ -1225,6 +1232,33 @@ body::after {
 .stel-ctl{background:#151929; border:1px solid var(--line); border-radius:8px;
   padding:0 8px; font-size:.75rem; color:var(--ink); min-height:44px;}
 input.stel-ctl{font-family:var(--font-mono); color-scheme:dark;}
+/* HUD rows: grouped, wrapping, one-handed. Numeric pills hold fixed slots
+   with tabular right-aligned numerals so live values never reflow. */
+.stel-row{display:flex; flex-wrap:nowrap; gap:6px; align-items:center; justify-content:center; width:auto; max-width:100%;}
+/* one-row icon dock (dynamic-island buttons): fixed slots, never reflows */
+.hud-btn{width:44px; height:44px; flex-shrink:0; border-radius:50%;
+  display:grid; place-items:center; background:transparent; border:1px solid transparent;
+  color:var(--ink-2); cursor:pointer;
+  transition:color .15s, background .15s, border-color .15s;}
+.hud-btn .icon{width:20px; height:20px;}
+.hud-btn:hover{color:#fff; background:rgba(255,255,255,.07); border-color:var(--line);}
+.hud-btn.active{color:#fff; background:rgba(255,255,255,.14); box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);}
+button.hud-coords{cursor:pointer; font:inherit;}
+button.hud-coords:hover{border-color:var(--line-strong);}
+.stel-hud .mono{font-variant-numeric:tabular-nums; text-align:right;}
+.mono-coord{min-width:20ch;}
+button.hud-coords{font-size:.6875rem;}
+.mono-fov{min-width:10ch;}
+.mono-radec{min-width:25ch;}
+.mono-pose{min-width:21ch;}
+input.stel-ctl.stel-time{width:23ch;}
+/* display drawer: island-style grid-rows morph */
+.stel-drawer{display:grid; grid-template-rows:0fr; transition:grid-template-rows var(--dur-island) var(--ease-island); width:100%;}
+.stel-drawer[data-open]{grid-template-rows:1fr;}
+.stel-drawer-in{overflow:hidden; min-height:0; opacity:0; transition:opacity .22s ease;
+  display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:center;}
+.stel-drawer[data-open] .stel-drawer-in{opacity:1;}
+@media (prefers-reduced-motion: reduce){ .stel-drawer{transition:none;} }
 .stel-load{position:absolute; inset:0; z-index:4; display:grid; place-items:center; color:var(--ink-3); font-size:.8125rem; background:rgba(4,5,10,.35);}
 .stel-sync{position:absolute; top:12px; right:12px; z-index:5; pointer-events:none;}
 .stel-sync span{display:block; width:8px; height:8px; border-radius:50%; background:#7c83fd; animation:stel-pulse 1s ease-in-out infinite;}
