@@ -4,7 +4,7 @@
   "ra": 83.82,
   "dec": -5.39,
   "measured_at": "2026-09-22T22:37:19.040399+00:00",
-  "detail": "ok",
+  "detail": "photometry-failed",
   "movers": 1,
   "variables": 40,
   "top_sigma": 96.8,

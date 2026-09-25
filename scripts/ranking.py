@@ -32,7 +32,7 @@ def main() -> dict:
         best = max(sigs, key=lambda s: s[0])
         rows.append({"target": Path(f).stem.replace("pairfit_", ""),
                      "status": "RATED", "n_tests": len(tests), "n_masked": masked,
-                     "max_dR": best[0], "max_dA": best[1],
+                     "max_dR": best[0], "max_dA": max(s[1] for s in sigs),
                      "best_family": best[2], "best_verdict": best[3]})
     rated = sorted([r for r in rows if r["status"] == "RATED"],
                    key=lambda r: r["max_dR"], reverse=True)

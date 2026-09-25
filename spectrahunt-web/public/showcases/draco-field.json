@@ -8,7 +8,7 @@
     {
       "label": "2025-05-01 \u00b7 D3",
       "band": 3,
-      "wavelength_um": null,
+      "wavelength_um": 2.02,
       "mjd": 60796.261392,
       "ra": 267.5,
       "dec": 57.5,
@@ -19,7 +19,7 @@
     {
       "label": "2025-05-02 \u00b7 D3",
       "band": 3,
-      "wavelength_um": null,
+      "wavelength_um": 2.02,
       "mjd": 60797.890364,
       "ra": 267.5,
       "dec": 57.5,
@@ -30,7 +30,7 @@
     {
       "label": "2025-05-07 \u00b7 D3",
       "band": 3,
-      "wavelength_um": null,
+      "wavelength_um": 2.02,
       "mjd": 60802.311697,
       "ra": 267.5,
       "dec": 57.5,
@@ -41,7 +41,7 @@
     {
       "label": "2025-05-20 \u00b7 D3",
       "band": 3,
-      "wavelength_um": null,
+      "wavelength_um": 2.02,
       "mjd": 60815.966758,
       "ra": 267.5,
       "dec": 57.5,
@@ -52,7 +52,7 @@
     {
       "label": "2025-05-25 \u00b7 D3",
       "band": 3,
-      "wavelength_um": null,
+      "wavelength_um": 2.02,
       "mjd": 60820.993946,
       "ra": 267.5,
       "dec": 57.5,
@@ -63,7 +63,7 @@
     {
       "label": "2025-06-12 \u00b7 D3",
       "band": 3,
-      "wavelength_um": null,
+      "wavelength_um": 2.02,
       "mjd": 60838.453329,
       "ra": 267.5,
       "dec": 57.5,
@@ -126,7 +126,7 @@
       "png": "/cutouts/draco-field_2025-06-12.png",
       "cutout_url": "https://irsa.ipac.caltech.edu/ibe/data/spherex/qr2/level2/2025W24_1A/l2b-v20-2025-252/3/level2_2025W24_1A_0671_1D3_spx_l2b-v20-2025-252.fits?center=267.5,57.5&size=0.15",
       "mjd": 60838.453329,
-      "wavelength_um": null
+      "wavelength_um": 2.02
     },
     "4": {
       "png": "/cutouts/draco-field_D4.png",

@@ -15,6 +15,8 @@ export interface ReportDoc {
   known: { name: string; kind: string } | null;
   detail: string;
   spectrum?: Array<{ band: number; wavelength_um: number; flux: number; flux_err: number; mjd: number }>;
+  lightcurve?: Array<{ mjd?: number; flux: number; flux_err?: number }>;
+  objects?: Array<{ kind: string; sigma: number; x: number; y: number; label: string | null }>;
 }
 
 export async function getReport(id: string): Promise<ReportDoc | null> {

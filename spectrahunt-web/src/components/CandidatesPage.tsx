@@ -38,7 +38,8 @@ async function getReport(id: string): Promise<Report | null> {
   return { id, detail: doc.detail ?? '', movers: doc.movers ?? 0,
     variables: doc.variables ?? 0, top_sigma: doc.top_sigma ?? 0,
     span_days: doc.span_days ?? null, variable_flag: doc.variable_flag ?? false,
-    known: doc.known ?? null } as Report;
+    known: doc.known ?? null,
+    objects: Array.isArray(doc.objects) ? doc.objects : [] } as Report;
 }
 
 function cardsFrom(showcases: Showcase[], reports: Map<string, Report>): Card[] {
@@ -49,9 +50,15 @@ function cardsFrom(showcases: Showcase[], reports: Map<string, Report>): Card[] 
     if (s.epochs.length >= 2 && mjds[0] !== undefined && mjds[1] !== undefined) {
       const a = s.epochs[0];
       const b = s.epochs[1];
-      const m = arcsecPerDay(a.ra ?? s.ra, a.dec ?? s.dec, b.ra ?? s.ra, b.dec ?? s.dec, (mjds[1] as number) - (mjds[0] as number));
-      // same-spot revisits measure registration (≈0), not a mover — show nothing
-      motion = m !== null && m > 0.05 ? m : null;
+      const ara = a.ra ?? s.ra, adec = a.dec ?? s.dec, bra = b.ra ?? s.ra, bdec = b.dec ?? s.dec;
+      // different-sky epochs (e.g. 3I/ATLAS Aug vs Dec, 85° apart) are not a
+      // motion pair — skip instead of printing thousands of ″/day (audit)
+      const sepDeg = Math.hypot(ara - bra, adec - bdec);
+      if (sepDeg < 1) {
+        const m = arcsecPerDay(ara, adec, bra, bdec, (mjds[1] as number) - (mjds[0] as number));
+        // same-spot revisits measure registration (≈0), not a mover — show nothing
+        motion = m !== null && m > 0.05 ? m : null;
+      }
     }
     let kind: Kind = 'pending';
     let knownName = '';
@@ -61,7 +68,7 @@ function cardsFrom(showcases: Showcase[], reports: Map<string, Report>): Card[] 
       else if (rep.movers > 0) kind = 'mover';
       else if (rep.variables > 0 || rep.variable_flag) kind = 'variable';
       else kind = 'unidentified';
-      const bits = [`top ${rep.top_sigma.toFixed(1)}σ`];
+      const bits = [`top ${(rep.top_sigma ?? 0).toFixed(1)}σ`];
       if (rep.span_days !== null) bits.push(`${Math.round(rep.span_days)}d baseline`);
       stat = bits.join(' · ');
     } else if (!rep) {
