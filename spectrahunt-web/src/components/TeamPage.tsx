@@ -59,23 +59,24 @@ export default function TeamPage() {
             <span className="team-photo" aria-hidden="true">{m.initials}</span>
             <h2>{m.name}</h2>
             <p className="team-role">{m.role}</p>
-            <div className="team-links">
+            <div className="team-links" role="group" aria-label={`Contact ${m.name}`}>
               {m.web && (
-                <a href={m.web} target="_blank" rel="noreferrer">
-                  <Icon name="ext" className="icon" />
-                  <span>{contactLabel(m.web, 'Website')}</span>
+                <a href={m.web} target="_blank" rel="noreferrer"
+                  aria-label={`Website: ${contactLabel(m.web, 'website')}`}
+                  title={contactLabel(m.web, 'Website')}>
+                  <Icon name="globe" className="icon" />
                 </a>
               )}
               {m.github && (
-                <a href={m.github} target="_blank" rel="noreferrer">
-                  <Icon name="ext" className="icon" />
-                  <span>{contactLabel(m.github, 'GitHub')}</span>
+                <a href={m.github} target="_blank" rel="noreferrer"
+                  aria-label={`GitHub: ${contactLabel(m.github, 'GitHub')}`}
+                  title={contactLabel(m.github, 'GitHub')}>
+                  <Icon name="code" className="icon" />
                 </a>
               )}
               {m.email && (
-                <a href={`mailto:${m.email}`}>
-                  <Icon name="ext" className="icon" />
-                  <span>{m.email}</span>
+                <a href={`mailto:${m.email}`} aria-label={`Email: ${m.email}`} title={m.email}>
+                  <Icon name="mail" className="icon" />
                 </a>
               )}
             </div>
