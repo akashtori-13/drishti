@@ -80,6 +80,16 @@ What this means for the brief's questions:
   simply an artifact" branch. Comet: 3 pairs, one per family — the failed
   visits broke simultaneity, so no cross-epoch verdict yet; needs the
   counterpart exposures, not more model.
+- **Forensics verdict (2026-09-26)**: `scripts/forensics_flip.py` pulled the
+  four flipped cutouts (`data/forensics/`). Pixel audit: in each visit one
+  band's stellar core lands on a flagged pixel — B1v2 core 91.1 flagged,
+  B4v1 core 50.8 flagged — and median-fill replaced core light with
+  background while reporting ±1 errors. Fix shipped: `aperture_flux` takes
+  the mask, excludes (never fills) bad pixels, area-corrects with inflated
+  errors, and reports `masked_frac`/`core_masked`; `extract_track` stores
+  both per point; `pairfit` excludes core-masked points from evolution
+  verdicts (pre-fix points carry `pre_fix_caveat`). Regression tests:
+  `backend/tests/test_masked_core.py` (3/3).
 - **Experiment 2** (what the same-band rule discards): measured
   (`scripts/audit_discard.py`, `docs/discard-audit.json`): **466/466 pairs
   kept, 0 rejected** — every field is single-band, so the bundle cannot

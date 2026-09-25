@@ -10,27 +10,50 @@ from typing import Any, Dict, List, Optional, Tuple
 
 def aperture_flux(image, x: float, y: float, r_aper: float = 3.0,
                   r_in: float = 6.0, r_out: float = 10.0,
-                  variance=None) -> Dict[str, float]:
-    """Background-subtracted aperture sum + rough error. Never raises."""
+                  variance=None, mask=None) -> Dict[str, float]:
+    """Background-subtracted aperture sum + rough error. Never raises.
+
+    When `mask` (True = bad, e.g. from mask_bad_pixels) is given, masked
+    pixels are EXCLUDED, not median-filled: the sum scales by full/good
+    area and the error inflates by the same factor. Area-scaling assumes
+    masked pixels carry the mean of good ones, which underestimates masked
+    cores — so `core_masked` flags measurements no evolution verdict may
+    use (proven by the D1+D4 control-star flip: median-fill wiped ~50-90
+    units of stellar core while reporting ±1 errors).
+    """
     import numpy as np
     data = np.asarray(image, dtype=float)
     h, w = data.shape[:2]
     yy, xx = np.mgrid[0:h, 0:w]
     dist = np.hypot(xx - x, yy - y)
-    ap = (dist <= r_aper) & np.isfinite(data)
-    an = (dist > r_in) & (dist <= r_out) & np.isfinite(data)
+    bad = np.zeros_like(dist, dtype=bool)
+    if mask is not None:
+        try:
+            bad = np.asarray(mask, dtype=bool)
+        except Exception:
+            pass
+    ap = (dist <= r_aper) & np.isfinite(data) & ~bad
+    an = (dist > r_in) & (dist <= r_out) & np.isfinite(data) & ~bad
     bg = float(np.median(data[an])) if an.any() else float(np.nanmedian(data))
+    npix_full = int(((dist <= r_aper) & np.isfinite(data)).sum())
     npix = int(ap.sum())
-    flux = float(data[ap].sum() - bg * npix) if npix else 0.0
+    masked_frac = 1.0 - npix / max(1, npix_full)
+    try:
+        core_masked = bool(bad[int(round(y)), int(round(x))])
+    except Exception:
+        core_masked = False
+    area = npix_full / max(1, npix)
+    flux = float((data[ap].sum() - bg * npix) * area) if npix else 0.0
     if variance is not None:
         try:
             var = np.asarray(variance, dtype=float)
-            err = float(np.sqrt(np.nansum(var[ap]) + npix * np.nanvar(data[an])))
+            err = float(np.sqrt(np.nansum(var[ap]) + npix * np.nanvar(data[an])) * area)
         except Exception:
-            err = float(np.sqrt(max(1.0, abs(flux))) + npix * 0.1)
+            err = float((np.sqrt(max(1.0, abs(flux))) + npix * 0.1) * area)
     else:
-        err = float(np.sqrt(max(1.0, abs(flux))) + npix * 0.1)
-    return {"flux": flux, "flux_err": err, "bg": bg, "npix": npix}
+        err = float((np.sqrt(max(1.0, abs(flux))) + npix * 0.1) * area)
+    return {"flux": flux, "flux_err": err, "bg": bg, "npix": npix,
+            "masked_frac": masked_frac, "core_masked": core_masked}
 
 
 def significance_map(img_a, img_b_aligned, var_a=None, var_b=None) -> Any:
