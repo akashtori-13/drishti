@@ -80,8 +80,11 @@ What this means for the brief's questions:
   the 28.9σ control "colour evolution" is GONE — core-masked visits are
   excluded from verdicts instead of silently filled. Comet: D2+D5 and D3+D6
   across ~3 months both read consistent-static (dA/dR ~0.5σ, faint-flux
-  caveats apply). In-app, core-masked visits render hollow with broken
-  guide segments — shown, never joined, never used.
+  caveats apply). A counterpart fill completed the comet to 20/20 with the
+  full D1+D4 chain (5 links, 60805→60903): all 7 cross-epoch tests across
+  all three families read consistent-static — no brightness or colour
+  evolution detected at these uncertainties. In-app, core-masked visits
+  render hollow with broken guide segments — shown, never joined, never used.
 - **Forensics verdict (2026-09-26)**: `scripts/forensics_flip.py` pulled the
   four flipped cutouts (`data/forensics/`). Pixel audit: in each visit one
   band's stellar core lands on a flagged pixel — B1v2 core 91.1 flagged,
