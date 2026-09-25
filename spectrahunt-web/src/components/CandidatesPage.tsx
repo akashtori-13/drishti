@@ -211,6 +211,8 @@ export default function CandidatesPage() {
       <div className="cand-grid" ref={gridRef}>
         {list.map((c, i) => {
           const band = BANDS[c.band - 1];
+          // thumbnail tone cycles per position so neighbours never match
+          const tone = (['gray', 'color', 'cb'] as const)[i % 3];
           return (
             <Reveal key={c.id} index={i}>
             <div className="cand-wrap">
@@ -219,7 +221,7 @@ export default function CandidatesPage() {
               aria-label={`${c.name}, ${KIND_LABEL[c.kind]}, ${c.stat}, ${band.label}`}
               onClick={() => openPreview(c.id)}
             >
-              <div className="cand-thumb">
+              <div className="cand-thumb" data-tone={tone}>
                 <Thumb card={c} />
               </div>
               <span className="cand-badges">
