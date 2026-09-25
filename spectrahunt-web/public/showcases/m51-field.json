@@ -8,7 +8,7 @@
     {
       "label": "2025-05-10 \u00b7 D3",
       "band": 3,
-      "wavelength_um": null,
+      "wavelength_um": 2.02,
       "mjd": 60805.850327,
       "ra": 202.47,
       "dec": 47.2,
@@ -19,7 +19,7 @@
     {
       "label": "2025-05-11 \u00b7 D3",
       "band": 3,
-      "wavelength_um": null,
+      "wavelength_um": 2.02,
       "mjd": 60806.869768,
       "ra": 202.47,
       "dec": 47.2,
@@ -30,7 +30,7 @@
     {
       "label": "2025-12-17 \u00b7 D3",
       "band": 3,
-      "wavelength_um": null,
+      "wavelength_um": 2.02,
       "mjd": 61026.387298,
       "ra": 202.47,
       "dec": 47.2,
@@ -41,7 +41,7 @@
     {
       "label": "2025-12-17 \u00b7 D3",
       "band": 3,
-      "wavelength_um": null,
+      "wavelength_um": 2.02,
       "mjd": 61026.658018,
       "ra": 202.47,
       "dec": 47.2,
@@ -52,7 +52,7 @@
     {
       "label": "2025-12-18 \u00b7 D3",
       "band": 3,
-      "wavelength_um": null,
+      "wavelength_um": 2.02,
       "mjd": 61027.946864,
       "ra": 202.47,
       "dec": 47.2,
@@ -63,7 +63,7 @@
     {
       "label": "2026-05-15 \u00b7 D3",
       "band": 3,
-      "wavelength_um": null,
+      "wavelength_um": 2.02,
       "mjd": 61175.826799,
       "ra": 202.47,
       "dec": 47.2,

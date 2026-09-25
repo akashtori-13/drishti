@@ -8,7 +8,7 @@
     {
       "label": "2026-03-24 \u00b7 D3",
       "band": 3,
-      "wavelength_um": null,
+      "wavelength_um": 2.02,
       "mjd": 61123.193895,
       "ra": 266.42,
       "dec": -29.01,
@@ -19,7 +19,7 @@
     {
       "label": "2026-03-26 \u00b7 D3",
       "band": 3,
-      "wavelength_um": null,
+      "wavelength_um": 2.02,
       "mjd": 61125.56777,
       "ra": 266.42,
       "dec": -29.01,
