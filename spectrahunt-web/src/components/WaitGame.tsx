@@ -482,14 +482,16 @@ export default function WaitGame({ headline = 'Fetching live sky data', onSkipHr
     };
     const up = () => { S.firing = false; };
     const vis = () => { last = performance.now(); };
-    canvas.addEventListener('pointermove', (e) => {
+    const onMove = (e: PointerEvent) => {
       if (e.pointerType !== 'mouse' && e.buttons === 0) return;
       toUnitMove(e.clientX);
-    });
-    canvas.addEventListener('pointerdown', (e) => {
+    };
+    const onDown = (e: PointerEvent) => {
       if (S.phase === 'over') { restart(); return; }
       toUnitMove(e.clientX);
-    });
+    };
+    canvas.addEventListener('pointermove', onMove);
+    canvas.addEventListener('pointerdown', onDown);
     window.addEventListener('pointerup', up);
     window.addEventListener('pointercancel', up);
     document.addEventListener('keydown', kd);
@@ -500,6 +502,8 @@ export default function WaitGame({ headline = 'Fetching live sky data', onSkipHr
       cancelAnimationFrame(raf);
       saveBest();
       ro.disconnect();
+      canvas.removeEventListener('pointermove', onMove);
+      canvas.removeEventListener('pointerdown', onDown);
       window.removeEventListener('pointerup', up);
       window.removeEventListener('pointercancel', up);
       document.removeEventListener('keydown', kd);

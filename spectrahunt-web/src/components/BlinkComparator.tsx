@@ -211,6 +211,9 @@ export default function BlinkComparator({
   const [specVals, setSpecVals] = useState<number[] | null>(null);
   const [sideHover, setSideHover] = useState<{ x: number; y: number; a: number; b: number } | null>(null);
   const [measureChip, setMeasureChip] = useState<{ x: number; y: number; lum: number; label: string } | null>(null);
+  // keyboard crosshair state lives with the other hooks (never below the
+  // early returns): arrows move it, Enter measures at its position.
+  const [cross, setCross] = useState({ x: 0.5, y: 0.5 });
 
   // Reset per-frame measurement when the frame set actually changes. Done
   // during render (not in an effect): `frames` gets a fresh identity on every
@@ -1285,6 +1288,21 @@ export default function BlinkComparator({
     const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const x = (e.clientX - r.left) / r.width;
     const y = (e.clientY - r.top) / r.height;
+    sampleSpot(x, y);
+  };
+  const onCanvasKey = (e: React.KeyboardEvent) => {    const step = 1 / 32;
+    let { x, y } = cross;
+    if (e.key === 'ArrowLeft') x = Math.max(0, x - step);
+    else if (e.key === 'ArrowRight') x = Math.min(1, x + step);
+    else if (e.key === 'ArrowUp') y = Math.max(0, y - step);
+    else if (e.key === 'ArrowDown') y = Math.min(1, y + step);
+    else if (e.key === 'Enter') { e.preventDefault(); sampleSpot(cross.x, cross.y); return; }
+    else return;
+    e.preventDefault();
+    setCross({ x, y });
+    setMeasureChip({ x, y, lum: 0, label: `crosshair ${Math.round(x * 100)}%, ${Math.round(y * 100)}%` });
+  };
+  function sampleSpot(x: number, y: number) {
     // chart's right half is schematic and replay is a simulation: taps there
     // don't measure pixels (chart measures on its captured half).
     if (mode === 'replay') return; // simulation taps don't measure pixels
@@ -1506,14 +1524,16 @@ export default function BlinkComparator({
                 <canvas
                   ref={mainRef}
                   id="blinkCanvas"
-                  role="img"
-                  aria-label={`${title} — ${cur?.label ?? 'no frame'}`}
+                  role="application"
+                  aria-label={`${title} — ${cur?.label ?? 'no frame'}. Arrow keys move the measuring crosshair, Enter measures.`}
+                  tabIndex={0}
                   style={{ width: '100%', height: '100%', display: 'block', cursor: onSample ? 'crosshair' : 'grab' }}
                   onPointerDown={onPointerDown}
                   onPointerMove={onPointerMove}
                   onPointerUp={onPointerUp}
                   onPointerCancel={onPointerUp}
                   onClick={onClickSample}
+                  onKeyDown={onCanvasKey}
                 />
                 <span className="viewer-tag mono">{modeLabel}</span>
                 <span className="viewer-tag epoch mono">{cur?.label ?? '—'}</span>
