@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import Header from '@/components/Header';
 import Icon from '@/components/Icon';
 import Tutorial from '@/components/Tutorial';
+import SpaceBackdrop from '@/components/SpaceBackdrop';
 import ArtifactPreview from '@/components/ArtifactPreview';
 import { useAppStore } from '@/lib/store';
 
@@ -16,6 +17,7 @@ export default function SiteChrome({ children, showTutorial = false }: { childre
   return (
     <div className="flex flex-col min-h-screen relative">
       <a className="skip" href="#main">Skip to content</a>
+      <SpaceBackdrop />
       <Header />
       {showTutorial && <Tutorial />}
       <ArtifactPreview />

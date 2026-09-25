@@ -6,7 +6,6 @@ import { Reveal } from '@/lib/reveal';
 import { BANDS } from '@/lib/sky';
 import { TOURS, GLOSSARY } from '@/lib/catalogs';
 import { useAppStore } from '@/lib/store';
-import SpaceBackdrop from '@/components/SpaceBackdrop';
 import { OrbitFinale } from '@/components/OrbitFinale';
 import { parseTLE, telemetryFor, type SwarmBundle } from '@/lib/orbit';
 import FALLBACK from '@/lib/tle-bundle.fallback.json';
@@ -40,7 +39,6 @@ export default function AboutPage() {
   }, []);
   return (
     <>
-    <SpaceBackdrop />
     <div className="prose" style={{ position: 'relative', zIndex: 1 }}>
       <p className="hero-kicker">Mission · method · data</p>
       <h1>About STELLAR</h1>
