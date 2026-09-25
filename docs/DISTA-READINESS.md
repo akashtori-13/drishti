@@ -41,10 +41,12 @@ were found. R range and ice wavelengths should be corrected to the values above.
   (bandstacks, reports, MJDs) exists.
 
 What this means for the brief's questions:
-- **Experiment 2** (what the same-band rule discards): within our bundle the
-  answer is currently "nothing" — we keep one band per field. The discard
-  happens upstream at index time; quantifying it needs the TAP-side audit,
-  not the bundle.
+- **Experiment 2** (what the same-band rule discards): measured
+  (`scripts/audit_discard.py`, `docs/discard-audit.json`): **466/466 pairs
+  kept, 0 rejected** — every field is single-band, so the bundle cannot
+  contain a rejectable pair by construction. The discard happens upstream at
+  index time; quantifying it needs TAP-side multi-band visit lists. Script
+  kept for re-runs once multi-band epochs land.
 - **Direction A vs B**: the bundle cannot yet feed either (no multi-band
   visits per position). Direction A needs Horizons-tracked extraction code
   (new); Direction B needs per-array flux+variance for ≥1 target (Experiment 1,
