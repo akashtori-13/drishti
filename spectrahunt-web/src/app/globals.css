@@ -1232,8 +1232,11 @@ body::after {
 .stel-ctl{background:#151929; border:1px solid var(--line); border-radius:8px;
   padding:0 8px; font-size:.75rem; color:var(--ink); min-height:44px;}
 input.stel-ctl{font-family:var(--font-mono); color-scheme:dark;}
-/* HUD rows: grouped, wrapping, one-handed. Numeric pills hold fixed slots
-   with tabular right-aligned numerals so live values never reflow. */
+/* HUD follows the system: native font stack with tabular numerals,
+   system-style frosted material */
+.stel-hud, .stel-hud input, .stel-hud select, .stel-hud button{
+  font-family:system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
 .stel-row{display:flex; flex-wrap:nowrap; gap:6px; align-items:center; justify-content:center; width:auto; max-width:100%;}
 /* one-row icon dock (dynamic-island buttons): fixed slots, never reflows */
 .hud-btn{width:44px; height:44px; flex-shrink:0; border-radius:50%;
@@ -1245,7 +1248,7 @@ input.stel-ctl{font-family:var(--font-mono); color-scheme:dark;}
 .hud-btn.active{color:#fff; background:rgba(255,255,255,.14); box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);}
 button.hud-coords{cursor:pointer; font:inherit;}
 button.hud-coords:hover{border-color:var(--line-strong);}
-.stel-hud .mono{font-variant-numeric:tabular-nums; text-align:right;}
+.stel-hud .mono{font-variant-numeric:tabular-nums; text-align:right; font-family:system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;}
 .mono-coord{min-width:20ch;}
 button.hud-coords{font-size:.6875rem;}
 .mono-fov{min-width:10ch;}
