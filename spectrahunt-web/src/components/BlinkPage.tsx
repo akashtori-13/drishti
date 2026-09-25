@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';import BlinkComparator from '@/components/BlinkComparator';
 import Icon from '@/components/Icon';
 import WaitGame from '@/components/WaitGame';
-import SpectrumPlot, { LightCurve } from '@/components/Plots';
+import SpectrumPlot, { LightCurve, SedPlot } from '@/components/Plots';
 import {
   fetchLiveShowcase, getShowcase, isLiveId, parseLiveId,
   skybotMatches, useLive, type Showcase,
@@ -152,6 +152,7 @@ export default function BlinkPage({ id }: { id: string }) {
   const [report, setReport] = useState<{
     movers: number; variables: number; top_sigma: number; span_days: number | null;
     variable_flag: boolean; known: { name: string; kind: string } | null; detail: string;
+    spectrum?: Array<{ band: number; wavelength_um: number; flux: number; flux_err: number; mjd: number }>;
   } | null>(null);
   const [detStats, setDetStats] = useState<{ movers: number; variables: number; ready: boolean } | null>(null);
   // Fetch progress for the WaitGame panel: monotonic step counter so the
@@ -530,6 +531,12 @@ export default function BlinkPage({ id }: { id: string }) {
                   )}
                   <h3>Spectrum</h3>
                   <BandSpectrum viewing={viewing} sample={sample} liveSpec={liveSpec} band={band} />
+                  {report?.spectrum?.length ? (
+                    <SedPlot points={report.spectrum.map((s) => ({
+                      wl: s.wavelength_um, flux: s.flux, err: s.flux_err,
+                      masked: !(s.flux > 0),
+                    }))} />
+                  ) : null}
                 </>
               )}
               {tab === 'epochs' && (
@@ -540,7 +547,7 @@ export default function BlinkPage({ id }: { id: string }) {
                       <button key={`${e.label}::${i}`} type="button" onClick={() => setEpochIdx(i)}
                         className={`epoch-item${i === epochIdx ? ' active' : ''}`} aria-pressed={i === epochIdx}>
                         <span>{e.label}</span>
-                        <span className="mono">{e.mjd ? mjdToDate(e.mjd) : ''}</span>
+                        <span className="mono">{e.mjd ? mjdToDate(e.mjd) : ''}{e.wavelength_um ? ` · λ ${e.wavelength_um.toFixed(2)}` : ' · λ —'}</span>
                       </button>
                     ))}
                   </div>

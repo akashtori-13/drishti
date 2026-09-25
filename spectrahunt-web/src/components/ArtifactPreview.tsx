@@ -8,6 +8,7 @@ import { BANDS } from '@/lib/sky';
 import { getShowcase, type Showcase } from '@/lib/showcases';
 import { loadCachedImage } from '@/lib/skycache';
 import { blinkURL, useAppStore } from '@/lib/store';
+import { SedPlot } from '@/components/Plots';
 
 type Preset = 'grayscale' | 'color' | 'colorblind';
 const PRESET_CMAP: Record<Preset, Colormap> = {
@@ -53,6 +54,19 @@ export default function ArtifactPreview() {
   const [failed, setFailed] = useState<Record<string, true>>({});
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
+  // measured per-band spectrum for the SED panel (same report bundle as blink)
+  const [repSpec, setRepSpec] = useState<Array<{ wavelength_um: number; flux: number; flux_err: number }> | null>(null);
+  useEffect(() => {
+    if (!previewId) return;
+    let alive = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setRepSpec(null);
+    void fetch(`/reports/${previewId}.json`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => { if (alive) setRepSpec(Array.isArray(j?.spectrum) ? j.spectrum : null); })
+      .catch(() => undefined);
+    return () => { alive = false; };
+  }, [previewId]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -346,7 +360,7 @@ export default function ArtifactPreview() {
                 onPointerUp={onPointerUp}
                 onPointerCancel={onPointerUp}
               />
-              <span className="viewer-tag mono">{cur?.label ?? '—'}</span>
+              <span className="viewer-tag mono">{cur?.label ?? '—'}{cur?.wavelength_um ? ` · λ ${cur.wavelength_um.toFixed(2)}` : ''}</span>
               {n > 1 && (
                 <div className="pv-transport" role="group" aria-label="Frame transport">
                   <button type="button" className="icon-btn pressable" style={{ minWidth: 44, minHeight: 44 }} onClick={() => step(-1)} aria-label="Previous frame">‹</button>
@@ -361,6 +375,12 @@ export default function ArtifactPreview() {
               <p className="hero-kicker">{bandMeta?.label ?? ''} · {n} epoch{n === 1 ? '' : 's'}</p>
               <h2>{data.title}</h2>
               <p className="pv-story">{shortStory(data.story)}</p>
+              {repSpec?.length ? (
+                <SedPlot points={repSpec.map((s) => ({
+                  wl: s.wavelength_um, flux: s.flux, err: s.flux_err,
+                  masked: !(s.flux > 0),
+                }))} />
+              ) : null}
               <div className="pv-presets" role="group" aria-label="Viewing mode">
                 {PRESETS.map((p) => (
                   <button
