@@ -906,6 +906,9 @@ kbd{font-family:var(--font-mono); font-size:.6875rem; border:1px solid var(--lin
   -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.14);}
 .cand-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:16px; margin-top:32px; grid-auto-rows:1fr;}
+@media(max-width:640px){
+  .cand-grid{grid-template-columns:repeat(2,1fr); gap:10px; margin-top:20px;}
+}
 .cand{
   position:relative; aspect-ratio:3/4;
   display:flex; flex-direction:column; justify-content:flex-end; text-align:left; padding:0; border-radius:16px; overflow:hidden;
@@ -919,8 +922,35 @@ kbd{font-family:var(--font-mono); font-size:.6875rem; border:1px solid var(--lin
 .cand-wrap{display:flex; flex-direction:column; min-width:0; height:100%;}
 .cand-wrap .cand{width:100%; flex:1; cursor:pointer; font:inherit; color:inherit;}
 .cand-objects-toggle{align-self:flex-start; margin-top:8px;}
-.cand-objects{list-style:none; margin:8px 0 0; padding:0; display:flex; flex-direction:column; gap:6px; font-size:.75rem; color:var(--ink-2); max-height:190px; overflow-y:auto; scrollbar-width:thin;}
-.cand-objects li{border:1px solid var(--line); border-radius:8px; padding:6px 10px; background:rgba(255,255,255,.02); overflow-wrap:anywhere;}
+/* in-card objects count chip (top-right over the art; opens the modal) */
+.cand-wrap{position:relative;}
+.cand-count{position:absolute; top:10px; right:10px; z-index:2;
+  min-width:44px; min-height:44px; padding:0 12px; border-radius:999px;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-family:var(--font-mono); font-size:.8125rem; color:var(--ink);
+  background:rgba(5,6,12,.82); border:1px solid var(--line-strong); cursor:pointer;
+  -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
+  transition:border-color .15s, background .15s;}
+.cand-count:hover{border-color:#fff; background:rgba(20,23,40,.9);}
+/* objects modal: veil fade, panel springs like the artifact preview */
+.obj-veil{position:fixed; inset:0; z-index:90; background:rgba(2,3,6,.66);
+  -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
+  display:grid; place-items:center; padding:20px;
+  animation:pv-fade .22s ease-out;}
+.obj-panel{position:relative; width:min(460px,100%); max-height:min(70dvh,560px); overflow-y:auto;
+  border-radius:20px; padding:18px;
+  background:var(--glass-strong); border:1px solid var(--line-strong);
+  -webkit-backdrop-filter:blur(24px); backdrop-filter:blur(24px);
+  box-shadow:0 30px 80px -12px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.1);
+  animation:obj-pop .34s var(--ease-spring);}
+@keyframes obj-pop{from{opacity:0; transform:translateY(14px) scale(.94);} to{opacity:1; transform:none;}}
+@media (prefers-reduced-motion: reduce){ .obj-veil,.obj-panel{animation:none;} }
+.obj-head{display:flex; align-items:center; justify-content:space-between; gap:12px; margin:0 44px 10px 0;}
+.obj-head h3{margin:0; font-size:1rem; color:var(--ink);}
+.obj-head .mono{color:var(--ink-2); font-size:.75rem; white-space:nowrap;}
+.obj-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px;}
+.obj-list li{border:1px solid var(--line); border-radius:10px; padding:10px 12px;
+  background:rgba(255,255,255,.03); font-size:.75rem; color:var(--ink-2); overflow-wrap:anywhere;}
 .cand-thumb{position:absolute; inset:0; background:#04050a; min-width:0; min-height:0; overflow:hidden;}
 .cand-thumb canvas{width:100%; height:100%; display:block;}
 .cand-thumb img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;}

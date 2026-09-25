@@ -13,7 +13,6 @@ import SearchBox, { type SearchTarget } from '@/components/SearchBox';
 import SurpriseButton from '@/components/SurpriseButton';
 import OrbitHero from '@/components/orbital/OrbitHero';
 import Inspector, { type InspectorField } from '@/components/Inspector';
-import SpaceBackdrop from '@/components/SpaceBackdrop';
 import FlickerNumber from '@/components/FlickerNumber';
 
 function fieldFromRaDec(ra: number, dec: number, grid: number[][], real?: Map<string, RealCell>): InspectorField {
@@ -278,7 +277,6 @@ export default function HomePage() {  const router = useRouter();
 
   return (
     <div>
-      <SpaceBackdrop />
       <section ref={heroRef} className={wake ? 'hero wake' : 'hero'} id="hero">
         <HeroSky grid={grid} coverage={coverage}
           markers={SHOWCASE_POINTS}

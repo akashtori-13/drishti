@@ -122,7 +122,7 @@ export default function CandidatesPage() {
   const openPreview = useAppStore((s) => s.openPreview);
   const [cards, setCards] = useState<Card[]>([]);
   const [filter, setFilter] = useState<Filter>('all');
-  const [openId, setOpenId] = useState<string | null>(null);
+  const [objModal, setObjModal] = useState<Card | null>(null);
   const docsRef = useRef(new Map<string, Showcase>());
   const repsRef = useRef(new Map<string, Report>());
   const gridRef = useRef<HTMLDivElement>(null);
@@ -211,7 +211,6 @@ export default function CandidatesPage() {
       <div className="cand-grid" ref={gridRef}>
         {list.map((c, i) => {
           const band = BANDS[c.band - 1];
-          const open = openId === c.id;
           return (
             <Reveal key={c.id} index={i}>
             <div className="cand-wrap">
@@ -239,32 +238,68 @@ export default function CandidatesPage() {
               </div>
             </button>
             {c.objects.length > 0 && (
-              <>
-                <button
-                  type="button" className="epoch-chip cand-objects-toggle" aria-expanded={open}
-                  onClick={() => setOpenId(open ? null : c.id)}
-                >
-                  {open ? 'Hide objects' : `Objects (${c.objects.length})`}
-                </button>
-                {open && (
-                  <ul className="cand-objects" aria-label={`Measured objects in ${c.name}`}>
-                    {c.objects.map((o, i) => (
-                      <li key={i} className="mono">
-                        <span className={o.kind === 'mover' ? 'tag-mover' : 'tag-var'}>
-                          {o.kind === 'mover' ? 'MOVER' : 'VARIABLE'}
-                        </span>{' '}
-                        #{i + 1} · {o.sigma.toFixed(1)}σ · x={o.x} y={o.y}
-                        {o.label && o.label !== 'Unidentified – possible discovery' ? ` · ${o.label}` : ''}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </>
+              <button
+                type="button" className="cand-count mono" aria-label={`Measured objects in ${c.name}: ${c.objects.length}. Show list.`}
+                onClick={(e) => { e.stopPropagation(); setObjModal(c); }}
+              >
+                {c.objects.length}
+              </button>
             )}
             </div>
             </Reveal>
           );
         })}
+      </div>
+      {objModal && (
+        <ObjModal
+          name={objModal.name}
+          objects={objModal.objects}
+          onClose={() => setObjModal(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+function ObjModal({ name, objects, onClose }: {
+  name: string;
+  objects: Card['objects'];
+  onClose: () => void;
+}) {
+  const closeRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    closeRef.current?.focus();
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [onClose]);
+  return (
+    <div className="obj-veil" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="obj-panel" role="dialog" aria-modal="true" aria-label={`Measured objects in ${name}`}>
+        <button ref={closeRef} type="button" className="pv-close" aria-label="Close objects"
+          style={{ minWidth: 44, minHeight: 44 }} onClick={onClose}>×</button>
+        <div className="obj-head">
+          <h3>{name}</h3>
+          <span className="mono">{objects.length} object{objects.length === 1 ? '' : 's'}</span>
+        </div>
+        <ul className="obj-list">
+          {objects.map((o, i) => (
+            <li key={i} className="mono">
+              <span className={o.kind === 'mover' ? 'tag-mover' : 'tag-var'}>
+                {o.kind === 'mover' ? 'MOVER' : 'VARIABLE'}
+              </span>{' '}
+              #{i + 1} · {o.sigma.toFixed(1)}σ · x={o.x} y={o.y}
+              {o.label && o.label !== 'Unidentified – possible discovery' ? ` · ${o.label}` : ''}
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
