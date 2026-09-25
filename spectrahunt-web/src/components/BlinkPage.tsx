@@ -119,6 +119,15 @@ export default function BlinkPage({ id }: { id: string }) {
     setPairSeen(true);
   }
   const viewing = data && data.id === id ? data : null;
+  // band PNG map identity must be stable across parent re-renders (audit:
+  // a fresh object literal retriggered the band-preload effect endlessly).
+  // Top-level hook (never inside conditional JSX) keyed on the data object.
+  const bandPngs = useMemo(
+    () => Object.fromEntries(
+      Object.entries(viewing?.bands ?? {}).map(([k, b]) => [Number(k), (b as { png?: string | null }).png ?? null]),
+    ),
+    [viewing],
+  );
 
   // load showcase (static JSON or live IRSA frames)
   useEffect(() => {
@@ -421,9 +430,7 @@ export default function BlinkPage({ id }: { id: string }) {
               center={{ ra: viewing.ra, dec: viewing.dec }}
               knownNames={skybot?.map((m) => m.name) ?? []}
               onStats={setDetStats}
-              bandPngs={Object.fromEntries(
-                Object.entries(viewing.bands ?? {}).map(([k, b]) => [Number(k), b.png ?? null]),
-              )}
+              bandPngs={bandPngs}
             />
           </section>
 
