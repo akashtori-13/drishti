@@ -7,6 +7,7 @@ import { BANDS } from '@/lib/sky';
 import { CHANNELS, applyStretch, colormap, type Colormap, type Stretch } from '@/lib/astro';
 import { assignTrackIds, buildTracks, detectMotion, sampleGrayAt, sampleGray, type TrackedCandidate, type Track } from '@/lib/motion';
 import { loadCachedImage } from '@/lib/skycache';
+import { useAppStore } from '@/lib/store';
 import { API_BASE } from '@/lib/showcases';
 
 export interface BlinkFrame {
@@ -165,7 +166,7 @@ export default function BlinkComparator({
   const [palette, setPalette] = useState(false);
   const [palQ, setPalQ] = useState('');
   const [stretch, setStretch] = useState<Stretch>('asinh');
-  const [cmap, setCmap] = useState<Colormap>('grayscale');
+  const [cmap, setCmap] = useState<Colormap>(() => (useAppStore.getState().colorblind ? 'cividis' : 'grayscale'));
   const [invert, setInvert] = useState(false);
   const [vmin, setVmin] = useState(0.05);
   const [vmax, setVmax] = useState(0.98);
@@ -173,6 +174,28 @@ export default function BlinkComparator({
   const [swipe, setSwipe] = useState(0.5);
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
+  const imgRef = useRef<HTMLImageElement | undefined>(undefined);
+  // view mirror: zoom never drops below cover, pan never leaves the frame
+  const vpRef = useRef({ zoom: 1, x: 0, y: 0 });
+  const clampView = (zoom: number, px: number, py: number) => {
+    const z = Math.min(6, Math.max(1, zoom));
+    const stage = stageRef.current;
+    const img = imgRef.current;
+    if (!stage || !img || !img.naturalWidth) return { z, x: 0, y: 0 };
+    const w = stage.clientWidth;
+    const h = stage.clientHeight;
+    if (!w || !h) return { z, x: 0, y: 0 };
+    const scale = Math.max(w / img.naturalWidth, h / img.naturalHeight) * z;
+    const mx = Math.max(0, (img.naturalWidth * scale - w) / 2);
+    const my = Math.max(0, (img.naturalHeight * scale - h) / 2);
+    return { z, x: Math.min(mx, Math.max(-mx, px)), y: Math.min(my, Math.max(-my, py)) };
+  };
+  const applyView = (zoom: number, px: number, py: number) => {
+    const c = clampView(zoom, px, py);
+    vpRef.current = { zoom: c.z, x: c.x, y: c.y };
+    setZoom(c.z);
+    setPan({ x: c.x, y: c.y });
+  };
   const [channel, setChannel] = useState<number>(() => {
     const ch = CHANNELS.filter((c) => c.detector === band);
     return ch[Math.floor(ch.length / 2)]?.idx ?? 0;
@@ -530,7 +553,7 @@ export default function BlinkComparator({
     if (!stage) return;
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-      setZoom((z) => Math.min(6, Math.max(0.2, z * (e.deltaY > 0 ? 0.92 : 1.09))));
+      applyView(vpRef.current.zoom * (e.deltaY > 0 ? 0.92 : 1.09), vpRef.current.x, vpRef.current.y);
     };
     stage.addEventListener('wheel', onWheel, { passive: false });
     const ro = new ResizeObserver(() => setSizeTick((t) => t + 1));
@@ -542,6 +565,7 @@ export default function BlinkComparator({
   }, []);
 
   const curImg = cur?.png ? loaded[cur.png] : undefined;
+  imgRef.current = curImg;
   const prevImg = prev?.png ? loaded[prev.png] : undefined;
   const totalFrames = frames.filter((f) => f.png).length;
   const doneFrames = frames.filter((f) => f.png && loaded[f.png]).length;
@@ -1157,12 +1181,12 @@ export default function BlinkComparator({
       // second finger down: park the pan, pinch takes over
       const pts = [...pointers.current.values()];
       pinch.current = {
-        dist: Math.max(20, Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y)), zoom,
+        dist: Math.max(20, Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y)), zoom: vpRef.current.zoom,
       };
       drag.current = null;
       return;
     }
-    drag.current = { x: e.clientX, y: e.clientY, pan: { ...pan }, moved: false };
+    drag.current = { x: e.clientX, y: e.clientY, pan: { x: vpRef.current.x, y: vpRef.current.y }, moved: false };
     suppressClick.current = false;
   };
   const onPointerMove = (e: React.PointerEvent) => {
@@ -1175,7 +1199,7 @@ export default function BlinkComparator({
       const dist = Math.max(20, Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y));
       if (pinch.current) {
         const ratio = dist / Math.max(20, pinch.current.dist);
-        setZoom(Math.min(6, Math.max(0.2, pinch.current.zoom * ratio)));
+        applyView(pinch.current.zoom * ratio, vpRef.current.x, vpRef.current.y);
         suppressClick.current = true; // pinch never counts as a tap
       } else {
         pinch.current = { dist, zoom };
@@ -1206,7 +1230,7 @@ export default function BlinkComparator({
       if (!panRaf.current) {
         panRaf.current = requestAnimationFrame(() => {
           panRaf.current = 0;
-          if (panPending.current) setPan(panPending.current);
+          if (panPending.current) applyView(vpRef.current.zoom, panPending.current.x, panPending.current.y);
         });
       }
       return;
@@ -1436,7 +1460,7 @@ export default function BlinkComparator({
       })),
       { name: 'Toggle invert', hint: '', run: () => setInvert((v) => !v) },
       ...BANDS.map((b) => ({ name: `Band ${b.label} (${b.range})`, hint: '', run: () => setBandAndChannel(b.id) })),
-      { name: 'Reset view', hint: '', run: () => { setPan({ x: 0, y: 0 }); setZoom(1); } },
+      { name: 'Reset view', hint: '', run: () => { vpRef.current = { zoom: 1, x: 0, y: 0 }; setPan({ x: 0, y: 0 }); setZoom(1); } },
       { name: 'Download PNG', hint: '', run: () => downloadPNG() },
       { name: 'Export figure PNG', hint: '', run: () => exportFigure() },
       { name: 'Record WebM', hint: '', run: () => void recordWebM() },
