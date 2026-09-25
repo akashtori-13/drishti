@@ -52,6 +52,14 @@ def bump_version(v: str) -> None:
             text, n = re.subn(pat, rf'\g<1>{v}\g<2>', text, count=1, flags=re.M)
             assert n == 1, f"version pattern not found in {path}"
             path.write_text(text)
+    major, minor, patch = (int(x) for x in v.split('.'))
+    gradle = WEB / "android" / "app" / "build.gradle"
+    if gradle.exists():
+        text = gradle.read_text()
+        text, n1 = re.subn(r'versionCode \d+', f'versionCode {major * 10000 + minor * 100 + patch}', text, count=1)
+        text, n2 = re.subn(r'versionName "\d+\.\d+\.\d+"', f'versionName "{v}"', text, count=1)
+        assert n1 == 1 and n2 == 1, f"version pattern not found in {gradle}"
+        gradle.write_text(text)
     print(f"version -> {v}")
 
 
