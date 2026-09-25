@@ -64,8 +64,12 @@ export const STAR_FILL = ['#e6e8f2', '#ffe6c4', '#c9dcff'];
 // Equirect views MUST mirror X when drawing so overlay math (RA right) matches.
 const ALLSKY = (w: number, h: number) =>
   `https://alasky.cds.unistra.fr/hips-image-services/hips2fits?hips=CDS%2FP%2F2MASS%2Fcolor&ra=180&dec=0&fov=360&width=${w}&height=${h}&projection=CAR&coordsys=icrs&rotation=0&format=jpg&stretch=log`;
-export const SKY_ALLSKY_URL = ALLSKY(1440, 720);
-export const SKY_ALLSKY_PREVIEW_URL = ALLSKY(720, 360);
+// Bundled offline base (public/data/allsky*.jpg, pinned by precache.json):
+// the whole sky in 637KB, no network. Remote ALLSKY() stays the fallback
+// for zoom tiles via loadCachedImage/HiPS (cached to device after viewing).
+export const SKY_ALLSKY_URL = '/data/allsky.jpg';
+export const SKY_ALLSKY_PREVIEW_URL = '/data/allsky-preview.jpg';
+export const SKY_ALLSKY_REMOTE_URL = ALLSKY(1440, 720);
 
 export const fmtRa = (v: number) => `${Number(v).toFixed(2)}°`;
 export const fmtDec = (v: number) => `${v < 0 ? '−' : ''}${Math.abs(Number(v)).toFixed(2)}°`;
