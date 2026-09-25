@@ -144,6 +144,31 @@ export default function StellariumView({
   const [obs, setObs] = useState<Observer>({ lat: 23.81, lon: 90.41, name: 'Dhaka (default)' });
   const [now, setNow] = useState(() => new Date());
   const [offH, setOffH] = useState(0);
+  // Manual time: frozen epoch ms takes over from the live clock + offset.
+  const [frozen, setFrozen] = useState<number | null>(null);
+  const stepH = (d: number) => {
+    if (frozen != null) setFrozen(frozen + d * 3600e3);
+    else setOffH((h) => h + d);
+  };
+  const goNow = () => { setFrozen(null); setOffH(0); };
+  const fmtLocal = (d: Date) => {
+    const p = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+  };
+  const CITIES: Observer[] = [
+    { lat: 23.81, lon: 90.41, name: 'Dhaka (default)' },
+    { lat: 28.61, lon: 77.21, name: 'Delhi' },
+    { lat: 1.35, lon: 103.82, name: 'Singapore' },
+    { lat: 35.68, lon: 139.69, name: 'Tokyo' },
+    { lat: -33.87, lon: 151.21, name: 'Sydney' },
+    { lat: 51.5, lon: -0.13, name: 'London' },
+    { lat: 40.71, lon: -74.0, name: 'New York' },
+    { lat: 34.05, lon: -118.24, name: 'Los Angeles' },
+    { lat: -22.91, lon: -43.17, name: 'Rio de Janeiro' },
+    { lat: -33.92, lon: 18.42, name: 'Cape Town' },
+    { lat: 64.15, lon: -21.94, name: 'Reykjavik' },
+    { lat: -77.84, lon: 166.67, name: 'McMurdo' },
+  ];
   const [img, setImg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [cursor, setCursor] = useState<{ ra: number; dec: number; alt: number; az: number } | null>(null);
@@ -156,7 +181,7 @@ export default function StellariumView({
   }, []);
   const [lines, setLines] = useState<ConLines | null>(null);
   const [stars, setStars] = useState<Array<{ ra: number; dec: number; g_mag: number | null }>>([]);
-  const t = new Date(now.getTime() + offH * 3600e3);
+  const t = frozen != null ? new Date(frozen) : new Date(now.getTime() + offH * 3600e3);
   const tMin = Math.floor(t.getTime() / 60000);
   const tNow = useMemo(() => new Date(tMin * 60000), [tMin]);
 
@@ -726,12 +751,33 @@ export default function StellariumView({
       {/* HUD */}
       <div className="stel-hud">
         <button type="button" className="epoch-chip" onClick={locate} title="Use device location">📍 {obs.name}</button>
+        <select className="stel-ctl" aria-label="Observing location"
+          value={obs.name === 'You (GPS)' ? '__gps' : obs.name}
+          onChange={(e) => {
+            const v = e.target.value;
+            if (v === '__gps') { locate(); return; }
+            const c = CITIES.find((c) => c.name === v);
+            if (c) setObs(c);
+          }}>
+          {obs.name === 'You (GPS)' ? (
+            <option value="__gps">📍 You (GPS)</option>
+          ) : (
+            <option value="__gps">📍 Device location</option>
+          )}
+          {CITIES.map((c) => <option key={c.name} value={c.name}>{c.name} {c.lat.toFixed(1)}°, {c.lon.toFixed(1)}°</option>)}
+        </select>
         <span className="mono">{clockOn ? `${t.toLocaleDateString()} ${t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : '—'}</span>
         <span role="group" aria-label="Time step" style={{ display: 'flex', gap: 4 }}>
-          <button type="button" className="epoch-chip" onClick={() => setOffH((h) => h - 1)} title="Back 1 hour">−1h</button>
-          <button type="button" className="epoch-chip" onClick={() => setOffH((h) => h + 1)} title="Forward 1 hour">+1h</button>
-          {offH !== 0 && <button type="button" className="epoch-chip" onClick={() => setOffH(0)}>Now</button>}
+          <button type="button" className="epoch-chip" onClick={() => stepH(-1)} title="Back 1 hour">−1h</button>
+          <button type="button" className="epoch-chip" onClick={() => stepH(1)} title="Forward 1 hour">+1h</button>
+          {(frozen != null || offH !== 0) && <button type="button" className="epoch-chip" onClick={goNow}>Now</button>}
         </span>
+        <input type="datetime-local" className="stel-ctl" aria-label="Set observing time"
+          value={fmtLocal(t)}
+          onChange={(e) => {
+            const v = new Date(e.target.value);
+            if (!Number.isNaN(v.getTime())) { setFrozen(v.getTime()); setOffH(0); }
+          }} />
         <span className="mono">Alt {centerAltAz.alt.toFixed(1)}° Az {centerAltAz.az.toFixed(1)}°</span>
         <span className="mono">FOV {fov < 10 ? fov.toFixed(1) : fov.toFixed(0)}°</span>
         {ar === 'off' ? (
