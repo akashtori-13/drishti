@@ -197,7 +197,8 @@ export default function CandidatesPage() {
                 key={f} type="button" aria-pressed={f === filter}
                 onClick={() => setFilter(f)}
               >
-                {f === 'all' ? 'All' : f === 'known' ? 'Known objects' : 'Unidentified'} ({count(f)})
+                {f === 'all' ? 'All' : f === 'known' ? 'Known objects' : 'Unidentified'}{' '}
+                <span className="count-pill" aria-hidden="true">{count(f)}</span>
               </button>
             ))}
           </div>

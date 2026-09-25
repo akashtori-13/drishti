@@ -37,6 +37,8 @@ export default function Header() {
   const pathname = rawPathname.length > 1 ? rawPathname.replace(/\/+$/, '') : rawPathname;
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [menuClosing, setMenuClosing] = useState(false);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [mSearch, setMSearch] = useState(false);
   const [typing, setTyping] = useState(false);
   const openPreview = useAppStore((s) => s.openPreview);
@@ -49,12 +51,35 @@ export default function Header() {
       : `${LINKS.find((n) => pathname === n.href || (n.match && pathname.startsWith(n.match)))?.label ?? 'STELLAR'} — STELLAR`;
   }, [pathname]);
 
+  // Animated close: flag first (CSS plays the exit), unmount after.
+  // Reduced motion skips the wait and closes instantly.
+  const closeMenu = () => {
+    if (!menuOpen || menuClosing) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setMenuOpen(false);
+      return;
+    }
+    setMenuClosing(true);
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(() => {
+      setMenuOpen(false);
+      setMenuClosing(false);
+    }, 240);
+  };
+
   useEffect(() => {
+    if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMenuOpen(false);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMenuClosing(false);
     setMSearch(false);
     setTyping(false);
   }, [pathname]);
+
+  useEffect(() => () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+  }, []);
 
   // Ctrl+K: navbar input, else the page's own search (hero, map tools),
   // else the mobile input row.
@@ -88,7 +113,7 @@ export default function Header() {
     const first = sheet?.querySelector<HTMLElement>('a[href], button:not([disabled])');
     (first ?? undefined)?.focus?.();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMenuOpen(false);
+      if (e.key === 'Escape') closeMenu();
       if (e.key === 'Tab' && sheet) {
         const items = sheet.querySelectorAll<HTMLElement>(
           'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
@@ -107,7 +132,7 @@ export default function Header() {
     };
     const onDown = (e: MouseEvent) => {
       if (islandRef.current && !islandRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
+        closeMenu();
         setMSearch(false);
       }
     };
@@ -138,7 +163,7 @@ export default function Header() {
   };
 
   const surprisePick = (t: SearchTarget) => {
-    setMenuOpen(false);
+    closeMenu();
     if (t.showcaseId) openPreview(t.showcaseId);
     else {
       try {
@@ -234,7 +259,7 @@ export default function Header() {
         </Link>
         <button type="button" className="island-iconbtn collapsible" aria-label={menuOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={menuOpen} aria-controls={menuOpen ? 'menu-sheet' : undefined}
-          onClick={() => setMenuOpen((o) => !o)}>
+          onClick={() => (menuOpen ? closeMenu() : setMenuOpen(true))}>
           <Icon name={menuOpen ? 'x' : 'menu'} className="icon" />
           <span className="ibtn-label" aria-hidden="true">Menu</span>
         </button>
@@ -257,9 +282,9 @@ export default function Header() {
       <div className="island-body" data-open={menuOpen || undefined}>
         <div className="island-body-in">
           {menuOpen && (
-            <nav id="menu-sheet" className="menu-sheet" aria-label="Views">
+            <nav id="menu-sheet" className="menu-sheet" aria-label="Views" data-closing={menuClosing || undefined}>
           {MENU.map((item) => (
-            <Link key={item.href} href={item.href} onClick={() => setMenuOpen(false)}
+            <Link key={item.href} href={item.href} onClick={() => closeMenu()}
               aria-current={item.active ? 'page' : undefined}
               className={`menu-link${item.active ? ' active' : ''}`}>
               <Icon name={item.icon} className="icon" />
