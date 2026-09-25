@@ -97,9 +97,22 @@ async def measure(url: str, ra: float, dec: float, tmp: Path) -> dict:
             return rec
         clean, flags = mask_bad_pixels(img, parsed.get("flags"), parsed.get("variance"))
         hit = aperture_flux(clean, float(x), float(y), variance=parsed.get("variance"))
+        # per-visit wavelength: cutout coords -> full-detector pixels via the
+        # (full-frame) CRPIX reference, then into the WCS-WAVE grid
+        lam, bw = parsed.get("wavelength_um"), None
+        try:
+            from backend.cutouts import wave_at
+            hdr = parsed.get("header", {}) or {}
+            lr = wcs.all_world2pix([[float(hdr["CRVAL1"]), float(hdr["CRVAL2"])]], 0)[0]
+            fx = float(x) + (float(hdr["CRPIX1"]) - float(lr[0]))
+            fy = float(y) + (float(hdr["CRPIX2"]) - float(lr[1]))
+            if parsed.get("wave_grid"):
+                lam, bw = wave_at(parsed["wave_grid"], fx, fy)
+        except Exception:
+            pass
         rec.update({"flux": hit["flux"], "flux_err": hit["flux_err"],
                     "npix": hit["npix"],
-                    "wavelength_um": parsed.get("wavelength_um"),
+                    "wavelength_um": lam, "bandwidth_um": bw,
                     "flags": str(flags)[:120] if flags is not None else None})
     except Exception as ex:  # noqa: BLE001 - per-point failure is data, not crash
         rec["reason"] = f"{type(ex).__name__}: {ex}"[:160]
