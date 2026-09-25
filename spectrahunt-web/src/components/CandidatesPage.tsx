@@ -13,16 +13,8 @@ interface ReportObject {
   kind: string; sigma: number; x: number; y: number; label: string | null;
 }
 
-interface ReportObject {
-  kind: string; sigma: number; x: number; y: number; label: string | null;
-}
-
-interface Report {
+interface Report extends ReportDoc {
   id: string;
-  movers: number; variables: number; top_sigma: number;
-  span_days: number | null; variable_flag: boolean;
-  known: { name: string; kind: string } | null;
-  detail: string;
   objects?: ReportObject[];
 }
 
@@ -38,7 +30,7 @@ interface Card {
 
 type Filter = 'all' | 'unknown' | 'known';
 
-import { getReport as getCachedReport } from '@/lib/reports';
+import { getReport as getCachedReport, type ReportDoc } from '@/lib/reports';
 
 async function getReport(id: string): Promise<Report | null> {
   const doc = await getCachedReport(id);

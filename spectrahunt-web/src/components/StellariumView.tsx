@@ -247,15 +247,26 @@ export default function StellariumView({
     if (!liveStars || !API_BASE) return;
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (fov > 60) { setStars([]); return; }
+    let alive = true;
+    const key = `sh-gaiastars:${ra.toFixed(1)}:${dec.toFixed(1)}:${fov.toFixed(0)}`;
     const t = setTimeout(() => {
       const url = `${API_BASE}/api/stars?ra=${ra.toFixed(2)}&dec=${dec.toFixed(2)}&fov_deg=${fov.toFixed(1)}`;
-      let alive = true;
       void fetch(url).then((r) => (r.ok ? r.json() : null)).then((j) => {
-        if (alive && j && Array.isArray(j.stars)) setStars(j.stars);
-      }).catch(() => undefined);
-      return () => { alive = false; };
+        if (!alive) return;
+        if (j && Array.isArray(j.stars)) {
+          setStars(j.stars);
+          lsSet(key, j.stars.slice(0, 500));
+        } else {
+          const cached = lsGet<Array<unknown>>(key);
+          if (cached) setStars(cached as never);
+        }
+      }).catch(() => {
+        if (!alive) return;
+        const cached = lsGet<Array<unknown>>(key);
+        if (cached) setStars(cached as never);
+      });
     }, 800);
-    return () => clearTimeout(t);
+    return () => { alive = false; clearTimeout(t); };
   }, [ra, dec, fov, liveStars]);
 
   // geolocation on demand
@@ -393,11 +404,14 @@ export default function StellariumView({
   const decQ = Math.round(dec / qStep) * qStep;
   const fovQ = Math.min(90, Math.max(0.5, 0.5 * Math.pow(1.25, Math.round(Math.log(fov / 0.5) / Math.log(1.25)))));
   const firstLoad = useRef(true);
+  const seq = useRef(0);
+  const gotTile = useRef(false);
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return;
     if (firstLoad.current) setLoading(true);
     let alive = true;
+    const my = ++seq.current;
     const W = Math.min(1200, Math.max(320, Math.round(host.clientWidth)));
     const H = Math.min(1200, Math.max(320, Math.round(host.clientHeight)));
     const v = view.current;
@@ -405,12 +419,12 @@ export default function StellariumView({
     const pv = setTimeout(() => {
       const url = skyUrl(raQ, decQ, fovQ, 384, 288, v.survey);
       void loadCachedImage(url)
-        .then(() => cachedImageSrc(url))
-        .then((src) => {
-          if (!alive) return;
+        .then((img) => {
+          if (!alive || seq.current !== my) return;
           firstLoad.current = false;
+          gotTile.current = true;
           setLoading(false);
-          setImg(src);
+          setImg(img.src);
         })
         .catch(() => undefined);
     }, 120);
@@ -418,12 +432,12 @@ export default function StellariumView({
     const full = setTimeout(() => {
       const url = skyUrl(raQ, decQ, fovQ, W, H, v.survey);
       void loadCachedImage(url)
-        .then(() => cachedImageSrc(url))
-        .then((src) => {
-          if (!alive) return;
+        .then((img) => {
+          if (!alive || seq.current !== my) return;
           firstLoad.current = false;
+          gotTile.current = true;
           setLoading(false);
-          setImg(src);
+          setImg(img.src);
         })
         .catch(() => undefined);
       // neighbor prefetch at snapped coords
@@ -435,7 +449,15 @@ export default function StellariumView({
         skyUrl(normRa(raQ - off), decQ, fovQ, W, H, v.survey),
       ]);
     }, 900);
-    return () => { alive = false; clearTimeout(pv); clearTimeout(full); };
+    // offline fallback: no tile at all (offline + empty cache) → bundled
+    // all-sky base instead of a stuck "Loading real sky…" (audit F9)
+    const fb = setTimeout(() => {
+      if (!alive || seq.current !== my || gotTile.current) return;
+      firstLoad.current = false;
+      setLoading(false);
+      setImg('/data/allsky.jpg');
+    }, 4000);
+    return () => { alive = false; clearTimeout(pv); clearTimeout(full); clearTimeout(fb); };
   }, [raQ, decQ, fovQ, survey]);
 
   // overlays
