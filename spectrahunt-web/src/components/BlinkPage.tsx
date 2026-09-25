@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';import BlinkCompara
 import Icon from '@/components/Icon';
 import WaitGame from '@/components/WaitGame';
 import { LightCurve, SedPlot } from '@/components/Plots';
-import { getReport } from '@/lib/reports';
+import { getReport, type ReportDoc } from '@/lib/reports';
 import {
   fetchLiveShowcase, getShowcase, isLiveId, parseLiveId,
   skybotMatches, useLive, type Showcase,
@@ -92,17 +92,14 @@ export default function BlinkPage({ id }: { id: string }) {
   const [err, setErr] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [skybot, setSkybot] = useState<Array<{ name: string }> | null>(null);
+  const [skybotDead, setSkybotDead] = useState(false);
   const [sample, setSample] = useState<{ x: number; y: number; values: number[] } | null>(null);
   const [tab, setTab] = useState<RailTab>('overview');
   const [flag, setFlag] = useState('');
   const [flags, setFlags] = useState<Array<{ x: number; note: string }>>([]);
   const [liveSpec, setLiveSpec] = useState<Array<{ wavelength_um: number; flux: number }> | null>(null);
   const [liveLc, setLiveLc] = useState<Array<{ mjd?: number; flux: number }> | null>(null);
-  const [report, setReport] = useState<{
-    movers: number; variables: number; top_sigma: number; span_days: number | null;
-    variable_flag: boolean; known: { name: string; kind: string } | null; detail: string;
-    spectrum?: Array<{ band: number; wavelength_um: number; flux: number; flux_err: number; mjd: number }>;
-  } | null>(null);
+  const [report, setReport] = useState<ReportDoc | null>(null);
   const [detStats, setDetStats] = useState<{ movers: number; variables: number; ready: boolean } | null>(null);
   // Fetch progress for the WaitGame panel: monotonic step counter so the
   // player sees what is loading and how far along it is.
@@ -162,9 +159,10 @@ export default function BlinkPage({ id }: { id: string }) {
         if (qm === 'side' || qm === 'swipe' || qm === 'diff' || qm === 'blink' || qm === 'color') setCompareMode(qm);
       } catch { /* keep defaults */ }
       setSkybot(null);
+      setSkybotDead(false);
       const mjd = d.epochs[0]?.mjd;
       if (mjd) void skybotMatches(d.ra, d.dec, mjd)
-        .then((m) => { if (alive) setSkybot(m); })
+        .then((m) => { if (!alive) return; if (m === null) setSkybotDead(true); else setSkybot(m); })
         .finally(() => mark(3, 'Cross-match complete — rendering your blink…'));
       else mark(3, 'Ready — rendering your blink…');
     };
@@ -533,10 +531,10 @@ export default function BlinkPage({ id }: { id: string }) {
                   <h3>Solar-system cross-match</h3>
                   <p>
                     {skybot === null
-                      ? 'Checking SkyBoT…'
+                      ? (skybotDead ? 'SkyBoT unreachable — verify with the links below.' : 'Checking SkyBoT…')
                       : skybot.length
                         ? `SkyBoT match: ${skybot[0].name}.`
-                        : 'No SkyBoT match — service unreachable or field empty; verify with the links below.'}
+                        : 'No SkyBoT match in this field.'}
                   </p>
                   {viewing.epochs[0]?.note && <p>{viewing.epochs[0].note}</p>}
                   <div className="ext-links">

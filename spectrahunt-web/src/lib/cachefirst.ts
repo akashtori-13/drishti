@@ -46,6 +46,11 @@ export function peek<T>(key: string): T | null {
  */
 export async function swr<T>(key: string, url: string, maxAgeMs: number): Promise<Fresh<T> | null> {
   const cached = lsGet<T>(key);
+  // Immutable build artifacts (Infinity TTL) never change: serve and skip
+  // the revalidation fetch entirely (saves one request per panel mount).
+  if (cached !== null && !Number.isFinite(maxAgeMs)) {
+    return { data: cached, stale: false };
+  }
   const fresh = cached !== null && age(key) < maxAgeMs;
   const refresh = (async () => {
     try {

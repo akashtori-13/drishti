@@ -115,15 +115,21 @@ async def _detect_async(ra, dec, band, size_deg, db_path) -> Dict[str, Any]:
     b_on_a, align_info = align_images(fa["image"], fa["wcs"], fb["image"], fb["wcs"])
     meas = measure_field(fa["image"], b_on_a, fa.get("variance"), fb.get("variance"))
     mjd_a, mjd_b = first.get("mjd"), last.get("mjd")
+    dt_days = (mjd_b or 0) - (mjd_a or 0)
+    # field motion from the top mover's dipole span (was: same position
+    # twice, always 0.0). None when no movers — UI says so honestly.
     motion = None
     try:
-        motion = arcsec_per_day(ra, dec, ra, dec, (mjd_b or 0) - (mjd_a or 0))
+        from backend.config import PIXEL_SCALE_ARCSEC
+        movers = [c for c in meas["candidates"] if c.get("kind") == "mover"]
+        if movers and dt_days and dt_days > 0:
+            top = max(movers, key=lambda c: c.get("sigma", 0))
+            motion = float(top.get("separation_px", 0)) * float(PIXEL_SCALE_ARCSEC) / dt_days
     except Exception:
-        pass
-    # label candidates: Gaia star within 8" -> known star; else SkyBoT check at field center.
-    # NOTE: IMCCE retired the legacy skybot_cone_search.php endpoint (404 since
-    # the SSP migration); query_skybot degrades to None and the UI links out
-    # for manual checks until the new SSP API is integrated.
+        motion = None
+    # label candidates: Gaia star within 5" of the CANDIDATE's own sky
+    # position (was: field-center result stamped on all); SkyBoT per
+    # candidate cone (capped; cached hits/misses make repeats cheap).
     gaia = query_gaia(ra, dec, 8.0, db_path=db_path)
     skybot = None
     skybot_status = "unavailable"
@@ -133,10 +139,51 @@ async def _detect_async(ra, dec, band, size_deg, db_path) -> Dict[str, Any]:
             skybot_status = "ok" if skybot else "empty"
     except Exception:
         skybot_status = "error"
-    for c in meas["candidates"]:
-        c["gaia"] = gaia[0] if gaia else None
-        c["label"] = ("Known star" if gaia and (gaia[0].get("separation_arcsec", 99) or 99) < 5
-                      else ("Known solar-system object" if skybot else "Unidentified – possible discovery"))
+
+    def _cand_sky(c):
+        try:
+            w = fa.get("wcs")
+            if w is None:
+                return None
+            r = w.all_pix2world([[float(c["x"]), float(c["y"])]], 0)[0]
+            return float(r[0]), float(r[1])
+        except Exception:
+            return None
+
+    def _sep(a, b, c, d):
+        import math
+        try:
+            return math.degrees(math.acos(max(-1.0, min(1.0,
+                math.sin(math.radians(b)) * math.sin(math.radians(d))
+                + math.cos(math.radians(b)) * math.cos(math.radians(d))
+                * math.cos(math.radians(a - c)))))) * 3600.0
+        except Exception:
+            return 1e9
+
+    for i, c in enumerate(meas["candidates"]):
+        sky = _cand_sky(c)
+        star = None
+        if sky and gaia:
+            near = [(g, _sep(sky[0], sky[1], g.get("ra", 1e9), g.get("dec", 1e9)))
+                    for g in gaia]
+            near = [(g, s) for g, s in near if s < 5.0]
+            if near:
+                star = min(near, key=lambda gs: gs[1])[0]
+        c["gaia"] = star
+        if star:
+            c["label"] = "Known star"
+            continue
+        if i < 12 and sky and mjd_a:
+            try:
+                hit = await query_skybot(sky[0], sky[1], float(mjd_a), 10.0, db_path=db_path)
+            except Exception:
+                hit = None
+            if hit:
+                c["label"] = "Known solar-system object"
+                c["skybot"] = hit
+                continue
+        c["label"] = ("Unidentified – possible discovery"
+                      if i < 12 else "Unchecked – crowded field")
     return {"candidates": meas["candidates"], "matched": 0,
             "movers": sum(1 for c in meas["candidates"] if c["kind"] == "mover"),
             "variables": sum(1 for c in meas["candidates"] if c["kind"] == "variable"),

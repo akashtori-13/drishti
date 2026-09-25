@@ -251,13 +251,13 @@ export async function resolveQuery(query: string): Promise<{ ra: number; dec: nu
   return { ra, dec };
 }
 
-export async function skybotMatches(ra: number, dec: number, mjd: number): Promise<Array<{ name: string }>> {
+export async function skybotMatches(ra: number, dec: number, mjd: number): Promise<Array<{ name: string }> | null> {
   if (!useLive) return [];
   try {
     const r = await fetchJSON<{ matches: Array<{ name: string }> }>(
       `${API_BASE}/api/skybot?ra=${ra}&dec=${dec}&mjd=${mjd}`);
     return r.matches ?? [];
   } catch {
-    return [];
+    return null; // unknown (unreachable), distinct from empty field
   }
 }
