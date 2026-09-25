@@ -100,6 +100,22 @@ def parse_fits(fits_path: Path) -> Dict[str, Any]:
                     result[ext.lower()] = hdul[ext].data
                 except Exception:
                     pass
+        # WCS-WAVE: single-row table; X[0]/Y[0] are the 11 grid coords over
+        # the full 2040px detector, VALUES[0] is (11, 11, 2): [.., 0] is
+        # wavelength in um, [.., 1] the per-pixel bandwidth.
+        try:
+            if "WCS-WAVE" in hdul:
+                wtab = hdul["WCS-WAVE"].data
+                xs = [int(v) for v in wtab["X"][0]]
+                ys = [int(v) for v in wtab["Y"][0]]
+                vals = wtab["VALUES"][0]
+                result["wave_grid"] = {
+                    "x": xs, "y": ys,
+                    "lam": [[float(vals[j][i][0]) for i in range(len(xs))] for j in range(len(ys))],
+                    "dl": [[float(vals[j][i][1]) for i in range(len(xs))] for j in range(len(ys))],
+                }
+        except Exception:
+            pass
         hdr = result["header"]
         for key in ("WAVECENT", "CRVAL3"):
             if key in hdr:
@@ -121,6 +137,25 @@ def parse_fits(fits_path: Path) -> Dict[str, Any]:
         except Exception:
             pass
     return result
+
+
+def wave_at(wave_grid, full_x: float, full_y: float) -> Tuple[Optional[float], Optional[float]]:
+    """Nearest WCS-WAVE grid point -> (wavelength_um, bandwidth_um).
+
+    Grid coordinates are full-detector pixels. Returns (None, None) off-grid.
+    """
+    try:
+        xs = wave_grid["x"]
+        ys = wave_grid["y"]
+        lam = wave_grid["lam"]
+        dl = wave_grid["dl"]
+        bi = min(range(len(xs)), key=lambda i: abs(xs[i] - full_x))
+        bj = min(range(len(ys)), key=lambda j: abs(ys[j] - full_y))
+        if not (0 <= full_x <= 2040 and 0 <= full_y <= 2040):
+            return None, None
+        return float(lam[bj][bi]), float(dl[bj][bi])
+    except Exception:
+        return None, None
 
 
 def mask_bad_pixels(image, flags=None, variance=None) -> Tuple[Any, Any]:
