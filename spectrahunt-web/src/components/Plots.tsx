@@ -91,7 +91,7 @@ export function SedPlot({ points }: {
           </g>
         ))}
         <text x={6} y={14} fontSize={9} fill="#8a90ab">flux</text>
-        <text x={W - 8} y={H - 8} fontSize={9} fill="#8a90ab" textAnchor="end">µm →</text>
+        <text x={W - 8} y={14} fontSize={9} fill="#8a90ab" textAnchor="end">µm</text>
       </svg>
       <p style={{ fontSize: 11, color: '#8a90ab', marginTop: 6 }}>
         Measured per-band flux with uncertainties{points.some((p) => p.masked) ? ' — hollow points masked.' : '.'}
