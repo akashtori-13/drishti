@@ -9,6 +9,7 @@ interface TrackPoint {
   flux: number | null;
   flux_err: number | null;
   mjd: number | null;
+  core_masked?: boolean | null;
 }
 
 interface TrackDoc {
@@ -41,6 +42,7 @@ export default function TrackSpectrum({ trackId, title, note }: {
   const span = mjds.length
     ? `MJD ${Math.min(...mjds).toFixed(1)}–${Math.max(...mjds).toFixed(1)}`
     : 'MJD —';
+  const nCoreMasked = doc.points.filter((p) => p.core_masked === true).length;
   return (
     <div>
       <h3>{title}</h3>
@@ -49,12 +51,13 @@ export default function TrackSpectrum({ trackId, title, note }: {
           wl: p.wavelength_um as number,
           flux: p.flux as number,
           err: p.flux_err ?? 0,
-          masked: !((p.flux as number) > 0),
+          masked: !((p.flux as number) > 0) || p.core_masked === true,
         }))} />
       ) : (
         <p className="fine">No measured spectrum — metadata only.</p>
       )}
-      <p className="fine">{note} {doc.n_points}/{doc.n_attempted} cutouts measured · {span}.</p>
+      <p className="fine">{note} {doc.n_points}/{doc.n_attempted} cutouts measured · {span}
+        {nCoreMasked ? ` · ${nCoreMasked} hollow: core pixel masked, excluded from evolution tests.` : '.'}</p>
     </div>
   );
 }
