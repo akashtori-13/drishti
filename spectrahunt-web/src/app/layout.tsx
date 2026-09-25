@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./reveal.css";
 import { Sprite } from "@/components/Icon";
+import SplashGate from "@/components/SplashGate";
 import SwRegister from "@/components/SwRegister";
 import NativeShell from "@/components/NativeShell";
 import { SKY_ALLSKY_PREVIEW_URL } from "@/lib/sky";
@@ -59,6 +60,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body className="min-h-full flex flex-col" data-view="home">
+        <div id="splash" aria-hidden="true">
+          <svg className="splash-mark" viewBox="0 0 512 512" focusable="false">
+            <circle cx="241.33" cy="270.67" r="106.56" fill="currentColor" />
+            <path d="M473.97 206.47A241.33 241.33 0 1 1 305.53 38.03A21.94 21.94 0 0 1 293.86 80.33A197.45 197.45 0 1 0 431.67 218.14A21.94 21.94 0 0 1 473.97 206.47Z" fill="currentColor" />
+            <path className="trap" d="M320.06 154.37A10.97 10.97 0 0 1 318 141.71L384.53 8.66A15.67 15.67 0 0 1 409.62 4.58L507.42 102.38A15.67 15.67 0 0 1 503.34 127.47L370.29 194A10.97 10.97 0 0 1 357.63 191.94Z" fill="currentColor" />
+          </svg>
+          <span className="splash-word">STELLAR</span>
+        </div>
+        <SplashGate />
         <Sprite />
         <SwRegister />
         <NativeShell />

@@ -1,15 +1,15 @@
 import type { Metadata } from 'next';
 import SiteChrome from '@/components/SiteChrome';
-import AboutPage from '@/components/AboutPage';
+import TeamPage from '@/components/TeamPage';
 
 export const metadata: Metadata = {
-  title: 'About — STELLAR',
+  title: 'Team — STELLAR',
 };
 
 export default function About() {
   return (
     <SiteChrome>
-      <AboutPage />
+      <TeamPage />
     </SiteChrome>
   );
 }

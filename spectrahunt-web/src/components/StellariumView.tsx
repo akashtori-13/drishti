@@ -771,11 +771,11 @@ export default function StellariumView({
           </button>
           {ar === 'off' ? (
             <button type="button" className="hud-btn" aria-label="Point at sky" title="Point your phone at the sky" onClick={startAR}>
-              <Icon name="skymap" className="icon" />
+              <Icon name="arrow" className="icon" />
             </button>
           ) : (
             <button type="button" className="hud-btn active" aria-pressed={ar === 'on'} aria-label="Stop sensor look" title="Stop sensor look" onClick={stopAR}>
-              <Icon name="skymap" className="icon" />
+              <Icon name="arrow" className="icon" />
             </button>
           )}
         </div>
