@@ -54,10 +54,10 @@ What this means for the brief's questions:
   static star (Experiment 3). Open calibration note: measured λ lands ~1%
   above each band's nominal max — within one bandwidth, flagged not hidden.
 - **Experiment 1b, tracked (2026-09-26)**: `--tracked 3I` resolves the comet
-  per visit via Horizons and measures at the moving position: 7/12 cutouts
-  (`data/track_3i-atlas-tracked.json`), one detection per band except B5
-  (both visits IBE 503; retry pending). Faint but on-target: B4 0.7±0.1,
-  B6 1.0±0.3, B1 1.0±0.3. All failures are IRSA transport, none pipeline.
+  per visit via Horizons and measures at the moving position: 11/14 cutouts
+  across all six bands (`data/track_3i-atlas-tracked.json`; B5 needed a retry
+  after transient IBE 503s). Faint but on-target: B4 0.7±0.1, B6 1.0±0.3,
+  B1 1.0±0.3, B5 0.9±0.2. All failures are IRSA transport, none pipeline.
 - **Experiment 3, control star (2026-09-26)**: same pipeline, fixed aperture
   on UCAC4 363-079561 (2MASS J16503662-1730286, SIMBAD-confirmed field star):
   11/12 cutouts, SNR 30–160 per point
