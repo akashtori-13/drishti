@@ -22,6 +22,15 @@
       "max_dA": null
     },
     {
+      "target": "gaia-dr3-4132566782882753024",
+      "status": "UNRATED",
+      "reason": "no clean cross-epoch tests",
+      "n_tests": 0,
+      "n_masked": 4,
+      "max_dR": null,
+      "max_dA": null
+    },
+    {
       "target": "tyc-6222-157-1",
       "status": "UNRATED",
       "reason": "no clean cross-epoch tests",
