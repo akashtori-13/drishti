@@ -11,6 +11,7 @@ import {
 } from '@/lib/showcases';
 import { blinkURL, useAppStore } from '@/lib/store';
 import TrackSpectrum from '@/components/TrackSpectrum';
+import PairVerdicts from '@/components/PairVerdicts';
 import { fmtDec, fmtRa } from '@/lib/sky';
 import { BANDS } from '@/lib/sky';
 import { arcsecPerDay, mjdToDate, toCSV } from '@/lib/astro';
@@ -490,6 +491,10 @@ export default function BlinkPage({ id }: { id: string }) {
                       <TrackSpectrum trackId="track_control-star"
                         title="Control: field star UCAC4 363-079561"
                         note="Fixed-position aperture on 2MASS J16503662-1730286, same pipeline." />
+                      <PairVerdicts pairId="pairfit_3i-atlas-tracked"
+                        title="Pair verdicts: comet" />
+                      <PairVerdicts pairId="pairfit_control-star"
+                        title="Pair verdicts: control star" />
                     </>
                   )}
                 </>
