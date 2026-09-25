@@ -28,7 +28,7 @@ function liveStripOnce(): string | null {
   }
 }
 
-export default function AboutPage() {
+export default function MissionPage() {
   const openPreview = useAppStore((s) => s.openPreview);
   // Client-only: telemetry reads the clock, so server and client renders
   // would mismatch (hydration error). Mount with null, fill in after.

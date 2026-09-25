@@ -45,7 +45,8 @@ export default function SiteChrome({ children, showTutorial = false }: { childre
               </div>
               <div className="foot-col">
                 <span className="foot-h">Learn</span>
-                <Link href="/about">About + tours</Link>
+                <Link href="/mission">Mission + tours</Link>
+                <Link href="/about">Team</Link>
                 <Link href="/#how">How it works</Link>
                 <Link href="/#fields">Fields</Link>
               </div>

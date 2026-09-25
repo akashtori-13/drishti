@@ -13,7 +13,8 @@ const LINKS = [
   { href: '/sky', label: 'SkyMap', desc: 'Observer and all-sky views' },
   { href: '/blink/3i-atlas', label: 'Blink', match: '/blink', desc: 'Compare epochs' },
   { href: '/candidates', label: 'Featured', desc: 'Measured fields' },
-  { href: '/about', label: 'About', desc: 'Mission and method' },
+  { href: '/about', label: 'About', desc: 'The crew' },
+  { href: '/mission', label: 'Mission', desc: 'Method and data' },
 ];
 
 /**
@@ -197,7 +198,8 @@ export default function Header() {
     { href: '/sky', label: 'SkyMap', desc: 'Observer and all-sky views', icon: 'skymap', active: skyActive },
     { href: '/blink/3i-atlas', label: 'Blink', desc: 'Compare epochs', icon: 'split', active: pathname.startsWith('/blink') },
     { href: '/candidates', label: 'Featured', desc: 'Measured fields', icon: 'target', active: candActive },
-    { href: '/about', label: 'About', desc: 'Mission and method', icon: 'info', active: pathname === '/about' },
+    { href: '/mission', label: 'Mission', desc: 'Method and data', icon: 'info', active: pathname === '/mission' },
+    { href: '/about', label: 'About', desc: 'The crew', icon: 'team', active: pathname === '/about' },
   ];
 
   return (
