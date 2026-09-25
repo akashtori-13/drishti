@@ -58,7 +58,10 @@ async function staleWhileRevalidate(request, cacheName) {
   const cache = await caches.open(cacheName);
   const cached = await cache.match(request);
   const fetchAndPut = fetch(request).then((res) => {
-    if (res && res.ok) cache.put(request, res.clone()).catch(() => undefined);
+    if (res && res.ok) {
+      cache.put(request, res.clone()).catch(() => undefined);
+      void trim(DATA_CACHE, 200);
+    }
     return res;
   }).catch(() => undefined);
   if (cached) {
@@ -121,7 +124,7 @@ self.addEventListener('fetch', (event) => {
   }
   if (path.startsWith('/_next/static/') || /\.(png|jpg|jpeg|webp|svg|woff2?)$/.test(path)
     || url.hostname.endsWith('googleapis.com') || url.hostname.endsWith('gstatic.com')) {
-    const trimTo = path.startsWith('/_next/static/') ? 0 : MAX_IMG_ENTRIES;
+    const trimTo = path.startsWith('/_next/static/') ? 100 : MAX_IMG_ENTRIES;
     event.respondWith(cacheFirst(request, path.startsWith('/_next/static/') ? STATIC_CACHE : IMG_CACHE, trimTo));
   }
 });

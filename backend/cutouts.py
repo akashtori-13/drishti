@@ -72,7 +72,7 @@ async def fetch_ibe(cutout_url: str, dest: Path, timeout: int = API_TIMEOUT_SECO
                 if r.status_code == 422:
                     # footprint mismatch ("Arrays do not overlap"): retrying is pointless
                     r.raise_for_status()
-                if r.status_code >= 500:
+                if r.status_code >= 500 or r.status_code in (408, 429):
                     raise httpx.HTTPStatusError(f"IBE {r.status_code}", request=r.request, response=r)
                 r.raise_for_status()
                 dest.write_bytes(r.content)
@@ -84,7 +84,8 @@ async def fetch_ibe(cutout_url: str, dest: Path, timeout: int = API_TIMEOUT_SECO
                         pass
             return dest
         except httpx.HTTPStatusError as e:
-            if e.response is not None and 400 <= e.response.status_code < 500:
+            if e.response is not None and 400 <= e.response.status_code < 500 \
+                    and e.response.status_code not in (408, 429):
                 raise
             last = e
         except Exception as e:  # noqa: BLE001 - network flakes, backoff below

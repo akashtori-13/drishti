@@ -107,12 +107,14 @@ def main(path: str) -> dict:
         by_band.setdefault(int(p["band"]), []).append(p)
     pairs = []
     for (ba, bb), name in FAMILIES.items():
+        used_b: set[int] = set()  # one B epoch pairs at most once (independence)
         for a in by_band.get(ba, []):
-            cands = [b for b in by_band.get(bb, [])
-                     if abs(b["mjd"] - a["mjd"]) <= DT_TOL_DAYS]
+            cands = [(j, b) for j, b in enumerate(by_band.get(bb, []))
+                     if j not in used_b and abs(b["mjd"] - a["mjd"]) <= DT_TOL_DAYS]
             if not cands:
                 continue
-            b = min(cands, key=lambda q: abs(q["mjd"] - a["mjd"]))
+            j, b = min(cands, key=lambda jb: abs(jb[1]["mjd"] - a["mjd"]))
+            used_b.add(j)
             A, sA, R, sR = pair_stats(a["flux"], a["flux_err"] or 0,
                                       b["flux"], b["flux_err"] or 0)
             # response-aware colour: flux per unit bandwidth in each arm,
