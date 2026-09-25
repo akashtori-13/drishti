@@ -45,3 +45,4 @@ desktop/src-tauri/target/
 spectrahunt-web/android/app/keystore.properties
 *.keystore
 *.jks
+desktop/src-tauri/gen/schemas/
