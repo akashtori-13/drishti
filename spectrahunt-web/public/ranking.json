@@ -1,0 +1,43 @@
+{
+  "rated": [
+    {
+      "target": "3i-atlas-tracked",
+      "status": "RATED",
+      "n_tests": 7,
+      "n_masked": 0,
+      "max_dR": 2.11,
+      "max_dA": 0.52,
+      "best_family": "D1+D4",
+      "best_verdict": "consistent-static"
+    }
+  ],
+  "unrated": [
+    {
+      "target": "252.65242_-17.50776",
+      "status": "UNRATED",
+      "reason": "no clean cross-epoch tests",
+      "n_tests": 0,
+      "n_masked": 6,
+      "max_dR": null,
+      "max_dA": null
+    },
+    {
+      "target": "tyc-6222-157-1",
+      "status": "UNRATED",
+      "reason": "no clean cross-epoch tests",
+      "n_tests": 0,
+      "n_masked": 6,
+      "max_dR": null,
+      "max_dA": null
+    },
+    {
+      "target": "ucac4-363-079491",
+      "status": "UNRATED",
+      "reason": "no clean cross-epoch tests",
+      "n_tests": 0,
+      "n_masked": 5,
+      "max_dR": null,
+      "max_dA": null
+    }
+  ]
+}

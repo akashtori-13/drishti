@@ -13,6 +13,7 @@ import {
 import { blinkURL, useAppStore } from '@/lib/store';
 import TrackSpectrum from '@/components/TrackSpectrum';
 import PairVerdicts from '@/components/PairVerdicts';
+import RankingBoard from '@/components/RankingBoard';
 import { fmtDec, fmtRa } from '@/lib/sky';
 import { BANDS } from '@/lib/sky';
 import { arcsecPerDay, mjdToDate, toCSV } from '@/lib/astro';
@@ -494,6 +495,7 @@ export default function BlinkPage({ id }: { id: string }) {
                         title="Pair verdicts: comet" />
                       <PairVerdicts pairId="pairfit_control-star"
                         title="Pair verdicts: control star" />
+                      <RankingBoard />
                     </>
                   )}
                 </>
