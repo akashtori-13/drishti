@@ -214,17 +214,21 @@ export default function Header() {
   ];
 
   return (
-    <div
-      ref={islandRef}
-      className="island glass"
-      role="navigation"
-      aria-label="Primary"
-      data-typing={typing || undefined}
-      data-home={pathname === '/' || undefined}
-      data-open={menuOpen || undefined}
-      onInput={onNavInput}
-      onKeyUp={onNavInput}
-    >
+    <>
+      {mSearch && (
+        <div className="nav-veil" aria-hidden="true" onClick={() => setMSearch(false)} />
+      )}
+      <div
+        ref={islandRef}
+        className="island glass"
+        role="navigation"
+        aria-label="Primary"
+        data-typing={typing || undefined}
+        data-home={pathname === '/' || undefined}
+        data-open={menuOpen || undefined}
+        onInput={onNavInput}
+        onKeyUp={onNavInput}
+      >
       <div className="island-row">
         <Link className="island-brand island-iconbtn" href="/" aria-label="STELLAR home"
           aria-current={pathname === '/' ? 'page' : undefined}>
@@ -325,5 +329,6 @@ export default function Header() {
         </div>
       </div>
     </div>
+    </>
   );
 }
