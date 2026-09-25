@@ -16,7 +16,9 @@ export default function SplashGate() {
       const wait = Math.max(0, MIN - (performance.now() - t0));
       setTimeout(() => {
         el.classList.add('done');
-        setTimeout(() => el.remove(), 500);
+        // hide, never remove: the node belongs to React's tree and
+        // surgical removal desyncs reconciliation (breaks routing)
+        setTimeout(() => { el.style.display = 'none'; }, 500);
       }, wait);
     };
     if (document.readyState === 'complete') dismiss();
