@@ -62,16 +62,16 @@ export default function TeamPage() {
             <div className="team-links" role="group" aria-label={`Contact ${m.name}`}>
               {m.web && (
                 <a href={m.web} target="_blank" rel="noreferrer"
-                  aria-label={`Website: ${contactLabel(m.web, 'website')}`}
+                  aria-label={`Portfolio: ${contactLabel(m.web, 'website')}`}
                   title={contactLabel(m.web, 'Website')}>
-                  <Icon name="globe" className="icon" />
+                  <Icon name="briefcase" className="icon" />
                 </a>
               )}
               {m.github && (
                 <a href={m.github} target="_blank" rel="noreferrer"
                   aria-label={`GitHub: ${contactLabel(m.github, 'GitHub')}`}
                   title={contactLabel(m.github, 'GitHub')}>
-                  <Icon name="code" className="icon" />
+                  <Icon name="github" className="icon" />
                 </a>
               )}
               {m.email && (
