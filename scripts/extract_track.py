@@ -121,6 +121,8 @@ async def measure(url: str, ra: float, dec: float, tmp: Path) -> dict:
 
 async def main_async(args) -> dict:
     bands = [int(x) for x in args.bands.split(",")]
+    if getattr(args, "tracked", None):
+        return await main_tracked(args, bands)
     if args.target:
         sc = load_showcase(args.target)
         ra, dec, name = sc["ra"], sc["dec"], sc.get("title", args.target)
@@ -147,6 +149,46 @@ async def main_async(args) -> dict:
                 points.append({**e, **rec})
     good = [p for p in points if p["flux"] is not None]
     return {"target": args.target or name, "ra": ra, "dec": dec,
+            "n_points": len(good), "n_attempted": len(points), "points": points}
+
+
+async def main_tracked(args, bands: list[int]) -> dict:
+    """Horizons-tracked extraction (Direction A prototype).
+
+    For each sample MJD, resolves the target's geocentric position via
+    Horizons, TAP-discovers cutouts covering THAT position per band, and
+    measures at the tracked coordinates. Points carry mode=tap-tracked.
+    """
+    from backend.horizons import positions as horizons_positions
+    sc = load_showcase(args.target) if args.target else None
+    if args.mjds:
+        sample = [float(x) for x in args.mjds.split(",")]
+    elif sc:
+        sample = sorted({e["mjd"] for e in sc.get("epochs", []) if e.get("mjd")})
+    else:
+        raise SystemExit("tracked mode needs --mjds or a --target bundle")
+    sky = horizons_positions(args.tracked, sample)
+    name = (sc.get("title", args.target) if sc else args.tracked) + " (Horizons-tracked)"
+    points: list[dict] = []
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        for b in bands:
+            for mjd, (ra, dec) in zip(sample, sky):
+                try:
+                    found = discover_epochs(ra, dec, band=b)
+                except Exception as ex:  # noqa: BLE001 - TAP flakes recorded per band
+                    print(f"  band {b} mjd={mjd}: TAP failed ({ex})", flush=True)
+                    continue
+                for f in (found or [])[:args.per_band]:
+                    print(f"measuring tracked band {b} mjd={f.get('mjd')} ...", flush=True)
+                    rec = await measure(f.get("cutout_url", ""), ra, dec, tmp)
+                    points.append({"band": b, "mjd": f.get("mjd", mjd),
+                                   "url": f.get("cutout_url", ""),
+                                   "label": f.get("label", ""), "source": "tap-tracked",
+                                   "track_ra": ra, "track_dec": dec, **rec})
+    good = [p for p in points if p["flux"] is not None]
+    return {"target": name, "mode": "horizons-tracked",
+            "horizons_target": args.tracked, "sample_mjds": sample,
             "n_points": len(good), "n_attempted": len(points), "points": points}
 
 
@@ -186,10 +228,16 @@ def main() -> None:
     ap.add_argument("--bands", default="1,2,3,4,5,6")
     ap.add_argument("--per-band", type=int, default=3)
     ap.add_argument("--no-plot", action="store_true")
+    ap.add_argument("--tracked", default=None,
+                    help="Horizons target name for moving-target extraction (e.g. 3I)")
+    ap.add_argument("--mjds", default=None,
+                    help="comma-separated sample MJDs for tracked mode")
     args = ap.parse_args()
     result = asyncio.run(main_async(args))
     DATA.mkdir(exist_ok=True)
     tag = args.target or f"{args.ra}_{args.dec}"
+    if getattr(args, "tracked", None):
+        tag += "-tracked"
     out_json = DATA / f"track_{tag}.json"
     out_json.write_text(json.dumps(result, indent=2))
     print(f"wrote {out_json}: {result['n_points']}/{result['n_attempted']} measured")
