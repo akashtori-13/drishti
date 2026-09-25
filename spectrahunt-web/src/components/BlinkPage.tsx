@@ -121,18 +121,6 @@ export default function BlinkPage({ id }: { id: string }) {
   if (detStats?.ready && !pairSeen) {
     setPairSeen(true);
   }
-  // Escape hatch: live frames can take minutes on a cold backend (IRSA-side
-  // generation). After 60s without a decoded pair, reveal the viewer anyway —
-  // its pending/failed/Retry states already exist and are honest, while the
-  // game screen hides them and offers no recourse (reported: stuck on
-  // "decoding first pair", hard refresh "fixed" it by warming the backend).
-  const [slowLive, setSlowLive] = useState(false);
-  useEffect(() => {
-    if (!isLiveId(id)) return;
-    setSlowLive(false);
-    const t = setTimeout(() => setSlowLive(true), 60000);
-    return () => clearTimeout(t);
-  }, [id]);
   const viewing = data && data.id === id ? data : null;
 
   // load showcase (static JSON or live IRSA frames)
@@ -389,11 +377,20 @@ export default function BlinkPage({ id }: { id: string }) {
       {loading && !isLiveId(id) && <div className="bw-status">Loading {id}…</div>}
       {/* One persistent game instance per field (keyed by id): progress
         steps only change props, so the run never restarts mid-fetch. */}
-      {isLiveId(id) && (loading || (!!viewing && !pairSeen && !slowLive)) && (
+      {isLiveId(id) && (loading || (!!viewing && !pairSeen)) && (
+        <>
         <WaitGame key={id}
           headline={loading ? undefined : 'Decoding your blink'}
           target={fetchTarget}
           progress={loading ? prog : { done: 2, total: 3, label: `Decoding first pair of ${viewing?.epochs.length ?? 2} epochs…` }} />
+        {!!viewing && !loading && (
+          <div style={{ textAlign: 'center', marginTop: 12 }}>
+            <button type="button" className="epoch-chip" onClick={() => setPairSeen(true)}>
+              Skip to viewer →
+            </button>
+          </div>
+        )}
+        </>
       )}
       {err && !loading && (
         <div className="bw-status error">
@@ -402,7 +399,7 @@ export default function BlinkPage({ id }: { id: string }) {
       )}
 
       {viewing && (
-        <div className="bw-grid" style={isLiveId(id) && !pairSeen && !slowLive ? { display: 'none' } : undefined}>
+        <div className="bw-grid" style={isLiveId(id) && !pairSeen ? { display: 'none' } : undefined}>
           <section className="bw-viewer" aria-label="Epoch comparator">
             <div className="bw-title">
               <h1>{viewing.title}</h1>
