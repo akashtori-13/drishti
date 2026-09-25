@@ -81,9 +81,9 @@ export const SPRITE_PX = 4;
 export const SLOT = 11 * SPRITE_PX + 12;
 
 /** Wave layout: rows grow to 5, columns fit the playfield. Returns aliens. */
-export function layoutWave(wave: number, fieldW: number): Alien[] {
+export function layoutWave(wave: number, fieldW: number, maxCols = 9): Alien[] {
   const rows = Math.min(2 + Math.floor((wave - 1) / 1), 5);
-  const cols = Math.max(4, Math.min(9, Math.floor(fieldW / SLOT)));
+  const cols = Math.min(maxCols, Math.max(4, Math.floor(fieldW / SLOT)));
   const out: Alien[] = [];
   for (let r = 0; r < rows; r++) {
     const def = ROW_DEFS[r % ROW_DEFS.length];

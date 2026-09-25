@@ -153,7 +153,8 @@ export default function WaitGame({ headline = 'Fetching live sky data', onSkipHr
     const cell = () => Math.max(10, Math.min(16, S.w / 60));
     const startWave = () => {
       const c = cell();
-      S.aliens = layoutWave(S.wave, S.w);
+      // small screens play fewer, smaller columns (S.k < 1 ⇒ scaled field)
+      S.aliens = layoutWave(S.wave, S.w, S.k < 1 ? 3 : 9);
       const margin = Math.max(24, S.w * 0.08);
       const cols = Math.max(...S.aliens.map((a) => a.col)) + 1;
       const gw = cols * SLOT;
