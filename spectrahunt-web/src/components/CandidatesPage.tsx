@@ -6,6 +6,7 @@ import { BANDS } from '@/lib/sky';
 import { useAppStore } from '@/lib/store';
 import { arcsecPerDay, toCSV } from '@/lib/astro';
 import { Reveal } from '@/lib/reveal';
+import { renderTone, type Tone } from '@/lib/tonemap';
 import { useTiltGroup } from '@/lib/tilt';
 
 interface ReportObject {
@@ -91,17 +92,30 @@ const KIND_LABEL: Record<Kind, string> = {
   unidentified: 'Unidentified', pending: 'Queued',
 };
 
-function Thumb({ card }: { card: Card }) {
+function Thumb({ card, tone }: { card: Card; tone: Tone }) {
   const band = BANDS[card.band - 1];
   const [broken, setBroken] = useState(false);
+  const [url, setUrl] = useState<string | null>(null);
   // reset when the card's image changes (navigation, revalidation swap-in)
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setBroken(false);
   }, [card.png]);
-  if (card.png && !broken) {
+  // exact preview-modal colormap for the current tone (cached per image)
+  useEffect(() => {
+    if (!card.png) return;
+    let alive = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setUrl(null);
+    void renderTone(card.png, tone).then(
+      (u) => { if (alive) setUrl(u); },
+      () => { if (alive) setBroken(true); },
+    );
+    return () => { alive = false; };
+  }, [card.png, tone]);
+  if (url && !broken) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={card.png} alt="" width={260} height={260} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} draggable={false} onError={() => setBroken(true)} />;
+    return <img src={url} alt="" width={260} height={260} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} draggable={false} onError={() => setBroken(true)} />;
   }
   return (
     <div
@@ -128,7 +142,7 @@ export default function CandidatesPage() {
   const [toneShift, setToneShift] = useState(0);
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const t = setInterval(() => setToneShift((s) => (s + 1) % 3), 8000);
+    const t = setInterval(() => setToneShift((s) => (s + 1) % 3), 3500);
     return () => clearInterval(t);
   }, []);
   const docsRef = useRef(new Map<string, Showcase>());
@@ -230,7 +244,7 @@ export default function CandidatesPage() {
               onClick={() => openPreview(c.id)}
             >
               <div className="cand-thumb" data-tone={tone}>
-                <Thumb card={c} />
+                <Thumb card={c} tone={tone} />
               </div>
               <span className="cand-badges">
                 <span className={`badge ${c.kind === 'known' ? 'known' : c.kind === 'pending' ? '' : 'unknown'}`}>
