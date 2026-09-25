@@ -168,7 +168,12 @@ def parse_fits(fits_path: Path) -> Dict[str, Any]:
 def wave_at(wave_grid, full_x: float, full_y: float) -> Tuple[Optional[float], Optional[float]]:
     """Nearest WCS-WAVE grid point -> (wavelength_um, bandwidth_um).
 
-    Grid coordinates are full-detector pixels. Returns (None, None) off-grid.
+    Grid coordinates are full-detector pixels. IBE *cutout* headers carry
+    no parent-detector offset (their CRPIX is cutout-frame, so
+    WCS(CRVAL)==CRPIX is a tautology and any cutout->parent mapping
+    collapses to a constant). Only call this with true full-frame pixels;
+    for cutouts use the band representative wavelength instead.
+    Returns (None, None) off-grid.
     """
     try:
         xs = wave_grid["x"]

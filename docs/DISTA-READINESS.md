@@ -42,17 +42,21 @@ were found. R range and ice wavelengths should be corrected to the values above.
 
 What this means for the brief's questions:
 - **Experiment 1 result (2026-09-25)**: `scripts/extract_track.py` on 3I/ATLAS
-  measured 6/7 cutouts across all six bands with per-visit λ from the WCS-WAVE
-  grid (1.13/1.67/2.43/3.86/4.44/5.02µm;
-  `data/track_3i-atlas.json` + `.png`). All fluxes sit at the noise floor
+  measured 6/7 cutouts across all six bands
+  (`data/track_3i-atlas.json` + `.png`). All fluxes sit at the noise floor
   (~1σ: 4.3±3.9, 1.2±3.5, 2.8±4.9, 1.5±1.4, 1.1±0.9, 0.8±1.0). Horizons
   (ATLAS C/2025 N1, geocentric) confirms why: the comet moves ~2.5°/5d and is
   degrees from the fixed aperture at every epoch — fixed-position photometry
   on a fast mover measures empty sky. This is not a pipeline failure; it is
   direct evidence that **Direction A (Horizons-tracked extraction) is required
   for solar-system bodies**, and the correct control is the same pipeline on a
-  static star (Experiment 3). Open calibration note: measured λ lands ~1%
-  above each band's nominal max — within one bandwidth, flagged not hidden.
+  static star (Experiment 3).
+- **Wavelength correction (2026-09-26)**: the first per-visit λ values were
+  WRONG, not ~1% off — all six bands returned constant corner-of-grid values
+  (1.126/1.668/…/5.018) because the cutout→detector mapping was a tautology
+  (WCS(CRVAL)==CRPIX; cutout headers carry no parent offset). All 28 points
+  reverted to band representative wavelengths (0.92–4.71µm); finer LVF
+  position dependence is unrecoverable from cutouts and is not claimed.
 - **Experiment 1b, tracked (2026-09-26)**: `--tracked 3I` resolves the comet
   per visit via Horizons and measures at the moving position: 11/14 cutouts
   across all six bands (`data/track_3i-atlas-tracked.json`; B5 needed a retry

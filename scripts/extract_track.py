@@ -69,7 +69,7 @@ def tap_epochs(ra: float, dec: float, bands: list[int], per_band: int) -> list[d
     return out
 
 
-async def measure(url: str, ra: float, dec: float, tmp: Path) -> dict:
+async def measure(url: str, ra: float, dec: float, tmp: Path, band=None) -> dict:
     """One cutout -> flux triple (or flux=null with a reason). Never raises."""
     rec: dict = {"flux": None, "flux_err": None, "wavelength_um": None,
                  "flags": None, "npix": 0}
@@ -98,17 +98,16 @@ async def measure(url: str, ra: float, dec: float, tmp: Path) -> dict:
         clean, badmask = mask_bad_pixels(img, parsed.get("flags"), parsed.get("variance"))
         hit = aperture_flux(clean, float(x), float(y),
                             variance=parsed.get("variance"), mask=badmask)
-        # per-visit wavelength: cutout coords -> full-detector pixels via the
-        # (full-frame) CRPIX reference, then into the WCS-WAVE grid
+        # per-visit wavelength: cutout headers carry no parent-detector
+        # offset (CRPIX is cutout-frame; WCS(CRVAL)==CRPIX is a tautology),
+        # so the WCS-WAVE grid is unreachable from cutouts. Use the band
+        # representative wavelength; intra-cutout LVF gradient is ~0.01um.
         lam, bw = parsed.get("wavelength_um"), None
         try:
-            from backend.cutouts import wave_at
-            hdr = parsed.get("header", {}) or {}
-            lr = wcs.all_world2pix([[float(hdr["CRVAL1"]), float(hdr["CRVAL2"])]], 0)[0]
-            fx = float(x) + (float(hdr["CRPIX1"]) - float(lr[0]))
-            fy = float(y) + (float(hdr["CRPIX2"]) - float(lr[1]))
-            if parsed.get("wave_grid"):
-                lam, bw = wave_at(parsed["wave_grid"], fx, fy)
+            from backend.config import BANDS as _BANDS
+            for _b in _BANDS:
+                if int(_b["id"]) == int(band or -1):
+                    lam, bw = float(_b["wave_um"]), float(_b["wave_um"]) / float(_b["R"])
         except Exception:
             pass
         rec.update({"flux": hit["flux"], "flux_err": hit["flux_err"],
@@ -141,13 +140,13 @@ async def main_async(args) -> dict:
         if args.target:
             for e in bundle_epochs(sc, bands):
                 print(f"measuring bundle band {e['band']} mjd={e['mjd']} ...", flush=True)
-                rec = await measure(e["url"], ra, dec, tmp)
+                rec = await measure(e["url"], ra, dec, tmp, band=e["band"])
                 points.append({**e, **rec})
         if missing:
             print(f"TAP discovery for bands {missing} ...", flush=True)
             for e in tap_epochs(ra, dec, missing, args.per_band):
                 print(f"measuring tap band {e['band']} mjd={e['mjd']} ...", flush=True)
-                rec = await measure(e["url"], ra, dec, tmp)
+                rec = await measure(e["url"], ra, dec, tmp, band=e["band"])
                 points.append({**e, **rec})
     good = [p for p in points if p["flux"] is not None]
     return {"target": args.target or name, "ra": ra, "dec": dec,
@@ -183,7 +182,7 @@ async def main_tracked(args, bands: list[int]) -> dict:
                     continue
                 for f in (found or [])[:args.per_band]:
                     print(f"measuring tracked band {b} mjd={f.get('mjd')} ...", flush=True)
-                    rec = await measure(f.get("cutout_url", ""), ra, dec, tmp)
+                    rec = await measure(f.get("cutout_url", ""), ra, dec, tmp, band=b)
                     points.append({"band": b, "mjd": f.get("mjd", mjd),
                                    "url": f.get("cutout_url", ""),
                                    "label": f.get("label", ""), "source": "tap-tracked",
