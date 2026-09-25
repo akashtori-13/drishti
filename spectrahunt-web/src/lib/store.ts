@@ -8,6 +8,10 @@ interface AppState {
   band: number;
   showMarkers: boolean;
   tutorialDone: boolean;
+  /** Global colorblind mode: locks thumbnails, previews, colormaps to cividis. */
+  colorblind: boolean;
+  /** Autoplay artifact preview frames on open. */
+  autoplay: boolean;
   /** Artifact preview modal: showcase id or null. Null = closed. */
   previewId: string | null;
   openPreview: (id: string) => void;
@@ -16,6 +20,8 @@ interface AppState {
   setEpochIdx: (i: number) => void;
   setBand: (b: number) => void;
   setShowMarkers: (v: boolean) => void;
+  setColorblind: (v: boolean) => void;
+  setAutoplay: (v: boolean) => void;
   setTutorialDone: (v: boolean) => void;
 }
 
@@ -31,11 +37,21 @@ export const useAppStore = create<AppState>((set) => ({
   band: 3,
   showMarkers: true,
   tutorialDone: typeof window !== 'undefined' ? load('sh-tutorial', false) : false,
+  colorblind: typeof window !== 'undefined' ? load('sh-colorblind', false) : false,
+  autoplay: typeof window !== 'undefined' ? load('sh-autoplay', true) : true,
 
   setCompareMode: (m) => set({ compareMode: m }),
   setEpochIdx: (i) => set({ epochIdx: Math.max(0, i) }),
   setBand: (b) => set({ band: b }),
   setShowMarkers: (v) => set({ showMarkers: v }),
+  setColorblind: (v) => {
+    set({ colorblind: v });
+    try { localStorage.setItem('sh-colorblind', v ? '1' : '0'); } catch { /* noop */ }
+  },
+  setAutoplay: (v) => {
+    set({ autoplay: v });
+    try { localStorage.setItem('sh-autoplay', v ? '1' : '0'); } catch { /* noop */ }
+  },
   setTutorialDone: (v) => {
     set({ tutorialDone: v });
     try { localStorage.setItem('sh-tutorial', v ? '1' : '0'); } catch { /* noop */ }

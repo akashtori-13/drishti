@@ -47,8 +47,8 @@ export default function ArtifactPreview() {
   const [data, setData] = useState<Showcase | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [epochIdx, setEpochIdx] = useState(0);
-  const [playing, setPlaying] = useState(true);
-  const [preset, setPreset] = useState<Preset>('color');
+  const [playing, setPlaying] = useState(() => useAppStore.getState().autoplay);
+  const [preset, setPreset] = useState<Preset>(() => (useAppStore.getState().colorblind ? 'colorblind' : 'color'));
   const [loaded, setLoaded] = useState<Record<string, HTMLImageElement>>({});
   const [failed, setFailed] = useState<Record<string, true>>({});
   const [zoom, setZoom] = useState(1);

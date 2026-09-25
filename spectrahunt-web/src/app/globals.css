@@ -124,6 +124,15 @@ main:focus{outline:none;}
 .splash-word{font-family:var(--font-display); font-weight:700; letter-spacing:.35em; text-indent:.35em; font-size:.875rem; color:var(--ink-2);}
 @media (prefers-reduced-motion: reduce){ .splash-mark .trap{animation:none;} #splash{transition:none;} }
 
+/* ---------- settings rows ---------- */
+.set-h{font-family:var(--font-mono); font-size:.75rem; font-weight:600; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--ink-3); margin:26px 0 6px;}
+.set-row{display:flex; align-items:center; gap:14px; padding:14px 4px;
+  border-bottom:1px solid rgba(255,255,255,.07);}
+.set-text{flex:1; min-width:0; display:flex; flex-direction:column; gap:3px;}
+.set-label{font-size:.9375rem; font-weight:600; color:var(--ink);}
+.set-desc{font-size:.8125rem; color:var(--ink-2); line-height:1.5;}
+
 /* ---------- team cards (photos slot into the monograms) ---------- */
 .team-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px; margin-top:28px;}
 .team-card{border-radius:20px; padding:22px 20px; display:flex; flex-direction:column; gap:8px;
