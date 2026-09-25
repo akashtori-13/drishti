@@ -3,7 +3,7 @@
 export type IconName =
   | 'logo' | 'search' | 'skymap' | 'back' | 'fwd' | 'down' | 'x'
   | 'play' | 'pause' | 'ext' | 'menu' | 'dice' | 'target'
-  | 'home' | 'split' | 'info' | 'dl';
+  | 'home' | 'split' | 'info' | 'dl' | 'clock' | 'sliders';
 
 /** Single-copy SVG sprite (render once in layout). */
 export function Sprite() {
@@ -31,6 +31,8 @@ export function Sprite() {
         <symbol id="i-split" viewBox="0 0 24 24"><rect x="3.5" y="5" width="7" height="14" rx="2" fill="none" stroke="currentColor" strokeWidth="1.8" /><rect x="13.5" y="5" width="7" height="14" rx="2" fill="none" stroke="currentColor" strokeWidth="1.8" /></symbol>
         <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" strokeWidth="1.8" /><path d="M12 11v5.2" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /><circle cx="12" cy="7.8" r="1.3" fill="currentColor" /></symbol>
         <symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 4v10.5M7.5 11 12 15.5 16.5 11" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /><path d="M5 19.5h14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></symbol>
+        <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" strokeWidth="1.8" /><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></symbol>
+        <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7.5h16M4 16.5h16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /><circle cx="15" cy="7.5" r="2.3" fill="currentColor" /><circle cx="9" cy="16.5" r="2.3" fill="currentColor" /></symbol>
       </defs>
     </svg>
   );

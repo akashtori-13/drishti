@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { API_BASE } from '@/lib/showcases';
 import { lerpAngle, poseFromOrientation, radecFromPose } from '@/lib/skyposture';
 import { cachedImageSrc, loadCachedImage, lsGet, lsSet, prefetch } from '@/lib/skycache';
+import Icon from '@/components/Icon';
 
 export interface Observer { lat: number; lon: number; name: string }
 export interface StelFocus { ra: number; dec: number; key: number }
@@ -144,6 +145,11 @@ export default function StellariumView({
   const [obs, setObs] = useState<Observer>({ lat: 23.81, lon: 90.41, name: 'Dhaka (default)' });
   const [now, setNow] = useState(() => new Date());
   const [offH, setOffH] = useState(0);
+  // HUD: one compact row; icon buttons expand panels inside the island.
+  // Only one panel open at a time; row slots never move.
+  const [hudPanel, setHudPanel] = useState<null | 'loc' | 'time' | 'display' | 'coords'>(null);
+  const togglePanel = (p: 'loc' | 'time' | 'display' | 'coords') =>
+    setHudPanel((cur) => (cur === p ? null : p));
   // Manual time: frozen epoch ms takes over from the live clock + offset.
   const [frozen, setFrozen] = useState<number | null>(null);
   const stepH = (d: number) => {
@@ -172,13 +178,6 @@ export default function StellariumView({
   const [img, setImg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [cursor, setCursor] = useState<{ ra: number; dec: number; alt: number; az: number } | null>(null);
-  // Live clock readout is client-only: SSR and hydration render a placeholder
-  // so a minute rollover between server render and hydration can't mismatch.
-  const [clockOn, setClockOn] = useState(false);
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setClockOn(true);
-  }, []);
   const [lines, setLines] = useState<ConLines | null>(null);
   const [stars, setStars] = useState<Array<{ ra: number; dec: number; g_mag: number | null }>>([]);
   const t = frozen != null ? new Date(frozen) : new Date(now.getTime() + offH * 3600e3);
@@ -748,49 +747,100 @@ export default function StellariumView({
         })}
       </div>
 
-      {/* HUD */}
-      <div className="stel-hud">
-        <button type="button" className="epoch-chip" onClick={locate} title="Use device location">📍 {obs.name}</button>
-        <select className="stel-ctl" aria-label="Observing location"
-          value={obs.name === 'You (GPS)' ? '__gps' : obs.name}
-          onChange={(e) => {
-            const v = e.target.value;
-            if (v === '__gps') { locate(); return; }
-            const c = CITIES.find((c) => c.name === v);
-            if (c) setObs(c);
-          }}>
-          {obs.name === 'You (GPS)' ? (
-            <option value="__gps">📍 You (GPS)</option>
+      {/* HUD: grouped rows — where/when, coordinates, display options */}
+      <div className="stel-hud" data-panel={hudPanel ?? undefined}>
+        <div className="stel-row stel-main">
+          <button type="button" className="mono mono-coord hud-coords" aria-expanded={hudPanel === 'coords'}
+            onClick={() => togglePanel('coords')} title="Coordinate details">
+            Alt {centerAltAz.alt.toFixed(1)}° Az {centerAltAz.az.toFixed(1)}°
+          </button>
+          <button type="button" className={`hud-btn${hudPanel === 'loc' ? ' active' : ''}`}
+            aria-expanded={hudPanel === 'loc'} aria-label="Observing location" title="Observing location"
+            onClick={() => togglePanel('loc')}>
+            <Icon name="target" className="icon" />
+          </button>
+          <button type="button" className={`hud-btn${hudPanel === 'time' ? ' active' : ''}`}
+            aria-expanded={hudPanel === 'time'} aria-label="Observing time" title="Observing time"
+            onClick={() => togglePanel('time')}>
+            <Icon name="clock" className="icon" />
+          </button>
+          <button type="button" className={`hud-btn${hudPanel === 'display' ? ' active' : ''}`}
+            aria-expanded={hudPanel === 'display'} aria-label="Display options" title="Display options"
+            onClick={() => togglePanel('display')}>
+            <Icon name="sliders" className="icon" />
+          </button>
+          {ar === 'off' ? (
+            <button type="button" className="hud-btn" aria-label="Point at sky" title="Point your phone at the sky" onClick={startAR}>
+              <Icon name="skymap" className="icon" />
+            </button>
           ) : (
-            <option value="__gps">📍 Device location</option>
+            <button type="button" className="hud-btn active" aria-pressed={ar === 'on'} aria-label="Stop sensor look" title="Stop sensor look" onClick={stopAR}>
+              <Icon name="skymap" className="icon" />
+            </button>
           )}
-          {CITIES.map((c) => <option key={c.name} value={c.name}>{c.name} {c.lat.toFixed(1)}°, {c.lon.toFixed(1)}°</option>)}
-        </select>
-        <span className="mono">{clockOn ? `${t.toLocaleDateString()} ${t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : '—'}</span>
-        <span role="group" aria-label="Time step" style={{ display: 'flex', gap: 4 }}>
-          <button type="button" className="epoch-chip" onClick={() => stepH(-1)} title="Back 1 hour">−1h</button>
-          <button type="button" className="epoch-chip" onClick={() => stepH(1)} title="Forward 1 hour">+1h</button>
-          {(frozen != null || offH !== 0) && <button type="button" className="epoch-chip" onClick={goNow}>Now</button>}
-        </span>
-        <input type="datetime-local" className="stel-ctl" aria-label="Set observing time"
-          value={fmtLocal(t)}
-          onChange={(e) => {
-            const v = new Date(e.target.value);
-            if (!Number.isNaN(v.getTime())) { setFrozen(v.getTime()); setOffH(0); }
-          }} />
-        <span className="mono">Alt {centerAltAz.alt.toFixed(1)}° Az {centerAltAz.az.toFixed(1)}°</span>
-        <span className="mono">FOV {fov < 10 ? fov.toFixed(1) : fov.toFixed(0)}°</span>
-        {ar === 'off' ? (
-          <button type="button" className="epoch-chip" onClick={startAR} title="Point your phone at the sky">◉ Point</button>
-        ) : (
-          <button type="button" className="epoch-chip" aria-pressed={ar === 'on'} onClick={stopAR}
-            title="Stop sensor look">◉ Live{ar === 'paused' ? ' (paused)' : ''}</button>
-        )}
+        </div>
+        <div className="stel-drawer" data-open={hudPanel != null || undefined}>
+          <div className="stel-drawer-in">
+            {hudPanel === 'loc' && (
+              <>
+                <button type="button" className="epoch-chip" onClick={locate} title="Use device location">📍 {obs.name}</button>
+                <select className="stel-ctl" aria-label="Observing location"
+                  value={obs.name === 'You (GPS)' ? '__gps' : obs.name}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v === '__gps') { locate(); return; }
+                    const c = CITIES.find((c) => c.name === v);
+                    if (c) setObs(c);
+                  }}>
+                  {obs.name === 'You (GPS)' ? (
+                    <option value="__gps">📍 You (GPS)</option>
+                  ) : (
+                    <option value="__gps">📍 Device location</option>
+                  )}
+                  {CITIES.map((c) => <option key={c.name} value={c.name}>{c.name} {c.lat.toFixed(1)}°, {c.lon.toFixed(1)}°</option>)}
+                </select>
+              </>
+            )}
+            {hudPanel === 'time' && (
+              <>
+                <input type="datetime-local" className="stel-ctl stel-time" aria-label="Set observing time"
+                  value={fmtLocal(t)} suppressHydrationWarning
+                  onChange={(e) => {
+                    const v = new Date(e.target.value);
+                    if (!Number.isNaN(v.getTime())) { setFrozen(v.getTime()); setOffH(0); }
+                  }} />
+                <span role="group" aria-label="Time step" style={{ display: 'flex', gap: 4 }}>
+                  <button type="button" className="epoch-chip" onClick={() => stepH(-1)} title="Back 1 hour">−1h</button>
+                  <button type="button" className="epoch-chip" onClick={() => stepH(1)} title="Forward 1 hour">+1h</button>
+                  {(frozen != null || offH !== 0) && <button type="button" className="epoch-chip" onClick={goNow}>Now</button>}
+                </span>
+              </>
+            )}
+            {hudPanel === 'display' && (
+              <>
+                <select value={survey} onChange={(e) => setSurvey(e.target.value)} aria-label="Sky survey"
+                  className="stel-ctl">
+                  {SURVEYS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
+                </select>
+                <button type="button" className="epoch-chip" aria-pressed={showStars} onClick={() => setShowStars((v) => !v)} title="Gaia catalog stars">Stars</button>
+                <button type="button" className="epoch-chip" aria-pressed={showLines} onClick={() => setShowLines((v) => !v)}>Figures</button>
+                <button type="button" className="epoch-chip" aria-pressed={showGrid} onClick={() => setShowGrid((v) => !v)}>Grid</button>
+              </>
+            )}
+            {hudPanel === 'coords' && (
+              <>
+                <span className="mono mono-fov">FOV {fov < 10 ? fov.toFixed(1) : fov.toFixed(0)}°</span>
+                <span className="mono mono-radec">→ RA {ra.toFixed(2)}° Dec {dec.toFixed(2)}°</span>
+                {cursor && <span className="mono mono-radec">· RA {cursor.ra.toFixed(2)}° Dec {cursor.dec.toFixed(2)}°</span>}
+              </>
+            )}
+          </div>
+        </div>
         {ar === 'paused' && (
           <button type="button" className="epoch-chip" onClick={resumeAR} title="Resume sensor look">Resume</button>
         )}
         {ar !== 'off' && poseHud && (
-          <span className="mono">◉ {poseHud.heading.toFixed(0)}° ↕ {poseHud.elev.toFixed(0)}°{poseHud.acc != null ? ` ±${poseHud.acc.toFixed(0)}°` : ''}</span>
+          <span className="mono mono-pose">◉ {poseHud.heading.toFixed(0)}° ↕ {poseHud.elev.toFixed(0)}°{poseHud.acc != null ? ` ±${poseHud.acc.toFixed(0)}°` : ''}</span>
         )}
         {ar !== 'off' && (
           <span role="group" aria-label="Compass calibration" style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
@@ -799,14 +849,6 @@ export default function StellariumView({
           </span>
         )}
         {arMsg && <span className="mono" role="status">{arMsg}</span>}
-        {cursor && <span className="mono">→ RA {cursor.ra.toFixed(2)}° Dec {cursor.dec.toFixed(2)}°</span>}
-        <select value={survey} onChange={(e) => setSurvey(e.target.value)} aria-label="Sky survey"
-          style={{ background: '#151929', border: '1px solid var(--line)', borderRadius: 8, padding: '3px 6px', fontSize: 12 }}>
-          {SURVEYS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
-        </select>
-        <button type="button" className="epoch-chip" aria-pressed={showStars} onClick={() => setShowStars((v) => !v)} title="Gaia catalog stars">Stars</button>
-        <button type="button" className="epoch-chip" aria-pressed={showLines} onClick={() => setShowLines((v) => !v)}>Figures</button>
-        <button type="button" className="epoch-chip" aria-pressed={showGrid} onClick={() => setShowGrid((v) => !v)}>Grid</button>
       </div>
     </div>
   );
