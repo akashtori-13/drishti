@@ -1,0 +1,110 @@
+[
+  {
+    "band": 1,
+    "mjd": 60903.413118,
+    "flux": 95.82205697894096,
+    "flux_err": 1.638674152432919,
+    "cut_pix": [
+      14.29,
+      14.03
+    ],
+    "cut_size": [
+      29,
+      29
+    ],
+    "edge_dist_px": 13.71,
+    "aperture_sky": [
+      252.65242,
+      -17.50776
+    ],
+    "aper_sum_raw": 125.76,
+    "aper_peak": 66.57,
+    "aper_npix": 27,
+    "ann_median": 0.415,
+    "ann_std": 0.274,
+    "ann_npix": 201,
+    "flagged_frac_aper": 0.037037037037037035,
+    "wave_um": null
+  },
+  {
+    "band": 1,
+    "mjd": 60903.41461,
+    "flux": 49.81082904338837,
+    "flux_err": 1.6952308618996217,
+    "cut_pix": [
+      13.93,
+      13.83
+    ],
+    "cut_size": [
+      29,
+      29
+    ],
+    "edge_dist_px": 13.83,
+    "aperture_sky": [
+      252.65242,
+      -17.50776
+    ],
+    "aper_sum_raw": 152.42,
+    "aper_peak": 91.09,
+    "aper_npix": 28,
+    "ann_median": 0.427,
+    "ann_std": 0.342,
+    "ann_npix": 200,
+    "flagged_frac_aper": 0.03571428571428571,
+    "wave_um": null
+  },
+  {
+    "band": 4,
+    "mjd": 60903.413118,
+    "flux": 54.664299346506596,
+    "flux_err": 0.8359686908700849,
+    "cut_pix": [
+      13.7,
+      13.97
+    ],
+    "cut_size": [
+      29,
+      29
+    ],
+    "edge_dist_px": 13.7,
+    "aperture_sky": [
+      252.65242,
+      -17.50776
+    ],
+    "aper_sum_raw": 110.62,
+    "aper_peak": 50.77,
+    "aper_npix": 27,
+    "ann_median": 0.199,
+    "ann_std": 0.148,
+    "ann_npix": 201,
+    "flagged_frac_aper": 0.037037037037037035,
+    "wave_um": null
+  },
+  {
+    "band": 4,
+    "mjd": 60903.41461,
+    "flux": 101.2459439188242,
+    "flux_err": 0.6288398194660513,
+    "cut_pix": [
+      14.13,
+      13.88
+    ],
+    "cut_size": [
+      29,
+      29
+    ],
+    "edge_dist_px": 13.87,
+    "aperture_sky": [
+      252.65242,
+      -17.50776
+    ],
+    "aper_sum_raw": 106.56,
+    "aper_peak": 46.39,
+    "aper_npix": 26,
+    "ann_median": 0.203,
+    "ann_std": 0.292,
+    "ann_npix": 197,
+    "flagged_frac_aper": 0.0,
+    "wave_um": null
+  }
+]

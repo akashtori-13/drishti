@@ -37,13 +37,33 @@ def cache_key(frame_id: str, ra: float, dec: float, size: float) -> str:
     return hashlib.md5(f"{frame_id}_{ra:.6f}_{dec:.6f}_{size:.4f}".encode()).hexdigest()[:16]
 
 
+# Persistent FITS cache: IRSA is flaky and demos have no network to spare.
+# Every downloaded cutout is kept under data/fits-cache/ (gitignored via
+# *.fits) keyed by URL hash, so re-runs and forensics never re-download.
+# The running app never needs it: shipped pages read precomputed JSONs.
+FITS_CACHE_DIR = Path(__file__).parent.parent / "data" / "fits-cache"
+
+
+def fits_cache_path(cutout_url: str) -> Path:
+    return FITS_CACHE_DIR / (hashlib.sha256(cutout_url.encode()).hexdigest() + ".fits")
+
+
 async def fetch_ibe(cutout_url: str, dest: Path, timeout: int = API_TIMEOUT_SECONDS * 2,
-                retries: int = 2) -> Path:
+                retries: int = 2, use_cache: bool = True) -> Path:
     """Download an IBE cutout URL to dest. Retries 5xx/network with backoff; 4xx fails fast."""
     import asyncio
+    import shutil
 
     import httpx
     dest.parent.mkdir(parents=True, exist_ok=True)
+    if use_cache:
+        try:
+            hit = fits_cache_path(cutout_url)
+            if hit.is_file() and hit.stat().st_size > 0:
+                shutil.copyfile(hit, dest)
+                return dest
+        except Exception:
+            pass
     last: Optional[Exception] = None
     for attempt in range(retries + 1):
         try:
@@ -56,6 +76,12 @@ async def fetch_ibe(cutout_url: str, dest: Path, timeout: int = API_TIMEOUT_SECO
                     raise httpx.HTTPStatusError(f"IBE {r.status_code}", request=r.request, response=r)
                 r.raise_for_status()
                 dest.write_bytes(r.content)
+                if use_cache:
+                    try:
+                        FITS_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+                        shutil.copyfile(dest, fits_cache_path(cutout_url))
+                    except Exception:
+                        pass
             return dest
         except httpx.HTTPStatusError as e:
             if e.response is not None and 400 <= e.response.status_code < 500:
