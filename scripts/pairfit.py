@@ -68,14 +68,29 @@ def main(path: str) -> dict:
                 "mjd": round((a["mjd"] + b["mjd"]) / 2, 4),
                 "dt_days": round(abs(a["mjd"] - b["mjd"]), 6),
                 "A": A, "A_err": sA, "R": R, "R_err": sR,
+                "core_masked": (True if True in (a.get("core_masked"), b.get("core_masked"))
+                                else None if None in (a.get("core_masked"), b.get("core_masked"))
+                                else False),
                 "la": a.get("wavelength_um"), "lb": b.get("wavelength_um"),
                 "fa": a["flux"], "fb": b["flux"],
             })
     tests = []
+    quality_masked = []
+    pre_fix = False
     for name in FAMILIES.values():
-        fam = sorted(
-            [p for p in pairs if p["family"] == name and p["R"] is not None],
-            key=lambda p: p["mjd"])
+        fam = []
+        for p in pairs:
+            if p["family"] != name or p["R"] is None:
+                continue
+            cm = p.get("core_masked")
+            if cm is True:
+                quality_masked.append(
+                    {"family": name, "mjd": p["mjd"], "reason": "core pixel masked"})
+                continue
+            if cm is None:
+                pre_fix = True  # predates mask tracking; verdict carries a caveat
+            fam.append(p)
+        fam.sort(key=lambda p: p["mjd"])
         for p, q in zip(fam, fam[1:]):
             dA = abs(p["A"] - q["A"]) / math.hypot(p["A_err"], q["A_err"])
             dR = abs(p["R"] - q["R"]) / math.hypot(p["R_err"] or 0, q["R_err"] or 0)
@@ -93,7 +108,9 @@ def main(path: str) -> dict:
     tag = Path(path).stem.replace("track_", "")
     out = Path("data") / f"pairfit_{tag}.json"
     out.write_text(json.dumps({"source": Path(path).name, "pairs": pairs,
-                               "tests": tests}, indent=2))
+                               "tests": tests,
+                               "quality_masked": quality_masked,
+                               "pre_fix_caveat": pre_fix}, indent=2))
     for t in tests:
         print(f"{t['family']} {t['mjd0']}->{t['mjd1']}: "
               f"dA={t['dA_sigma']}σ dR={t['dR_sigma']}σ => {t['verdict']}")

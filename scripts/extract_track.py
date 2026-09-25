@@ -95,8 +95,9 @@ async def measure(url: str, ra: float, dec: float, tmp: Path) -> dict:
         if not (0 <= x < w and 0 <= y < h):
             rec["reason"] = "target outside cutout"
             return rec
-        clean, flags = mask_bad_pixels(img, parsed.get("flags"), parsed.get("variance"))
-        hit = aperture_flux(clean, float(x), float(y), variance=parsed.get("variance"))
+        clean, badmask = mask_bad_pixels(img, parsed.get("flags"), parsed.get("variance"))
+        hit = aperture_flux(clean, float(x), float(y),
+                            variance=parsed.get("variance"), mask=badmask)
         # per-visit wavelength: cutout coords -> full-detector pixels via the
         # (full-frame) CRPIX reference, then into the WCS-WAVE grid
         lam, bw = parsed.get("wavelength_um"), None
@@ -113,7 +114,8 @@ async def measure(url: str, ra: float, dec: float, tmp: Path) -> dict:
         rec.update({"flux": hit["flux"], "flux_err": hit["flux_err"],
                     "npix": hit["npix"],
                     "wavelength_um": lam, "bandwidth_um": bw,
-                    "flags": str(flags)[:120] if flags is not None else None})
+                    "aper_masked_frac": round(hit["masked_frac"], 4),
+                    "core_masked": bool(hit["core_masked"])})
     except Exception as ex:  # noqa: BLE001 - per-point failure is data, not crash
         rec["reason"] = f"{type(ex).__name__}: {ex}"[:160]
     return rec
