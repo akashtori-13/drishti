@@ -33,6 +33,58 @@ from pathlib import Path
 FAMILIES = {(1, 4): "D1+D4", (2, 5): "D2+D5", (3, 6): "D3+D6"}
 DT_TOL_DAYS = 0.01  # simultaneous = within ~15 min; ours are ~2 min apart
 SIG = 3.0  # evolution verdict threshold
+P_EVOLVE = 0.0027  # joint-test p-value threshold (~3 sigma)
+
+
+def _gser(a: float, x: float) -> float:
+    """Regularized lower incomplete gamma P(a,x) by series expansion."""
+    if x <= 0:
+        return 0.0
+    ap = a
+    total = 1.0 / a
+    delta = total
+    for _ in range(200):
+        ap += 1
+        delta *= x / ap
+        total += delta
+        if abs(delta) < abs(total) * 1e-12:
+            break
+    return total * math.exp(-x + a * math.log(x) - math.lgamma(a))
+
+
+def chi2_sf(x: float, k: int) -> float:
+    """Survival function P(ChiSq_k > x). Pure stdlib, deterministic."""
+    if x <= 0:
+        return 1.0
+    return max(0.0, min(1.0, 1.0 - _gser(k / 2.0, x / 2.0)))
+
+
+def joint_shared_colour(epochs: list[tuple[float, float, float, float]]):
+    """Joint fit: free amplitude per epoch, ONE shared colour fraction r.
+
+    Model: fa_t = A_t*r, fb_t = A_t*(1-r). Returns (chi2, r_hat).
+    Saturated per-epoch model has chi2 == 0, so chi2 ~ ChiSq(T-1) under the
+    shared-colour null. Golden-section search on r; A_t analytic (WLS).
+    """
+    def chi2_of(r: float) -> float:
+        r = min(1.0 - 1e-9, max(1e-9, r))
+        tot = 0.0
+        for fa, sa, fb, sb in epochs:
+            wa, wb = 1.0 / max(1e-18, sa * sa), 1.0 / max(1e-18, sb * sb)
+            A = (fa * r * wa + fb * (1 - r) * wb) / max(1e-18, r * r * wa + (1 - r) ** 2 * wb)
+            tot += (fa - A * r) ** 2 * wa + (fb - A * (1 - r)) ** 2 * wb
+        return tot
+    lo, hi = 1e-6, 1 - 1e-6
+    gr = (math.sqrt(5) - 1) / 2
+    c, d = hi - gr * (hi - lo), lo + gr * (hi - lo)
+    for _ in range(80):
+        if chi2_of(c) < chi2_of(d):
+            hi = d
+        else:
+            lo = c
+        c, d = hi - gr * (hi - lo), lo + gr * (hi - lo)
+    r_hat = (lo + hi) / 2
+    return chi2_of(r_hat), r_hat
 
 
 def pair_stats(fa: float, sa: float, fb: float, sb: float):
@@ -63,18 +115,30 @@ def main(path: str) -> dict:
             b = min(cands, key=lambda q: abs(q["mjd"] - a["mjd"]))
             A, sA, R, sR = pair_stats(a["flux"], a["flux_err"] or 0,
                                       b["flux"], b["flux_err"] or 0)
+            # response-aware colour: flux per unit bandwidth in each arm,
+            # folding the SPHEREx band response (dlam) into the ratio
+            dla = a.get("bandwidth_um") or 0
+            dlb = b.get("bandwidth_um") or 0
+            if R is not None and dla and dlb and dla > 0 and dlb > 0:
+                r_pb = R * (dlb / dla)
+                r_pb_err = (sR or 0) * (dlb / dla)
+            else:
+                r_pb, r_pb_err = None, None
             pairs.append({
                 "family": name, "bands": [ba, bb],
                 "mjd": round((a["mjd"] + b["mjd"]) / 2, 4),
                 "dt_days": round(abs(a["mjd"] - b["mjd"]), 6),
                 "A": A, "A_err": sA, "R": R, "R_err": sR,
+                "R_per_bandwidth": r_pb, "R_per_bandwidth_err": r_pb_err,
                 "core_masked": (True if True in (a.get("core_masked"), b.get("core_masked"))
                                 else None if None in (a.get("core_masked"), b.get("core_masked"))
                                 else False),
                 "la": a.get("wavelength_um"), "lb": b.get("wavelength_um"),
                 "fa": a["flux"], "fb": b["flux"],
+                "fa_err": a["flux_err"] or 0, "fb_err": b["flux_err"] or 0,
             })
     tests = []
+    joints = []
     quality_masked = []
     pre_fix = False
     for name in FAMILIES.values():
@@ -105,10 +169,28 @@ def main(path: str) -> dict:
             tests.append({"family": name, "mjd0": p["mjd"], "mjd1": q["mjd"],
                           "dA_sigma": round(dA, 2), "dR_sigma": round(dR, 2),
                           "verdict": verdict})
+        # joint likelihood test: one shared colour across ALL clean epochs
+        # of this family vs per-epoch colours (saturated). chi2 ~ ChiSq(T-1).
+        joint = None
+        if len(fam) >= 2:
+            ep = [(p["fa"], max(1e-9, p["fa_err"] or 0),
+                   p["fb"], max(1e-9, p["fb_err"] or 0)) for p in fam]
+            chi2, r_hat = joint_shared_colour(ep)
+            dof = len(ep) - 1
+            pv = chi2_sf(chi2, dof)
+            joint = {"family": name, "epochs": len(ep),
+                     "chi2": round(chi2, 3), "dof": dof,
+                     "p_shared_colour": pv,
+                     "r_hat": round(r_hat, 4),
+                     "joint_verdict": ("colour evolution (shared-R rejected)"
+                                       if pv < P_EVOLVE else "consistent-static")}
+            print(f"{name} JOINT shared-R: chi2={chi2:.2f}/{dof} p={pv:.4f} "
+                  f"=> {joint['joint_verdict']}")
+            joints.append(joint)
     tag = Path(path).stem.replace("track_", "")
     out = Path("data") / f"pairfit_{tag}.json"
     out.write_text(json.dumps({"source": Path(path).name, "pairs": pairs,
-                               "tests": tests,
+                               "tests": tests, "joints": joints,
                                "quality_masked": quality_masked,
                                "pre_fix_caveat": pre_fix}, indent=2))
     for t in tests:

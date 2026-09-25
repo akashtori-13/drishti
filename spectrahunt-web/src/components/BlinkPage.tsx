@@ -485,6 +485,8 @@ export default function BlinkPage({ id }: { id: string }) {
                   ) : (
                     <p className="fine">No brightness samples yet — arm Measure on the image and click a spot, or wait for live pipeline photometry.</p>
                   )}
+                  {viewing.id !== '3i-atlas' && (
+                    <>
                   <h3>Spectrum</h3>
                   {report?.spectrum?.length ? (
                     <SedPlot points={report.spectrum.map((s) => ({
@@ -492,6 +494,8 @@ export default function BlinkPage({ id }: { id: string }) {
                       masked: !(s.flux > 0),
                     }))} />
                   ) : null}
+                    </>
+                  )}
                   {viewing.id === '3i-atlas' && (
                     <>
                       <TrackSpectrum trackId="track_3i-atlas-tracked"
