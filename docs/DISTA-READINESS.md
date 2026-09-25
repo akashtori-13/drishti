@@ -76,8 +76,12 @@ What this means for the brief's questions:
   reparameterizes each simultaneous D1+D4/D2+D5/D3+D6 pair (confirmed in our
   data: paired bands share MJDs to ~1e-3 d from the same weekly directory)
   into amplitude A=fa+fb and colour R=fa/fb with propagated errors, then
-  tests cross-epoch (dA/dR in σ). Post-fix re-run with real mask metadata:
-  the 28.9σ control "colour evolution" is GONE — core-masked visits are
+  tests cross-epoch (dA/dR in σ). Upgraded to a true joint likelihood:
+  free amplitude per epoch with ONE shared colour fraction, χ² vs the
+  saturated model (~χ²_{T-1}), plus response-aware colour R·(Δλb/Δλa).
+  All three comet families agree under both methods (joint p=0.34–0.49).
+  Post-fix re-run with real mask metadata: the 28.9σ control "colour
+  evolution" is GONE — core-masked visits are
   excluded from verdicts instead of silently filled. Comet: D2+D5 and D3+D6
   across ~3 months both read consistent-static (dA/dR ~0.5σ, faint-flux
   caveats apply). A counterpart fill completed the comet to 20/20 with the
