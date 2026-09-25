@@ -64,6 +64,20 @@ export function SedPlot({ points }: {
   const fspan = Math.max(1e-9, fmax - fmin);
   const X = (wl: number) => 34 + ((wl - lo) / span) * (W - 46);
   const Y = (f: number) => H - 24 - ((f - fmin) / fspan) * (H - 44);
+  // guide segments join consecutive unmasked points only — never through hollows
+  const segs: Array<Array<{ x: number; y: number }>> = [];
+  {
+    let cur: Array<{ x: number; y: number }> = [];
+    points.forEach((p) => {
+      if (p.masked) {
+        if (cur.length > 1) segs.push(cur);
+        cur = [];
+      } else {
+        cur.push({ x: X(p.wl), y: Y(Math.max(fmin, Math.min(fmax, p.flux))) });
+      }
+    });
+    if (cur.length > 1) segs.push(cur);
+  }
   return (
     <div>
       <svg viewBox={`0 0 ${W} ${H}`} role="img"
@@ -72,10 +86,11 @@ export function SedPlot({ points }: {
         {[0.25, 0.5, 0.75].map((f) => (
           <line key={f} x1={34} x2={W - 6} y1={H * f} y2={H * f} stroke="rgba(255,255,255,.08)" strokeWidth={1} />
         ))}
-        <polyline
-          points={real.map((p) => `${X(p.wl)},${Y(p.flux)}`).join(' ')}
-          fill="none" stroke="#7c83fd" strokeWidth={2}
-        />
+        {segs.map((s, i) => (
+          <polyline key={i}
+            points={s.map((p) => `${p.x},${p.y}`).join(' ')}
+            fill="none" stroke="#7c83fd" strokeWidth={2} />
+        ))}
         {points.map((p, i) => (
           <g key={i}>
             <line x1={X(p.wl)} x2={X(p.wl)}

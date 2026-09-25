@@ -72,14 +72,12 @@ What this means for the brief's questions:
   reparameterizes each simultaneous D1+D4/D2+D5/D3+D6 pair (confirmed in our
   data: paired bands share MJDs to ~1e-3 d from the same weekly directory)
   into amplitude A=fa+fb and colour R=fa/fb with propagated errors, then
-  tests cross-epoch (dA/dR in σ). Control star: D1+D4 across two visits
-  2 min apart gives dA=0.22σ but dR=28.9σ — an amplitude-conserving colour
-  flip no star performs in 2 minutes. The method works as built: it caught
-  an inconsistency, and on a control target the only honest reading is
-  instrumental systematics between consecutive exposures, i.e. the "or
-  simply an artifact" branch. Comet: 3 pairs, one per family — the failed
-  visits broke simultaneity, so no cross-epoch verdict yet; needs the
-  counterpart exposures, not more model.
+  tests cross-epoch (dA/dR in σ). Post-fix re-run with real mask metadata:
+  the 28.9σ control "colour evolution" is GONE — core-masked visits are
+  excluded from verdicts instead of silently filled. Comet: D2+D5 and D3+D6
+  across ~3 months both read consistent-static (dA/dR ~0.5σ, faint-flux
+  caveats apply). In-app, core-masked visits render hollow with broken
+  guide segments — shown, never joined, never used.
 - **Forensics verdict (2026-09-26)**: `scripts/forensics_flip.py` pulled the
   four flipped cutouts (`data/forensics/`). Pixel audit: in each visit one
   band's stellar core lands on a flagged pixel — B1v2 core 91.1 flagged,
