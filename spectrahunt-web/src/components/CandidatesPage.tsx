@@ -223,13 +223,13 @@ export default function CandidatesPage() {
               <div className="cand-thumb">
                 <Thumb card={c} />
               </div>
-              <div className="cand-body">
-                <span className="cand-badges">
-                  <span className={`badge ${c.kind === 'known' ? 'known' : c.kind === 'pending' ? '' : 'unknown'}`}>
-                    <span className="dot" />{c.kind === 'known' && c.knownName ? `Known · ${c.knownName}` : KIND_LABEL[c.kind]}
-                  </span>
-                  <span className="cand-score mono">{c.stat}</span>
+              <span className="cand-badges">
+                <span className={`badge ${c.kind === 'known' ? 'known' : c.kind === 'pending' ? '' : 'unknown'}`}>
+                  <span className="dot" />{c.kind === 'known' && c.knownName ? `Known · ${c.knownName}` : KIND_LABEL[c.kind]}
                 </span>
+                <span className="cand-score mono">{c.stat}</span>
+              </span>
+              <div className="cand-body">
                 <div className="cand-name">{c.name}</div>
                 <div className="cand-meta mono"><span>{band.label}</span><span>{c.date}</span></div>
                 <div className="cand-meta mono">
