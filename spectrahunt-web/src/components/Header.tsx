@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import Icon, { type IconName } from '@/components/Icon';
 import SearchBox, { type SearchTarget } from '@/components/SearchBox';
 import SurpriseButton from '@/components/SurpriseButton';
@@ -82,6 +83,16 @@ export default function Header() {
     if (closeTimer.current) clearTimeout(closeTimer.current);
   }, []);
 
+  // Hero search hands off to the nav row (mobile): the dock morphs into
+  // the search bar with the keyboard, same as the nav toggle.
+  useEffect(() => {
+    const open = () => {
+      flushSync(() => setMSearch(true));
+      document.querySelector<HTMLInputElement>('#nav-msearch-input')?.focus();
+    };
+    window.addEventListener('sh-nav-search', open);
+    return () => window.removeEventListener('sh-nav-search', open);
+  }, []);
   // Ctrl+K: navbar input, else the page's own search (hero, map tools),
   // else the mobile input row.
   useEffect(() => {
@@ -243,7 +254,12 @@ export default function Header() {
         )}
         {!bare && (
           <button type="button" className="island-iconbtn nav-msearch-toggle collapsible" aria-label="Search and navigate (Ctrl+K)"
-            title="Search and navigate (Ctrl+K)" onClick={() => setMSearch(true)}>
+            title="Search and navigate (Ctrl+K)" onClick={() => {
+              // flush the row into the DOM first so focus lands in the
+              // same tap gesture — that is what opens the keyboard
+              flushSync(() => setMSearch(true));
+              document.querySelector<HTMLInputElement>('#nav-msearch-input')?.focus();
+            }}>
             <Icon name="search" className="icon" />
             <span className="ibtn-label" aria-hidden="true">Search</span>
           </button>
@@ -266,21 +282,19 @@ export default function Header() {
           <span className="ibtn-label" aria-hidden="true">Menu</span>
         </button>
       </div>
-      {!bare && (
-        <div className="island-mrow" data-open={mSearch || undefined}>
-          <button type="button" className="island-iconbtn" aria-label="Back to navigation"
-            onClick={() => setMSearch(false)}>
-            <Icon name="back" className="icon" />
-          </button>
-          <div
-            className="nav-search"
-            role="search"
-          >
-            <Icon name="search" className="icon" />
-            <SearchBox key={pathname} id="nav-msearch" placeholder="Jump to an object or field…" onPick={pick} />
-          </div>
+      <div className="island-mrow" data-open={mSearch || undefined}>
+        <button type="button" className="island-iconbtn" aria-label="Back to navigation"
+          onClick={() => setMSearch(false)}>
+          <Icon name="back" className="icon" />
+        </button>
+        <div
+          className="nav-search"
+          role="search"
+        >
+          <Icon name="search" className="icon" />
+          <SearchBox key={pathname} id="nav-msearch" placeholder="Jump to an object or field…" onPick={pick} />
         </div>
-      )}
+      </div>
       <div className="island-body" data-open={menuOpen || undefined}>
         <div className="island-body-in">
           {menuOpen && (
