@@ -183,7 +183,7 @@ export default function SkyPage() {
         <p className="map-title">Find a field</p>
         <div style={{ display: 'flex', gap: 8, alignItems: 'stretch' }}>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <SearchBox id="ms" placeholder="Object or RA, Dec" compact onPick={pick} />
+            <SearchBox id="ms" placeholder="Object or RA, Dec" compact onPick={pick} handoff />
           </div>
           <SurpriseButton compact onPick={pick} className="lucky-icon-btn" />
         </div>

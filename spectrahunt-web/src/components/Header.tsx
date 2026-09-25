@@ -43,6 +43,19 @@ export default function Header() {
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [mSearch, setMSearch] = useState(false);
   const [typing, setTyping] = useState(false);
+  // pick handler carried in by a page-level search handoff (same page)
+  const [extPick, setExtPick] = useState<((t: SearchTarget) => void) | null>(null);
+  // taps that open search must not instantly close it on the veil
+  const openedAt = useRef(0);
+  const openMSearch = () => {
+    openedAt.current = Date.now();
+    flushSync(() => setMSearch(true));
+    document.querySelector<HTMLInputElement>('#nav-msearch-input')?.focus();
+  };
+  const veilTap = () => {
+    if (Date.now() - openedAt.current < 400) return;
+    setMSearch(false);
+  };
   const openPreview = useAppStore((s) => s.openPreview);
   const islandRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
@@ -71,6 +84,7 @@ export default function Header() {
 
   useEffect(() => {
     if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
+    setExtPick(null);
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMenuOpen(false);
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -83,12 +97,13 @@ export default function Header() {
     if (closeTimer.current) clearTimeout(closeTimer.current);
   }, []);
 
-  // Hero search hands off to the nav row (mobile): the dock morphs into
-  // the search bar with the keyboard, same as the nav toggle.
+  // Hero/map search hands off to the nav row (mobile): the dock morphs
+  // into the search bar with the keyboard, carrying the page pick handler.
   useEffect(() => {
-    const open = () => {
-      flushSync(() => setMSearch(true));
-      document.querySelector<HTMLInputElement>('#nav-msearch-input')?.focus();
+    const open = (e: Event) => {
+      const carried = (e as CustomEvent<{ onPick?: (t: SearchTarget) => void }>).detail?.onPick;
+      setExtPick(carried ? () => carried : null);
+      openMSearch();
     };
     window.addEventListener('sh-nav-search', open);
     return () => window.removeEventListener('sh-nav-search', open);
@@ -216,7 +231,7 @@ export default function Header() {
   return (
     <>
       {mSearch && (
-        <div className="nav-veil" aria-hidden="true" onClick={() => setMSearch(false)} />
+        <div className="nav-veil" aria-hidden="true" onClick={veilTap} />
       )}
       <div
         ref={islandRef}
@@ -261,8 +276,8 @@ export default function Header() {
             title="Search and navigate (Ctrl+K)" onClick={() => {
               // flush the row into the DOM first so focus lands in the
               // same tap gesture — that is what opens the keyboard
-              flushSync(() => setMSearch(true));
-              document.querySelector<HTMLInputElement>('#nav-msearch-input')?.focus();
+              setExtPick(null);
+              openMSearch();
             }}>
             <Icon name="search" className="icon" />
             <span className="ibtn-label" aria-hidden="true">Search</span>
@@ -296,7 +311,7 @@ export default function Header() {
           role="search"
         >
           <Icon name="search" className="icon" />
-          <SearchBox key={pathname} id="nav-msearch" placeholder="Jump to an object or field…" onPick={pick} />
+          <SearchBox key={`${pathname}-${extPick ? 'ext' : 'nav'}`} id="nav-msearch" placeholder="Jump to an object or field…" onPick={extPick ?? pick} />
         </div>
       </div>
       <div className="island-body" data-open={menuOpen || undefined}>
