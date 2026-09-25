@@ -26,8 +26,19 @@ def _load_cache() -> dict:
 
 
 def _save_cache(cache: dict) -> None:
+    import os
+    import tempfile
     CACHE.parent.mkdir(exist_ok=True)
-    CACHE.write_text(json.dumps(cache, indent=2))
+    fd, tmp = tempfile.mkstemp(dir=str(CACHE.parent), prefix=".horizons-")
+    try:
+        with os.fdopen(fd, "w") as f:
+            json.dump(cache, f, indent=2)
+        os.replace(tmp, CACHE)
+    except Exception:
+        try:
+            os.unlink(tmp)
+        except Exception:
+            pass
 
 
 def _fetch_table(target: str, jd_start: float, jd_end: float, step_min: int = 1440) -> list:

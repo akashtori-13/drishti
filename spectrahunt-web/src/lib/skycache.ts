@@ -43,6 +43,9 @@ async function idbGet(url: string): Promise<Blob | null> {
   }
 }
 
+const IDB_INDEX = 'sh-idb-index';
+const IDB_MAX_ENTRIES = 300;
+
 async function idbPut(url: string, blob: Blob): Promise<void> {
   try {
     if (blob.size > 4_000_000) return; // quota safety
@@ -57,6 +60,24 @@ async function idbPut(url: string, blob: Blob): Promise<void> {
         resolve();
       }
     });
+    // bounded growth: insert-ordered index in localStorage, evict oldest
+    try {
+      const idx = [url, ...(JSON.parse(localStorage.getItem(IDB_INDEX) ?? '[]') as string[])
+        .filter((k) => k !== url)].slice(0, IDB_MAX_ENTRIES);
+      const d2 = await db();
+      for (const old of (JSON.parse(localStorage.getItem(IDB_INDEX) ?? '[]') as string[])
+        .filter((k) => !idx.includes(k))) {
+        await new Promise<void>((resolve) => {
+          try {
+            const tx = d2.transaction(DB_STORE, 'readwrite');
+            tx.objectStore(DB_STORE).delete(old);
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => resolve();
+          } catch { resolve(); }
+        });
+      }
+      localStorage.setItem(IDB_INDEX, JSON.stringify(idx));
+    } catch { /* private mode: memory cache still works */ }
   } catch { /* private mode etc: memory cache still works */ }
 }
 
@@ -148,6 +169,7 @@ export function lsSet(key: string, value: unknown, cap = 40) {
     const idx = [key, ...lsIndex().filter((k) => k !== key)].slice(0, cap);
     for (const old of lsIndex().filter((k) => !idx.includes(k))) {
       try { localStorage.removeItem(old); } catch { /* noop */ }
+      try { localStorage.removeItem(`${old}:at`); } catch { /* noop */ }
     }
     localStorage.setItem(LS_INDEX, JSON.stringify(idx));
   } catch { /* quota: skip */ }

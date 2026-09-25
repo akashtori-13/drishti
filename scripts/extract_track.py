@@ -18,6 +18,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import os
 import sys
 import tempfile
 from pathlib import Path
@@ -240,7 +241,9 @@ def main() -> None:
     if getattr(args, "tracked", None):
         tag += "-tracked"
     out_json = DATA / f"track_{tag}.json"
-    out_json.write_text(json.dumps(result, indent=2))
+    tmp_json = DATA / f"track_{tag}.tmp.{os.getpid()}.json"
+    tmp_json.write_text(json.dumps(result, indent=2))
+    os.replace(tmp_json, out_json)
     print(f"wrote {out_json}: {result['n_points']}/{result['n_attempted']} measured")
     if not args.no_plot:
         plot(result, DATA / f"track_{tag}.png")
