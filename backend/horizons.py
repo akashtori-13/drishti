@@ -96,6 +96,18 @@ def positions(target: str, mjds: list[float]) -> list[tuple[float, float]]:
         cache[key] = table
         _save_cache(cache)
     table = cache[key]
+    need_lo = min(mjds) + 2400000.5
+    need_hi = max(mjds) + 2400000.5
+    if need_lo < table[0][0] or need_hi > table[-1][0]:
+        # cached span doesn't cover the request: refetch wider instead of
+        # silently clamping to the edge (audit B11)
+        jd_lo, jd_hi = need_lo - 1.0, need_hi + 1.0
+        try:
+            table = _fetch_table(target, jd_lo, jd_hi)
+        except Exception as e:  # noqa: BLE001
+            raise RuntimeError(f"Horizons query failed for {target}: {e}") from e
+        cache[key] = table
+        _save_cache(cache)
     out = []
     for mjd in mjds:
         jd = mjd + 2400000.5

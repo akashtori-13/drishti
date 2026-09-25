@@ -28,10 +28,11 @@ def align_images(image_a, wcs_a, image_b, wcs_b) -> Tuple[Any, Dict[str, Any]]:
             from reproject import reproject_interp
             wa, wb = _celestial(wcs_a), _celestial(wcs_b)
             arr, _ = reproject_interp((b, wb), wa, shape_out=a.shape, order="bilinear")
-            bad = ~np.isfinite(arr)
-            if bad.any():
-                arr[bad] = np.nanmedian(a)
-            return arr, {"method": "wcs-reproject"}
+            # non-overlap stays NaN (never median-filled: that forces B-A~0
+            # and fakes agreement — audit B3). Downstream is NaN-safe
+            # (_peaks masks non-finite; aperture_flux requires finite).
+            bad_frac = float(np.isfinite(arr).sum()) / max(1, arr.size)
+            return arr, {"method": "wcs-reproject", "overlap_frac": round(bad_frac, 4)}
         except Exception as e:  # noqa: BLE001
             print(f"WCS reproject failed ({e}); trying correlation")
     # last resort: crop/pad + correlation shift
@@ -71,7 +72,9 @@ def _shift(image, dy: float, dx: float):
 
 
 def sky_to_pixel(ra: float, dec: float, wcs, shape) -> Optional[Tuple[float, float]]:
-    """ICRS -> pixel (x, y) or None. Falls back to array center."""
+    """ICRS -> pixel (x, y) or None on any failure. Never falls back to
+    array center: silent wrong-position photometry (audit B2) is worse
+    than a skipped frame — callers already `continue` on None."""
     try:
         if wcs is not None:
             x, y = _celestial(wcs).all_world2pix([[float(ra), float(dec)]], 0)[0]
@@ -79,8 +82,4 @@ def sky_to_pixel(ra: float, dec: float, wcs, shape) -> Optional[Tuple[float, flo
                 return float(x), float(y)
     except Exception:
         pass
-    try:
-        h, w = shape[:2]
-        return float(w / 2), float(h / 2)
-    except Exception:
-        return None
+    return None

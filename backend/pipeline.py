@@ -231,6 +231,9 @@ async def lightcurve_for(ra: float, dec: float, band: int = 3,
         points.append({"mjd": h.get("mjd"), "flux": m["flux"], "flux_err": m["flux_err"],
                        "x": xy[0], "y": xy[1]})
     out = {"points": points, "band": band, "detail": "ok" if points else "fetch-failed"}
+    if points and len(points) < len(hits):
+        out["detail"] = "partial"
+        out["missing"] = len(hits) - len(points)
     if not points and isinstance(stale, dict) and stale.get("points"):
         out = {**stale, "detail": "stale"}
     elif points:
@@ -258,11 +261,13 @@ async def spectrum_for(ra: float, dec: float,
     except Exception:
         hit, stale = None, None
     points = []
+    attempted = 0
     for b in BANDS:
         det = b["id"]
         hits = discover_cached(ra, dec, det, size_deg, db_path)
         if not hits:
             continue
+        attempted += 1
         f = await _fetch_frame(hits[-1]["cutout_url"])
         if f is None:
             continue
@@ -272,8 +277,9 @@ async def spectrum_for(ra: float, dec: float,
         m = aperture_flux(f["image"], xy[0], xy[1], variance=f.get("variance"))
         points.append({"band": det, "wavelength_um": f.get("wavelength_um") or b["wave_um"],
                        "flux": m["flux"], "flux_err": m["flux_err"], "mjd": hits[-1].get("mjd")})
-    out = {"points": sorted(points, key=lambda p: p["wavelength_um"]),
-           "detail": "ok" if points else "fetch-failed"}
+    if points and len(points) < attempted:
+        out["detail"] = "partial"
+        out["missing"] = attempted - len(points)
     if not points and isinstance(stale, dict) and stale.get("points"):
         out = {**stale, "detail": "stale"}
     elif points:
