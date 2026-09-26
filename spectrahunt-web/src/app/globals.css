@@ -1211,6 +1211,11 @@ body::after {
 .rate input{width:110px; accent-color:#fff;}
 .hist{width:100%; max-width:280px; height:44px; background:#04050a; border-radius:8px; border:1px solid var(--line);}
 .cand-detect-list{display:flex; flex-direction:column; gap:6px; font-size:.75rem; color:var(--ink-2); margin-top:8px;}
+.cand-detect-list.is-chips{flex-direction:row; gap:6px; flex-wrap:nowrap; overflow-x:auto; scrollbar-width:thin; padding-block:2px; scroll-snap-type:x proximity; min-height:48px; align-items:center;}
+.cand-detect-list.is-chips li{flex:0 0 auto; scroll-snap-align:start; display:inline-flex; align-items:center; gap:6px; min-height:44px; padding:6px 12px; border-radius:999px; border:1px solid var(--line); white-space:nowrap;}
+.cand-detect-list.is-chips .cand-sk{display:inline-block; width:64px; height:18px; border-radius:9px; background:#161b30;}
+.cand-detect-list.is-chips .cand-quiet{border-style:dashed; color:var(--ink-3);}
+@media (prefers-reduced-motion:reduce){.cand-detect-list.is-chips{scroll-snap-type:none;}}
 .tag-mover{color:#f0bb52; font-weight:700;}
 .tag-var{color:#5aa9e6; font-weight:700;}
 .pal-veil{position:fixed; inset:0; z-index:90; background:rgba(4,5,10,.6); display:grid; justify-items:center; align-items:start; padding-top:12vh;}

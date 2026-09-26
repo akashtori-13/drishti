@@ -65,7 +65,13 @@ export default function BlinkPage({ id }: { id: string }) {
   const [liveSpec, setLiveSpec] = useState<Array<{ wavelength_um: number; flux: number }> | null>(null);
   const [liveLc, setLiveLc] = useState<Array<{ mjd?: number; flux: number }> | null>(null);
   const [report, setReport] = useState<ReportDoc | null>(null);
-  const [detStats, setDetStats] = useState<{ movers: number; variables: number; ready: boolean; cands?: Array<{ kind: string; sigma: number }>; bins?: number[] | null } | null>(null);
+  const [detStats, setDetStats] = useState<{ movers: number; variables: number; ready: boolean; cands?: Array<{ kind: string; sigma: number; n?: number | null; x?: number; y?: number }>; bins?: number[] | null } | null>(null);
+  const [heldStats, setHeldStats] = useState<typeof detStats>(null);
+  const statsHandler = (st: typeof detStats) => {
+    if (st) { setDetStats(st); setHeldStats(st); } else setDetStats(null);
+  };
+  const shownStats = detStats ?? heldStats;
+  const showingHeld = !detStats && !!heldStats;
   // Fetch progress for the WaitGame panel: monotonic step counter so the
   // player sees what is loading and how far along it is.
   const [prog, setProg] = useState({ done: 0, total: 3, label: 'Contacting IRSA…' });
@@ -397,7 +403,7 @@ export default function BlinkPage({ id }: { id: string }) {
               onSample={setSample}
               center={{ ra: viewing.ra, dec: viewing.dec }}
               knownNames={skybot?.map((m) => m.name) ?? []}
-              onStats={setDetStats}
+              onStats={statsHandler}
               bandPngs={bandPngs}
             />
           </section>
@@ -438,36 +444,51 @@ export default function BlinkPage({ id }: { id: string }) {
                     )}
                   </div>
                   <h3>Detections — what moved?</h3>
-                  <p className="fine">
-                    {detStats
-                      ? detStats.movers + detStats.variables > 0
-                        ? `${detStats.movers} mover${detStats.movers === 1 ? '' : 's'}, ${detStats.variables} variable${detStats.variables === 1 ? '' : 's'} ≥5σ in this pair.`
-                        : 'No movers above 5σ between these epochs — quiet field.'
-                      : 'Scanning pixels for movers…'}
+                  <div aria-busy={showingHeld} style={showingHeld ? { opacity: 0.55 } : undefined}>
+                  <p className="fine" style={{ minHeight: 38 }}>
+                    {!shownStats
+                      ? 'Scanning pixels for movers…'
+                      : showingHeld
+                        ? 'Measuring new pair — showing previous pair…'
+                        : shownStats.movers + shownStats.variables > 0
+                          ? `${shownStats.movers} mover${shownStats.movers === 1 ? '' : 's'}, ${shownStats.variables} variable${shownStats.variables === 1 ? '' : 's'} ≥5σ in this pair.`
+                          : 'No movers above 5σ between these epochs — quiet field.'}
                   </p>
-                  {detStats && (detStats.cands ?? []).length > 0 && (
-                    <ul className="cand-detect-list">
-                      {detStats.cands!.slice(0, 5).map((c, i) => (
-                        <li key={`${c.kind}:${i}`} className="mono">
-                          <span className={c.kind === 'mover' ? 'tag-mover' : 'tag-var'}>
-                            {c.kind === 'mover' ? 'MOVER' : 'VARIABLE'}
-                          </span>{' '}
-                          #{i + 1} · {c.sigma.toFixed(1)}σ
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                  {detStats?.bins?.length ? (
-                    <svg viewBox="0 0 220 44" role="img" aria-label="Brightness histogram of the displayed frame"
-                      style={{ width: '100%', maxWidth: 280, background: '#04050a', borderRadius: 8 }}>
-                      {detStats.bins.map((v, bi) => {
-                        const mx = Math.max(1, ...detStats.bins!);
-                        const bh = Math.max(1, (v / mx) * 40);
-                        return <rect key={bi} x={(bi / detStats.bins!.length) * 220} y={44 - bh}
-                          width={220 / detStats.bins!.length - 0.5} height={bh} fill="#7c83fd" />;
-                      })}
-                    </svg>
-                  ) : null}
+                  <ul className="cand-detect-list is-chips" aria-label="Top detections" style={{ minHeight: 48 }}>
+                    {!shownStats ? (
+                      [0, 1, 2].map((i) => (
+                        <li key={i} aria-hidden="true"><span className="cand-sk" /></li>
+                      ))
+                    ) : (shownStats.cands ?? []).length ? (
+                      shownStats.cands!.slice(0, 5).map((c, i) => {
+                        const tag = c.kind === 'mover' ? `M${c.n ?? i + 1}` : `V${c.n ?? i + 1}`;
+                        return (
+                          <li key={`${c.kind}:${tag}`} className="mono" title={`${c.kind} ${tag}, ${c.sigma.toFixed(1)} sigma`}>
+                            <span className={c.kind === 'mover' ? 'tag-mover' : 'tag-var'}>{tag}</span>{' '}
+                            {c.sigma.toFixed(1)}σ
+                          </li>
+                        );
+                      })
+                    ) : (
+                      <li className="mono cand-quiet">○ Quiet ≥5σ — no movers</li>
+                    )}
+                  </ul>
+                  <div style={{ height: 64 }}>
+                    {shownStats?.bins?.length ? (
+                      <svg viewBox="0 0 220 44" role="img" aria-label="Brightness histogram of the displayed frame"
+                        style={{ width: '100%', maxWidth: 280, aspectRatio: '220 / 44', display: 'block', background: '#04050a', borderRadius: 8 }}>
+                        {shownStats.bins.map((v, bi) => {
+                          const mx = Math.max(1, ...shownStats.bins!);
+                          const bh = Math.max(1, (v / mx) * 40);
+                          return <rect key={bi} x={(bi / shownStats.bins!.length) * 220} y={44 - bh}
+                            width={220 / shownStats.bins!.length - 0.5} height={bh} fill="#7c83fd" />;
+                        })}
+                      </svg>
+                    ) : (
+                      <div aria-hidden="true" style={{ width: '100%', maxWidth: 280, height: 56, background: '#04050a', borderRadius: 8 }} />
+                    )}
+                  </div>
+                  </div>
                   <dl className="meta-grid">
                     <dt>RA / Dec</dt><dd className="mono">{fmtRa(viewing.ra)} / {fmtDec(viewing.dec)}</dd>
                     <dt>Date</dt><dd className="mono">{cur?.mjd ? `${mjdToDate(cur.mjd)} (MJD ${cur.mjd.toFixed(2)})` : '—'}</dd>

@@ -178,7 +178,7 @@ export default function BlinkComparator({
   knownNames?: string[];
   /** Newest-epoch PNG per detector (1-6) for true false-color composites. */
   bandPngs?: Record<number, string | null>;
-  onStats?: (s: { movers: number; variables: number; ready: boolean; cands?: Array<{ kind: string; sigma: number }>; bins?: number[] | null } | null) => void;
+  onStats?: (s: { movers: number; variables: number; ready: boolean; cands?: Array<{ kind: string; sigma: number; n?: number | null; x?: number; y?: number }>; bins?: number[] | null } | null) => void;
 }) {
   const n = frames.length;
   const idx = Math.min(epochIdx, n - 1);
@@ -650,7 +650,8 @@ export default function BlinkComparator({
     }
     const movers = candidates.filter((c) => c.kind === 'mover').length;
     onStats({ movers, variables: candidates.length - movers, ready: true,
-      cands: candidates.slice(0, 5).map((c) => ({ kind: c.kind, sigma: c.sigma })),
+      cands: candidates.slice(0, 5).map((c) => ({ kind: c.kind, sigma: c.sigma,
+        n: (c as { n?: number }).n ?? null, x: c.x, y: c.y })),
       bins: histBins.current });
   }, [candidates, curImg, prevImg, onStats]);
   const bandMeta = BANDS[band - 1];
