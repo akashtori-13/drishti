@@ -213,6 +213,29 @@ flowchart LR
 
 Frame switching < 200 ms after preload; first view < 3 s (static shell + cached tiles).
 
+### 6.1 Retention: every downloaded byte persists (not temp)
+
+IRSA/JPL/CDS servers are flaky and demos run offline: **no download is ever
+temp-only.** Temp dirs/files are transfer buffers; the bytes always land in a
+persistent store before use:
+
+| Download | Persistent store | Writer |
+|---|---|---|
+| IBE FITS cutouts | `data/fits-cache/<sha256(url)>.fits` (gitignored, never pruned) | `fetch_ibe(use_cache=True)` — atomic temp+rename |
+| Horizons ephemerides | `data/horizons_cache.json` (committed) | atomic temp+rename |
+| HiPS tiles (browser) | IndexedDB `spectrahunt-sky`, 300-entry LRU | `skycache.ts` |
+| Small JSON (browser) | localStorage, 40-entry LRU + timestamps | `cachefirst.ts` / `skycache.ts` |
+| TLE bundles | `public/data/tle-bundle.json` (committed) | `build_tle_bundle.py` |
+| Compare JPGs | `public/compare/` (committed) | `fetch_compare.py` |
+| Track/pairfit/ranking JSONs | `data/` + `public/tracks|pairs/` (committed) | extract/pairfit/ranking scripts |
+
+Rules: re-runs must hit cache, never re-download; `fetch_ibe` serves cache
+hits offline; committed JSONs are the offline presentation contract; large
+binaries stay on disk, never in git (`*.fits` ignored). Verified 2026-09-26:
+no downloader in `backend/` or `scripts/` deletes a payload without a
+persistent copy (tem dirs in `pipeline._fetch_frame`, `extract_track`,
+`forensics_flip`, `nep_stack` are buffers only).
+
 ## 7. Coordinate consistency (verified, not assumed)
 
 A past bug class: background imagery disagreed with overlay math. Closed by
