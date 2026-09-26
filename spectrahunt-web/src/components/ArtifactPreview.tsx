@@ -8,8 +8,6 @@ import { BANDS } from '@/lib/sky';
 import { getShowcase, type Showcase } from '@/lib/showcases';
 import { loadCachedImage } from '@/lib/skycache';
 import { blinkURL, useAppStore } from '@/lib/store';
-import { SedPlot } from '@/components/Plots';
-import { getReport } from '@/lib/reports';
 
 type Preset = 'grayscale' | 'color' | 'colorblind';
 const PRESET_CMAP: Record<Preset, Colormap> = {
@@ -17,12 +15,6 @@ const PRESET_CMAP: Record<Preset, Colormap> = {
   color: 'viridis',
   colorblind: 'cividis',
 };
-const PRESETS: Array<{ id: Preset; label: string; hint: string; sw: string }> = [
-  { id: 'grayscale', label: 'Grayscale', hint: 'Neutral luminance view', sw: 'linear-gradient(135deg,#111,#eee)' },
-  { id: 'color', label: 'Color', hint: 'Full-range color view', sw: 'linear-gradient(135deg,#440154,#21918c,#fde725)' },
-  { id: 'colorblind', label: 'Colorblind', hint: 'Colorblind-friendly: perceptually uniform, color-vision-deficiency safe', sw: 'linear-gradient(135deg,#00224e,#7ad151,#fee838)' },
-];
-
 function drawCover(ctx: CanvasRenderingContext2D, img: HTMLImageElement, w: number, h: number, pan: { x: number; y: number }, zoom: number) {
   const scale = Math.max(w / img.width, h / img.height) * zoom;
   const dw = img.width * scale;
@@ -55,17 +47,6 @@ export default function ArtifactPreview() {
   const [failed, setFailed] = useState<Record<string, true>>({});
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
-  // measured per-band spectrum for the SED panel (same report bundle as blink)
-  const [repSpec, setRepSpec] = useState<Array<{ wavelength_um: number; flux: number; flux_err: number }> | null>(null);
-  useEffect(() => {
-    if (!previewId) return;
-    let alive = true;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setRepSpec(null);
-    void getReport(previewId)
-      .then((j) => { if (alive) setRepSpec(Array.isArray(j?.spectrum) ? j.spectrum : null); });
-    return () => { alive = false; };
-  }, [previewId]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -176,7 +157,7 @@ export default function ArtifactPreview() {
   }, [epochs, previewId]);
 
   const curImg = cur?.png ? loaded[cur.png] : undefined;
-  imgRef.current = curImg;
+  useEffect(() => { imgRef.current = curImg; }, [curImg]);
 
   // autoplay (still image when reduced motion or single frame)
   useEffect(() => {
@@ -270,20 +251,11 @@ export default function ArtifactPreview() {
   useEffect(() => {
     const stage = stageRef.current;
     if (!stage || !previewId) return;
-    const onWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      // Trackpad pinch arrives as ctrl+wheel with fine deltas: scale smoothly.
-      // Plain wheel steps a fixed notch. deltaY 0 = no-op (synthetic events).
-      const factor = e.ctrlKey ? Math.exp(-e.deltaY * 0.003) : e.deltaY > 0 ? 0.92 : 1.09;
-      if (factor === 1) return;
-      const v = vpRef.current;
-      applyView(v.zoom * factor, v.x, v.y);
-    };
+    // no wheel-zoom on the porch: scroll belongs to the page, not the
+    // picture (audit). Pinch/drag pan stay for touch; double-click resets.
     const onDbl = () => applyView(1, 0, 0);
-    stage.addEventListener('wheel', onWheel, { passive: false });
     stage.addEventListener('dblclick', onDbl);
     return () => {
-      stage.removeEventListener('wheel', onWheel);
       stage.removeEventListener('dblclick', onDbl);
     };
   }, [previewId]);
@@ -337,8 +309,9 @@ export default function ArtifactPreview() {
   const goAdvanced = () => {
     if (!data) return;
     const id = data.id;
+    useAppStore.getState().setEntryCmap(PRESET_CMAP[preset]);
     closePreview();
-    router.push(blinkURL(id, { band, epoch: idx }));
+    router.push(blinkURL(id, { band: cur?.band ?? band, epoch: idx, mode: 'blink', cmap: PRESET_CMAP[preset] }));
   };
 
   if (!previewId) return null;
@@ -354,7 +327,7 @@ export default function ArtifactPreview() {
           <div className="pv-status error">
             Couldn’t load this field: {err}.
             <div className="btn-row" style={{ marginTop: 12 }}>
-              <Link className="epoch-chip" href={`/blink/${encodeURIComponent(previewId)}`} onClick={closePreview}>
+              <Link className="epoch-chip" href={blinkURL(previewId, { band, epoch: idx, mode: 'blink' })} onClick={closePreview}>
                 Open analysis anyway
               </Link>
             </div>
@@ -373,7 +346,7 @@ export default function ArtifactPreview() {
                 onPointerUp={onPointerUp}
                 onPointerCancel={onPointerUp}
               />
-              <span className="viewer-tag mono">{cur?.label ?? '—'}{cur?.wavelength_um ? ` · λ ${cur.wavelength_um.toFixed(2)}` : ''}</span>
+              <span className="viewer-tag mono">{cur?.band ? `D${cur.band}` : bandMeta?.label ?? ''} · Frame {idx + 1} of {n} · real IRSA cutout</span>
               {n > 1 && (
                 <div className="pv-transport" role="group" aria-label="Frame transport">
                   <button type="button" className="icon-btn pressable" style={{ minWidth: 44, minHeight: 44 }} onClick={() => step(-1)} aria-label="Previous frame">‹</button>
@@ -385,32 +358,23 @@ export default function ArtifactPreview() {
               )}
             </div>
             <div className="pv-side">
-              <p className="hero-kicker">{bandMeta?.label ?? ''} · {n} epoch{n === 1 ? '' : 's'}</p>
+              <p className="hero-kicker">Archival infrared · blinks because the sky changed</p>
               <h2>{data.title}</h2>
-              <p className="pv-story">{shortStory(data.story)}</p>
-              {repSpec?.length ? (
-                <SedPlot points={repSpec.map((s) => ({
-                  wl: s.wavelength_um, flux: s.flux, err: s.flux_err,
-                  masked: !(s.flux > 0),
-                }))} />
-              ) : null}
-              <div className="pv-presets" role="group" aria-label="Viewing mode">
-                {PRESETS.map((p) => (
-                  <button
-                    key={p.id} type="button"
-                    className={`pv-preset${preset === p.id ? ' active' : ''}`}
-                    aria-pressed={preset === p.id} title={p.hint}
-                    onClick={() => setPreset(p.id)}
-                  >
-                    <span className="pv-sw" style={{ background: p.sw }} aria-hidden="true" />
-                    <span>{p.label}</span>
-                  </button>
-                ))}
-              </div>
+              <p className="pv-story">{shortStory(data.story, 220)}</p>
+              <p className="fine">Measured in {Object.keys(data.bands ?? {}).length} bands — full spectrum lives in analysis.</p>
+              <p className="fine mono">Cutouts: NASA/IRSA · cached on device.</p>
               <div className="pv-cta-box">
-                <p className="fine">Full blink workspace: all modes, measure, spectra, exports.</p>
                 <button type="button" className="btn primary pv-cta" onClick={goAdvanced}>
-                  Explore advanced analysis
+                  Open blink workspace →
+                </button>
+                <p className="fine">Frame {idx + 1} of {n} · {cur?.label ?? bandMeta?.label ?? ''} · continues where you left off.</p>
+                <button type="button" className="epoch-chip" aria-pressed={preset === 'colorblind'}
+                  style={{ marginTop: 8 }} onClick={() => {
+                    const next = preset === 'colorblind' ? 'color' : 'colorblind';
+                    setPreset(next);
+                    useAppStore.getState().setColorblind(next === 'colorblind');
+                  }}>
+                  {preset === 'colorblind' ? '✓ Colorblind-safe' : 'Colorblind-safe'}
                 </button>
               </div>
             </div>
