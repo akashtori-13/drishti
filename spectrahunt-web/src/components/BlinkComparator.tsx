@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import Icon from '@/components/Icon';
-import SpectrumPlot from '@/components/Plots';
 import { BANDS } from '@/lib/sky';
 import { CHANNELS, applyStretch, colormap, type Colormap, type Stretch } from '@/lib/astro';
 import { assignTrackIds, buildTracks, detectMotion, sampleGrayAt, sampleGray, type TrackedCandidate, type Track } from '@/lib/motion';
@@ -173,7 +172,7 @@ export default function BlinkComparator({
   mode: CompareMode; onModeChange: (m: CompareMode) => void;
   epochIdx: number; onEpochChange: (i: number) => void;
   showMarkers: boolean; onToggleMarkers?: () => void; fovArcmin?: number;
-  onSample?: (args: { x: number; y: number; values: number[] }) => void;
+  onSample?: (args: { x: number; y: number; values: number[] } | null) => void;
   center?: { ra: number; dec: number };
   /** Known-object names at field center (SkyBoT) for the chart overlay. */
   knownNames?: string[];
@@ -235,7 +234,6 @@ export default function BlinkComparator({
   const [loadedBand, setLoadedBand] = useState<Record<string, HTMLImageElement>>({});
   const [recording, setRecording] = useState(false);
   const [probe, setProbe] = useState<{ sx: number; sy: number; lum: number; ra: number; dec: number } | null>(null);
-  const [specVals, setSpecVals] = useState<number[] | null>(null);
   const [sideHover, setSideHover] = useState<{ x: number; y: number; a: number; b: number } | null>(null);
   const [measureChip, setMeasureChip] = useState<{ x: number; y: number; lum: number; label: string } | null>(null);
   // keyboard crosshair state lives with the other hooks (never below the
@@ -250,7 +248,6 @@ export default function BlinkComparator({
   const nextSig = frames.map((f) => f.png ?? '').join('|');
   if (framesSig !== nextSig) {
     setFramesSig(nextSig);
-    setSpecVals(null);
     setMeasureChip(null);
   }
 
@@ -1351,7 +1348,6 @@ export default function BlinkComparator({
       } catch { return 0; }
     });
     if (onSample) onSample({ x, y, values });
-    setSpecVals(values);
     setMeasureChip({ x, y, lum: values[idx] ?? 0, label: cur?.label ?? '' });
   };
 
@@ -1649,6 +1645,9 @@ export default function BlinkComparator({
               <p className="ws-hint">Simulated replay: detected movers fly their measured vectors, blanks auto-skipped. Rendered — not pixels.</p>
             )}
             {mode === 'diff' && (
+              <p className="ws-status mono" style={{ color: '#e8c34a' }}><span ref={diffStatRef} /></p>
+            )}
+            {mode === 'diff' && (
               <label className="ws-level"><span>Gain</span>
                 <input type="range" min={1} max={8} step={0.5} value={diffScale} onChange={(e) => setDiffScale(Number(e.target.value))} aria-label="Difference gain" />
                 <output>{diffScale.toFixed(1)}×</output>
@@ -1716,7 +1715,6 @@ export default function BlinkComparator({
                 </button>
               ))}
             </div>
-            <p className="ws-meta">{bandMeta.label} · {bandMeta.range} · 102 channels · same-band blink only</p>
             <div className="ws-sub">Channel</div>
             <label className="ws-field">Spectral channel
               <select value={channel} onChange={(e) => setChannel(Number(e.target.value))} aria-label="Spectral channel">
@@ -1750,27 +1748,10 @@ export default function BlinkComparator({
 
           <section className="ws-sec" aria-label="Measure">
             <h3 className="ws-title">Measure</h3>
-            <p className="ws-hint">Click the image to measure that spot.</p>
-            <div className="ws-result mono" aria-live="polite">
-              {measureChip
-                ? <>px {measureChip.lum} · {measureChip.label}</>
-                : probe
-                  ? <>px {probe.lum}{Number.isFinite(probe.ra) ? <> · {probe.ra.toFixed(3)}°, {probe.dec >= 0 ? '+' : ''}{probe.dec.toFixed(3)}°</> : ' · hover'}</>
-                  : 'No measurement yet'}
-            </div>
-            <div className="ws-sub">Spectrum</div>
-            <div className="ws-inset">
-              {specVals ? (
-                <SpectrumPlot values={specVals} band={band} />
-              ) : (
-                <p className="ws-hint">Measure a spot to draw its spectrum.</p>
-              )}
-            </div>
-            <div className="ws-sub">Change map</div>
-            <p className="ws-status">
-              <span ref={diffStatRef} className="mono" style={{ color: '#e8c34a' }} />
-              {mode !== 'diff' && <span className="mono">Switch to Diff to quantify change</span>}
-            </p>
+            <p className="ws-hint">Click the image to measure that spot — results read out in Overview.</p>
+            <button type="button" className="ws-btn" onClick={() => { setMeasureChip(null); onSample?.(null); }}>
+              Clear spot
+            </button>
           </section>
         </aside>
 

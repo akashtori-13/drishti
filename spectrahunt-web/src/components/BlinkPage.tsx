@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';import BlinkComparator from '@/components/BlinkComparator';
 import Icon from '@/components/Icon';
 import WaitGame from '@/components/WaitGame';
-import { LightCurve, SedPlot } from '@/components/Plots';
+import SpectrumPlot, { LightCurve, SedPlot } from '@/components/Plots';
 import { getReport, type ReportDoc } from '@/lib/reports';
 import {
   fetchLiveShowcase, getShowcase, isLiveId, parseLiveId,
@@ -437,7 +437,6 @@ export default function BlinkPage({ id }: { id: string }) {
                       <span className="badge unknown"><span className="dot" /> Unidentified, needs review</span>
                     )}
                   </div>
-                  <p className="story">{viewing.story}</p>
                   <h3>Detections — what moved?</h3>
                   <p className="fine">
                     {detStats
@@ -469,6 +468,12 @@ export default function BlinkPage({ id }: { id: string }) {
                       })}
                     </svg>
                   ) : null}
+                  <dl className="meta-grid">
+                    <dt>RA / Dec</dt><dd className="mono">{fmtRa(viewing.ra)} / {fmtDec(viewing.dec)}</dd>
+                    <dt>Date</dt><dd className="mono">{cur?.mjd ? `${mjdToDate(cur.mjd)} (MJD ${cur.mjd.toFixed(2)})` : '—'}</dd>
+                    <dt>Band</dt><dd className="mono">D{band}</dd>
+                    <dt>Epochs</dt><dd className="mono">{epochs.length}</dd>
+                  </dl>
                   <h3>Did it brighten? — brightness over time</h3>
                   {liveLc?.length || sample?.values.length ? (
                     <>
@@ -480,11 +485,18 @@ export default function BlinkPage({ id }: { id: string }) {
                       {liveLc && <p className="fine">Real pipeline aperture photometry.</p>}
                     </>
                   ) : (
-                    <p className="fine">No brightness samples yet — arm Measure on the image and click a spot, or wait for live pipeline photometry.</p>
+                    <p className="fine">No brightness samples yet — click the image and click a spot, or wait for live pipeline photometry.</p>
                   )}
+                  {sample?.values.length ? (
+                    <>
+                      <h3>Measured spot — proxy (click)</h3>
+                      <SpectrumPlot values={sample.values} band={band} />
+                      <p className="fine">Spot at {Math.round(sample.x * 100)}%, {Math.round(sample.y * 100)}% — per-epoch image brightness, not calibrated photometry.</p>
+                    </>
+                  ) : null}
                   {viewing.id !== '3i-atlas' && (
                     <>
-                  <h3>Spectrum</h3>
+                  <h3>What is it? — color fingerprint</h3>
                   {report?.spectrum?.length ? (
                     <SedPlot points={report.spectrum.map((s) => ({
                       wl: s.wavelength_um, flux: s.flux, err: s.flux_err,
@@ -498,16 +510,19 @@ export default function BlinkPage({ id }: { id: string }) {
                       <TrackSpectrum trackId="track_3i-atlas-tracked"
                         title="Comet spectrum (Horizons-tracked)"
                         note="Aperture follows JPL Horizons (geocentric) per visit." />
-                      <TrackSpectrum trackId="track_control-star"
-                        title="Control: field star UCAC4 363-079561"
-                        note="Fixed-position aperture on 2MASS J16503662-1730286, same pipeline." />
                       <PairVerdicts pairId="pairfit_3i-atlas-tracked"
-                        title="Pair verdicts: comet" />
-                      <PairVerdicts pairId="pairfit_control-star"
-                        title="Pair verdicts: control star" />
-                      <RankingBoard />
+                        title="Did the comet's color change? — paired-visit tests" />
+                      <details>
+                        <summary className="fine">Same test on a steady star — control</summary>
+                        <TrackSpectrum trackId="track_control-star"
+                          title="Control: field star UCAC4 363-079561"
+                          note="Fixed-position aperture on 2MASS J16503662-1730286, same pipeline." />
+                        <PairVerdicts pairId="pairfit_control-star"
+                          title="Same test on a steady star — control" />
+                      </details>
                     </>
                   )}
+                  <p className="story">{viewing.story}</p>
                 </>
               )}
               {tab === 'epochs' && (
@@ -522,7 +537,6 @@ export default function BlinkPage({ id }: { id: string }) {
                       </button>
                     ))}
                   </div>
-                  <p className="fine">Tip: the spectrum for the clicked spot now lives under Overview — always visible, no tab-hopping.</p>
                 </>
               )}
               {tab === 'catalogs' && (
@@ -549,6 +563,7 @@ export default function BlinkPage({ id }: { id: string }) {
                   <h3>Same sky, other eyes</h3>
                   <OtherEyes id={viewing.id} />
                   <p className="cite-box">Data: NASA/JPL–Caltech SPHEREx, processed by IRSA (IPAC). DOI 10.26131/IRSA652.</p>
+                  <RankingBoard />
                 </>
               )}
               {tab === 'share' && (
