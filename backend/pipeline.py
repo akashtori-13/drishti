@@ -8,9 +8,33 @@ Field pipeline: the sophisticated path from sky position to measured candidates.
 Every entry point is bounded and never raises; failures degrade to explicit
 `detail` strings the API forwards verbatim.
 """
+import asyncio
 import tempfile
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+
+# Shared fetch throttle: IRSA 429/408-sensitive; 4 concurrent max.
+_FETCH_SEM: Any = None
+
+
+def _fetch_sem() -> Any:
+    import asyncio
+    global _FETCH_SEM
+    if _FETCH_SEM is None:
+        _FETCH_SEM = asyncio.Semaphore(4)
+    return _FETCH_SEM
+
+
+async def _fetch_many(urls: List[str]) -> List[Any]:
+    """Concurrent _fetch_frame over urls (order-preserving, None on failure)."""
+    import asyncio
+    sem = _fetch_sem()
+
+    async def one(url: str) -> Any:
+        async with sem:
+            return await _fetch_frame(url)
+
+    return list(await asyncio.gather(*(one(u) for u in urls)))
 
 from backend.config import CUTOUT_SIZE_DEG, DATABASE_PATH
 
@@ -96,19 +120,34 @@ async def _detect_async(ra, dec, band, size_deg, db_path) -> Dict[str, Any]:
     if len(hits) < 2:
         return {"candidates": [], "matched": 0, "detail": "need-2-epochs",
                 "mjd_a": None, "mjd_b": None}
-    # some covering frames 422 on IBE despite TAP footprints: walk inward
+    # some covering frames 422 on IBE despite TAP footprints: walk inward.
+    # First pass concurrently (4-way semaphore), then fill gaps serially.
     fa = fb = None
     first = last = None
-    for h in hits[:4]:
-        fa = await _fetch_frame(h["cutout_url"])
-        if fa is not None:
-            first = h
+    cands_a = [h["cutout_url"] for h in hits[:4]]
+    got_a = await _fetch_many(cands_a)
+    for h, f in zip(hits[:4], got_a):
+        if f is not None:
+            fa, first = f, h
             break
-    for h in hits[-4:][::-1]:
-        fb = await _fetch_frame(h["cutout_url"])
-        if fb is not None:
-            last = h
+    if fa is None:
+        for h in hits[4:]:
+            fa = await _fetch_frame(h["cutout_url"])
+            if fa is not None:
+                first = h
+                break
+    cands_b = [h["cutout_url"] for h in hits[-4:][::-1]]
+    got_b = await _fetch_many(cands_b)
+    for h, f in zip(hits[-4:][::-1], got_b):
+        if f is not None and h is not first:
+            fb, last = f, h
             break
+    if fb is None:
+        for h in list(reversed(hits[:-4])) if len(hits) > 4 else []:
+            fb = await _fetch_frame(h["cutout_url"])
+            if fb is not None:
+                last = h
+                break
     if fa is None or fb is None:
         return {"candidates": [], "matched": 0, "detail": "fetch-failed",
                 "mjd_a": first.get("mjd"), "mjd_b": last.get("mjd")}
@@ -220,8 +259,8 @@ async def lightcurve_for(ra: float, dec: float, band: int = 3,
     if not hits:
         return {"points": [], "detail": "no-epochs"}
     points = []
-    for h in hits:
-        f = await _fetch_frame(h["cutout_url"])
+    got = await _fetch_many([h["cutout_url"] for h in hits])
+    for h, f in zip(hits, got):
         if f is None:
             continue
         xy = sky_to_pixel(ra, dec, f["wcs"], f["image"].shape)
@@ -262,13 +301,14 @@ async def spectrum_for(ra: float, dec: float,
         hit, stale = None, None
     points = []
     attempted = 0
-    for b in BANDS:
+    discs = await asyncio.gather(*[
+        asyncio.to_thread(discover_cached, ra, dec, b["id"], size_deg, db_path)
+        for b in BANDS])
+    jobs = [(b, hits[-1]) for b, hits in zip(BANDS, discs) if hits]
+    attempted = len(jobs)
+    got = await _fetch_many([h["cutout_url"] for _, h in jobs])
+    for (b, h), f in zip(jobs, got):
         det = b["id"]
-        hits = discover_cached(ra, dec, det, size_deg, db_path)
-        if not hits:
-            continue
-        attempted += 1
-        f = await _fetch_frame(hits[-1]["cutout_url"])
         if f is None:
             continue
         xy = sky_to_pixel(ra, dec, f["wcs"], f["image"].shape)
