@@ -108,7 +108,8 @@ export default function ArtifactPreview() {
     setData(null);
     setErr(null);
     setEpochIdx(0);
-    setPlaying(true);
+    // respect the stored autoplay setting (audit: was forced true on open)
+    setPlaying(useAppStore.getState().autoplay);
     setLoaded({});
     setFailed({});
     setZoom(1);
@@ -123,19 +124,32 @@ export default function ArtifactPreview() {
     return () => { alive = false; };
   }, [previewId]);
 
-  // lock body scroll + focus + esc while open
+  // lock body scroll + focus + esc/trap while open
   useEffect(() => {
     if (!previewId) return;
     const prev = document.body.style.overflow;
+    const opener = document.activeElement as HTMLElement | null;
     document.body.style.overflow = 'hidden';
     closeRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closePreview();
+      if (e.key === 'Escape') { closePreview(); return; }
+      if (e.key !== 'Tab') return;
+      const panel = panelRef.current;
+      if (!panel) return;
+      const items = [...panel.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')]
+        .filter((el) => !el.hasAttribute('disabled') && el.getClientRects().length > 0);
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
     };
     document.addEventListener('keydown', onKey);
     return () => {
       document.body.style.overflow = prev;
       document.removeEventListener('keydown', onKey);
+      if (opener && document.contains(opener)) opener.focus();
     };
   }, [previewId, closePreview]);
 
