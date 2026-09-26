@@ -88,8 +88,10 @@ async def _fetch_frame(cutout_url: str):
         if parsed["image"] is None:
             print(f"frame empty IMAGE: {cutout_url[:120]}")
             return None
-        masked, _ = mask_bad_pixels(parsed["image"], parsed.get("flags"), parsed.get("variance"))
-        return {"image": masked, "variance": parsed.get("variance"), "wcs": parsed.get("wcs"),
+        masked, badmask = mask_bad_pixels(parsed["image"], parsed.get("flags"), parsed.get("variance"))
+        import numpy as np
+        return {"image": masked, "mask": np.asarray(badmask, dtype=bool),
+                "variance": parsed.get("variance"), "wcs": parsed.get("wcs"),
                 "wavelength_um": parsed.get("wavelength_um"),
                 "bandwidth_um": parsed.get("bandwidth_um"),
                 "pixel_scale_arcsec": parsed.get("pixel_scale_arcsec")}
@@ -152,7 +154,8 @@ async def _detect_async(ra, dec, band, size_deg, db_path) -> Dict[str, Any]:
         return {"candidates": [], "matched": 0, "detail": "fetch-failed",
                 "mjd_a": first.get("mjd"), "mjd_b": last.get("mjd")}
     b_on_a, align_info = align_images(fa["image"], fa["wcs"], fb["image"], fb["wcs"])
-    meas = measure_field(fa["image"], b_on_a, fa.get("variance"), fb.get("variance"))
+    meas = measure_field(fa["image"], b_on_a, fa.get("variance"), fb.get("variance"),
+                         mask_a=fa.get("mask"), mask_b=None)
     mjd_a, mjd_b = first.get("mjd"), last.get("mjd")
     dt_days = (mjd_b or 0) - (mjd_a or 0)
     # field motion from the top mover's dipole span (was: same position

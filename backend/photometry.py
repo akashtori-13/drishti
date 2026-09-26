@@ -44,10 +44,15 @@ def aperture_flux(image, x: float, y: float, r_aper: float = 3.0,
         core_masked = False
     area = npix_full / max(1, npix)
     flux = float((data[ap].sum() - bg * npix) * area) if npix else 0.0
+    # background uncertainty scales as npix^2/N_ann (audit: npix*var overstated
+    # it ~7x); variance terms clipped at 0 so negative variance can't NaN this
+    n_an = int(an.sum())
+    bg_var = (npix * npix / max(1, n_an)) * float(np.nanvar(data[an])) if an.any() else 0.0
     if variance is not None:
         try:
             var = np.asarray(variance, dtype=float)
-            err = float(np.sqrt(np.nansum(var[ap]) + npix * np.nanvar(data[an])) * area)
+            var = np.maximum(var, 0.0)
+            err = float(np.sqrt(max(0.0, np.nansum(var[ap])) + max(0.0, bg_var)) * area)
         except Exception:
             err = float((np.sqrt(max(1.0, abs(flux))) + npix * 0.1) * area)
     else:
@@ -112,7 +117,9 @@ def find_dipoles(sig, thresh: float = 5.0, pair_px: float = 12.0) -> Dict[str, A
             q = neg[best]
             movers.append({"x": (p["x"] + q["x"]) / 2, "y": (p["y"] + q["y"]) / 2,
                            "sigma": (p["sigma"] + q["sigma"]) / 2,
-                           "separation_px": bestd, "kind": "mover"})
+                           "separation_px": bestd, "kind": "mover",
+                           "x_pos": p["x"], "y_pos": p["y"],
+                           "x_neg": q["x"], "y_neg": q["y"]})
         else:
             variables.append({**p, "kind": "variable"})
     for k, q in enumerate(neg):
@@ -123,16 +130,27 @@ def find_dipoles(sig, thresh: float = 5.0, pair_px: float = 12.0) -> Dict[str, A
 
 
 def measure_field(img_a, img_b_aligned, var_a=None, var_b=None,
-                  thresh: float = 5.0) -> Dict[str, Any]:
-    """Difference + dipoles + per-candidate aperture photometry on both epochs."""
+                  thresh: float = 5.0, mask_a=None, mask_b=None) -> Dict[str, Any]:
+    """Difference + dipoles + per-candidate aperture photometry on both epochs.
+
+    Movers are measured at their lobes, not the midpoint: in the (B−A)
+    difference image the negative lobe is the source's epoch-A position and
+    the positive lobe its epoch-B position (audit: midpoint photometry sampled
+    empty sky between lobes). Masks thread through when provided.
+    """
     sig = significance_map(img_a, img_b_aligned, var_a, var_b)
     found = find_dipoles(sig, thresh)
     cands = []
     for c in found["movers"] + found["variables"]:
-        fa = aperture_flux(img_a, c["x"], c["y"])
-        fb = aperture_flux(img_b_aligned, c["x"], c["y"])
+        if c.get("kind") == "mover" and "x_neg" in c:
+            fa = aperture_flux(img_a, c["x_neg"], c["y_neg"], variance=var_a, mask=mask_a)
+            fb = aperture_flux(img_b_aligned, c["x_pos"], c["y_pos"], variance=var_b, mask=mask_b)
+        else:
+            fa = aperture_flux(img_a, c["x"], c["y"], variance=var_a, mask=mask_a)
+            fb = aperture_flux(img_b_aligned, c["x"], c["y"], variance=var_b, mask=mask_b)
         cands.append({**c, "flux_a": fa["flux"], "flux_b": fb["flux"],
-                      "flux_err_a": fa["flux_err"], "flux_err_b": fb["flux_err"]})
+                      "flux_err_a": fa["flux_err"], "flux_err_b": fb["flux_err"],
+                      "core_masked_a": fa["core_masked"], "core_masked_b": fb["core_masked"]})
     try:
         import numpy as np
         finite = np.asarray(sig)[np.isfinite(sig)]

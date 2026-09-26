@@ -439,9 +439,20 @@ export default function BlinkPage({ id }: { id: string }) {
 
           <aside className="bw-rail" aria-label="Field data">
             <div className="rtabs" role="tablist" aria-label="Field data">
-              {(['overview', 'epochs', 'catalogs', 'share'] as RailTab[]).map((t) => (
+              {(['overview', 'epochs', 'catalogs', 'share'] as RailTab[]).map((t, ti, arr) => (
                 <button key={t} type="button" role="tab" aria-selected={tab === t}
-                  className={`rtab${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}>
+                  tabIndex={tab === t ? 0 : -1}
+                  className={`rtab${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}
+                  onKeyDown={(e) => {
+                    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+                    e.preventDefault();
+                    const d = e.key === 'ArrowRight' ? 1 : -1;
+                    const next = arr[(ti + d + arr.length) % arr.length];
+                    setTab(next);
+                    requestAnimationFrame(() => {
+                      (e.currentTarget.parentElement?.children[(ti + d + arr.length) % arr.length] as HTMLElement | undefined)?.focus();
+                    });
+                  }}>
                   {t === 'overview' ? 'Overview' : t === 'epochs' ? `Epochs (${epochs.length})` : t === 'catalogs' ? 'Catalogs' : 'Share'}
                 </button>
               ))}
