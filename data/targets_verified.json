@@ -1,0 +1,4477 @@
+{
+ "n": 1119,
+ "results": {
+  "M1": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 175833.6
+  },
+  "M2": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 136216.9
+  },
+  "M3": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 156503.1
+  },
+  "M4": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 204540.1
+  },
+  "M5": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 269104.8
+  },
+  "M6": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 132969.6
+  },
+  "M7": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 118533.0
+  },
+  "M8": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 130044.8
+  },
+  "M9": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 177568.4
+  },
+  "M10": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 225621.7
+  },
+  "M11": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 140424.3
+  },
+  "M12": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 237570.7
+  },
+  "M13": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 276703.6
+  },
+  "M14": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 197032.0
+  },
+  "M15": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 178985.2
+  },
+  "M16": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 142167.0
+  },
+  "M17": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 135053.2
+  },
+  "M18": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 133493.8
+  },
+  "M19": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 174141.7
+  },
+  "M20": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 133783.5
+  },
+  "M21": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 133522.5
+  },
+  "M22": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 105850.3
+  },
+  "M23": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 146838.3
+  },
+  "M24": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 132578.2
+  },
+  "M25": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 119682.8
+  },
+  "M26": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 135326.8
+  },
+  "M27": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 212108.4
+  },
+  "M28": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 112839.7
+  },
+  "M29": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 267157.4
+  },
+  "M30": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 70721.4
+  },
+  "M31": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 123793.9
+  },
+  "M32": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 125155.9
+  },
+  "M33": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 131177.4
+  },
+  "M34": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 64310.6
+  },
+  "M35": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 188231.0
+  },
+  "M36": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 136876.1
+  },
+  "M37": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 151308.2
+  },
+  "M38": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 127122.0
+  },
+  "M39": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 304699.2
+  },
+  "M40": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 147090.7
+  },
+  "M41": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 237889.9
+  },
+  "M42": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 263212.8
+  },
+  "M43": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 262633.0
+  },
+  "M44": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 91161.3
+  },
+  "M45": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 128908.3
+  },
+  "M46": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 191719.5
+  },
+  "M47": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 194578.2
+  },
+  "M48": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 152263.4
+  },
+  "M49": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 116781.1
+  },
+  "M50": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 209258.8
+  },
+  "M51": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 147876.4
+  },
+  "M52": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 357551.0
+  },
+  "M53": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 141046.4
+  },
+  "M54": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 79222.7
+  },
+  "M55": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 45226.1
+  },
+  "M56": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 244588.8
+  },
+  "M57": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 258672.8
+  },
+  "M58": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 117941.3
+  },
+  "M59": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 121849.0
+  },
+  "M60": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 123380.1
+  },
+  "M61": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 116532.4
+  },
+  "M62": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 167120.6
+  },
+  "M63": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 137087.7
+  },
+  "M64": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 124363.5
+  },
+  "M65": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 51133.3
+  },
+  "M66": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 52334.2
+  },
+  "M67": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 91138.4
+  },
+  "M68": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 198910.6
+  },
+  "M69": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 94210.3
+  },
+  "M70": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 85403.6
+  },
+  "M71": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 198981.2
+  },
+  "M72": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 84890.9
+  },
+  "M73": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 86527.2
+  },
+  "M74": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 179834.4
+  },
+  "M75": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 54771.6
+  },
+  "M76": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 60573.5
+  },
+  "M77": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 215991.6
+  },
+  "M78": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 251552.8
+  },
+  "M79": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 296255.2
+  },
+  "M80": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 218002.2
+  },
+  "M81": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 132397.8
+  },
+  "M82": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 129679.0
+  },
+  "M83": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 232531.8
+  },
+  "M84": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 105714.2
+  },
+  "M85": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 100463.5
+  },
+  "M86": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 106667.4
+  },
+  "M87": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 111336.6
+  },
+  "M88": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 109847.0
+  },
+  "M89": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 115283.1
+  },
+  "M90": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 115487.0
+  },
+  "M91": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 112703.5
+  },
+  "M92": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 281082.7
+  },
+  "M93": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 207806.9
+  },
+  "M94": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 122842.7
+  },
+  "M95": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 33268.6
+  },
+  "M96": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 33991.0
+  },
+  "M97": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 128011.7
+  },
+  "M98": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 93749.3
+  },
+  "M99": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 98599.4
+  },
+  "M100": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 100542.6
+  },
+  "M101": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 167120.6
+  },
+  "M102": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 190648.9
+  },
+  "M103": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 46688.9
+  },
+  "M104": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 162911.7
+  },
+  "M105": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 32096.8
+  },
+  "M106": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 119012.7
+  },
+  "M107": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 227077.7
+  },
+  "M108": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 129946.9
+  },
+  "M109": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 129057.0
+  },
+  "M110": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 123816.3
+  },
+  "C14": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 30110.5
+  },
+  "C31": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 125709.7
+  },
+  "C33": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 243131.6
+  },
+  "C34": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 239065.6
+  },
+  "C27": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 266862.8
+  },
+  "C11": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 356030.8
+  },
+  "C49": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 218704.8
+  },
+  "Centaurus A NGC5128": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 255406.7
+  },
+  "Sculptor Galaxy NGC253": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 328410.2
+  },
+  "NGC1300": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 283417.3
+  },
+  "NGC1097": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 323494.4
+  },
+  "NGC1365": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 343815.3
+  },
+  "NGC1232": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 287714.6
+  },
+  "NGC7727": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 180399.1
+  },
+  "Arp273 UGC1810": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 82308.7
+  },
+  "Arp273 UGC1813": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 82324.2
+  },
+  "Arp147 IC194": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 209729.6
+  },
+  "Arp147 IC195": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 209867.3
+  },
+  "Tadpole Galaxy Arp188 UGC10214": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 211952.0
+  },
+  "VV29 Tadpole tail knot": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 211971.9
+  },
+  "ESO243-49 HLX-1": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 383591.0
+  },
+  "GN-z11": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 160996.3
+  },
+  "Cartwheel Galaxy ESO350-40": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 356020.4
+  },
+  "Mice NGC4676A": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 123159.0
+  },
+  "Mice NGC4676B": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 123168.0
+  },
+  "The Eyes NGC4435": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 109053.7
+  },
+  "The Eyes NGC4438": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 107652.1
+  },
+  "Hoag's Object": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 243267.9
+  },
+  "Malin 1": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 113805.2
+  },
+  "Dragonfly 44": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 125025.4
+  },
+  "NGC3628 Hamburger Leo Triplet": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 52712.2
+  },
+  "Antennae NGC4038": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 161383.7
+  },
+  "Antennae NGC4039": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 161362.1
+  },
+  "NGC6744": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 106953.8
+  },
+  "NGC300": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 363861.1
+  },
+  "NGC55": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 377070.3
+  },
+  "NGC247": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 315195.3
+  },
+  "NGC891": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 71517.7
+  },
+  "Needle Galaxy NGC4565": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 105848.1
+  },
+  "Splinter Galaxy NGC5907": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 194029.4
+  },
+  "Whale Galaxy NGC4631": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 84188.3
+  },
+  "NGC4627": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 84210.6
+  },
+  "Hockey Stick NGC4656": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 98527.4
+  },
+  "Cocoon Galaxy NGC4490": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 113120.7
+  },
+  "NGC4485": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 113143.2
+  },
+  "NGC4449 Caldwell 21": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 116093.2
+  },
+  "NGC4214": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 97402.1
+  },
+  "NGC4216": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 97462.6
+  },
+  "NGC4535": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 120251.3
+  },
+  "NGC4536": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 130720.6
+  },
+  "NGC4725": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 71162.0
+  },
+  "NGC5033": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 133373.8
+  },
+  "NGC5248": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 172884.8
+  },
+  "NGC5363": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 194282.8
+  },
+  "NGC5364": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 194720.7
+  },
+  "NGC5746": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 239996.1
+  },
+  "NGC5813": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 254383.8
+  },
+  "NGC5846": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 259077.4
+  },
+  "NGC5985": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 201184.3
+  },
+  "NGC6503": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 232640.7
+  },
+  "Fireworks Galaxy NGC6946": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 307663.0
+  },
+  "Barnard's Galaxy NGC6822": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 86504.2
+  },
+  "IC10": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 81835.8
+  },
+  "IC342 Caldwell 5": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 33020.0
+  },
+  "IC1613 Caldwell 51": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 238445.7
+  },
+  "WLM Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 314961.7
+  },
+  "Sextans A": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 91098.5
+  },
+  "Sextans B": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 58829.7
+  },
+  "Pegasus Dwarf Irregular": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 236476.0
+  },
+  "Leo A": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 48359.0
+  },
+  "Leo I dwarf": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 32944.6
+  },
+  "Fornax Dwarf": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 338976.7
+  },
+  "Sculptor Dwarf": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 350542.3
+  },
+  "Carina Dwarf": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 286252.3
+  },
+  "Draco Dwarf": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 239436.1
+  },
+  "Ursa Minor Dwarf": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 195886.9
+  },
+  "Canes Venatici I": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 143339.3
+  },
+  "Hercules Dwarf": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 275686.4
+  },
+  "Bootes I": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 185734.1
+  },
+  "Andromeda I": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 132676.0
+  },
+  "Andromeda II": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 130684.4
+  },
+  "Andromeda III": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 143742.5
+  },
+  "LGS3 Pisces Dwarf": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 176750.8
+  },
+  "Aquarius Dwarf": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 83023.2
+  },
+  "Sagittarius dSph": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 79222.7
+  },
+  "Sagittarius dIrr": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 84959.2
+  },
+  "Arp84 NGC5394": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 162548.4
+  },
+  "Arp84 NGC5395": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 162605.9
+  },
+  "Arp87 NGC3808A": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 110408.6
+  },
+  "Arp148 Mayall's Object": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 81678.4
+  },
+  "Arp220 ULIRG": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 253501.9
+  },
+  "Arp194 UGC6945": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 81825.7
+  },
+  "Arp240 NGC5257": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 188347.6
+  },
+  "Arp240 NGC5258": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 188366.5
+  },
+  "Arp272 NGC6050": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 289039.7
+  },
+  "Arp299 NGC3690A": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 141342.9
+  },
+  "Arp299 IC694": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 141320.6
+  },
+  "Arp302 UGC9618N": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 211243.3
+  },
+  "Arp270 NGC3395": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 49090.4
+  },
+  "Arp270 NGC3396": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 49100.6
+  },
+  "Arp271 NGC5426": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 214298.5
+  },
+  "Arp271 NGC5427": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 214362.8
+  },
+  "Arp278 NGC7253A": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 87425.7
+  },
+  "Arp284 NGC7714": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 212680.7
+  },
+  "Arp284 NGC7715": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 212575.4
+  },
+  "Arp86 NGC7753": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 278909.5
+  },
+  "Arp86 NGC7752": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 278882.1
+  },
+  "Arp157 NGC520": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 224542.9
+  },
+  "VV114 ESO343-IG013E": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 300492.0
+  },
+  "VV141 Arp143 NGC2444": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 131095.2
+  },
+  "VV141 Arp143 NGC2445": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 131114.0
+  },
+  "VV340 UGC9618S": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 211224.8
+  },
+  "VV705 NGC5256": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 152504.8
+  },
+  "ESO510-G13 warped": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 228335.5
+  },
+  "ESO325-G004 lens Abell S740": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 235911.4
+  },
+  "Lindsay-Shapley Ring AM0644-741": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 246010.9
+  },
+  "Polar Ring NGC660": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 184381.2
+  },
+  "UFO Galaxy NGC2683": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 90945.2
+  },
+  "NGC2841": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 117458.7
+  },
+  "NGC2903": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 63654.5
+  },
+  "Spindle NGC3115": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 102200.9
+  },
+  "NGC3184": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 77061.0
+  },
+  "NGC3198": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 91785.2
+  },
+  "NGC3227": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 4023.2
+  },
+  "NGC3226 companion": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 4068.8
+  },
+  "NGC3310 starburst": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 120392.5
+  },
+  "NGC3319": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 77213.0
+  },
+  "NGC3344": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 21763.8
+  },
+  "NGC3359": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 155037.1
+  },
+  "NGC3486": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 40760.9
+  },
+  "NGC3489": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 35832.8
+  },
+  "Bubble Galaxy NGC3521": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 80004.2
+  },
+  "NGC3621": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 202346.2
+  },
+  "NGC3705": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 64937.0
+  },
+  "NGC3877": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 109786.3
+  },
+  "NGC3941": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 86085.0
+  },
+  "NGC3982": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 133906.6
+  },
+  "NGC4013": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 103739.1
+  },
+  "NGC4026": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 122681.3
+  },
+  "NGC4041": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 156769.6
+  },
+  "NGC4088": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 122972.1
+  },
+  "NGC4100": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 120478.1
+  },
+  "NGC4157": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 124176.9
+  },
+  "NGC4217": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 117400.6
+  },
+  "Silver Needle NGC4244 Caldwell 26": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 100536.7
+  },
+  "NGC4395 low-mass Seyfert": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 100648.2
+  },
+  "NGC4448": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 99611.0
+  },
+  "NGC4494": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 101988.8
+  },
+  "NGC4559 Caldwell 36": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 105454.0
+  },
+  "NGC4605": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 160046.6
+  },
+  "NGC4697 Caldwell 52": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 129421.0
+  },
+  "NGC4699": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 155654.6
+  },
+  "NGC4742": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 198638.7
+  },
+  "NGC4782": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 173990.4
+  },
+  "NGC4783": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 174016.3
+  },
+  "NGC4945 Caldwell 83": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 313665.7
+  },
+  "NGC4981": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 173322.6
+  },
+  "NGC5005 Caldwell 29": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 132031.1
+  },
+  "NGC5102": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 239699.0
+  },
+  "NGC5253 Caldwell 80": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 237217.9
+  },
+  "NGC5264": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 234214.6
+  },
+  "NGC5291 interacting": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 238659.0
+  },
+  "NGC5408 dwarf": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 264453.8
+  },
+  "NGC5474 M101 companion dwarf": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 167250.8
+  },
+  "NGC5585": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 173793.9
+  },
+  "NGC5713": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 238771.5
+  },
+  "NGC5719 companion": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 238849.8
+  },
+  "NGC5775": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 245611.8
+  },
+  "NGC5774": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 245358.7
+  },
+  "NGC5806": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 253341.7
+  },
+  "NGC5879": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 191607.3
+  },
+  "NGC5962": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 265871.8
+  },
+  "NGC6015": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 204488.4
+  },
+  "NGC6118": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 257291.6
+  },
+  "NGC6140 LSB": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 210549.3
+  },
+  "NGC6181": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 286078.3
+  },
+  "NGC6207 cluster": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 276677.2
+  },
+  "JADES-GS-z14-0": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 313710.0
+  },
+  "Maisie's Galaxy CEERS2_588": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 172114.3
+  },
+  "MACS0647-JD lensed": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 74861.9
+  },
+  "Earendel WHL0137-LS": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 264701.4
+  },
+  "Icarus MACS J1149 LS1": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 68258.5
+  },
+  "Sunburst Arc Godzilla": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 164510.3
+  },
+  "GLASS-z12 GHZ2 Abell2744": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 353179.5
+  },
+  "CR7 COSMOS Ly-alpha": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 70496.0
+  },
+  "DDO154 dwarf": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 120859.9
+  },
+  "IC1101 Abell2029 BCG": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 283858.9
+  },
+  "Perseus A NGC1275 Caldwell 24": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 64105.9
+  },
+  "NGC1260 SN2006gy host": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 63748.8
+  },
+  "NGC1052 ESO415-G009": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 245509.0
+  },
+  "Arp118 NGC1144": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 214948.1
+  },
+  "NGC1143 companion": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 214883.3
+  },
+  "NGC1140 starburst": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 251321.9
+  },
+  "NGC1156 dwarf": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 124342.7
+  },
+  "NGC1187": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 296098.3
+  },
+  "NGC1253 Arp279": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 223384.3
+  },
+  "NGC1288": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 330825.0
+  },
+  "NGC1398": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 308331.3
+  },
+  "NGC1399 Fornax core": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 341470.2
+  },
+  "NGC1404 Fornax": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 341985.3
+  },
+  "NGC1427A Fornax jellyfish": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 340951.3
+  },
+  "NGC1433": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 346750.2
+  },
+  "NGC1448": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 348036.2
+  },
+  "NGC1493": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 340225.9
+  },
+  "NGC1499 California Nebula": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 88311.2
+  },
+  "NGC1512": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 339737.9
+  },
+  "NGC1531 companion": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 334213.5
+  },
+  "NGC1532 edge-on": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 334182.0
+  },
+  "NGC1566 Dorado Seyfert": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 330449.3
+  },
+  "NGC1569 dwarf starburst": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 34182.8
+  },
+  "Large Magellanic Cloud center": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 309014.1
+  },
+  "Small Magellanic Cloud NGC292 center": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 341274.6
+  },
+  "Tarantula Nebula NGC2070": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 311738.3
+  },
+  "30 Doradus R136 core": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 311957.7
+  },
+  "Carina Nebula NGC3372": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 280193.9
+  },
+  "Eta Carinae": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 281466.3
+  },
+  "LMC N11": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 333445.8
+  },
+  "LMC N44": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 329113.7
+  },
+  "SMC NGC346": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 349530.4
+  },
+  "SMC NGC371": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 348374.5
+  },
+  "SMC NGC330": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 345731.3
+  },
+  "LMC NGC1866": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 329662.3
+  },
+  "LMC NGC1850": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 323841.8
+  },
+  "LMC NGC2014": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 332111.3
+  },
+  "LMC NGC2020": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 332355.8
+  },
+  "LMC NGC2032 Seagull": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 332643.0
+  },
+  "LMC Hodge 301": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 312322.0
+  },
+  "47 Tucanae NGC104": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 359882.9
+  },
+  "Omega Centauri NGC5139": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 263530.6
+  },
+  "Southern Pleiades IC2602": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 252307.6
+  },
+  "NGC3532 Carina cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 278458.5
+  },
+  "LMC N59A": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 332099.5
+  },
+  "SMC Lindsay 113": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 323034.9
+  },
+  "Hubble Deep Field HDF-N": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 161018.8
+  },
+  "Hubble Ultra Deep Field HUDF": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 313745.9
+  },
+  "GOODS-North": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 161035.6
+  },
+  "GOODS-South": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 313849.2
+  },
+  "COSMOS field center": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 69035.0
+  },
+  "Extended Groth Strip EGS": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 172167.4
+  },
+  "North Ecliptic Pole NEP deep": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 232693.7
+  },
+  "South Ecliptic Pole SEP deep": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 326397.0
+  },
+  "Kepler field center": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 292190.6
+  },
+  "TESS Northern CVZ": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 228545.9
+  },
+  "TESS Southern CVZ": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 306485.6
+  },
+  "JWST NEP Time Domain Field": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 225143.0
+  },
+  "Subaru Deep Field SDF": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 142882.8
+  },
+  "Chandra Deep Field South CDF-S": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 313736.9
+  },
+  "Lockman Hole": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 135191.0
+  },
+  "Chandra Deep Field North CDF-N": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 161035.9
+  },
+  "Galactic Center Sgr A*": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 134882.4
+  },
+  "Galactic Anticenter": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 159237.2
+  },
+  "North Ecliptic Pole landmark": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 232693.7
+  },
+  "South Ecliptic Pole landmark": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 326397.0
+  },
+  "March Equinox point J2000": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 278413.4
+  },
+  "September Equinox point": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 109830.9
+  },
+  "June Solstice point": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 185643.3
+  },
+  "December Solstice point": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 134796.9
+  },
+  "North Galactic Pole": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 117512.8
+  },
+  "South Galactic Pole": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 332750.8
+  },
+  "Crab Pulsar PSR B0531+21": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 175827.0
+  },
+  "Vela Pulsar": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 245636.8
+  },
+  "Geminga PSR J0633+1746": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 200963.1
+  },
+  "Cygnus X-1": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 256436.3
+  },
+  "Sco X-1": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 231953.9
+  },
+  "SS 433": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 163923.7
+  },
+  "GRS 1915+105": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 181720.1
+  },
+  "Pictor A": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 306398.6
+  },
+  "Fornax A NGC1316": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 347504.8
+  },
+  "Cygnus A 3C405": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 276001.7
+  },
+  "Quasar 3C273": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 126669.4
+  },
+  "Quasar 3C48": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 120980.9
+  },
+  "Quasar 3C147": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 86071.1
+  },
+  "Blazar OJ 287": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 78920.1
+  },
+  "BL Lacertae": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 286665.8
+  },
+  "Markarian 421": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 70043.9
+  },
+  "Markarian 501": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 276083.2
+  },
+  "PKS 2155-304": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 68579.0
+  },
+  "CTA 102": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 199901.0
+  },
+  "LMC X-1": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 310147.5
+  },
+  "LMC X-3": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 323707.4
+  },
+  "SMC X-1": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 326537.1
+  },
+  "GRO J1655-40": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 152996.4
+  },
+  "GX 339-4": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 134038.8
+  },
+  "3C353 radio galaxy": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 223190.0
+  },
+  "Hercules A 3C348": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 247900.3
+  },
+  "SN1987A LMC": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 310866.4
+  },
+  "SN1006 remnant": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 224026.9
+  },
+  "Tycho SNR SN1572 3C10": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 70212.8
+  },
+  "Kepler SNR SN1604": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 162016.6
+  },
+  "Cassiopeia A 3C461": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 349077.1
+  },
+  "SN1993J": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 132199.1
+  },
+  "SN2011fe": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 167094.3
+  },
+  "SN1054 remnant Crab Nebula": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 175822.4
+  },
+  "SN1181 3C58": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 34246.1
+  },
+  "SN185 RCW86": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 175251.7
+  },
+  "SN393 RX J1713.7-3946": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 139681.3
+  },
+  "SN1986J in NGC891": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 71803.8
+  },
+  "SN2014J": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 129679.0
+  },
+  "SN2006gy superluminous": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 63712.4
+  },
+  "SN1972E in NGC5253": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 237255.4
+  },
+  "NGC 7000 North America Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 289075.8
+  },
+  "IC 5070 Pelican Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 288136.3
+  },
+  "IC 1396 Elephant's Trunk Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 336767.7
+  },
+  "NGC 1499 California Nebula": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 88654.1
+  },
+  "IC 1805 Heart Nebula": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 21202.5
+  },
+  "IC 1848 Soul Nebula": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 12494.1
+  },
+  "IC 434 Horsehead Nebula": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 256698.1
+  },
+  "NGC 2024 Flame Nebula": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 255114.0
+  },
+  "NGC 2264 Cone Nebula": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 204790.3
+  },
+  "NGC 2244 Rosette Cluster": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 218282.0
+  },
+  "NGC 2237 Rosette Nebula": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 217593.5
+  },
+  "NGC 2359 Thor's Helmet": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 204783.0
+  },
+  "NGC 281 Pacman Nebula": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 72851.7
+  },
+  "NGC 7635 Bubble Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 356062.4
+  },
+  "NGC 7380 Wizard Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 343357.4
+  },
+  "NGC 7822 Cederblad 214": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 72165.1
+  },
+  "IC 410 Tadpoles Nebula": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 131815.4
+  },
+  "IC 417 Spider and Fly Nebula": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 131677.4
+  },
+  "IC 443 Jellyfish Nebula": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 198982.8
+  },
+  "IC 2177 Seagull Nebula": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 211530.1
+  },
+  "NGC 2467 Skull and Crossbones Nebula": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 209309.3
+  },
+  "NGC 6334 Cat's Paw Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 141900.7
+  },
+  "NGC 6357 Lobster Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 141526.5
+  },
+  "NGC 6188 Fighting Dragons of Ara": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 146466.0
+  },
+  "IC 2944 Running Chicken Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 241263.7
+  },
+  "NGC 3324 Gabriela Mistral Nebula": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 283441.6
+  },
+  "NGC 3293 Gem Cluster": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 281954.4
+  },
+  "NGC 3603 Starburst Cluster Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 258878.1
+  },
+  "NGC 3532 Wishing Well Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 278458.5
+  },
+  "NGC 3766 Pearl Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 248409.3
+  },
+  "NGC 4755 Jewel Box Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 223549.8
+  },
+  "NGC 6231 Northern Jewel Box Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 149307.1
+  },
+  "NGC 6383": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 136730.4
+  },
+  "IC 4604 Rho Ophiuchi Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 207642.5
+  },
+  "IC 4592 Blue Horsehead Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 230457.2
+  },
+  "IC 2118 Witch Head Nebula": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 258295.8
+  },
+  "NGC 7023 Iris Nebula": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 273643.5
+  },
+  "NGC 6914 Reflection Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 281351.0
+  },
+  "NGC 2261 Hubble's Variable Nebula": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 207677.0
+  },
+  "NGC 1999 Keyhole Nebula": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 267731.4
+  },
+  "NGC 1788 Reflection Nebula": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 245819.5
+  },
+  "NGC 6726 Corona Australis Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 66837.3
+  },
+  "IC 5146 Cocoon Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 302406.2
+  },
+  "NGC 7027 Protobubble Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 281259.4
+  },
+  "NGC 6543 Cat's Eye Nebula": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 232202.2
+  },
+  "NGC 7293 Helix Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 110713.4
+  },
+  "NGC 2392 Eskimo Nebula": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 150532.5
+  },
+  "NGC 3242 Ghost of Jupiter": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 139475.4
+  },
+  "NGC 3132 Eight-Burst Nebula": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 218367.7
+  },
+  "NGC 6369 Little Ghost Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 158233.9
+  },
+  "NGC 7009 Saturn Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 91341.2
+  },
+  "NGC 6818 Little Gem Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 89014.4
+  },
+  "NGC 6751 Glowing Eye Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 132905.0
+  },
+  "NGC 6905 Blue Flash Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 200961.7
+  },
+  "NGC 7662 Blue Snowball Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 303659.9
+  },
+  "NGC 6826 Blinking Planetary Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 311514.6
+  },
+  "NGC 6302 Bug Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 144203.9
+  },
+  "NGC 6537 Red Spider Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 138389.3
+  },
+  "NGC 6210 Turtle Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 285708.3
+  },
+  "NGC 3918 Blue Planetary Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 267135.1
+  },
+  "IC 4406 Retina Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 242087.5
+  },
+  "IC 418 Spirograph Nebula": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 282908.1
+  },
+  "NGC 1501 Oyster Nebula": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 21986.7
+  },
+  "NGC 1514 Crystal Ball Nebula": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 109986.5
+  },
+  "NGC 40 Bow-Tie Nebula": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 69097.6
+  },
+  "NGC 1535 Cleopatra's Eye": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 263945.7
+  },
+  "NGC 2022 Planetary Nebula": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 221352.8
+  },
+  "NGC 2371 Gemini Nebula": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 147004.9
+  },
+  "NGC 2440 White Butterfly Nebula": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 198055.6
+  },
+  "NGC 2818 Planetary Nebula": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 210717.3
+  },
+  "NGC 2867 Planetary Nebula": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 284015.0
+  },
+  "NGC 4361 Planetary Nebula": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 171555.4
+  },
+  "NGC 7048 Planetary Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 296000.8
+  },
+  "NGC 7139 Planetary Nebula": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 311994.8
+  },
+  "NGC 7354 Planetary Nebula": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 349661.1
+  },
+  "IC 5217 Planetary Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 317890.6
+  },
+  "IC 1747 Planetary Nebula": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 35882.3
+  },
+  "IC 2003 Planetary Nebula": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 98404.6
+  },
+  "NGC 2438 Planetary Nebula": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 191518.5
+  },
+  "NGC 2792 Planetary Nebula": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 230660.5
+  },
+  "NGC 3211 Planetary Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 273737.0
+  },
+  "NGC 457 Owl Cluster": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 56295.9
+  },
+  "NGC 663 Cluster": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 40558.9
+  },
+  "NGC 654 Cluster": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 41317.8
+  },
+  "NGC 659 Cluster": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 41710.3
+  },
+  "NGC 869 h Persei Double Cluster": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 30110.5
+  },
+  "NGC 884 chi Persei Double Cluster": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 28510.7
+  },
+  "NGC 7789 Caroline's Rose": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 347334.3
+  },
+  "NGC 6939 Cluster": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 303708.1
+  },
+  "NGC 6940 Vulpecula Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 230229.1
+  },
+  "NGC 6910 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 275259.1
+  },
+  "NGC 7209 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 301074.5
+  },
+  "NGC 7243 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 313417.4
+  },
+  "NGC 7510 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 353290.5
+  },
+  "NGC 7686 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 322275.6
+  },
+  "NGC 7790 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 359777.7
+  },
+  "NGC 7788 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 360072.7
+  },
+  "IC 4665 Summer Beehive Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 211650.4
+  },
+  "IC 4756 Graff's Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 180367.4
+  },
+  "NGC 2477 Cluster": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 237948.9
+  },
+  "NGC 2451 Cluster": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 238842.5
+  },
+  "NGC 2516 Southern Beehive Cluster": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 298787.3
+  },
+  "NGC 2547 Cluster": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 262376.4
+  },
+  "NGC 3114 Cluster": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 288999.1
+  },
+  "NGC 3228 Cluster": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 258558.3
+  },
+  "NGC 2660 Cluster": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 250734.5
+  },
+  "NGC 4103 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 238370.8
+  },
+  "NGC 4349 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 228277.0
+  },
+  "NGC 4463 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 213392.5
+  },
+  "NGC 4815 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 203348.8
+  },
+  "NGC 6067 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 152798.7
+  },
+  "NGC 6087 S Normae Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 146142.9
+  },
+  "NGC 6124 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 170794.9
+  },
+  "NGC 6242 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 152771.4
+  },
+  "NGC 6281 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 149241.9
+  },
+  "NGC 6322 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 131657.2
+  },
+  "NGC 6400 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 125149.9
+  },
+  "NGC 6416 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 129793.6
+  },
+  "NGC 6451 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 128723.3
+  },
+  "NGC 6604 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 146246.7
+  },
+  "NGC 6649 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 140245.5
+  },
+  "NGC 6664 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 144225.4
+  },
+  "NGC 6709 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 189107.0
+  },
+  "NGC 6755 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 163317.3
+  },
+  "NGC 6802 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 208428.2
+  },
+  "NGC 6830 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 214394.8
+  },
+  "NGC 6834 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 236589.7
+  },
+  "NGC 6871 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 257991.7
+  },
+  "NGC 6883 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 258026.8
+  },
+  "NGC 7039 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 293480.9
+  },
+  "NGC 7062 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 296898.0
+  },
+  "NGC 7160 Cluster": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 322545.9
+  },
+  "NGC 7235 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 337908.7
+  },
+  "NGC 7419 Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 352640.5
+  },
+  "NGC 744 Cluster": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 43124.3
+  },
+  "NGC 1027 Cluster": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 17423.4
+  },
+  "NGC 1245 Cluster": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 43494.7
+  },
+  "NGC 129 Cluster": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 75370.0
+  },
+  "NGC 133 Cluster": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 69003.3
+  },
+  "NGC 146 Cluster": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 68367.7
+  },
+  "NGC 188 Caldwell 1 Cluster": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 94031.9
+  },
+  "NGC 225 Cluster": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 66516.4
+  },
+  "NGC 1502 Cluster": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 23213.0
+  },
+  "NGC 1528 Cluster": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 43357.4
+  },
+  "NGC 1545 Cluster": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 48430.8
+  },
+  "NGC 1664 Cluster": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 82413.3
+  },
+  "NGC 1817 Cluster": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 182144.7
+  },
+  "NGC 2129 Cluster": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 186743.6
+  },
+  "NGC 2158 Cluster": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 188073.5
+  },
+  "NGC 2169 Cluster": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 220667.6
+  },
+  "NGC 2281 Cluster": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 156801.6
+  },
+  "NGC 2301 Cluster": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 207320.9
+  },
+  "NGC 2324 Cluster": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 195766.0
+  },
+  "NGC 2360 Caroline's Cluster": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 209051.1
+  },
+  "NGC 2362 Tau Canis Majoris Cluster": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 224046.1
+  },
+  "NGC 104 47 Tucanae": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 359882.9
+  },
+  "NGC 288 Globular Cluster": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 330714.8
+  },
+  "NGC 362 Globular Cluster": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 367443.1
+  },
+  "NGC 1261 Globular Cluster": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 351555.9
+  },
+  "NGC 1851 Globular Cluster": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 306096.1
+  },
+  "NGC 2298 Globular Cluster": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 257386.2
+  },
+  "NGC 2808 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 281199.2
+  },
+  "NGC 3201 Globular Cluster": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 239542.8
+  },
+  "NGC 4372 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 186882.5
+  },
+  "NGC 4833 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 184531.5
+  },
+  "NGC 5139 Omega Centauri": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 263506.6
+  },
+  "NGC 5286 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 236074.4
+  },
+  "NGC 5466 Globular Cluster": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 174456.1
+  },
+  "NGC 5927 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 182899.3
+  },
+  "NGC 5986 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 205176.5
+  },
+  "NGC 6101 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 148301.8
+  },
+  "NGC 6144 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 202754.3
+  },
+  "NGC 6304 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 158116.3
+  },
+  "NGC 6325 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 167994.0
+  },
+  "NGC 6388 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 118433.6
+  },
+  "NGC 6397 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 113025.7
+  },
+  "NGC 6440 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 150078.1
+  },
+  "NGC 6441 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 117964.9
+  },
+  "NGC 6541 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 99764.7
+  },
+  "NGC 6544 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 125669.3
+  },
+  "NGC 6553 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 122560.0
+  },
+  "NGC 6569 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 108447.3
+  },
+  "NGC 6584 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 95674.7
+  },
+  "NGC 6624 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 103208.2
+  },
+  "NGC 6652 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 89994.4
+  },
+  "NGC 6712 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 132388.1
+  },
+  "NGC 6723 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 68551.5
+  },
+  "NGC 6752 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 95297.4
+  },
+  "NGC 6934 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 154989.1
+  },
+  "NGC 7006 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 188103.7
+  },
+  "NGC 7492 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 151809.7
+  },
+  "NGC 121 SMC Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 367725.6
+  },
+  "NGC 330 SMC Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 345880.4
+  },
+  "NGC 419 SMC Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 336617.6
+  },
+  "NGC 55 Sculptor Dwarf Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 377125.6
+  },
+  "NGC 247 Cetus Spiral Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 315184.0
+  },
+  "NGC 253 Sculptor Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 328413.7
+  },
+  "NGC 300 Spiral Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 363877.1
+  },
+  "NGC 404 Mirach's Ghost": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 126920.5
+  },
+  "NGC 488 Spiral Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 216938.5
+  },
+  "NGC 772 Spiral Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 160000.2
+  },
+  "NGC 891 Silver Sliver Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 71517.7
+  },
+  "NGC 925 Spiral Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 100304.0
+  },
+  "NGC 1023 Lenticular Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 77629.3
+  },
+  "NGC 1055 Spiral Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 214562.5
+  },
+  "NGC 1097 Spiral Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 323512.3
+  },
+  "NGC 1232 Spiral Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 287719.1
+  },
+  "NGC 1291 Outer Ring Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 361568.9
+  },
+  "NGC 1300 Barred Spiral Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 283413.7
+  },
+  "NGC 1313 Topsy Turvy Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 347828.0
+  },
+  "NGC 1316 Fornax A": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 347504.8
+  },
+  "NGC 1365 Great Barred Spiral Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 343815.1
+  },
+  "NGC 1399 Fornax Central Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 341470.2
+  },
+  "NGC 1404 Fornax Elliptical Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 341985.3
+  },
+  "NGC 1350 Spiral Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 334737.5
+  },
+  "NGC 1398 Spiral Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 308753.2
+  },
+  "NGC 1532 Edge-on Spiral Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 334259.7
+  },
+  "NGC 1566 Intermediate Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 330449.3
+  },
+  "NGC 1569 Dwarf Starburst Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 34083.4
+  },
+  "NGC 1808 Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 308760.1
+  },
+  "NGC 1961 Spiral Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 58228.9
+  },
+  "NGC 2146 Dusty Hand Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 75924.2
+  },
+  "NGC 2207 Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 258424.4
+  },
+  "IC 2163 Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 258716.2
+  },
+  "NGC 2403 Spiral Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 98677.1
+  },
+  "NGC 2683 UFO Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 86297.4
+  },
+  "NGC 2841 Tiger's Eye Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 117301.0
+  },
+  "NGC 2903 Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 47178.6
+  },
+  "NGC 2997 Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 187507.0
+  },
+  "NGC 3079 Bubble Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 128793.8
+  },
+  "NGC 3109 Antlia Dwarf Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 167742.6
+  },
+  "NGC 3184 Little Pinwheel Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 77065.7
+  },
+  "NGC 3190 Leo Quartet Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 10416.0
+  },
+  "NGC 3227 Arp 94 Interacting Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 4023.2
+  },
+  "NGC 3226 Arp 94 Elliptical Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 4369.2
+  },
+  "NGC 3256 Starburst Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 230381.0
+  },
+  "NGC 3310 Starburst Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 120392.5
+  },
+  "NGC 3344 Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 21472.3
+  },
+  "NGC 3521 Bubble Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 80004.2
+  },
+  "NGC 3621 Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 194191.3
+  },
+  "NGC 3628 Hamburger Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 51275.1
+  },
+  "NGC 3718 Arp 214 Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 123711.2
+  },
+  "NGC 3877 Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 109483.2
+  },
+  "NGC 3953 Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 125246.8
+  },
+  "NGC 4038 Antennae Galaxies East": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 161429.5
+  },
+  "NGC 4039 Antennae Galaxies West": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 161463.2
+  },
+  "NGC 4088 Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 122992.8
+  },
+  "NGC 4151 Eye of Sauron Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 99457.5
+  },
+  "NGC 4214 Dwarf Starburst Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 97402.1
+  },
+  "NGC 4216 Silver Streak Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 97443.2
+  },
+  "NGC 4236 Spiral Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 173711.8
+  },
+  "NGC 4244 Silver Needle Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 100536.7
+  },
+  "NGC 4261 3C 270 Elliptical Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 112013.0
+  },
+  "NGC 4274 Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 93819.2
+  },
+  "NGC 4314 Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 95883.5
+  },
+  "NGC 4388 Virgo Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 106686.3
+  },
+  "NGC 4402 Virgo Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 106669.4
+  },
+  "NGC 4438 Eyes Galaxies": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 107873.2
+  },
+  "NGC 4435 Eyes Galaxies": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 107354.6
+  },
+  "NGC 4449 Box Dwarf Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 116128.5
+  },
+  "NGC 4450 Virgo Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 103885.2
+  },
+  "NGC 4490 Cocoon Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 113120.7
+  },
+  "NGC 4526 Virgo Lenticular Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 120799.2
+  },
+  "NGC 4535 Virgo Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 120384.5
+  },
+  "NGC 4559 Coma Pinwheel Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 105659.2
+  },
+  "NGC 4565 Needle Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 105911.5
+  },
+  "NGC 4631 Whale Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 111063.0
+  },
+  "NGC 4656 Hockey Stick Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 112234.6
+  },
+  "NGC 4666 Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 143802.5
+  },
+  "NGC 4697 Caldwell 52 Elliptical Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 156177.5
+  },
+  "NGC 4725 Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 116871.2
+  },
+  "NGC 4945 Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 266789.3
+  },
+  "NGC 5005 Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 131751.0
+  },
+  "NGC 5033 Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 133376.0
+  },
+  "NGC 5102 Lenticular Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 239517.6
+  },
+  "NGC 5128 Centaurus A": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 255415.0
+  },
+  "NGC 5248 Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 172988.6
+  },
+  "NGC 5364 Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 194169.7
+  },
+  "NGC 5474 Dwarf Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 167346.3
+  },
+  "NGC 5746 Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 239788.3
+  },
+  "NGC 5907 Splinter Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 193881.7
+  },
+  "NGC 6240 Starfish Galaxy": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 241602.7
+  },
+  "NGC 6744 Pavo Spiral Galaxy": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 106938.9
+  },
+  "NGC 6822 Barnard's Galaxy": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 86486.9
+  },
+  "NGC 6946 Fireworks Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 307663.0
+  },
+  "NGC 6951 Spiral Galaxy": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 277014.2
+  },
+  "NGC 7217 Spiral Galaxy": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 251765.0
+  },
+  "NGC 7317 Stephan's Quintet Member": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 266487.4
+  },
+  "NGC 7318A Stephan's Quintet Member": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 266578.8
+  },
+  "NGC 7319 Stephan's Quintet Member": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 266629.7
+  },
+  "NGC 7320 Stephan's Quintet Foreground": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 266721.0
+  },
+  "NGC 7331 Deer Lick Galaxy": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 268220.7
+  },
+  "NGC 7479 Superman Galaxy": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 217496.7
+  },
+  "NGC 7552 Grus Quartet Galaxy": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 110104.9
+  },
+  "NGC 7582 Grus Quartet Galaxy": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 111698.2
+  },
+  "NGC 7590 Grus Spiral Galaxy": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 112208.8
+  },
+  "NGC 7599 Grus Spiral Galaxy": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 112450.4
+  },
+  "NGC 7727 Interacting Galaxy": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 183555.4
+  },
+  "NGC 7793 Spiral Galaxy": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 154721.8
+  },
+  "NGC 7814 Little Sombrero Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 229437.5
+  },
+  "IC 342 Hidden Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 33020.0
+  },
+  "IC 10 Starburst Dwarf Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 81835.8
+  },
+  "IC 1613 Dwarf Galaxy": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 238414.2
+  },
+  "IC 2391 Open Cluster": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 269763.7
+  },
+  "IC 2602 Southern Pleiades Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 252094.8
+  },
+  "NGC 6992 Veil Nebula East": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 243129.5
+  },
+  "NGC 6960 Witch's Broom Veil Nebula West": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 239097.1
+  },
+  "NGC 6979 Pickering's Triangle Veil Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 244427.8
+  },
+  "NGC 2736 Pencil Nebula": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 243892.6
+  },
+  "NGC 3199 Windblown Nebula": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 280893.8
+  },
+  "NGC 6164 Emission Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 151017.1
+  },
+  "NGC 6165 Emission Nebula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 151017.1
+  },
+  "NGC 6355 Globular Cluster": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 161684.9
+  },
+  "IC 59 Ghost of Cassiopeia Nebula": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 62587.9
+  },
+  "IC 63 Ghost of Cassiopeia Nebula": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 61275.5
+  },
+  "Andromeda": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 127207.4
+  },
+  "Antlia": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 198897.9
+  },
+  "Apus": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 148849.6
+  },
+  "Aquarius": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 126467.1
+  },
+  "Aquila": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 147464.7
+  },
+  "Ara": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 128015.6
+  },
+  "Aries": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 146898.2
+  },
+  "Auriga": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 133619.9
+  },
+  "Bootes": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 214845.7
+  },
+  "Caelum": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 323846.8
+  },
+  "Camelopardalis": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 40529.7
+  },
+  "Cancer": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 98253.5
+  },
+  "Canes Venatici": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 131811.2
+  },
+  "Canis Major": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 234921.6
+  },
+  "Canis Minor": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 160275.8
+  },
+  "Capricornus": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 67243.5
+  },
+  "Carina": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 298556.5
+  },
+  "Cassiopeia": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 62374.6
+  },
+  "Centaurus": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 267189.7
+  },
+  "Cepheus": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 308830.3
+  },
+  "Cetus": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 266793.3
+  },
+  "Chamaeleon": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 184605.3
+  },
+  "Circinus": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 170148.4
+  },
+  "Columba": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 280050.2
+  },
+  "Coma Berenices": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 113008.9
+  },
+  "Corona Australis": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 66884.1
+  },
+  "Corona Borealis": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 248799.6
+  },
+  "Corvus": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 183415.0
+  },
+  "Crater": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 141186.0
+  },
+  "Crux": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 234073.8
+  },
+  "Cygnus": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 279574.9
+  },
+  "Delphinus": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 178817.9
+  },
+  "Dorado": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 315426.1
+  },
+  "Draco": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 225099.3
+  },
+  "Equuleus": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 160697.4
+  },
+  "Eridanus": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 310924.4
+  },
+  "Fornax": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 323572.3
+  },
+  "Gemini": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 173851.2
+  },
+  "Grus": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 82984.0
+  },
+  "Hercules": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 289421.6
+  },
+  "Horologium": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 355823.4
+  },
+  "Hydra": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 126384.7
+  },
+  "Hydrus": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 295701.9
+  },
+  "Indus": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 88409.5
+  },
+  "Lacerta": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 303016.7
+  },
+  "Leo": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 18639.8
+  },
+  "Leo Minor": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 43311.0
+  },
+  "Lepus": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 289095.3
+  },
+  "Libra": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 280981.2
+  },
+  "Lupus": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 200742.0
+  },
+  "Lynx": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 132867.0
+  },
+  "Lyra": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 263682.8
+  },
+  "Mensa": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 231791.1
+  },
+  "Microscopium": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 23631.4
+  },
+  "Monoceros": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 200839.3
+  },
+  "Musca": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 188436.9
+  },
+  "Norma": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 152712.1
+  },
+  "Octans": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 202321.5
+  },
+  "Ophiuchus": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 190559.7
+  },
+  "Orion": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 237431.1
+  },
+  "Pavo": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 124101.4
+  },
+  "Pegasus": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 235200.9
+  },
+  "Perseus": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 52246.9
+  },
+  "Phoenix": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 395237.1
+  },
+  "Pictor": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 303725.5
+  },
+  "Pisces": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 224720.2
+  },
+  "Piscis Austrinus": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 66704.5
+  },
+  "Puppis": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 232355.4
+  },
+  "Pyxis": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 202396.9
+  },
+  "Reticulum": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 338001.5
+  },
+  "Sagitta": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 198666.2
+  },
+  "Sagittarius": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 79853.3
+  },
+  "Scorpius": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 183152.1
+  },
+  "Sculptor": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 355305.0
+  },
+  "Scutum": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 137094.4
+  },
+  "Serpens": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 233070.4
+  },
+  "Sextans": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 80860.7
+  },
+  "Taurus": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 168401.8
+  },
+  "Telescopium": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 78706.5
+  },
+  "Triangulum": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 115151.6
+  },
+  "Triangulum Australe": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 148488.1
+  },
+  "Tucana": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 118641.2
+  },
+  "Ursa Major": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 126728.4
+  },
+  "Ursa Minor": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 186151.2
+  },
+  "Vela": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 247530.3
+  },
+  "Virgo": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 173814.9
+  },
+  "Volans": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 263064.9
+  },
+  "Vulpecula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 215071.5
+  },
+  "Sirius": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 233492.1
+  },
+  "Canopus": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 293961.2
+  },
+  "Arcturus": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 193396.4
+  },
+  "Vega": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 280339.0
+  },
+  "Capella": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 88082.5
+  },
+  "Rigel": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 264127.8
+  },
+  "Procyon": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 160544.4
+  },
+  "Betelgeuse": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 233392.6
+  },
+  "Achernar": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 379806.7
+  },
+  "Hadar": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 195205.6
+  },
+  "Altair": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 164883.0
+  },
+  "Acrux": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 221823.1
+  },
+  "Aldebaran": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 167960.3
+  },
+  "Antares": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 200149.4
+  },
+  "Spica": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 192590.1
+  },
+  "Pollux": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 132499.1
+  },
+  "Fomalhaut": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 114222.4
+  },
+  "Deneb": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 291391.9
+  },
+  "Mimosa": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 228922.7
+  },
+  "Regulus": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 34061.1
+  },
+  "Adhara": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 241710.8
+  },
+  "Castor": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 139271.3
+  },
+  "Gacrux": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 248429.1
+  },
+  "Shaula": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 129817.2
+  },
+  "Bellatrix": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 221781.2
+  },
+  "Elnath": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 149721.8
+  },
+  "Miaplacidus": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 245349.4
+  },
+  "Alnilam": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 250636.1
+  },
+  "Alnair": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 70604.6
+  },
+  "Alnitak": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 254965.1
+  },
+  "Alioth": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 148559.5
+  },
+  "Dubhe": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 150725.4
+  },
+  "Mirfak": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 34203.5
+  },
+  "Wezen": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 229621.6
+  },
+  "Sargas": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 119468.8
+  },
+  "Kaus Australis": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 96772.2
+  },
+  "Avior": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 292265.8
+  },
+  "Alkaid": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 157311.4
+  },
+  "Menkalinan": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 114872.7
+  },
+  "Atria": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 142449.1
+  },
+  "Alhena": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 199424.0
+  },
+  "Peacock": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 75935.7
+  },
+  "Mirzam": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 250868.0
+  },
+  "Alphard": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 116709.3
+  },
+  "Hamal": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 141870.8
+  },
+  "Polaris": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 107815.8
+  },
+  "Nunki": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 86729.7
+  },
+  "Denebola": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 73205.3
+  },
+  "Arneb": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 290986.9
+  },
+  "Alpheratz": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 184918.3
+  },
+  "Diphda": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 307631.3
+  },
+  "Kochab": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 178279.4
+  },
+  "Algol": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 66440.8
+  },
+  "Algieba": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 7015.8
+  },
+  "Almach": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 78758.1
+  },
+  "Tarazed": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 172209.6
+  },
+  "Navi": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 62612.7
+  },
+  "Sadr": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 273453.6
+  },
+  "Eltanin": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 264609.3
+  },
+  "Caph": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 87378.4
+  },
+  "Schedar": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 79041.3
+  },
+  "Alderamin": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 310447.0
+  },
+  "Menkar": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 199344.5
+  },
+  "Phact": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 277236.0
+  },
+  "Alphecca": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 247566.1
+  },
+  "Alchiba": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 182327.1
+  },
+  "Alkes": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 140244.2
+  },
+  "Sualocin": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 186002.4
+  },
+  "Thuban": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 180261.9
+  },
+  "Kitalpha": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 151221.5
+  },
+  "Rasalgethi": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 250512.4
+  },
+  "Rasalhague": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 234437.6
+  },
+  "Markab": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 222663.1
+  },
+  "Ankaa": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 383375.7
+  },
+  "Alrescha": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 215483.2
+  },
+  "Unukalhai": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 286951.9
+  },
+  "Mira": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 224729.2
+  },
+  "P Cygni": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 265480.8
+  },
+  "Proxima Centauri": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 179302.9
+  },
+  "Barnard's Star": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 201998.5
+  },
+  "TRAPPIST-1": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 175380.8
+  },
+  "Tabby's Star": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 288953.3
+  },
+  "Rigil Kentaurus": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 180063.3
+  },
+  "Mintaka": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 245954.6
+  },
+  "Saiph": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 270882.9
+  },
+  "Meissa": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 225601.9
+  },
+  "Hatysa": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 264390.8
+  },
+  "Mizar": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 154866.8
+  },
+  "Alcor": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 154765.0
+  },
+  "Phecda": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 129287.8
+  },
+  "Merak": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 131706.8
+  },
+  "Megrez": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 142977.8
+  },
+  "Pherkad": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 203547.2
+  },
+  "Yildun": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 108207.9
+  },
+  "Sheliak": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 260427.0
+  },
+  "Sulafat": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 258197.8
+  },
+  "Albireo": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 234512.7
+  },
+  "Gienah Cygni": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 250797.9
+  },
+  "Fawaris": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 292539.2
+  },
+  "61 Cygni": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 268817.6
+  },
+  "Chi Cygni": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 249316.9
+  },
+  "RR Lyrae": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 285999.5
+  },
+  "Double Double": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 281630.1
+  },
+  "Izar": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 207340.8
+  },
+  "Muphrid": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 179532.3
+  },
+  "Nekkar": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 207823.9
+  },
+  "Seginus": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 182745.3
+  },
+  "Cor Caroli": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 123407.0
+  },
+  "Chara": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 121581.6
+  },
+  "La Superba": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 131416.1
+  },
+  "Diadem": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 139174.3
+  },
+  "Beta Comae Berenices": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 133000.4
+  },
+  "FK Comae Berenices": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 141923.3
+  },
+  "Vindemiatrix": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 139850.9
+  },
+  "Porrima": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 142980.1
+  },
+  "Zavijava": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 99310.8
+  },
+  "Zubeneschamali": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 277551.8
+  },
+  "Zubenelgenubi": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 261770.2
+  },
+  "Zubenelakrab": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 270572.1
+  },
+  "Brachium": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 271397.3
+  },
+  "Gliese 581": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 278193.3
+  },
+  "Sabik": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 190679.6
+  },
+  "Zeta Ophiuchi": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 228393.5
+  },
+  "Cebalrai": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 214980.4
+  },
+  "RS Ophiuchi": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 179932.4
+  },
+  "Lesath": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 174904.6
+  },
+  "Dschubba": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 232409.6
+  },
+  "Acrab": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 235607.0
+  },
+  "Jabbah": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 227458.2
+  },
+  "Wei": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 189169.2
+  },
+  "Eta Scorpii": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 135431.7
+  },
+  "U Scorpii": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 225029.3
+  },
+  "Kaus Borealis": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 106033.3
+  },
+  "Kaus Media": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 106638.1
+  },
+  "Alnasl": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 119308.0
+  },
+  "Ascella": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 73122.0
+  },
+  "Rukbat": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 51514.4
+  },
+  "Arkab": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 55905.1
+  },
+  "Pistol Star": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 134983.5
+  },
+  "S Doradus": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 311156.2
+  },
+  "R Doradus": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 330206.6
+  },
+  "Beta Doradus": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 321555.3
+  },
+  "Beta Pictoris": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 301441.7
+  },
+  "Kapteyn's Star": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 309047.5
+  },
+  "Zeta Reticuli": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 346858.6
+  },
+  "Alpha Reticuli": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 334749.1
+  },
+  "Beta Reticuli": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 342564.6
+  },
+  "Alpha Horologii": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 337354.0
+  },
+  "R Horologii": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 365352.9
+  },
+  "Alpha Caeli": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 322814.1
+  },
+  "Gamma Caeli": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 310592.2
+  },
+  "Dalim": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 317880.5
+  },
+  "Beta Fornacis": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 330691.0
+  },
+  "Alpha Sculptoris": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 340797.1
+  },
+  "Beta Sculptoris": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 365681.9
+  },
+  "R Sculptoris": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 342309.9
+  },
+  "Alpha Microscopii": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 16721.3
+  },
+  "Gamma Microscopii": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 23328.5
+  },
+  "AX Microscopii": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 32202.8
+  },
+  "Alpha Indi": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 49050.4
+  },
+  "Beta Indi": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 81643.8
+  },
+  "Epsilon Indi": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 87835.9
+  },
+  "Alpha Telescopii": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 81109.5
+  },
+  "Zeta Telescopii": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 89189.8
+  },
+  "Alpha Arae": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 115955.4
+  },
+  "Beta Arae": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 120002.9
+  },
+  "Alpha Normae": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 152282.0
+  },
+  "Gamma2 Normae": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 155960.4
+  },
+  "Alpha Lupi": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 218549.3
+  },
+  "Beta Lupi": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 221929.6
+  },
+  "Alpha Circini": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 169896.1
+  },
+  "Beta Circini": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 169552.7
+  },
+  "Gamma Apodis": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 160854.9
+  },
+  "Alpha Apodis": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 135725.9
+  },
+  "Beta Muscae": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 195748.3
+  },
+  "Alpha Muscae": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 191111.6
+  },
+  "Theta Muscae": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 199964.9
+  },
+  "Beta Chamaeleontis": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 177596.6
+  },
+  "Alpha Chamaeleontis": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 212842.0
+  },
+  "Gamma Chamaeleontis": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 189076.9
+  },
+  "Sigma Octantis": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 191909.6
+  },
+  "Alpha Octantis": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 167538.4
+  },
+  "Beta Hydri": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 282821.6
+  },
+  "Alpha Hydri": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 367978.7
+  },
+  "Beta Mensae": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 298403.1
+  },
+  "Alpha Mensae": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 250899.3
+  },
+  "Beta Volantis": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 254023.3
+  },
+  "Alpha Volantis": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 273290.8
+  },
+  "Gamma Volantis": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 273029.7
+  },
+  "Suhail": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 234621.8
+  },
+  "Regor": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 257031.6
+  },
+  "Alsephina": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 274805.7
+  },
+  "Markeb": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 272274.4
+  },
+  "Naos": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 238199.1
+  },
+  "Tureis": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 202790.2
+  },
+  "Azmidi": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 234717.5
+  },
+  "L2 Puppis": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 263448.0
+  },
+  "RS Puppis": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 220756.8
+  },
+  "Aspidiske": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 286388.3
+  },
+  "Hadir": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 267359.5
+  },
+  "AG Carinae": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 271461.2
+  },
+  "Imai": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 248834.6
+  },
+  "Ginan": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 236462.2
+  },
+  "Menkent": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 257722.7
+  },
+  "Muhlifain": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 260800.3
+  },
+  "Epsilon Centauri": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 231246.8
+  },
+  "HR 5171": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 204163.7
+  },
+  "Beta Trianguli Australis": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 150296.3
+  },
+  "Gamma Trianguli Australis": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 151397.4
+  },
+  "Beta Pavonis": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 109893.1
+  },
+  "Delta Pavonis": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 109953.4
+  },
+  "Tiaki": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 80561.1
+  },
+  "Al Dhanab": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 72881.8
+  },
+  "Beta Phoenicis": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 389808.1
+  },
+  "SX Phoenicis": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 369033.4
+  },
+  "Beta Tucanae": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 385638.2
+  },
+  "Gamma Tucanae": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 379065.1
+  },
+  "Alpha Tucanae": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 100827.4
+  },
+  "VY Canis Majoris": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 223149.1
+  },
+  "EZ Canis Majoris": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 220799.1
+  },
+  "Furud": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 263069.0
+  },
+  "Aludra": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 229101.7
+  },
+  "Gomeisa": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 160012.1
+  },
+  "Luyten's Star": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 170335.8
+  },
+  "Ross 614": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 235269.8
+  },
+  "S Monocerotis": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 204730.4
+  },
+  "Beta Monocerotis": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 235061.3
+  },
+  "V838 Monocerotis": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 202570.3
+  },
+  "Alpha Monocerotis": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 178227.5
+  },
+  "R Leporis": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 280976.6
+  },
+  "Ran": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 247915.9
+  },
+  "Tau Ceti": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 282967.4
+  },
+  "UV Ceti": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 292035.3
+  },
+  "Keid": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 319835.3
+  },
+  "Cursa": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 251626.4
+  },
+  "Zibal": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 245336.0
+  },
+  "Acamar": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 359020.1
+  },
+  "Sadalmelik": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 164773.9
+  },
+  "Sadalsuud": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 119821.8
+  },
+  "Sadachbia": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 157104.4
+  },
+  "Skat": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 141922.9
+  },
+  "Gliese 876": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 143631.9
+  },
+  "Enif": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 175141.0
+  },
+  "Homam": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 211838.6
+  },
+  "Baham": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 190169.0
+  },
+  "Algenib": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 226141.5
+  },
+  "Scheat": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 257230.3
+  },
+  "51 Pegasi": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 235527.2
+  },
+  "Upsilon Andromedae": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 90686.5
+  },
+  "Ross 248": {
+   "match": "Gaia DR3 6695387649736709760",
+   "sep_arcsec": 312436.9
+  },
+  "Delta Andromedae": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 159890.8
+  },
+  "Mirach": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 127090.9
+  },
+  "Mothallah": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 131103.1
+  },
+  "Deltotum": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 102445.6
+  },
+  "Gamma Trianguli": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 111124.1
+  },
+  "Sheratan": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 155719.1
+  },
+  "Mesarthim": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 160981.8
+  },
+  "Botein": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 143084.4
+  },
+  "Teegarden's Star": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 154338.6
+  },
+  "Ain": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 153196.5
+  },
+  "Tianguan": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 180348.4
+  },
+  "T Tauri": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 152985.3
+  },
+  "Alcyone": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 128858.9
+  },
+  "Atlas": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 129125.2
+  },
+  "Gamma Tauri": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 166200.2
+  },
+  "Mahasim": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 140238.3
+  },
+  "Hassaleh": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 119576.5
+  },
+  "Almaaz": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 92432.7
+  },
+  "Saclateni": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 97119.0
+  },
+  "Propus": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 195869.3
+  },
+  "Mekbuda": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 175365.9
+  },
+  "Wasat": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 172038.1
+  },
+  "Mebsuta": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 186023.7
+  },
+  "Tejat Posterior": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 203077.1
+  },
+  "U Geminorum": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 141504.9
+  },
+  "Altarf": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 123482.6
+  },
+  "Asellus Australis": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 89027.1
+  },
+  "Asellus Borealis": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 89387.6
+  },
+  "Acubens": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 97802.6
+  },
+  "55 Cancri": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 88891.0
+  },
+  "Ras Elased": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 37481.0
+  },
+  "Aldhafera": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 15423.7
+  },
+  "Chertan": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 43892.6
+  },
+  "Zosma": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 38755.7
+  },
+  "Wolf 359": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 53493.3
+  },
+  "CW Leonis": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 42927.6
+  },
+  "Beta Leonis Minoris": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 59600.5
+  },
+  "Praecipua": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 51813.4
+  },
+  "38 Lynx": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 78321.5
+  },
+  "Alpha Lyncis": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 72237.4
+  },
+  "Lalande 21185": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 62622.1
+  },
+  "W Ursae Majoris": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 129801.9
+  },
+  "Groombridge 1830": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 87104.2
+  },
+  "Groombridge 34": {
+   "match": "UCAC4 747-027109",
+   "sep_arcsec": 129075.3
+  },
+  "Alpha Antliae": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 184664.0
+  },
+  "Gamma Hydrae": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 210134.6
+  },
+  "R Hydrae": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 212278.4
+  },
+  "V Hydrae": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 149588.7
+  },
+  "TW Hydrae": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 198972.5
+  },
+  "Alpha Sextantis": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 74524.7
+  },
+  "Beta Sextantis": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 96949.3
+  },
+  "Beta Crateris": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 157810.1
+  },
+  "Gienah Corvi": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 163162.4
+  },
+  "Algorab": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 162501.6
+  },
+  "Minkar": {
+   "match": "DES J102810.56+200540.9",
+   "sep_arcsec": 188078.7
+  }
+ }
+}

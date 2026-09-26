@@ -49,7 +49,7 @@ We're Team AKASHTORI. We tried blinking SPHEREx ourselves — gave up after ten 
 ## Act III · WHAT — The Tool (1:45–2:45)
 **Objective:** Captured UI take: comet, 3 allies, control kill, qualified static. Cursor continuity, URL visible.
 
-> **VISUAL (captured UI, animated cursor):** Tap the 3I/ATLAS chip → difference mode cancels to gray, remnant pops with A→B vector. 3s silent hold. Ally checkmarks stamp (SIMBAD, SkyBoT unavailable-labeled, CelesTrak, DSS, Yale). Then: false-alarm spike chart → pixel grid with magenta-flagged cores → hollow-dot re-render → red stamp dragged to trash → `CAN'T TELL` stamp. Badge throughout: `cached replay — simulation where labeled, not live sky`.
+> **VISUAL (captured UI, animated cursor):** Tap the 3I/ATLAS chip → Horizons-tracked path draws → difference mode cancels to gray, remnant pops with A→B vector. 3s silent hold. Ally checkmarks stamp (SIMBAD, DSS). Lower-third: `tracked positions, not fixed stare`. Then: false-alarm spike chart → pixel grid with magenta-flagged cores → hollow-dot re-render → red stamp dragged to trash → `CAN'T TELL` stamp. Badge throughout: `cached replay — simulation where labeled, not live sky`.
 
 **[FAST]**
 
