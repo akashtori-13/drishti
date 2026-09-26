@@ -293,22 +293,36 @@ function ObjModal({ name, objects, onClose }: {
   onClose: () => void;
 }) {
   const closeRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
+    const opener = document.activeElement as HTMLElement | null;
     closeRef.current?.focus();
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') { onClose(); return; }
+      if (e.key !== 'Tab') return;
+      const panel = panelRef.current;
+      if (!panel) return;
+      const items = [...panel.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')]
+        .filter((el) => !el.hasAttribute('disabled') && el.getClientRects().length > 0);
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
     };
     document.addEventListener('keydown', onKey);
     return () => {
       document.body.style.overflow = prev;
       document.removeEventListener('keydown', onKey);
+      if (opener && document.contains(opener)) opener.focus();
     };
   }, [onClose]);
   return (
     <div className="obj-veil" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="obj-panel" role="dialog" aria-modal="true" aria-label={`Measured objects in ${name}`}>
+      <div ref={panelRef} className="obj-panel" role="dialog" aria-modal="true" aria-label={`Measured objects in ${name}`}>
         <button ref={closeRef} type="button" className="pv-close" aria-label="Close objects"
           style={{ minWidth: 44, minHeight: 44 }} onClick={onClose}>×</button>
         <div className="obj-head">
@@ -317,7 +331,7 @@ function ObjModal({ name, objects, onClose }: {
         </div>
         <ul className="obj-list">
           {objects.map((o, i) => (
-            <li key={i} className="mono">
+            <li key={`${o.kind}:${o.x},${o.y}`} className="mono">
               <span className={o.kind === 'mover' ? 'tag-mover' : 'tag-var'}>
                 {o.kind === 'mover' ? 'MOVER' : 'VARIABLE'}
               </span>{' '}
