@@ -1,100 +1,100 @@
 # DRISHTI: 240 Seconds of Glory
 **NASA Space Apps Challenge — Pitch Script · Four-Act · 2026-09-27**
-**Target runtime: 4:00 (240 seconds)**
+**Official timing: WHO 45s / WHY 60s / WHAT 60s / SO WHAT 75s. Total with cards: under 240s.**
 
-> Draft 2 — judge fixes applied: no invented waste tuple, no absolutes, 3-spoken montage, control-star qualifier, new closer, 3 static end cards, ~390 spoken words.
+> Draft 3 — NSAC-aligned: official act slots, [CHALLENGE] slots for Sep-17 summaries, spoken roster, continuous-take demo, fixed closer, full-DOI cards.
 
 ---
 
-## Act I · Who — The Plates (0:00–0:45)
-**Objective:** Stakes in the first 10 seconds. Team + dataset + access split into short lines.
+## Act I · WHO — The Plates (0:00–0:45, ~100 words)
+**Objective:** Stakes in 10s, spoken names + roles, challenge slot, dataset line.
 
-> **VISUAL:** Black. Two hands hold printed SPHEREx frames, flip them click-click. Match-cut to DRISHTI blinking the same field. Lower-thirds: names, one at a time.
+> **VISUAL:** Black. Two hands hold printed SPHEREx frames, flip them click-click. One continuous take whips to phone running DRISHTI on the same field — no cut. Lower-thirds: full names, one at a time. Card: [CHALLENGE].
 
 **[FAST]**
 
 A thousand stars stayed put. One moved — and it became Pluto.
 
-*[beat]*
+In 1930 Tombaugh blinked two plates by hand, night after night.
 
-In 1930, a twenty-four-year-old in Flagstaff blinked two plates, night after night, for months, by hand.
+We're Team AKASHTORI — I'm Himel Das, systems; Zubayer Hasan Shaad, tech; Md Hedayet Ullah, research; Md Mahdin Al Abrar, communications; Aazmaine Alif Abrar, quality; Suraiya Ratry Orni, science review — for [CHALLENGE].
 
 **[SLOW]**
 
-We're Team AKASHTORI. SPHEREx photographs the whole sky every six months in 102 infrared colors. Nobody can blink all of that by hand. So we built DRISHTI: it blinks SPHEREx Quick Release 2 from the NASA/IPAC Infrared Science Archive. In a browser. On a phone. No login.
+SPHEREx photographs the whole sky every six months in 102 infrared colors. Nobody can blink all that by hand. So we built DRISHTI: it blinks SPHEREx Quick Release 2 from the NASA/IPAC Infrared Science Archive, in a browser, on a phone. Here's the catch.
 
 > **ANCHOR:** A thousand stars stayed put. One didn't.
 
 ---
 
-## Act II · Why — The Drift (0:45–1:45)
-**Objective:** Villain is geometry. Honest waste framing — idle comparisons, not deleted data.
+## Act II · WHY — The Drift (0:45–1:45, ~140 words)
+**Objective:** Villain is geometry. Honest idle framing, no invented tuple.
 
 > **VISUAL:** Hand slides rainbow strip over pixel grid. Timeline dots dim to idle — none leave the archive.
 
 **[SLOW]**
 
-SPHEREx has no moving prism. Each pixel stares through a different tint on a rainbow window glued to the detector. So the same star looks bluer on one side of the photo and redder on the other.
+SPHEREx carries no moving prism. A rainbow filter is glued to the detector, so each pixel sees in one of 102 infrared colors. Same star, left side looks bluer, right side looks redder.
 
-Shift a little each revisit, and the star lands on a new tint. Nothing is deleted — the archive keeps it all. What gets lost is narrower: under same-colour rules, visit after visit can't be fairly compared, so good data sits idle for that question.
+Revisit shifts a little, star lands on a new tint. The archive still holds those visits. But same-colour rules mean visit after visit can't be fairly compared, so good data sits idle for that question. And when the detector flags a pixel, we set it aside — we don't use what we can't trust.
 
 **[FAST]**
 
-That idle is the waste. The drift is nobody's fault. It's the price of an all-sky rainbow.
+That idle is the waste. The drift is nobody's fault. It's geometry — the price of an all-sky rainbow.
 
-> **ANCHOR:** We keep every visit we can trust — flagged pixels out.
+> **ANCHOR:** The drift is nobody's fault. It's geometry.
 
 ---
 
-## Act III · What — The Tool (1:45–3:00)
-**Objective:** Demo sprint. Comet, trimmed montage, rigor story with control qualifier, static visitor.
+## Act III · WHAT — The Tool (1:45–2:45, ~120 words)
+**Objective:** One continuous take: comet demo, 3 allies, control-star kill, static verdict.
 
-> **VISUAL:** UI-in-hand. Tap the 3I/ATLAS chip. Difference mode: field cancels to gray, one remnant pops with A→B vector. Hold 3 silent seconds.
+> **VISUAL:** Continuous single take, UI-in-hand. Tap the 3I/ATLAS chip → difference mode: field cancels to gray, one remnant pops with A→B vector. Hold 3 seconds silent. URL visible throughout.
 
 **[FAST]**
 
-This is only the third known visitor from another star. Watch it move — everything else stands still. A fixed stare misses it — it races two-and-a-half degrees in five days. So we chase it with NASA's Horizons track, and measure where it lands, error bars and all.
+This is only the third known visitor from another star. Watch it move — everything else stands still. It races two-and-a-half degrees in five days, so a fixed stare misses it. We chase it with NASA's Horizons track, and measure where it lands, error bars and all.
 
-**[MONTAGE — 3 spoken allies, ~7s]**
+Every position gets cross-checked — SPHEREx sees it. Gaia pins the stars. Horizons says where it should be.
 
-And it isn't working alone. Every position gets cross-checked — SPHEREx sees it. Gaia pins the stars. Horizons says where it should be.
-
-*[SILENT STAMPS — SIMBAD, SkyBoT (labeled degraded), CelesTrak, DSS, Yale — lower-thirds only, ~2.5s]*
+*[SILENT STAMPS — SIMBAD, SkyBoT (labeled degraded), CelesTrak, DSS, Yale — lower-thirds only]*
 
 **[SLOW]**
 
-Now the part most teams won't show you. Our pipeline once flagged a control star — 28.9 sigma colour change. We checked the pixels: flagged detector pixels. Contamination, not sky. We killed the claim, shipped the fix, withdrew the verdict.
+Now what most teams won't show you. Our pipeline once flagged a CONTROL star — 28.9 sigma colour change. We checked the pixels: flagged detector pixels. Contamination, not sky. We killed the claim, shipped the fix.
 
 *[beat]*
 
-We'd rather say "don't know" than publish a ghost. The visitor stands as measured: six colours, honest error bars, seven pair tests, all static. No outburst claimed.
+We'd rather say don't know than publish a ghost. The visitor stands as measured: static, with honest error bars. No outburst claimed.
 
 > **ANCHOR:** A difference is only a discovery once the detector is ruled out.
 
 ---
 
-## Act IV · So What & Next — The Sky (3:00–4:00)
-**Objective:** Scale, reuse pointer, open experiment, closing line, static end cards.
+## Act IV · SO WHAT & NEXT — The Sky (2:45–4:00, ~170 words + 15s cards)
+**Objective:** Who-benefits, spoken repo + QR, open experiment + ask, fixed closer, 3 static cards inside 240s.
 
-> **VISUAL:** 2,590-cell census map, dice roll, σ-ranked cards. Phone held up: airplane mode ON, timeline blinks from cache. QR + repo URL held 5 seconds.
+> **VISUAL:** 2,590-cell census map, dice roll into unknown field, σ-ranked cards. Phone held up: airplane mode ON (toggle visible), timeline blinks from cache. Repo URL + QR held 5 seconds.
 
 **[FAST]**
 
-Twenty fields, 143 epochs — every measurement public JSON. Star catalogs, nebulae, constellations, cached satellite tracks. No login, no wifi, one thumb — watch. Reuse it tonight: repo on screen, MIT, offline app, schema in the readme.
+Twenty fields, one hundred forty-three epochs — every measurement public JSON. Two thousand five hundred ninety sky cells mapped, two hundred forty cutouts cached — one thumb to play them. A classroom with one phone, no wifi, can blink the same sky we do, offline, tonight.
+
+The code is MIT at github dot com slash akashtori-13 slash drishti — on screen now, QR held. Schema's in the readme — reuse the JSON in any app.
 
 **[SLOW]**
 
-One experiment is still open, and we're saying so on the label: whether colours agree across detector pairs. Either way we learn — a negative result gets reported too.
+One experiment is still open: do colours agree across detector pairs? We report negatives too — and we need you: blink a new field offline, send us where we disagree.
 
 *[long pause — let the room go quiet]*
 
 > **FINAL SPOKEN WORDS — hold, then black:**
-> Tombaugh blinked two plates. We blink 143 epochs — and keep every pixel.
+> Tombaugh blinked two plates. We blink 143 epochs — and keep every visit we can trust.
 
-**END CARDS (static, no narration):**
-- Card 1 (4s): DRISHTI / Team AKASHTORI / Space Apps 2026 / 143 epochs · 240 cutouts · public JSON + repo URL + QR.
-- Card 2 (6s): SPHEREx/IRSA QR2 DOI 10.26131/IRSA652 + QR3 …662, then Gaia / SIMBAD / Horizons / SkyBoT / CelesTrak / DSS-2MASS / Yale.
-- Card 3 (5s): Negative results reported too · SkyBoT degraded, labeled · nebula art marked · subtitles on.
+**END CARDS (static, no narration, inside 240s):**
+- Card 1 (4s): DRISHTI / Team AKASHTORI — all six names + roles / Space Apps 2026 / 143 epochs · 240 cutouts · public JSON + repo URL + QR / MIT · offline-capable · no login.
+- Card 2 (6s): Data — SPHEREx/IRSA QR2 https://doi.org/10.26131/IRSA652 / QR3 https://doi.org/10.26131/IRSA662 / ESA Gaia DR3 · CDS SIMBAD/Sesame + 2MASS/DSS · NASA/JPL Horizons (geocentric) · IMCCE SkyBoT / MPC checker links only / CelesTrak via mirror (checksummed) / Yale BSC v5 / d3-celestial / Messier-NGC (artistic render).
+- Card 3 (5s): Negative results reported too · SkyBoT degraded, labeled · nebula art marked · replay labeled simulation · no AI sky imagery · no stock footage · subtitles on.
 
 ---
 
@@ -115,3 +115,7 @@ One experiment is still open, and we're saying so on the label: whether colours 
 | Messier/NGC positions | 16 nebula anchors (rendering artistic) | Code honesty contract |
 | Constellation lines (d3-celestial) | Sky overlays, search | Credit |
 | Popular targets (ours) | 1,119 curated entries, SIMBAD-verified | Method in repo |
+
+## Demo shooting spec (continuous takes, no jump cuts)
+
+- T1 plates-to-browser (45s) · T2 rainbow prop (60s) · T3 visitor chase + difference (50s) · T4 rigor scroll (25s) · T5 census + airplane offline (45s) · T6 repo + QR hold (15s). URL visible, finger in frame, airplane toggle on camera. Canned: all JSONs/cutouts/vectors cached. Fallback: USB backup + printed frames + QR cards.
