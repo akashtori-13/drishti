@@ -13,9 +13,9 @@
 
 **[FAST]**
 
-**MAHDIN, warm:** Across every plate he checked, thousands of stars stayed put. One stood out — and it became Pluto. In 1930 Tombaugh blinked two plates by hand, night after night.
+**MAHDIN, warm:** Across every plate he checked, thousands of stars stayed put. One stood out — and it became Pluto. In 1930 Tombaugh blinked plates by hand, night after night.
 
-We're Team AKASHTORI. We tried blinking SPHEREx ourselves — gave up after ten fields. So DRISHTI does it.
+We're Team AKASHTORI. We tried blinking SPHEREx ourselves — by hand, we got nowhere. So DRISHTI does it.
 
 **[SLOW]**
 
@@ -36,7 +36,7 @@ We're Team AKASHTORI. We tried blinking SPHEREx ourselves — gave up after ten 
 
 **MAHDIN:** SPHEREx carries no moving prism. Six rainbow filters, one per detector — each pixel sees one tint. Same star: bluer on the left, redder on the right.
 
-**ORNI:** Our same-colour rule: when the tint shifts, visits can't be fairly compared, so good data sits idle for that question. Nothing was deleted — IRSA still serves QR2 and QR3 as of September 2026. QR1 is retired. Both DOIs are on screen.
+**ORNI:** Our same-colour rule: when the tint shifts, visits can't be fairly compared, so good data sits idle for that question. No science deleted — QR1 retired, QR2 and QR3 served as of September 2026, both DOIs pinned on screen.
 
 **[FAST]**
 
@@ -69,7 +69,7 @@ We're Team AKASHTORI. We tried blinking SPHEREx ourselves — gave up after ten 
 
 *[beat]*
 
-For 3I: all six bands, eleven of fourteen visits — three transport failures, shown hollow — Horizons-tracked. Faint, consistent-static. No brightness or colour evolution at these uncertainties. Numbers and error bars are on screen. We're not claiming an outburst.
+For 3I: all six bands, eleven of fourteen cutouts — three transport failures, shown hollow — Horizons-tracked. Faint, consistent-static. No brightness or colour evolution at these uncertainties. Numbers and error bars are on screen. We're not claiming an outburst.
 
 > **ANCHOR:** A difference is only a discovery once the detector is ruled out.
 
@@ -94,7 +94,7 @@ For 3I: all six bands, eleven of fourteen visits — three transport failures, s
 
 **ORNI:** File field plus two epochs plus a screenshot, in repo issues via the QR. Pass or fail counts.
 
-**ORNI:** Every number you just heard, we traced to the repo before we shot this. What survives is what's true.
+**ORNI:** Every measurement you just heard traces to IRSA through the repo — uncertainties on screen. What survives is what's checkable.
 
 *[2s silence. Cut to black.]*
 
@@ -105,7 +105,7 @@ For 3I: all six bands, eleven of fourteen visits — three transport failures, s
 > Archive intact — verdicts only on visits that survive flags.
 
 **END CARDS (static, no narration, inside 240s):**
-- Card 1 (4s): DRISHTI / Team AKASHTORI — all six names + roles / Space Apps 2026 / [CHALLENGE] / 143 epochs · 240 cutouts · public JSON + repo URL + QR / MIT · offline-capable · no login.
+- Card 1 (4s): DRISHTI / Himel Das, Zubayer Hasan Shaad, Md Hedayet Ullah, Md Mahdin Al Abrar, Aazmaine Alif Abrar, Suraiya Ratry Orni / Space Apps 2026 / [CHALLENGE] / 143 epochs · 240 cutouts · public JSON + repo URL + QR / MIT · offline-capable · no login.
 - Card 2 (6s): Data — SPHEREx/IRSA QR2 https://doi.org/10.26131/IRSA652 / QR3 https://doi.org/10.26131/IRSA662 / ESA Gaia DR3 · CDS SIMBAD/Sesame + 2MASS/DSS · NASA/JPL Horizons (geocentric) · IMCCE SkyBoT (unavailable, labeled) / MPC checker links only (no fetch) / CelesTrak via mirror (checksummed) / Yale BSC v5 / d3-celestial / Messier-NGC (artistic render).
 - Card 3 (5s): Negative results reported too · SkyBoT unavailable, labeled · nebula art marked · replay labeled simulation · no AI sky imagery · no stock footage · English subtitles burned-in + .srt.
 
