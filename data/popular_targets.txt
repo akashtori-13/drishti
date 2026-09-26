@@ -1,0 +1,1120 @@
+# Popular-sky precache targets: name | RA_deg | Dec_deg | type. Sources: team lists, SIMBAD cross-check pending.
+M1 | 83.63 | 22.01 | nebula
+M2 | 323.36 | -0.82 | cluster
+M3 | 205.55 | 28.38 | cluster
+M4 | 245.90 | -26.53 | cluster
+M5 | 229.64 | 2.08 | cluster
+M6 | 265.08 | -32.27 | cluster
+M7 | 268.47 | -34.85 | cluster
+M8 | 270.90 | -24.38 | nebula
+M9 | 259.80 | -18.52 | cluster
+M10 | 254.29 | -4.10 | cluster
+M11 | 282.77 | -6.27 | cluster
+M12 | 251.81 | -1.95 | cluster
+M13 | 250.42 | 36.46 | cluster
+M14 | 264.40 | -3.25 | cluster
+M15 | 322.49 | 12.17 | cluster
+M16 | 274.70 | -13.81 | nebula
+M17 | 275.20 | -16.17 | nebula
+M18 | 274.98 | -17.11 | cluster
+M19 | 255.66 | -26.27 | cluster
+M20 | 270.60 | -23.03 | nebula
+M21 | 271.05 | -22.49 | cluster
+M22 | 279.10 | -23.90 | cluster
+M23 | 269.20 | -19.00 | cluster
+M24 | 274.23 | -18.48 | cluster
+M25 | 277.95 | -19.25 | cluster
+M26 | 281.33 | -9.38 | cluster
+M27 | 299.90 | 22.72 | nebula
+M28 | 276.14 | -24.87 | cluster
+M29 | 305.98 | 38.53 | cluster
+M30 | 325.09 | -23.18 | cluster
+M31 | 10.68 | 41.27 | galaxy
+M32 | 10.67 | 40.86 | galaxy
+M33 | 23.46 | 30.66 | galaxy
+M34 | 40.52 | 42.75 | cluster
+M35 | 92.27 | 24.33 | cluster
+M36 | 84.05 | 34.14 | cluster
+M37 | 88.07 | 32.55 | cluster
+M38 | 82.18 | 35.85 | cluster
+M39 | 323.05 | 48.44 | cluster
+M40 | 185.55 | 58.07 | cluster
+M41 | 101.50 | -20.76 | cluster
+M42 | 83.82 | -5.39 | nebula
+M43 | 83.88 | -5.17 | nebula
+M44 | 130.10 | 19.98 | cluster
+M45 | 56.85 | 24.12 | cluster
+M46 | 115.44 | -14.81 | cluster
+M47 | 114.15 | -14.50 | cluster
+M48 | 123.43 | -5.80 | cluster
+M49 | 187.44 | 8.00 | galaxy
+M50 | 105.80 | -8.33 | cluster
+M51 | 202.47 | 47.20 | galaxy
+M52 | 351.05 | 61.59 | cluster
+M53 | 198.23 | 18.17 | cluster
+M54 | 283.76 | -30.48 | cluster
+M55 | 294.99 | -30.96 | cluster
+M56 | 289.15 | 30.18 | cluster
+M57 | 283.40 | 33.03 | nebula
+M58 | 189.43 | 11.82 | galaxy
+M59 | 190.51 | 11.65 | galaxy
+M60 | 190.92 | 11.55 | galaxy
+M61 | 185.48 | 4.47 | galaxy
+M62 | 255.30 | -30.11 | cluster
+M63 | 198.95 | 42.03 | galaxy
+M64 | 194.18 | 21.68 | galaxy
+M65 | 169.73 | 13.09 | galaxy
+M66 | 170.06 | 12.99 | galaxy
+M67 | 132.60 | 11.82 | cluster
+M68 | 189.87 | -26.74 | cluster
+M69 | 277.85 | -32.35 | cluster
+M70 | 280.80 | -32.29 | cluster
+M71 | 298.44 | 18.78 | cluster
+M72 | 313.37 | -12.54 | cluster
+M73 | 314.73 | -12.38 | cluster
+M74 | 24.17 | 15.78 | galaxy
+M75 | 301.52 | -21.92 | cluster
+M76 | 25.58 | 51.58 | nebula
+M77 | 40.67 | -0.01 | galaxy
+M78 | 86.69 | 0.08 | nebula
+M79 | 81.04 | -24.52 | cluster
+M80 | 244.26 | -22.98 | cluster
+M81 | 148.89 | 69.07 | galaxy
+M82 | 148.97 | 69.68 | galaxy
+M83 | 204.25 | -29.87 | galaxy
+M84 | 186.27 | 12.95 | galaxy
+M85 | 186.35 | 18.19 | galaxy
+M86 | 186.55 | 12.95 | galaxy
+M87 | 187.71 | 12.39 | galaxy
+M88 | 188.00 | 14.42 | galaxy
+M89 | 188.92 | 12.53 | galaxy
+M90 | 189.21 | 13.16 | galaxy
+M91 | 188.86 | 14.50 | galaxy
+M92 | 259.28 | 43.14 | cluster
+M93 | 116.13 | -23.86 | cluster
+M94 | 192.72 | 41.12 | galaxy
+M95 | 160.99 | 11.70 | galaxy
+M96 | 161.69 | 11.82 | galaxy
+M97 | 168.70 | 55.02 | nebula
+M98 | 183.45 | 14.90 | galaxy
+M99 | 184.71 | 14.42 | galaxy
+M100 | 185.73 | 15.82 | galaxy
+M101 | 210.80 | 54.35 | galaxy
+M102 | 226.62 | 55.76 | galaxy
+M103 | 23.30 | 60.66 | cluster
+M104 | 190.00 | -11.62 | galaxy
+M105 | 161.96 | 12.58 | galaxy
+M106 | 184.74 | 47.30 | galaxy
+M107 | 248.13 | -13.05 | cluster
+M108 | 167.88 | 55.67 | galaxy
+M109 | 179.40 | 53.37 | galaxy
+M110 | 10.09 | 41.68 | galaxy
+C14 | 34.75 | 57.13 | cluster
+C31 | 79.07 | 34.27 | nebula
+C33 | 314.11 | 31.72 | nebula
+C34 | 311.41 | 30.71 | nebula
+C27 | 303.07 | 38.35 | nebula
+C11 | 350.11 | 61.20 | nebula
+C49 | 97.98 | 4.98 | nebula
+Centaurus A NGC5128 | 201.365 | -43.019 | galaxy
+Sculptor Galaxy NGC253 | 11.888 | -25.288 | galaxy
+NGC1300 | 49.920 | -19.411 | galaxy
+NGC1097 | 41.580 | -30.275 | galaxy
+NGC1365 | 53.402 | -36.140 | galaxy
+NGC1232 | 47.440 | -20.579 | galaxy
+NGC7727 | 353.976 | -12.325 | merger
+Arp273 UGC1810 | 35.550 | 39.220 | interacting
+Arp273 UGC1813 | 35.590 | 39.200 | interacting
+Arp147 IC194 | 46.340 | 1.150 | interacting
+Arp147 IC195 | 46.370 | 1.110 | interacting
+Tadpole Galaxy Arp188 UGC10214 | 240.040 | 55.430 | interacting
+VV29 Tadpole tail knot | 240.060 | 55.440 | interacting
+ESO243-49 HLX-1 | 16.090 | -44.520 | ULX
+GN-z11 | 189.160 | 62.240 | high-z galaxy
+Cartwheel Galaxy ESO350-40 | 9.280 | -33.710 | ring galaxy
+Mice NGC4676A | 194.871 | 30.709 | interacting
+Mice NGC4676B | 194.874 | 30.704 | interacting
+The Eyes NGC4435 | 186.918 | 12.078 | interacting
+The Eyes NGC4438 | 186.854 | 12.990 | interacting
+Hoag's Object | 229.800 | 21.800 | ring galaxy
+Malin 1 | 189.260 | 14.740 | LSB galaxy
+Dragonfly 44 | 195.240 | 26.970 | UDG
+NGC3628 Hamburger Leo Triplet | 170.540 | 13.590 | galaxy
+Antennae NGC4038 | 180.470 | -18.870 | interacting
+Antennae NGC4039 | 180.440 | -18.880 | interacting
+NGC6744 | 287.410 | -63.860 | galaxy
+NGC300 | 13.720 | -37.680 | galaxy
+NGC55 | 3.720 | -39.200 | galaxy
+NGC247 | 11.760 | -20.760 | galaxy
+NGC891 | 35.640 | 42.350 | galaxy
+Needle Galaxy NGC4565 | 189.090 | 25.990 | galaxy
+Splinter Galaxy NGC5907 | 229.010 | 56.330 | galaxy
+Whale Galaxy NGC4631 | 180.530 | 32.540 | galaxy
+NGC4627 | 180.480 | 32.660 | dwarf
+Hockey Stick NGC4656 | 186.070 | 32.130 | galaxy
+Cocoon Galaxy NGC4490 | 187.650 | 41.640 | interacting
+NGC4485 | 187.630 | 41.680 | interacting
+NGC4449 Caldwell 21 | 187.040 | 44.090 | dwarf starburst
+NGC4214 | 183.910 | 36.330 | dwarf
+NGC4216 | 183.950 | 13.240 | galaxy
+NGC4535 | 188.580 | 8.200 | galaxy
+NGC4536 | 188.610 | 2.110 | galaxy
+NGC4725 | 178.110 | 25.500 | galaxy
+NGC5033 | 198.360 | 36.590 | Seyfert
+NGC5248 | 204.310 | 8.890 | galaxy
+NGC5363 | 209.100 | 5.120 | galaxy
+NGC5364 | 209.190 | 5.020 | galaxy
+NGC5746 | 221.230 | 1.950 | galaxy
+NGC5813 | 225.300 | 1.700 | galaxy
+NGC5846 | 226.620 | 1.600 | galaxy
+NGC5985 | 235.060 | 59.330 | galaxy
+NGC6503 | 277.390 | 70.140 | dwarf
+Fireworks Galaxy NGC6946 | 308.720 | 60.150 | galaxy
+Barnard's Galaxy NGC6822 | 296.230 | -14.800 | dwarf
+IC10 | 5.100 | 59.300 | dwarf starburst
+IC342 Caldwell 5 | 56.700 | 68.100 | galaxy
+IC1613 Caldwell 51 | 16.200 | 2.120 | dwarf
+WLM Galaxy | 2.500 | -15.460 | dwarf
+Sextans A | 151.970 | -4.700 | dwarf
+Sextans B | 150.010 | 5.330 | dwarf
+Pegasus Dwarf Irregular | 352.150 | 14.740 | dwarf
+Leo A | 147.400 | 30.660 | dwarf
+Leo I dwarf | 152.120 | 12.310 | dwarf
+Fornax Dwarf | 40.000 | -34.510 | dwarf
+Sculptor Dwarf | 15.040 | -33.710 | dwarf
+Carina Dwarf | 100.400 | -50.970 | dwarf
+Draco Dwarf | 260.050 | 57.920 | dwarf
+Ursa Minor Dwarf | 227.300 | 67.220 | dwarf
+Canes Venatici I | 202.010 | 33.560 | dwarf
+Hercules Dwarf | 247.760 | 12.790 | dwarf
+Bootes I | 210.020 | 14.500 | dwarf
+Andromeda I | 11.430 | 38.030 | dwarf
+Andromeda II | 19.130 | 33.430 | dwarf
+Andromeda III | 8.890 | 36.480 | dwarf
+LGS3 Pisces Dwarf | 15.970 | 21.500 | dwarf
+Aquarius Dwarf | 311.760 | -12.800 | dwarf
+Sagittarius dSph | 283.760 | -30.480 | dwarf
+Sagittarius dIrr | 292.500 | -17.700 | dwarf
+Arp84 NGC5394 | 209.550 | 37.450 | interacting
+Arp84 NGC5395 | 209.570 | 37.440 | interacting
+Arp87 NGC3808A | 190.130 | 22.450 | interacting
+Arp148 Mayall's Object | 168.960 | 40.920 | merger
+Arp220 ULIRG | 233.740 | 23.500 | ULIRG
+Arp194 UGC6945 | 179.520 | 32.700 | interacting
+Arp240 NGC5257 | 204.980 | -0.880 | interacting
+Arp240 NGC5258 | 204.990 | -0.870 | interacting
+Arp272 NGC6050 | 241.310 | 17.750 | interacting
+Arp299 NGC3690A | 172.130 | 58.560 | merger
+Arp299 IC694 | 172.160 | 58.550 | merger
+Arp302 UGC9618N | 221.450 | 24.740 | interacting
+Arp270 NGC3395 | 162.530 | 32.930 | interacting
+Arp270 NGC3396 | 162.540 | 32.930 | interacting
+Arp271 NGC5426 | 210.830 | -6.030 | interacting
+Arp271 NGC5427 | 210.850 | -6.030 | interacting
+Arp278 NGC7253A | 335.600 | -29.550 | interacting
+Arp284 NGC7714 | 354.060 | 2.090 | interacting
+Arp284 NGC7715 | 354.030 | 2.080 | interacting
+Arp86 NGC7753 | 356.760 | 29.490 | interacting
+Arp86 NGC7752 | 356.770 | 29.470 | interacting
+Arp157 NGC520 | 21.150 | 3.790 | merger
+VV114 ESO343-IG013E | 15.200 | -17.420 | merger
+VV141 Arp143 NGC2444 | 117.000 | 39.020 | ring galaxy
+VV141 Arp143 NGC2445 | 116.990 | 39.010 | ring galaxy
+VV340 UGC9618S | 221.440 | 24.730 | interacting
+VV705 NGC5256 | 204.570 | 48.270 | merger
+ESO510-G13 warped | 205.010 | -26.650 | galaxy
+ESO325-G004 lens Abell S740 | 201.880 | -33.820 | lens galaxy
+Lindsay-Shapley Ring AM0644-741 | 101.240 | -74.210 | ring galaxy
+Polar Ring NGC660 | 25.760 | 13.650 | polar ring
+UFO Galaxy NGC2683 | 131.330 | 33.420 | galaxy
+NGC2841 | 140.510 | 51.020 | galaxy
+NGC2903 | 138.100 | 21.500 | galaxy
+Spindle NGC3115 | 151.310 | -7.720 | galaxy
+NGC3184 | 154.570 | 41.420 | galaxy
+NGC3198 | 154.990 | 45.550 | galaxy
+NGC3227 | 155.880 | 19.870 | Seyfert
+NGC3226 companion | 155.860 | 19.900 | galaxy
+NGC3310 starburst | 159.690 | 53.500 | starburst
+NGC3319 | 160.100 | 41.420 | barred galaxy
+NGC3344 | 161.060 | 24.920 | galaxy
+NGC3359 | 162.090 | 63.100 | galaxy
+NGC3486 | 165.080 | 28.970 | galaxy
+NGC3489 | 165.070 | 13.900 | galaxy
+Bubble Galaxy NGC3521 | 166.450 | -0.040 | galaxy
+NGC3621 | 179.630 | -32.810 | galaxy
+NGC3705 | 172.030 | 9.740 | galaxy
+NGC3877 | 177.030 | 47.430 | galaxy
+NGC3941 | 178.230 | 36.990 | lenticular
+NGC3982 | 179.070 | 55.090 | Seyfert
+NGC4013 | 179.630 | 43.870 | edge-on galaxy
+NGC4026 | 180.320 | 50.840 | lenticular
+NGC4041 | 180.650 | 62.230 | galaxy
+NGC4088 | 181.390 | 50.550 | galaxy
+NGC4100 | 181.530 | 49.550 | galaxy
+NGC4157 | 182.700 | 50.480 | edge-on galaxy
+NGC4217 | 183.900 | 47.100 | edge-on galaxy
+Silver Needle NGC4244 Caldwell 26 | 184.370 | 37.810 | galaxy
+NGC4395 low-mass Seyfert | 186.450 | 33.550 | Seyfert
+NGC4448 | 187.030 | 28.640 | galaxy
+NGC4494 | 187.860 | 25.620 | galaxy
+NGC4559 Caldwell 36 | 188.990 | 27.960 | galaxy
+NGC4605 | 190.000 | 61.720 | dwarf
+NGC4697 Caldwell 52 | 182.110 | -5.800 | galaxy
+NGC4699 | 192.060 | -5.490 | galaxy
+NGC4742 | 193.020 | -24.280 | galaxy
+NGC4782 | 193.540 | -12.570 | interacting elliptical
+NGC4783 | 193.550 | -12.570 | interacting elliptical
+NGC4945 Caldwell 83 | 76.310 | -49.460 | starburst
+NGC4981 | 197.230 | -6.850 | galaxy
+NGC5005 Caldwell 29 | 197.790 | 37.060 | galaxy
+NGC5102 | 200.490 | -36.630 | lenticular
+NGC5253 Caldwell 80 | 204.980 | -31.640 | starburst
+NGC5264 | 205.060 | -29.910 | dwarf
+NGC5291 interacting | 206.830 | -30.420 | interacting
+NGC5408 dwarf | 210.650 | -41.370 | dwarf starburst
+NGC5474 M101 companion dwarf | 211.250 | 53.660 | dwarf
+NGC5585 | 214.360 | 56.720 | dwarf spiral
+NGC5713 | 220.160 | -0.290 | starburst
+NGC5719 companion | 220.240 | -0.110 | interacting
+NGC5775 | 223.370 | 3.580 | edge-on galaxy
+NGC5774 | 223.320 | 3.650 | galaxy
+NGC5806 | 225.000 | 1.700 | galaxy
+NGC5879 | 227.460 | 57.000 | galaxy
+NGC5962 | 233.960 | 16.460 | galaxy
+NGC6015 | 238.830 | 62.310 | galaxy
+NGC6118 | 245.450 | -2.070 | galaxy
+NGC6140 LSB | 245.850 | 65.300 | LSB galaxy
+NGC6181 | 248.070 | 19.780 | galaxy
+NGC6207 cluster | 250.420 | 36.470 | globular cluster
+JADES-GS-z14-0 | 53.160 | -27.770 | high-z galaxy
+Maisie's Galaxy CEERS2_588 | 214.730 | 52.770 | high-z galaxy
+MACS0647-JD lensed | 101.970 | 70.250 | lensed high-z
+Earendel WHL0137-LS | 20.340 | -8.260 | lensed star
+Icarus MACS J1149 LS1 | 177.400 | 22.400 | lensed star
+Sunburst Arc Godzilla | 234.700 | -56.700 | lensed galaxy
+GLASS-z12 GHZ2 Abell2744 | 3.580 | -30.390 | high-z galaxy
+CR7 COSMOS Ly-alpha | 150.110 | 1.780 | high-z galaxy
+DDO154 dwarf | 193.930 | 27.140 | dwarf
+IC1101 Abell2029 BCG | 234.970 | 5.750 | BCG
+Perseus A NGC1275 Caldwell 24 | 49.950 | 41.510 | radio galaxy Seyfert
+NGC1260 SN2006gy host | 49.230 | 41.610 | galaxy
+NGC1052 ESO415-G009 | 40.270 | -8.250 | elliptical radio
+Arp118 NGC1144 | 43.930 | -0.120 | interacting
+NGC1143 companion | 43.910 | -0.100 | interacting
+NGC1140 starburst | 41.360 | -10.020 | starburst
+NGC1156 dwarf | 44.920 | 25.040 | dwarf
+NGC1187 | 45.840 | -22.860 | galaxy
+NGC1253 Arp279 | 48.230 | -2.720 | interacting
+NGC1288 | 49.350 | -32.580 | galaxy
+NGC1398 | 54.720 | -26.210 | galaxy
+NGC1399 Fornax core | 54.620 | -35.450 | elliptical
+NGC1404 Fornax | 54.720 | -35.590 | elliptical
+NGC1427A Fornax jellyfish | 55.040 | -35.290 | dwarf
+NGC1433 | 55.610 | -47.220 | ringed galaxy
+NGC1448 | 56.130 | -44.640 | galaxy
+NGC1493 | 59.780 | -46.060 | barred galaxy
+NGC1499 California Nebula | 60.400 | 36.370 | nebula
+NGC1512 | 60.970 | -43.350 | barred ring
+NGC1531 companion | 62.990 | -32.840 | dwarf
+NGC1532 edge-on | 63.000 | -32.830 | galaxy
+NGC1566 Dorado Seyfert | 65.000 | -54.930 | Seyfert
+NGC1569 dwarf starburst | 67.780 | 64.850 | dwarf starburst
+Large Magellanic Cloud center | 80.890 | -69.760 | dwarf galaxy
+Small Magellanic Cloud NGC292 center | 13.180 | -72.830 | dwarf galaxy
+Tarantula Nebula NGC2070 | 84.680 | -69.100 | nebula
+30 Doradus R136 core | 84.676 | -69.080 | star cluster
+Carina Nebula NGC3372 | 161.260 | -59.860 | nebula
+Eta Carinae | 161.200 | -59.680 | LBV star
+LMC N11 | 74.250 | -66.390 | nebula
+LMC N44 | 80.500 | -67.980 | nebula
+SMC NGC346 | 14.770 | -72.170 | cluster nebula
+SMC NGC371 | 17.780 | -72.040 | cluster
+SMC NGC330 | 14.100 | -72.470 | cluster
+LMC NGC1866 | 78.400 | -65.450 | cluster
+LMC NGC1850 | 77.700 | -68.760 | cluster
+LMC NGC2014 | 80.850 | -67.380 | nebula
+LMC NGC2020 | 80.890 | -67.510 | nebula
+LMC NGC2032 Seagull | 80.600 | -67.590 | nebula
+LMC Hodge 301 | 84.550 | -69.060 | cluster
+47 Tucanae NGC104 | 6.020 | -72.080 | globular cluster
+Omega Centauri NGC5139 | 201.690 | -47.480 | globular cluster
+Southern Pleiades IC2602 | 160.650 | -64.400 | open cluster
+NGC3532 Carina cluster | 166.560 | -58.670 | open cluster
+LMC N59A | 81.200 | -67.450 | nebula
+SMC Lindsay 113 | 19.500 | -73.670 | cluster
+Hubble Deep Field HDF-N | 189.200 | 62.240 | deep field
+Hubble Ultra Deep Field HUDF | 53.160 | -27.780 | deep field
+GOODS-North | 189.230 | 62.240 | deep field
+GOODS-South | 53.120 | -27.810 | deep field
+COSMOS field center | 150.120 | 2.210 | deep field
+Extended Groth Strip EGS | 214.750 | 52.830 | deep field
+North Ecliptic Pole NEP deep | 270.000 | 66.560 | deep field
+South Ecliptic Pole SEP deep | 90.000 | -66.560 | deep field
+Kepler field center | 290.670 | 44.500 | survey field
+TESS Northern CVZ | 270.000 | 69.000 | survey field
+TESS Southern CVZ | 90.000 | -69.000 | survey field
+JWST NEP Time Domain Field | 260.680 | 65.450 | deep field
+Subaru Deep Field SDF | 201.000 | 27.480 | deep field
+Chandra Deep Field South CDF-S | 53.080 | -27.780 | deep field
+Lockman Hole | 161.250 | 57.580 | deep field
+Chandra Deep Field North CDF-N | 189.280 | 62.230 | deep field
+Galactic Center Sgr A* | 266.417 | -29.008 | landmark galactic center
+Galactic Anticenter | 86.410 | 28.970 | landmark
+North Ecliptic Pole landmark | 270.000 | 66.560 | ecliptic pole
+South Ecliptic Pole landmark | 90.000 | -66.560 | ecliptic pole
+March Equinox point J2000 | 0.000 | 0.000 | equinox
+September Equinox point | 180.000 | 0.000 | equinox
+June Solstice point | 90.000 | 23.440 | solstice
+December Solstice point | 270.000 | -23.440 | solstice
+North Galactic Pole | 192.860 | 27.130 | galactic pole
+South Galactic Pole | 12.860 | -27.130 | galactic pole
+Crab Pulsar PSR B0531+21 | 83.633 | 22.014 | pulsar
+Vela Pulsar | 128.836 | -45.176 | pulsar
+Geminga PSR J0633+1746 | 98.475 | 17.770 | pulsar
+Cygnus X-1 | 299.590 | 35.200 | X-ray binary
+Sco X-1 | 244.980 | -15.640 | X-ray binary
+SS 433 | 287.950 | 4.980 | microquasar
+GRS 1915+105 | 288.800 | 10.940 | microquasar
+Pictor A | 79.770 | -45.780 | radio galaxy
+Fornax A NGC1316 | 50.670 | -37.210 | radio galaxy
+Cygnus A 3C405 | 299.870 | 40.730 | radio galaxy
+Quasar 3C273 | 187.270 | 2.050 | quasar
+Quasar 3C48 | 24.420 | 33.160 | quasar
+Quasar 3C147 | 83.180 | 49.490 | quasar
+Blazar OJ 287 | 133.700 | 20.100 | blazar
+BL Lacertae | 330.680 | 42.280 | blazar
+Markarian 421 | 166.110 | 38.200 | blazar
+Markarian 501 | 253.470 | 39.760 | blazar
+PKS 2155-304 | 329.710 | -30.220 | blazar
+CTA 102 | 338.150 | 11.730 | quasar
+LMC X-1 | 80.090 | -69.740 | X-ray binary
+LMC X-3 | 84.700 | -64.080 | X-ray binary
+SMC X-1 | 19.270 | -73.440 | X-ray binary
+GRO J1655-40 | 253.500 | -39.840 | microquasar
+GX 339-4 | 255.700 | -48.790 | X-ray binary
+3C353 radio galaxy | 257.170 | -0.990 | radio galaxy
+Hercules A 3C348 | 252.780 | 4.990 | radio galaxy
+SN1987A LMC | 83.870 | -69.270 | SNR
+SN1006 remnant | 225.360 | -41.930 | SNR
+Tycho SNR SN1572 3C10 | 6.300 | 64.140 | SNR
+Kepler SNR SN1604 | 262.670 | -21.490 | SNR
+Cassiopeia A 3C461 | 350.850 | 58.810 | SNR
+SN1993J | 148.880 | 69.110 | supernova
+SN2011fe | 210.770 | 54.370 | supernova
+SN1054 remnant Crab Nebula | 83.640 | 22.020 | SNR
+SN1181 3C58 | 31.400 | 64.830 | SNR
+SN185 RCW86 | 220.680 | -62.470 | SNR
+SN393 RX J1713.7-3946 | 258.390 | -39.760 | SNR
+SN1986J in NGC891 | 35.580 | 42.290 | supernova
+SN2014J | 148.970 | 69.680 | supernova
+SN2006gy superluminous | 49.240 | 41.620 | supernova
+SN1972E in NGC5253 | 204.990 | -31.650 | supernova
+NGC 7000 North America Nebula | 314.64 | 44.53 | emission nebula
+IC 5070 Pelican Nebula | 312.74 | 44.33 | emission nebula
+IC 1396 Elephant's Trunk Nebula | 324.74 | 57.49 | emission nebula
+NGC 1499 California Nebula | 60.73 | 36.37 | emission nebula
+IC 1805 Heart Nebula | 38.14 | 61.45 | emission nebula
+IC 1848 Soul Nebula | 42.97 | 60.44 | emission nebula
+IC 434 Horsehead Nebula | 85.27 | -2.46 | dark nebula
+NGC 2024 Flame Nebula | 85.43 | -1.85 | emission nebula
+NGC 2264 Cone Nebula | 100.24 | 9.88 | emission nebula
+NGC 2244 Rosette Cluster | 98.14 | 4.87 | open cluster
+NGC 2237 Rosette Nebula | 98.30 | 4.98 | emission nebula
+NGC 2359 Thor's Helmet | 109.67 | -13.20 | emission nebula
+NGC 281 Pacman Nebula | 13.16 | 56.63 | emission nebula
+NGC 7635 Bubble Nebula | 350.20 | 61.20 | emission nebula
+NGC 7380 Wizard Nebula | 341.75 | 58.10 | emission nebula
+NGC 7822 Cederblad 214 | 0.92 | 68.62 | emission nebula
+IC 410 Tadpoles Nebula | 80.64 | 33.42 | emission nebula
+IC 417 Spider and Fly Nebula | 82.08 | 34.40 | emission nebula
+IC 443 Jellyfish Nebula | 94.25 | 22.50 | supernova remnant
+IC 2177 Seagull Nebula | 106.13 | -10.73 | emission nebula
+NGC 2467 Skull and Crossbones Nebula | 118.07 | -26.40 | emission nebula
+NGC 6334 Cat's Paw Nebula | 259.89 | -35.95 | emission nebula
+NGC 6357 Lobster Nebula | 261.08 | -34.20 | emission nebula
+NGC 6188 Fighting Dragons of Ara | 250.14 | -48.78 | emission nebula
+IC 2944 Running Chicken Nebula | 174.10 | -62.92 | emission nebula
+NGC 3324 Gabriela Mistral Nebula | 159.34 | -58.63 | emission nebula
+NGC 3293 Gem Cluster | 158.88 | -58.22 | open cluster
+NGC 3603 Starburst Cluster Nebula | 168.83 | -61.26 | emission nebula
+NGC 3532 Wishing Well Cluster | 166.56 | -58.67 | open cluster
+NGC 3766 Pearl Cluster | 174.08 | -61.62 | open cluster
+NGC 4755 Jewel Box Cluster | 193.41 | -60.35 | open cluster
+NGC 6231 Northern Jewel Box Cluster | 253.54 | -41.83 | open cluster
+NGC 6383 | 263.66 | -32.57 | open cluster
+IC 4604 Rho Ophiuchi Nebula | 246.44 | -24.43 | reflection nebula
+IC 4592 Blue Horsehead Nebula | 242.90 | -19.45 | reflection nebula
+IC 2118 Witch Head Nebula | 76.69 | -7.22 | reflection nebula
+NGC 7023 Iris Nebula | 315.38 | 68.17 | reflection nebula
+NGC 6914 Reflection Nebula | 306.15 | 42.48 | reflection nebula
+NGC 2261 Hubble's Variable Nebula | 99.82 | 8.74 | reflection nebula
+NGC 1999 Keyhole Nebula | 84.07 | -6.72 | reflection nebula
+NGC 1788 Reflection Nebula | 76.84 | -3.33 | reflection nebula
+NGC 6726 Corona Australis Nebula | 285.42 | -36.88 | reflection nebula
+IC 5146 Cocoon Nebula | 328.36 | 47.27 | emission nebula
+NGC 7027 Protobubble Nebula | 316.76 | 42.24 | planetary nebula
+NGC 6543 Cat's Eye Nebula | 269.64 | 66.63 | planetary nebula
+NGC 7293 Helix Nebula | 337.41 | -20.83 | planetary nebula
+NGC 2392 Eskimo Nebula | 112.29 | 20.91 | planetary nebula
+NGC 3242 Ghost of Jupiter | 156.19 | -18.64 | planetary nebula
+NGC 3132 Eight-Burst Nebula | 151.77 | -40.43 | planetary nebula
+NGC 6369 Little Ghost Nebula | 262.34 | -23.77 | planetary nebula
+NGC 7009 Saturn Nebula | 316.05 | -11.36 | planetary nebula
+NGC 6818 Little Gem Nebula | 295.99 | -14.15 | planetary nebula
+NGC 6751 Glowing Eye Nebula | 286.48 | -5.99 | planetary nebula
+NGC 6905 Blue Flash Nebula | 305.60 | 20.10 | planetary nebula
+NGC 7662 Blue Snowball Nebula | 351.49 | 42.55 | planetary nebula
+NGC 6826 Blinking Planetary Nebula | 296.19 | 50.52 | planetary nebula
+NGC 6302 Bug Nebula | 258.39 | -37.10 | planetary nebula
+NGC 6537 Red Spider Nebula | 271.33 | -19.84 | planetary nebula
+NGC 6210 Turtle Nebula | 251.12 | 23.80 | planetary nebula
+NGC 3918 Blue Planetary Nebula | 177.56 | -57.18 | planetary nebula
+IC 4406 Retina Nebula | 215.61 | -44.15 | planetary nebula
+IC 418 Spirograph Nebula | 81.87 | -12.70 | planetary nebula
+NGC 1501 Oyster Nebula | 61.75 | 60.92 | planetary nebula
+NGC 1514 Crystal Ball Nebula | 62.33 | 30.78 | planetary nebula
+NGC 40 Bow-Tie Nebula | 3.25 | 72.52 | planetary nebula
+NGC 1535 Cleopatra's Eye | 63.57 | -12.73 | planetary nebula
+NGC 2022 Planetary Nebula | 85.53 | 9.08 | planetary nebula
+NGC 2371 Gemini Nebula | 111.39 | 29.49 | planetary nebula
+NGC 2440 White Butterfly Nebula | 115.48 | -18.22 | planetary nebula
+NGC 2818 Planetary Nebula | 139.01 | -36.62 | planetary nebula
+NGC 2867 Planetary Nebula | 140.36 | -58.31 | planetary nebula
+NGC 4361 Planetary Nebula | 186.13 | -18.80 | planetary nebula
+NGC 7048 Planetary Nebula | 318.39 | 46.29 | planetary nebula
+NGC 7139 Planetary Nebula | 326.55 | 63.80 | planetary nebula
+NGC 7354 Planetary Nebula | 340.10 | 61.28 | planetary nebula
+IC 5217 Planetary Nebula | 335.88 | 50.96 | planetary nebula
+IC 1747 Planetary Nebula | 29.30 | 63.33 | planetary nebula
+IC 2003 Planetary Nebula | 58.99 | 33.13 | planetary nebula
+NGC 2438 Planetary Nebula | 115.46 | -14.73 | planetary nebula
+NGC 2792 Planetary Nebula | 138.08 | -42.43 | planetary nebula
+NGC 3211 Planetary Nebula | 153.06 | -62.83 | planetary nebula
+NGC 457 Owl Cluster | 19.90 | 58.33 | open cluster
+NGC 663 Cluster | 26.55 | 61.25 | open cluster
+NGC 654 Cluster | 25.89 | 61.88 | open cluster
+NGC 659 Cluster | 26.12 | 60.70 | open cluster
+NGC 869 h Persei Double Cluster | 34.75 | 57.13 | open cluster
+NGC 884 chi Persei Double Cluster | 35.60 | 57.13 | open cluster
+NGC 7789 Caroline's Rose | 359.30 | 56.73 | open cluster
+NGC 6939 Cluster | 307.90 | 60.63 | open cluster
+NGC 6940 Vulpecula Cluster | 308.60 | 28.30 | open cluster
+NGC 6910 Cluster | 305.83 | 40.78 | open cluster
+NGC 7209 Cluster | 331.33 | 46.50 | open cluster
+NGC 7243 Cluster | 333.78 | 49.88 | open cluster
+NGC 7510 Cluster | 347.83 | 60.57 | open cluster
+NGC 7686 Cluster | 352.50 | 49.13 | open cluster
+NGC 7790 Cluster | 359.60 | 61.22 | open cluster
+NGC 7788 Cluster | 359.10 | 61.40 | open cluster
+IC 4665 Summer Beehive Cluster | 266.60 | 5.72 | open cluster
+IC 4756 Graff's Cluster | 279.80 | 5.45 | open cluster
+NGC 2477 Cluster | 118.02 | -38.53 | open cluster
+NGC 2451 Cluster | 116.33 | -37.97 | open cluster
+NGC 2516 Southern Beehive Cluster | 119.55 | -60.87 | open cluster
+NGC 2547 Cluster | 122.56 | -49.22 | open cluster
+NGC 3114 Cluster | 150.67 | -60.12 | open cluster
+NGC 3228 Cluster | 155.42 | -51.72 | open cluster
+NGC 2660 Cluster | 130.62 | -47.20 | open cluster
+NGC 4103 Cluster | 181.62 | -61.25 | open cluster
+NGC 4349 Cluster | 186.12 | -61.87 | open cluster
+NGC 4463 Cluster | 187.42 | -64.78 | open cluster
+NGC 4815 Cluster | 194.52 | -64.95 | open cluster
+NGC 6067 Cluster | 243.30 | -54.22 | open cluster
+NGC 6087 S Normae Cluster | 244.68 | -57.90 | open cluster
+NGC 6124 Cluster | 246.38 | -40.67 | open cluster
+NGC 6242 Cluster | 253.83 | -39.47 | open cluster
+NGC 6281 Cluster | 256.12 | -37.90 | open cluster
+NGC 6322 Cluster | 259.62 | -42.95 | open cluster
+NGC 6400 Cluster | 265.12 | -36.93 | open cluster
+NGC 6416 Cluster | 266.07 | -32.37 | open cluster
+NGC 6451 Cluster | 267.68 | -30.22 | open cluster
+NGC 6604 Cluster | 274.60 | -12.25 | open cluster
+NGC 6649 Cluster | 278.42 | -10.40 | open cluster
+NGC 6664 Cluster | 279.10 | -8.20 | open cluster
+NGC 6709 Cluster | 282.80 | 10.35 | open cluster
+NGC 6755 Cluster | 286.90 | 4.23 | open cluster
+NGC 6802 Cluster | 292.60 | 20.27 | open cluster
+NGC 6830 Cluster | 297.80 | 23.07 | open cluster
+NGC 6834 Cluster | 298.02 | 29.42 | open cluster
+NGC 6871 Cluster | 301.48 | 35.78 | open cluster
+NGC 6883 Cluster | 302.83 | 35.87 | open cluster
+NGC 7039 Cluster | 317.70 | 45.62 | open cluster
+NGC 7062 Cluster | 320.90 | 46.38 | open cluster
+NGC 7160 Cluster | 328.43 | 62.60 | open cluster
+NGC 7235 Cluster | 333.10 | 57.27 | open cluster
+NGC 7419 Cluster | 343.62 | 60.80 | open cluster
+NGC 744 Cluster | 29.60 | 55.48 | open cluster
+NGC 1027 Cluster | 40.68 | 61.63 | open cluster
+NGC 1245 Cluster | 48.70 | 47.25 | open cluster
+NGC 129 Cluster | 7.50 | 60.23 | open cluster
+NGC 133 Cluster | 7.83 | 63.37 | open cluster
+NGC 146 Cluster | 8.30 | 63.30 | open cluster
+NGC 188 Caldwell 1 Cluster | 12.10 | 85.25 | open cluster
+NGC 225 Cluster | 10.90 | 61.78 | open cluster
+NGC 1502 Cluster | 61.90 | 62.33 | open cluster
+NGC 1528 Cluster | 63.88 | 51.23 | open cluster
+NGC 1545 Cluster | 65.17 | 50.25 | open cluster
+NGC 1664 Cluster | 72.78 | 43.70 | open cluster
+NGC 1817 Cluster | 78.10 | 16.70 | open cluster
+NGC 2129 Cluster | 90.30 | 23.32 | open cluster
+NGC 2158 Cluster | 91.90 | 24.10 | open cluster
+NGC 2169 Cluster | 92.10 | 13.95 | open cluster
+NGC 2281 Cluster | 102.10 | 41.08 | open cluster
+NGC 2301 Cluster | 102.90 | 0.47 | open cluster
+NGC 2324 Cluster | 106.10 | 1.05 | open cluster
+NGC 2360 Caroline's Cluster | 109.50 | -15.62 | open cluster
+NGC 2362 Tau Canis Majoris Cluster | 109.68 | -24.95 | open cluster
+NGC 104 47 Tucanae | 6.02 | -72.08 | globular cluster
+NGC 288 Globular Cluster | 13.20 | -26.58 | globular cluster
+NGC 362 Globular Cluster | 15.80 | -70.85 | globular cluster
+NGC 1261 Globular Cluster | 48.07 | -55.22 | globular cluster
+NGC 1851 Globular Cluster | 78.53 | -40.05 | globular cluster
+NGC 2298 Globular Cluster | 102.25 | -36.00 | globular cluster
+NGC 2808 Globular Cluster | 138.00 | -64.87 | globular cluster
+NGC 3201 Globular Cluster | 154.40 | -46.42 | globular cluster
+NGC 4372 Globular Cluster | 186.40 | -72.67 | globular cluster
+NGC 4833 Globular Cluster | 194.90 | -70.88 | globular cluster
+NGC 5139 Omega Centauri | 201.70 | -47.48 | globular cluster
+NGC 5286 Globular Cluster | 206.60 | -51.37 | globular cluster
+NGC 5466 Globular Cluster | 211.36 | 28.53 | globular cluster
+NGC 5927 Globular Cluster | 232.00 | -50.67 | globular cluster
+NGC 5986 Globular Cluster | 236.52 | -37.78 | globular cluster
+NGC 6101 Globular Cluster | 246.40 | -72.20 | globular cluster
+NGC 6144 Globular Cluster | 246.83 | -26.02 | globular cluster
+NGC 6304 Globular Cluster | 258.64 | -29.46 | globular cluster
+NGC 6325 Globular Cluster | 259.27 | -23.77 | globular cluster
+NGC 6388 Globular Cluster | 264.07 | -44.73 | globular cluster
+NGC 6397 Globular Cluster | 265.18 | -53.67 | globular cluster
+NGC 6440 Globular Cluster | 267.22 | -20.35 | globular cluster
+NGC 6441 Globular Cluster | 267.56 | -37.05 | globular cluster
+NGC 6541 Globular Cluster | 271.90 | -43.70 | globular cluster
+NGC 6544 Globular Cluster | 271.90 | -25.00 | globular cluster
+NGC 6553 Globular Cluster | 272.32 | -25.90 | globular cluster
+NGC 6569 Globular Cluster | 273.41 | -31.83 | globular cluster
+NGC 6584 Globular Cluster | 274.66 | -52.22 | globular cluster
+NGC 6624 Globular Cluster | 275.92 | -30.37 | globular cluster
+NGC 6652 Globular Cluster | 278.95 | -32.98 | globular cluster
+NGC 6712 Globular Cluster | 283.27 | -8.70 | globular cluster
+NGC 6723 Globular Cluster | 284.89 | -36.60 | globular cluster
+NGC 6752 Globular Cluster | 287.72 | -59.98 | globular cluster
+NGC 6934 Globular Cluster | 308.57 | 7.40 | globular cluster
+NGC 7006 Globular Cluster | 315.37 | 16.19 | globular cluster
+NGC 7492 Globular Cluster | 347.11 | -15.62 | globular cluster
+NGC 121 SMC Globular Cluster | 6.70 | -71.53 | globular cluster
+NGC 330 SMC Cluster | 14.10 | -72.46 | globular cluster
+NGC 419 SMC Cluster | 17.20 | -72.88 | globular cluster
+NGC 55 Sculptor Dwarf Galaxy | 3.72 | -39.22 | spiral galaxy
+NGC 247 Cetus Spiral Galaxy | 11.79 | -20.77 | spiral galaxy
+NGC 253 Sculptor Galaxy | 11.89 | -25.29 | spiral galaxy
+NGC 300 Spiral Galaxy | 13.70 | -37.68 | spiral galaxy
+NGC 404 Mirach's Ghost | 17.36 | 35.72 | lenticular galaxy
+NGC 488 Spiral Galaxy | 22.90 | 5.25 | spiral galaxy
+NGC 772 Spiral Galaxy | 29.84 | 19.00 | spiral galaxy
+NGC 891 Silver Sliver Galaxy | 35.64 | 42.35 | spiral galaxy
+NGC 925 Spiral Galaxy | 36.78 | 33.59 | spiral galaxy
+NGC 1023 Lenticular Galaxy | 40.10 | 39.06 | lenticular galaxy
+NGC 1055 Spiral Galaxy | 40.42 | 0.43 | spiral galaxy
+NGC 1097 Spiral Galaxy | 41.58 | -30.28 | spiral galaxy
+NGC 1232 Spiral Galaxy | 47.43 | -20.58 | spiral galaxy
+NGC 1291 Outer Ring Galaxy | 49.32 | -41.12 | spiral galaxy
+NGC 1300 Barred Spiral Galaxy | 49.92 | -19.41 | spiral galaxy
+NGC 1313 Topsy Turvy Galaxy | 49.57 | -66.50 | spiral galaxy
+NGC 1316 Fornax A | 50.67 | -37.21 | lenticular galaxy
+NGC 1365 Great Barred Spiral Galaxy | 53.40 | -36.14 | spiral galaxy
+NGC 1399 Fornax Central Galaxy | 54.62 | -35.45 | elliptical galaxy
+NGC 1404 Fornax Elliptical Galaxy | 54.72 | -35.59 | elliptical galaxy
+NGC 1350 Spiral Galaxy | 52.78 | -33.63 | spiral galaxy
+NGC 1398 Spiral Galaxy | 54.67 | -26.33 | spiral galaxy
+NGC 1532 Edge-on Spiral Galaxy | 63.02 | -32.85 | spiral galaxy
+NGC 1566 Intermediate Spiral Galaxy | 65.00 | -54.93 | spiral galaxy
+NGC 1569 Dwarf Starburst Galaxy | 67.70 | 64.85 | irregular galaxy
+NGC 1808 Spiral Galaxy | 76.94 | -37.51 | spiral galaxy
+NGC 1961 Spiral Galaxy | 85.58 | 69.38 | spiral galaxy
+NGC 2146 Dusty Hand Galaxy | 94.60 | 78.35 | spiral galaxy
+NGC 2207 Spiral Galaxy | 94.12 | -21.37 | spiral galaxy
+IC 2163 Spiral Galaxy | 94.02 | -21.39 | spiral galaxy
+NGC 2403 Spiral Galaxy | 114.21 | 65.60 | spiral galaxy
+NGC 2683 UFO Galaxy | 133.17 | 33.42 | spiral galaxy
+NGC 2841 Tiger's Eye Galaxy | 140.51 | 50.97 | spiral galaxy
+NGC 2903 Spiral Galaxy | 143.04 | 21.50 | spiral galaxy
+NGC 2997 Spiral Galaxy | 146.41 | -31.19 | spiral galaxy
+NGC 3079 Bubble Galaxy | 150.50 | 55.68 | spiral galaxy
+NGC 3109 Antlia Dwarf Galaxy | 150.78 | -26.16 | irregular galaxy
+NGC 3184 Little Pinwheel Galaxy | 154.55 | 41.42 | spiral galaxy
+NGC 3190 Leo Quartet Galaxy | 154.55 | 21.83 | spiral galaxy
+NGC 3227 Arp 94 Interacting Galaxy | 155.88 | 19.87 | spiral galaxy
+NGC 3226 Arp 94 Elliptical Galaxy | 155.77 | 19.90 | elliptical galaxy
+NGC 3256 Starburst Galaxy | 156.96 | -43.90 | interacting galaxies
+NGC 3310 Starburst Galaxy | 159.69 | 53.50 | spiral galaxy
+NGC 3344 Spiral Galaxy | 160.91 | 24.92 | spiral galaxy
+NGC 3521 Bubble Galaxy | 166.45 | -0.04 | spiral galaxy
+NGC 3621 Spiral Galaxy | 169.57 | -32.81 | spiral galaxy
+NGC 3628 Hamburger Galaxy | 170.08 | 13.59 | spiral galaxy
+NGC 3718 Arp 214 Galaxy | 173.14 | 53.07 | spiral galaxy
+NGC 3877 Spiral Galaxy | 176.56 | 47.50 | spiral galaxy
+NGC 3953 Spiral Galaxy | 178.46 | 52.33 | spiral galaxy
+NGC 4038 Antennae Galaxies East | 180.48 | -18.88 | interacting galaxies
+NGC 4039 Antennae Galaxies West | 180.50 | -18.88 | interacting galaxies
+NGC 4088 Spiral Galaxy | 181.41 | 50.55 | spiral galaxy
+NGC 4151 Eye of Sauron Galaxy | 182.61 | 39.41 | spiral galaxy
+NGC 4214 Dwarf Starburst Galaxy | 183.91 | 36.33 | irregular galaxy
+NGC 4216 Silver Streak Galaxy | 183.91 | 13.15 | spiral galaxy
+NGC 4236 Spiral Galaxy | 184.08 | 69.46 | spiral galaxy
+NGC 4244 Silver Needle Galaxy | 184.37 | 37.81 | spiral galaxy
+NGC 4261 3C 270 Elliptical Galaxy | 184.84 | 5.83 | elliptical galaxy
+NGC 4274 Spiral Galaxy | 184.95 | 29.61 | spiral galaxy
+NGC 4314 Spiral Galaxy | 185.61 | 29.90 | spiral galaxy
+NGC 4388 Virgo Spiral Galaxy | 186.45 | 12.67 | spiral galaxy
+NGC 4402 Virgo Spiral Galaxy | 186.61 | 13.11 | spiral galaxy
+NGC 4438 Eyes Galaxies | 186.93 | 13.02 | interacting galaxies
+NGC 4435 Eyes Galaxies | 186.80 | 13.08 | lenticular galaxy
+NGC 4449 Box Dwarf Galaxy | 187.05 | 44.10 | irregular galaxy
+NGC 4450 Virgo Spiral Galaxy | 187.07 | 17.09 | spiral galaxy
+NGC 4490 Cocoon Galaxy | 187.65 | 41.64 | interacting galaxies
+NGC 4526 Virgo Lenticular Galaxy | 188.51 | 7.70 | lenticular galaxy
+NGC 4535 Virgo Spiral Galaxy | 188.62 | 8.20 | spiral galaxy
+NGC 4559 Coma Pinwheel Galaxy | 189.02 | 25.77 | spiral galaxy
+NGC 4565 Needle Galaxy | 189.11 | 25.99 | spiral galaxy
+NGC 4631 Whale Galaxy | 190.53 | 32.54 | spiral galaxy
+NGC 4656 Hockey Stick Galaxy | 191.00 | 32.17 | spiral galaxy
+NGC 4666 Spiral Galaxy | 191.29 | -0.47 | spiral galaxy
+NGC 4697 Caldwell 52 Elliptical Galaxy | 192.03 | -5.80 | elliptical galaxy
+NGC 4725 Spiral Galaxy | 192.51 | 25.50 | spiral galaxy
+NGC 4945 Spiral Galaxy | 196.36 | -49.47 | spiral galaxy
+NGC 5005 Spiral Galaxy | 197.68 | 37.06 | spiral galaxy
+NGC 5033 Spiral Galaxy | 198.36 | 36.60 | spiral galaxy
+NGC 5102 Lenticular Galaxy | 200.37 | -36.63 | lenticular galaxy
+NGC 5128 Centaurus A | 201.37 | -43.02 | lenticular galaxy
+NGC 5248 Spiral Galaxy | 204.34 | 8.89 | spiral galaxy
+NGC 5364 Spiral Galaxy | 209.03 | 5.02 | spiral galaxy
+NGC 5474 Dwarf Spiral Galaxy | 211.31 | 53.67 | dwarf galaxy
+NGC 5746 Spiral Galaxy | 221.17 | 1.95 | spiral galaxy
+NGC 5907 Splinter Galaxy | 228.91 | 56.33 | spiral galaxy
+NGC 6240 Starfish Galaxy | 253.25 | 2.40 | interacting galaxies
+NGC 6744 Pavo Spiral Galaxy | 287.44 | -63.86 | spiral galaxy
+NGC 6822 Barnard's Galaxy | 296.24 | -14.80 | dwarf galaxy
+NGC 6946 Fireworks Galaxy | 308.72 | 60.15 | spiral galaxy
+NGC 6951 Spiral Galaxy | 309.29 | 66.10 | spiral galaxy
+NGC 7217 Spiral Galaxy | 331.97 | 31.37 | spiral galaxy
+NGC 7317 Stephan's Quintet Member | 338.90 | 33.97 | elliptical galaxy
+NGC 7318A Stephan's Quintet Member | 338.99 | 33.97 | elliptical galaxy
+NGC 7319 Stephan's Quintet Member | 339.04 | 33.97 | spiral galaxy
+NGC 7320 Stephan's Quintet Foreground | 339.10 | 33.98 | spiral galaxy
+NGC 7331 Deer Lick Galaxy | 339.27 | 34.42 | spiral galaxy
+NGC 7479 Superman Galaxy | 346.17 | 12.32 | spiral galaxy
+NGC 7552 Grus Quartet Galaxy | 349.04 | -42.59 | spiral galaxy
+NGC 7582 Grus Quartet Galaxy | 349.58 | -42.37 | spiral galaxy
+NGC 7590 Grus Spiral Galaxy | 349.73 | -42.24 | spiral galaxy
+NGC 7599 Grus Spiral Galaxy | 349.83 | -42.26 | spiral galaxy
+NGC 7727 Interacting Galaxy | 354.97 | -12.30 | interacting galaxies
+NGC 7793 Spiral Galaxy | 359.46 | -32.59 | spiral galaxy
+NGC 7814 Little Sombrero Galaxy | 0.81 | 16.15 | spiral galaxy
+IC 342 Hidden Galaxy | 56.70 | 68.10 | spiral galaxy
+IC 10 Starburst Dwarf Galaxy | 5.10 | 59.30 | dwarf galaxy
+IC 1613 Dwarf Galaxy | 16.20 | 2.13 | dwarf galaxy
+IC 2391 Open Cluster | 130.10 | -53.07 | open cluster
+IC 2602 Southern Pleiades Cluster | 160.80 | -64.40 | open cluster
+NGC 6992 Veil Nebula East | 314.10 | 31.72 | supernova remnant
+NGC 6960 Witch's Broom Veil Nebula West | 311.37 | 30.72 | supernova remnant
+NGC 6979 Pickering's Triangle Veil Nebula | 312.80 | 32.15 | supernova remnant
+NGC 2736 Pencil Nebula | 135.04 | -45.90 | supernova remnant
+NGC 3199 Windblown Nebula | 150.35 | -57.85 | emission nebula
+NGC 6164 Emission Nebula | 248.37 | -48.42 | emission nebula
+NGC 6165 Emission Nebula | 248.37 | -48.42 | emission nebula
+NGC 6355 Globular Cluster | 259.54 | -26.36 | globular cluster
+IC 59 Ghost of Cassiopeia Nebula | 13.86 | 61.08 | emission nebula
+IC 63 Ghost of Cassiopeia Nebula | 14.77 | 60.91 | emission nebula
+Andromeda | 11.0 | 40.0 | constellation-center
+Antlia | 152.0 | -35.0 | constellation-center
+Apus | 259.5 | -75.0 | constellation-center
+Aquarius | 338.0 | -15.0 | constellation-center
+Aquila | 295.0 | 3.0 | constellation-center
+Ara | 257.0 | -53.0 | constellation-center
+Aries | 38.0 | 20.0 | constellation-center
+Auriga | 91.0 | 40.0 | constellation-center
+Bootes | 225.0 | 30.0 | constellation-center
+Caelum | 70.0 | -37.0 | constellation-center
+Camelopardalis | 60.0 | 70.0 | constellation-center
+Cancer | 128.0 | 20.0 | constellation-center
+Canes Venatici | 195.0 | 45.0 | constellation-center
+Canis Major | 105.0 | -25.0 | constellation-center
+Canis Minor | 115.0 | 5.0 | constellation-center
+Capricornus | 315.0 | -18.0 | constellation-center
+Carina | 132.0 | -62.0 | constellation-center
+Cassiopeia | 15.0 | 60.0 | constellation-center
+Centaurus | 195.0 | -50.0 | constellation-center
+Cepheus | 330.0 | 65.0 | constellation-center
+Cetus | 23.0 | -10.0 | constellation-center
+Chamaeleon | 165.0 | -79.0 | constellation-center
+Circinus | 225.0 | -62.0 | constellation-center
+Columba | 90.0 | -35.0 | constellation-center
+Coma Berenices | 191.0 | 23.0 | constellation-center
+Corona Australis | 285.0 | -40.0 | constellation-center
+Corona Borealis | 238.0 | 33.0 | constellation-center
+Corvus | 188.0 | -22.0 | constellation-center
+Crater | 173.0 | -16.0 | constellation-center
+Crux | 188.0 | -60.0 | constellation-center
+Cygnus | 310.0 | 42.0 | constellation-center
+Delphinus | 310.0 | 14.0 | constellation-center
+Dorado | 86.0 | -60.0 | constellation-center
+Draco | 260.0 | 65.0 | constellation-center
+Equuleus | 318.0 | 8.0 | constellation-center
+Eridanus | 53.0 | -27.0 | constellation-center
+Fornax | 38.0 | -30.0 | constellation-center
+Gemini | 105.0 | 22.0 | constellation-center
+Grus | 338.0 | -47.0 | constellation-center
+Hercules | 255.0 | 30.0 | constellation-center
+Horologium | 45.0 | -55.0 | constellation-center
+Hydra | 158.0 | -15.0 | constellation-center
+Hydrus | 30.0 | -75.0 | constellation-center
+Indus | 315.0 | -60.0 | constellation-center
+Lacerta | 338.0 | 46.0 | constellation-center
+Leo | 158.0 | 15.0 | constellation-center
+Leo Minor | 155.0 | 32.0 | constellation-center
+Lepus | 83.0 | -20.0 | constellation-center
+Libra | 230.0 | -16.0 | constellation-center
+Lupus | 233.0 | -43.0 | constellation-center
+Lynx | 120.0 | 47.0 | constellation-center
+Lyra | 285.0 | 35.0 | constellation-center
+Mensa | 82.5 | -77.5 | constellation-center
+Microscopium | 315.0 | -40.0 | constellation-center
+Monoceros | 105.0 | 0.0 | constellation-center
+Musca | 190.0 | -71.0 | constellation-center
+Norma | 245.0 | -52.0 | constellation-center
+Octans | 0.0 | -85.0 | constellation-center
+Ophiuchus | 263.0 | -8.0 | constellation-center
+Orion | 84.0 | 3.0 | constellation-center
+Pavo | 300.0 | -70.0 | constellation-center
+Pegasus | 345.0 | 20.0 | constellation-center
+Perseus | 53.0 | 45.0 | constellation-center
+Phoenix | 15.0 | -48.0 | constellation-center
+Pictor | 90.0 | -55.0 | constellation-center
+Pisces | 8.0 | 12.0 | constellation-center
+Piscis Austrinus | 330.0 | -32.0 | constellation-center
+Puppis | 116.0 | -35.0 | constellation-center
+Pyxis | 135.0 | -33.0 | constellation-center
+Reticulum | 60.0 | -62.0 | constellation-center
+Sagitta | 295.0 | 18.0 | constellation-center
+Sagittarius | 285.0 | -28.0 | constellation-center
+Scorpius | 248.0 | -33.0 | constellation-center
+Sculptor | 8.0 | -33.0 | constellation-center
+Scutum | 280.0 | -10.0 | constellation-center
+Serpens | 258.0 | 5.0 | constellation-center
+Sextans | 153.0 | -2.0 | constellation-center
+Taurus | 68.0 | 16.0 | constellation-center
+Telescopium | 285.0 | -52.0 | constellation-center
+Triangulum | 30.0 | 32.0 | constellation-center
+Triangulum Australe | 240.0 | -65.0 | constellation-center
+Tucana | 353.0 | -60.0 | constellation-center
+Ursa Major | 165.0 | 55.0 | constellation-center
+Ursa Minor | 240.0 | 75.0 | constellation-center
+Vela | 135.0 | -47.0 | constellation-center
+Virgo | 200.0 | -2.0 | constellation-center
+Volans | 120.0 | -70.0 | constellation-center
+Vulpecula | 305.0 | 24.0 | constellation-center
+Sirius | 101.287 | -16.716 | star
+Canopus | 95.988 | -52.696 | star
+Arcturus | 213.915 | 19.182 | star
+Vega | 279.235 | 38.784 | star
+Capella | 79.172 | 45.998 | star
+Rigel | 78.634 | -8.202 | star
+Procyon | 114.825 | 5.225 | star
+Betelgeuse | 88.793 | 7.407 | star
+Achernar | 24.429 | -57.237 | star
+Hadar | 210.955 | -60.373 | star
+Altair | 297.696 | 8.868 | star
+Acrux | 186.65 | -63.099 | star
+Aldebaran | 68.98 | 16.509 | star
+Antares | 247.352 | -26.432 | star
+Spica | 201.298 | -11.161 | star
+Pollux | 116.329 | 28.026 | star
+Fomalhaut | 344.413 | -29.622 | star
+Deneb | 310.358 | 45.28 | star
+Mimosa | 191.931 | -59.689 | star
+Regulus | 152.093 | 11.967 | star
+Adhara | 104.657 | -28.972 | star
+Castor | 113.65 | 31.888 | star
+Gacrux | 187.791 | -57.113 | star
+Shaula | 263.402 | -37.104 | star
+Bellatrix | 81.283 | 6.35 | star
+Elnath | 81.573 | 28.607 | star
+Miaplacidus | 138.3 | -69.717 | star
+Alnilam | 84.053 | -1.202 | star
+Alnair | 332.058 | -46.961 | star
+Alnitak | 85.19 | -1.943 | star
+Alioth | 193.507 | 55.96 | star
+Dubhe | 165.932 | 61.751 | star
+Mirfak | 51.081 | 49.861 | star
+Wezen | 108.29 | -26.393 | star
+Sargas | 264.33 | -43.0 | star
+Kaus Australis | 276.043 | -34.385 | star
+Avior | 125.628 | -59.51 | star
+Alkaid | 206.885 | 49.313 | star
+Menkalinan | 89.882 | 44.948 | star
+Atria | 249.192 | -69.028 | star
+Alhena | 99.428 | 16.399 | star
+Peacock | 309.808 | -56.735 | star
+Mirzam | 95.675 | -17.956 | star
+Alphard | 141.897 | -8.659 | star
+Hamal | 31.794 | 23.462 | star
+Polaris | 37.954 | 89.264 | star
+Nunki | 283.816 | -26.297 | star
+Denebola | 177.265 | 14.572 | star
+Arneb | 82.061 | -17.821 | star
+Alpheratz | 2.097 | 29.091 | star
+Diphda | 11.332 | -17.987 | star
+Kochab | 222.676 | 74.156 | star
+Algol | 47.12 | 40.957 | star
+Algieba | 154.99 | 19.84 | star
+Almach | 30.975 | 42.33 | star
+Tarazed | 296.2 | 10.61 | star
+Navi | 14.18 | 60.72 | star
+Sadr | 304.94 | 40.256 | star
+Eltanin | 263.78 | 51.489 | star
+Caph | 2.294 | 59.15 | star
+Schedar | 10.127 | 56.537 | star
+Alderamin | 320.027 | 62.586 | star
+Menkar | 45.57 | 4.09 | star
+Phact | 90.96 | -34.074 | star
+Alphecca | 233.67 | 26.71 | star
+Alchiba | 183.0 | -24.73 | star
+Alkes | 164.9 | -18.14 | star
+Sualocin | 312.0 | 15.91 | star
+Thuban | 211.1 | 64.375 | star
+Kitalpha | 318.27 | 5.23 | star
+Rasalgethi | 258.66 | 14.39 | star
+Rasalhague | 263.73 | 12.56 | star
+Markab | 345.05 | 15.21 | star
+Ankaa | 6.571 | -42.306 | star
+Alrescha | 30.0 | 2.76 | star
+Unukalhai | 236.07 | 6.43 | star
+Mira | 53.677 | -2.978 | star
+Eta Carinae | 161.265 | -59.685 | star
+P Cygni | 304.799 | 38.032 | star
+Proxima Centauri | 217.429 | -62.679 | star
+Barnard's Star | 269.453 | 4.693 | star
+TRAPPIST-1 | 346.625 | -5.041 | star
+Tabby's Star | 301.566 | 44.456 | star
+Rigil Kentaurus | 219.902 | -60.834 | star
+Mintaka | 83.0 | -0.299 | star
+Saiph | 86.94 | -9.67 | star
+Meissa | 88.79 | 9.93 | star
+Hatysa | 83.56 | -5.91 | star
+Mizar | 200.98 | 54.925 | star
+Alcor | 200.77 | 55.02 | star
+Phecda | 178.46 | 53.695 | star
+Merak | 165.46 | 56.382 | star
+Megrez | 183.86 | 57.033 | star
+Pherkad | 230.18 | 71.834 | star
+Yildun | 262.0 | 86.59 | star
+Sheliak | 282.621 | 33.363 | star
+Sulafat | 282.73 | 32.69 | star
+Albireo | 292.685 | 27.959 | star
+Gienah Cygni | 311.55 | 33.97 | star
+Fawaris | 296.1 | 45.13 | star
+61 Cygni | 316.7 | 38.75 | star
+Chi Cygni | 296.0 | 32.79 | star
+RR Lyrae | 291.36 | 42.78 | star
+Double Double | 281.0 | 39.64 | star
+Izar | 221.25 | 27.074 | star
+Muphrid | 209.57 | 18.398 | star
+Nekkar | 228.0 | 40.39 | star
+Seginus | 217.43 | 38.314 | star
+Cor Caroli | 194.05 | 38.32 | star
+Chara | 192.0 | 41.36 | star
+La Superba | 194.4 | 45.56 | star
+Diadem | 197.5 | 17.54 | star
+Beta Comae Berenices | 197.9 | 27.87 | star
+FK Comae Berenices | 200.6 | 26.97 | star
+Vindemiatrix | 195.5 | 10.95 | star
+Porrima | 190.42 | -1.45 | star
+Zavijava | 177.67 | 1.765 | star
+Zubeneschamali | 229.25 | -9.383 | star
+Zubenelgenubi | 222.7 | -16.04 | star
+Zubenelakrab | 233.9 | -14.79 | star
+Brachium | 226.0 | -25.28 | star
+Gliese 581 | 229.8 | -7.72 | star
+Sabik | 257.6 | -15.72 | star
+Zeta Ophiuchi | 249.3 | -10.57 | star
+Cebalrai | 264.3 | 4.57 | star
+RS Ophiuchi | 267.55 | -6.71 | star
+Lesath | 247.5 | -37.35 | star
+Dschubba | 240.08 | -22.622 | star
+Acrab | 241.089 | -19.805 | star
+Jabbah | 243.8 | -19.47 | star
+Wei | 245.0 | -34.29 | star
+Eta Scorpii | 258.0 | -43.24 | star
+U Scorpii | 245.63 | -17.85 | star
+Kaus Borealis | 278.0 | -25.42 | star
+Kaus Media | 275.1 | -29.83 | star
+Alnasl | 270.63 | -30.42 | star
+Ascella | 286.12 | -29.88 | star
+Rukbat | 290.9 | -40.62 | star
+Arkab | 290.66 | -44.46 | star
+Pistol Star | 266.5 | -28.82 | star
+S Doradus | 84.9 | -69.13 | star
+R Doradus | 69.9 | -62.0 | star
+Beta Doradus | 83.4 | -62.5 | star
+Beta Pictoris | 86.82 | -51.066 | star
+Kapteyn's Star | 77.9 | -45.02 | star
+Zeta Reticuli | 49.6 | -62.5 | star
+Alpha Reticuli | 64.55 | -62.51 | star
+Beta Reticuli | 56.0 | -64.7 | star
+Alpha Horologii | 62.5 | -42.35 | star
+R Horologii | 43.0 | -49.85 | star
+Alpha Caeli | 70.0 | -41.9 | star
+Gamma Caeli | 76.0 | -35.3 | star
+Dalim | 46.8 | -28.95 | star
+Beta Fornacis | 42.4 | -32.34 | star
+Alpha Sculptoris | 11.28 | -29.24 | star
+Beta Sculptoris | 12.6 | -37.98 | star
+R Sculptoris | 21.1 | -32.69 | star
+Alpha Microscopii | 313.8 | -33.97 | star
+Gamma Microscopii | 315.4 | -32.65 | star
+AX Microscopii | 319.3 | -38.87 | star
+Alpha Indi | 318.8 | -47.39 | star
+Beta Indi | 313.7 | -58.17 | star
+Epsilon Indi | 330.84 | -56.786 | star
+Alpha Telescopii | 279.73 | -45.82 | star
+Zeta Telescopii | 277.1 | -49.87 | star
+Alpha Arae | 263.736 | -49.876 | star
+Beta Arae | 261.3 | -55.53 | star
+Alpha Normae | 246.6 | -50.1 | star
+Gamma2 Normae | 244.9 | -50.11 | star
+Alpha Lupi | 220.6 | -47.39 | star
+Beta Lupi | 224.6 | -43.24 | star
+Alpha Circini | 221.17 | -64.97 | star
+Beta Circini | 229.4 | -58.8 | star
+Gamma Apodis | 248.4 | -78.77 | star
+Alpha Apodis | 259.5 | -69.0 | star
+Beta Muscae | 191.6 | -68.1 | star
+Alpha Muscae | 192.9 | -69.14 | star
+Theta Muscae | 195.7 | -65.47 | star
+Beta Chamaeleontis | 184.6 | -79.43 | star
+Alpha Chamaeleontis | 128.9 | -76.12 | star
+Gamma Chamaeleontis | 158.0 | -78.2 | star
+Sigma Octantis | 324.0 | -88.96 | star
+Alpha Octantis | 316.0 | -82.18 | star
+Beta Hydri | 6.4 | -77.26 | star
+Alpha Hydri | 27.92 | -61.57 | star
+Beta Mensae | 75.7 | -71.25 | star
+Alpha Mensae | 92.5 | -74.46 | star
+Beta Volantis | 126.3 | -70.29 | star
+Alpha Volantis | 135.5 | -66.35 | star
+Gamma Volantis | 107.2 | -70.45 | star
+Suhail | 136.99 | -43.43 | star
+Regor | 122.43 | -47.34 | star
+Alsephina | 130.72 | -54.71 | star
+Markeb | 141.5 | -55.01 | star
+Naos | 120.9 | -40.0 | star
+Tureis | 119.0 | -24.3 | star
+Azmidi | 117.8 | -37.1 | star
+L2 Puppis | 109.08 | -44.64 | star
+RS Puppis | 122.85 | -34.34 | star
+Aspidiske | 146.5 | -59.275 | star
+Hadir | 146.8 | -65.07 | star
+AG Carinae | 164.0 | -60.5 | star
+Imai | 183.0 | -58.75 | star
+Ginan | 185.4 | -60.4 | star
+Menkent | 211.7 | -36.37 | star
+Muhlifain | 190.4 | -48.96 | star
+Epsilon Centauri | 204.9 | -53.47 | star
+HR 5171 | 206.8 | -59.69 | star
+Beta Trianguli Australis | 238.9 | -63.43 | star
+Gamma Trianguli Australis | 237.0 | -68.77 | star
+Beta Pavonis | 311.2 | -66.16 | star
+Delta Pavonis | 306.2 | -66.18 | star
+Tiaki | 336.9 | -46.88 | star
+Al Dhanab | 333.9 | -37.11 | star
+Beta Phoenicis | 16.5 | -46.54 | star
+SX Phoenicis | 23.2 | -41.25 | star
+Beta Tucanae | 7.7 | -63.18 | star
+Gamma Tucanae | 23.4 | -58.22 | star
+Alpha Tucanae | 335.6 | -60.24 | star
+VY Canis Majoris | 110.74 | -25.768 | star
+EZ Canis Majoris | 110.0 | -23.5 | star
+Furud | 95.64 | -30.06 | star
+Aludra | 111.034 | -29.303 | star
+Gomeisa | 113.74 | 8.29 | star
+Luyten's Star | 111.9 | 5.32 | star
+Ross 614 | 95.75 | -2.77 | star
+S Monocerotis | 100.25 | 9.9 | star
+Beta Monocerotis | 97.2 | -7.03 | star
+V838 Monocerotis | 106.0 | -3.83 | star
+Alpha Monocerotis | 116.9 | -9.65 | star
+R Leporis | 74.9 | -14.81 | star
+Ran | 53.233 | -9.458 | star
+Tau Ceti | 26.017 | -15.937 | star
+UV Ceti | 23.65 | -17.95 | star
+Keid | 63.82 | -28.65 | star
+Cursa | 76.9 | -5.085 | star
+Zibal | 48.26 | -8.82 | star
+Acamar | 44.0 | -40.32 | star
+Sadalmelik | 337.666 | -0.312 | star
+Sadalsuud | 322.89 | -5.57 | star
+Sadachbia | 335.68 | -1.44 | star
+Skat | 344.0 | -15.83 | star
+Gliese 876 | 343.32 | -14.25 | star
+Enif | 326.0 | 9.87 | star
+Homam | 16.03 | 10.61 | star
+Baham | 341.0 | 6.2 | star
+Algenib | 3.31 | 15.18 | star
+Scheat | 345.19 | 28.083 | star
+51 Pegasi | 344.0 | 20.77 | star
+Upsilon Andromedae | 26.0 | 41.41 | star
+Ross 248 | 356.0 | 44.2 | star
+Delta Andromedae | 9.9 | 30.86 | star
+Mirach | 17.433 | 35.62 | star
+Mothallah | 25.45 | 29.58 | star
+Deltotum | 31.6 | 34.99 | star
+Gamma Trianguli | 28.6 | 33.86 | star
+Sheratan | 28.66 | 20.758 | star
+Mesarthim | 28.5 | 19.29 | star
+Botein | 47.73 | 19.61 | star
+Teegarden's Star | 43.25 | 16.88 | star
+Ain | 64.6 | 19.18 | star
+Tianguan | 84.41 | 21.143 | star
+T Tauri | 65.5 | 19.54 | star
+Alcyone | 56.75 | 24.117 | star
+Atlas | 57.29 | 24.136 | star
+Gamma Tauri | 65.13 | 15.63 | star
+Mahasim | 89.9 | 37.21 | star
+Hassaleh | 74.1 | 33.17 | star
+Almaaz | 78.0 | 43.82 | star
+Saclateni | 76.0 | 41.08 | star
+Propus | 93.0 | 22.51 | star
+Mekbuda | 105.0 | 20.62 | star
+Wasat | 105.55 | 21.98 | star
+Mebsuta | 100.24 | 25.13 | star
+Tejat Posterior | 95.9 | 22.51 | star
+U Geminorum | 114.7 | 22.0 | star
+Altarf | 124.1 | 9.19 | star
+Asellus Australis | 131.1 | 18.15 | star
+Asellus Borealis | 130.4 | 21.5 | star
+Acubens | 130.59 | 11.86 | star
+55 Cancri | 130.6 | 28.34 | star
+Ras Elased | 146.4 | 23.77 | star
+Aldhafera | 154.1 | 23.42 | star
+Chertan | 168.73 | 15.43 | star
+Zosma | 168.53 | 20.524 | star
+Wolf 359 | 164.12 | 7.0 | star
+CW Leonis | 146.99 | 13.28 | star
+Beta Leonis Minoris | 156.9 | 36.65 | star
+Praecipua | 158.3 | 34.45 | star
+38 Lynx | 139.6 | 36.77 | star
+Alpha Lyncis | 139.98 | 34.39 | star
+Lalande 21185 | 165.83 | 35.97 | star
+W Ursae Majoris | 150.6 | 55.97 | star
+Groombridge 1830 | 178.0 | 37.72 | star
+Groombridge 34 | 4.7 | 43.9 | star
+Alpha Antliae | 156.7 | -31.2 | star
+Gamma Hydrae | 199.7 | -23.13 | star
+R Hydrae | 200.7 | -23.08 | star
+V Hydrae | 162.0 | -21.2 | star
+TW Hydrae | 165.47 | -34.74 | star
+Alpha Sextantis | 154.85 | -0.49 | star
+Beta Sextantis | 157.6 | -6.83 | star
+Beta Crateris | 167.9 | -22.58 | star
+Gienah Corvi | 183.53 | -17.54 | star
+Algorab | 184.58 | -16.52 | star
+Minkar | 188.58 | -23.4 | star
