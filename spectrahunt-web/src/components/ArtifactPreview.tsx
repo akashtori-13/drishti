@@ -335,7 +335,7 @@ export default function ArtifactPreview() {
         <button ref={closeRef} type="button" className="pv-close pressable" aria-label="Close preview"
           style={{ minWidth: 44, minHeight: 44 }}
           onClick={closePreview}>×</button>
-        {!data && !err && <div className="pv-loading" aria-label="Loading preview"><span /></div>}
+        {!data && !err && <div className="pv-loading" role="status" aria-label="Loading preview"><span /></div>}
         {err && !data && (
           <div className="pv-status error">
             Couldn’t load this field: {err}.

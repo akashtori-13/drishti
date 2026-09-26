@@ -749,7 +749,7 @@ export default function StellariumView({
         onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onKeyDown={onKeyLook}
         onPointerLeave={() => { pointers.current.clear(); pinch.current = null; drag.current = null; setCursor(null); }}
       />
-      {loading && !img && <div className="stel-load">Loading real sky…</div>}
+      {loading && !img && <div className="stel-load" role="status">Loading real sky…</div>}
       {loading && img && <div className="stel-sync" aria-hidden="true"><span /></div>}
 
       {/* cardinal ring */}
