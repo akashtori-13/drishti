@@ -17,7 +17,7 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
-QUERY_TIMEOUT = 90
+QUERY_TIMEOUT = 180
 CHECKPOINT_EVERY = 50
 
 
@@ -50,13 +50,23 @@ def simbad_check(targets: list[dict]) -> dict:
         if t["name"] in res:
             continue
         try:
-            q = ("SELECT TOP 1 main_id, ra, dec, DISTANCE(POINT('ICRS', %f, %f), coord) AS sep "
-                 "FROM basic WHERE CONTAINS(POINT('ICRS', %f, %f), CIRCLE('ICRS', %f, %f, 0.008333)) = 1 "
-                 "ORDER BY sep ASC" % (t["ra"], t["dec"], t["ra"], t["dec"], t["ra"], t["dec"]))
-            rows = timed_search(svc, q, 1)
+            q = ("SELECT TOP 3 main_id, ra, dec "
+                 "FROM basic WHERE CONTAINS(POINT('ICRS', %f, %f), CIRCLE('ICRS', %f, %f, 0.008333)) = 1"
+                 % (t["ra"], t["dec"], t["ra"], t["dec"]))
+            rows = timed_search(svc, q, 3)
             if len(rows):
-                res[t["name"]] = {"match": str(rows[0]["main_id"]),
-                                  "sep_arcsec": round(float(rows[0]["sep"]) * 3600.0, 1)}
+                import math
+                best = None
+                for row in rows:
+                    try:
+                        dra = (float(row["ra"]) - t["ra"]) * math.cos(math.radians(t["dec"]))
+                        dd = float(row["dec"]) - t["dec"]
+                        sep = math.hypot(dra, dd) * 3600.0
+                    except (TypeError, ValueError):
+                        continue
+                    if best is None or sep < best[1]:
+                        best = (str(row["main_id"]), round(sep, 1))
+                res[t["name"]] = {"match": best[0], "sep_arcsec": best[1]} if best else {"match": None, "sep_arcsec": None}
             else:
                 res[t["name"]] = {"match": None, "sep_arcsec": None}
         except Exception as e:  # noqa: BLE001 - record, don't stop the batch
