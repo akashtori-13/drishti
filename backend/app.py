@@ -13,6 +13,7 @@ from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
@@ -50,6 +51,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="DRISHTI API", version=PIPELINE_VERSION, lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=CORS_ORIGINS, allow_credentials=False,
                    allow_methods=["GET", "OPTIONS"], allow_headers=["Content-Type", "Range"])
+app.add_middleware(GZipMiddleware, minimum_size=1024)
 
 
 class EpochHit(BaseModel):
@@ -144,7 +146,8 @@ async def api_epochs(ra: float = Query(...), dec: float = Query(...),
                      band: int = Query(3, ge=1, le=6),
                      size_deg: float = Query(CUTOUT_SIZE_DEG, gt=0, le=1.0)):
     from backend.epochs import discover_epochs
-    return discover_epochs(ra, dec, band=band, size_deg=size_deg)
+    import asyncio
+    return await asyncio.to_thread(discover_epochs, ra, dec, band=band, size_deg=size_deg)
 
 
 @app.get("/api/cutout.png")
@@ -262,9 +265,11 @@ async def api_stars(ra: float = Query(...), dec: float = Query(...),
     """Gaia DR3 stars in the current view (cached 30d). Powers the observer overlay."""
     from backend.crossmatch import query_gaia_cone
     mag_limit = 16.0 if fov_deg < 5 else 13.0 if fov_deg < 20 else 10.5
+    import asyncio
     try:
-        stars = query_gaia_cone(ra, dec, fov_deg * 0.75, mag_limit=mag_limit,
-                                top=2000, db_path=DATABASE_PATH)
+        stars = await asyncio.to_thread(
+            query_gaia_cone, ra, dec, fov_deg * 0.75, mag_limit=mag_limit,
+            top=2000, db_path=DATABASE_PATH)
         return {"stars": stars, "detail": "ok"}
     except Exception as e:
         print(f"stars failed: {e}")
@@ -272,7 +277,21 @@ async def api_stars(ra: float = Query(...), dec: float = Query(...),
 
 
 def _prune_frames(keep: int = 500) -> None:
-    """Bound the on-demand frame cache: drop oldest beyond `keep` files."""
+    """Bound the on-demand frame cache: drop oldest beyond `keep` files.
+    Throttled to once per 10 min: this runs off the request path cost-wise
+    (audit: glob+stat sort on every miss was pure overhead)."""
+    import time
+    global _prune_last
+    try:
+        now = time.monotonic()
+    except Exception:
+        now = 0.0
+    try:
+        if now - globals().get("_prune_last", 0) < 600:
+            return
+        globals()["_prune_last"] = now
+    except Exception:
+        pass
     try:
         files = sorted(Path(PNG_CACHE_DIR).glob("frame_*.png"), key=lambda p: p.stat().st_mtime)
         for old in files[:-keep] if len(files) > keep else []:

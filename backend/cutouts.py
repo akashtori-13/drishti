@@ -78,8 +78,19 @@ async def fetch_ibe(cutout_url: str, dest: Path, timeout: int = API_TIMEOUT_SECO
                 dest.write_bytes(r.content)
                 if use_cache:
                     try:
+                        import os
+                        import tempfile
                         FITS_CACHE_DIR.mkdir(parents=True, exist_ok=True)
-                        shutil.copyfile(dest, fits_cache_path(cutout_url))
+                        fd, tmp = tempfile.mkstemp(dir=str(FITS_CACHE_DIR), prefix=".dl-")
+                        try:
+                            with os.fdopen(fd, "wb") as f:
+                                f.write(r.content)
+                            os.replace(tmp, fits_cache_path(cutout_url))
+                        except Exception:
+                            try:
+                                os.unlink(tmp)
+                            except Exception:
+                                pass
                     except Exception:
                         pass
             return dest

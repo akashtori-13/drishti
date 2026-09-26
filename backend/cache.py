@@ -152,17 +152,26 @@ def api_cache_get(db_path: str, key: str, max_age_s: int, allow_stale: bool = Fa
 
 
 def api_cache_set(db_path: str, key: str, value: Any) -> None:
-    now = datetime.now(timezone.utc).isoformat()
-    conn = get_connection(db_path)
+    import threading
+    # single-writer: concurrent coroutines/threads share the lock so two
+    # overlapping requests never interleave a commit (audit: database-locked)
+    global _write_lock
     try:
-        conn.execute(
-            "INSERT INTO api_cache (key, value, updated_at) VALUES (?, ?, ?) "
-            "ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_at=excluded.updated_at",
-            (key, json.dumps(value, default=float), now),
-        )
-        conn.commit()
-    finally:
-        conn.close()
+        _write_lock
+    except NameError:
+        _write_lock = threading.Lock()
+    now = datetime.now(timezone.utc).isoformat()
+    with _write_lock:
+        conn = get_connection(db_path)
+        try:
+            conn.execute(
+                "INSERT INTO api_cache (key, value, updated_at) VALUES (?, ?, ?) "
+                "ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_at=excluded.updated_at",
+                (key, json.dumps(value, default=float), now),
+            )
+            conn.commit()
+        finally:
+            conn.close()
 
 
 if __name__ == "__main__":
