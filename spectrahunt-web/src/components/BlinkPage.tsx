@@ -483,15 +483,18 @@ export default function BlinkPage({ id }: { id: string }) {
                         real={!!liveLc}
                       />
                       {liveLc && <p className="fine">Real pipeline aperture photometry.</p>}
+                      {!liveLc && sample?.values.length ? (
+                        <p className="fine">Spot at {Math.round(sample.x * 100)}%, {Math.round(sample.y * 100)}% — per-epoch image brightness, not calibrated photometry.</p>
+                      ) : null}
                     </>
                   ) : (
                     <p className="fine">No brightness samples yet — click the image and click a spot, or wait for live pipeline photometry.</p>
                   )}
-                  {sample?.values.length ? (
+                  {sample?.values.length && liveLc?.length ? (
                     <>
                       <h3>Measured spot — proxy (click)</h3>
                       <SpectrumPlot values={sample.values} band={band} />
-                      <p className="fine">Spot at {Math.round(sample.x * 100)}%, {Math.round(sample.y * 100)}% — per-epoch image brightness, not calibrated photometry.</p>
+                      <p className="fine">Same spot as above, per-epoch view — shown only because real pipeline photometry differs.</p>
                     </>
                   ) : null}
                   {viewing.id !== '3i-atlas' && (
