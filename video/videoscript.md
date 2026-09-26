@@ -2,7 +2,7 @@
 **NASA Space Apps Challenge — Pitch Script · Four-Act · 2026-09-27**
 **Official timing: WHO 45s / WHY 60s / WHAT 60s / SO WHAT 75s. Spoken ~210s + 15s cards = under 240s.**
 
-> Draft 6 — round-4 judges' fixes: dated retention, six LVF arrays, replay-simulation badge, ORNI labels, Zubayer offline beat, first-person decisions, handoff cues, trimmed Act III, sourced counts, locked-tripod demo takes.
+> Draft 7 — round-5 verification fixes: Alif verification beat, thousands qualified, header corrected.
 
 ---
 
@@ -13,7 +13,7 @@
 
 **[FAST]**
 
-**HIMEL:** Thousands of stars stayed put. One stood out — and it became Pluto.
+**HIMEL:** Across every plate he checked, thousands of stars stayed put. One stood out — and it became Pluto.
 
 In 1930 Tombaugh blinked two plates by hand, night after night.
 
@@ -23,7 +23,7 @@ We're Team AKASHTORI — *[gestures; each steps in, says own name]* I'm Himel Da
 
 **HIMEL:** SPHEREx photographs the whole sky every six months in 102 infrared colors. No team can practically blink all that by hand at scale, visit by visit. So we built DRISHTI: cached SPHEREx Quick Release 2 cutouts (QR3 where covered) from the NASA/IPAC Infrared Science Archive, in a browser, on a phone.
 
-> **ANCHOR:** Thousands of stars stayed put. One didn't.
+> **ANCHOR:** Across thousands of checked stars, one stood out.
 
 ---
 
@@ -91,6 +91,8 @@ We're Team AKASHTORI — *[gestures; each steps in, says own name]* I'm Himel Da
 **[SLOW]**
 
 **MAHDIN:** I left one part open on purpose — census-wide pair agreement is still open. If it's negative we'll post that too. Tonight: open the repo issues page linked from the QR, blink one cached field, file field plus two epochs plus a screenshot. Pass or fail counts.
+
+**ALIF:** I'm Alif, quality — every number you just heard, I traced to the repo before we shot this. What survives is what's true.
 
 *[long pause. All six step into frame.]*
 
