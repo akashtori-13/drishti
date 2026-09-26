@@ -349,7 +349,7 @@ export default function HomePage() {  const router = useRouter();
               );
             })}
             {!fields.length && (
-              <p className="empty">Loading fields…</p>
+              <p className="empty" role="status">Loading fields…</p>
             )}
           </div>
         </div>

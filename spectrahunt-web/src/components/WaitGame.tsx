@@ -461,6 +461,11 @@ export default function WaitGame({ headline = 'Fetching live sky data', onSkipHr
       S.firing = true;
     };
     const kd = (e: KeyboardEvent) => {
+      // never hijack typing or focused controls (audit: Space on Mute/Skip
+      // fired the cannon AND the button; R restarted while typing)
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable
+        || t.tagName === 'SELECT' || t.tagName === 'BUTTON' || t.tagName === 'A')) return;
       // game-over screen is canvas-drawn: R, Enter, or Space runs it back.
       if (S.phase === 'over') {
         if (e.key === 'r' || e.key === 'R' || e.key === 'Enter' || e.key === ' ') {
@@ -543,13 +548,13 @@ export default function WaitGame({ headline = 'Fetching live sky data', onSkipHr
           </span>
         </div>
         <canvas
-          ref={canvasRef} role="img"
+          ref={canvasRef} role="img" tabIndex={0}
           aria-label="Space defense game: move with arrows or drag, shoot with Space. Press R or tap to restart after game over."
         />
         <div className="waitgame-foot">
           <span>Hold the line: arrows/drag to move, Space/touch to fire. R / tap restarts after game over.</span>
           <span style={{ display: 'flex', gap: 8 }}>
-            <button type="button" className="epoch-chip" onClick={() => setMuted((m) => !m)}>
+            <button type="button" className="epoch-chip" aria-pressed={muted} onClick={() => setMuted((m) => !m)}>
               {muted ? 'Unmute' : 'Mute'}
             </button>
             <Link href={onSkipHref} className="epoch-chip">Skip wait</Link>

@@ -315,11 +315,13 @@ export default function BlinkPage({ id }: { id: string }) {
     return arcsecPerDay(a.ra ?? viewing.ra, a.dec ?? viewing.dec, b.ra ?? viewing.ra, b.dec ?? viewing.dec, m1 - m0);
   }, [viewing, m0, m1, epochs]);
 
+  const [copyMsg, setCopyMsg] = useState('');
   const copyLink = async () => {
     const url = shareURL();
     try {
       if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(url);
+        setCopyMsg('Link copied.');
         return;
       }
     } catch { /* fall through to the legacy path */ }
@@ -333,7 +335,8 @@ export default function BlinkPage({ id }: { id: string }) {
       ta.select();
       document.execCommand('copy');
       ta.remove();
-    } catch { /* clipboard unavailable — link stays in the address bar */ }
+      setCopyMsg('Link copied.');
+    } catch { setCopyMsg('Copy failed — link is in the address bar.'); }
   };
 
   const exportJSON = () => {
@@ -381,7 +384,7 @@ export default function BlinkPage({ id }: { id: string }) {
         </div>
       </div>
 
-      {loading && !isLiveId(id) && <div className="bw-status">Loading {id}…</div>}
+      {loading && !isLiveId(id) && <div className="bw-status" role="status">Loading {id}…</div>}
       {/* One persistent game instance per field (keyed by id): progress
         steps only change props, so the run never restarts mid-fetch. */}
       {isLiveId(id) && (loading || (!!viewing && !pairSeen)) && (
@@ -564,6 +567,7 @@ export default function BlinkPage({ id }: { id: string }) {
                   <h3>Share & export</h3>
                   <div className="btn-row">
                     <button type="button" className="epoch-chip" onClick={copyLink}>Copy link</button>
+                    <span role="status" aria-live="polite" className="fine">{copyMsg}</span>
                     <button type="button" className="epoch-chip" onClick={exportCSV}>CSV</button>
                     <button type="button" className="epoch-chip" onClick={exportJSON}>JSON</button>
                   </div>
