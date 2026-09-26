@@ -1,55 +1,53 @@
 # DRISHTI: 240 Seconds
 **NASA Space Apps Challenge — Pitch Script · Four-Act · 2026-09-27**
-**Two voices only (Mahdin: story, Orni: science). Animated screen + captures, no live presenters. Spoken ~210s + 15s cards = under 240s.**
+**Two voices only (Mahdin: story, Orni: science). Animated screen + captures, no live presenters. Spoken ~200s + 15s cards + 15s designed silence = under 240s.**
 
-> Draft 8 — two-voice animated retool. [CHALLENGE] slot for Sep-17 summaries.
+> Draft 10 — 20-producer cycle: UI-first cold open, PRISM BREAK villain, electric demo, C6 closer ending on data, persistent QR footer. [CHALLENGE] slot for Sep-17 summaries.
 
 ---
 
-## Act I · WHO — The Plates (0:00–0:45)
-**Objective:** Stakes in 10s. No spoken roster (names on Card 1 only).
+## Act I · WHO — The Blink (0:00–0:45)
+**Objective:** Motion + real data in <2s. No spoken roster (names on Card 1 only).
 
-> **VISUAL (animated):** Black. Archival Tombaugh plates blink 3×, one dot circled `PLUTO`. Animated cursor drags plates into a browser frame: real DRISHTI capture, URL visible. Roster chips (Mahdin / Orni only) pulse with first lines. Card: [CHALLENGE].
+> **VISUAL (captured, no fade-in):** Hard-start mid-blink on real DRISHTI capture, URL bar visible, epoch counter ticking `87/143`. Lower-third from 0:02: `SPHEREx QR2 · IRSA · DOI 10.26131/IRSA652`. Single archival Tombaugh plate blinks once behind translucent UI (labeled `ARCHIVAL — Lowell Obs.`), cursor drags plate into browser frame, URL identical. DOI watermark bottom-right held 6s. Roster chips never spoken.
 
 **[FAST]**
 
-**MAHDIN, warm:** Across every plate he checked, thousands of stars stayed put. One stood out — and it became Pluto. In 1930 Tombaugh blinked plates by hand, night after night.
+**MAHDIN, close-mic:** Watch the middle — same sky, six months apart. One dot moves.
 
-We're Team AKASHTORI. We tried blinking SPHEREx ourselves — by hand, we got nowhere. So DRISHTI does it.
+**ORNI, flat:** Epoch eighty-seven of one hundred forty-three. SPHEREx Quick Release 2 cached from IRSA — QR3 where covered — in a browser, on a phone.
 
-**[SLOW]**
-
-**MAHDIN:** SPHEREx photographs the whole sky every six months in infrared colors. No team can blink all that by hand, visit by visit.
-
-**ORNI, flat:** One hundred two bands. Cached Quick Release 2 cutouts — QR3 where covered — from the NASA/IPAC Infrared Science Archive, in a browser, on a phone.
+**MAHDIN:** Ninety-six years ago Tombaugh did this by hand and found Pluto. Hand-blinking all that, visit by visit, doesn't scale. So DRISHTI does it.
 
 > **ANCHOR:** Across thousands of checked stars, one stood out.
 
 ---
 
 ## Act II · WHY — The Drift (0:45–1:45)
-**Objective:** Villain is geometry. Animated prop, no hands.
+**Objective:** Villain is geometry. PRISM BREAK gasp, no hands, no blame.
 
-> **VISUAL (animated):** Vector pixel grid; 6-stop gradient bar labeled `FILTER 1–6 — ILLUSTRATION` slides over it, pixels shifting blue→red. Timeline dots dim to idle, slide to an `ARCHIVE INTACT` shelf. Lower-third throughout: `ILLUSTRATION — not measurement`.
-
-**[SLOW]**
-
-**MAHDIN:** SPHEREx carries no moving prism. Six rainbow filters, one per detector — each pixel sees one tint. Same star: bluer on the left, redder on the right.
-
-**ORNI:** Our same-colour rule: when the tint shifts, visits can't be fairly compared, so good data sits idle for that question. No science deleted — QR1 retired, QR2 and QR3 served as of September 2026, both DOIs pinned on screen.
+> **VISUAL (animated):** Black, one star-dot. Glass prism drops, rainbow fan blooms (`WHAT YOU EXPECT`) — prism cracks, fan shatters into 6 chunky glass tiles `FILTER 1–6 — ILLUSTRATION` slamming left→right with thunks. Same star under Tile 2 vs Tile 5: visibly different tint, blink comparator flickers color not motion. Tiles labeled, grid labeled `SCHEMATIC GRID`. Timeline dots dim, slide to `ARCHIVE INTACT` shelf (QR1 dimmed, QR2/QR3 lit), 1.5s silent slide. Ghost inset top-left: reused archival plate crop 20% opacity (`ARCHIVAL INSET — not data`). DRIFT-WASH (6-stop, hatched, cividis-safe) + DRIFT-TONE (180→320Hz gliss, subtitled). Lower-third throughout: `ILLUSTRATION — not measurement`.
 
 **[FAST]**
 
-**MAHDIN, wry:** That idle is the waste. Nobody messed up. That's just how they built it.
+**ORNI, flat, over shatter:** SPHEREx carries no prism. Six filters, one per detector — each pixel sees one tint.
+
+**MAHDIN:** Same star. Bluer left, redder right. You can't fairly compare those visits.
+
+**MAHDIN, wry:** Tombaugh blinked same-tint plates — ours change tint mid-blink.
+
+**ORNI:** Same-colour rule: when the tint shifts, that pair waits on the shelf for this question. No science deleted — QR1 retired, QR2 and QR3 served as of September 2026, both DOIs pinned on screen.
+
+**MAHDIN, quiet:** Good data, sitting idle, intact — while a real change could slip past. Nobody built it wrong. That's geometry.
 
 > **ANCHOR:** The drift is nobody's fault. It's geometry.
 
 ---
 
 ## Act III · WHAT — The Tool (1:45–2:45)
-**Objective:** Captured UI take: comet, 3 allies, control kill, qualified static. Cursor continuity, URL visible.
+**Objective:** One captured take, no cuts inside. Comet pop at 2:02, 3s silence, control kill, qualified static. URL visible.
 
-> **VISUAL (captured UI, animated cursor):** Tap the 3I/ATLAS chip → Horizons-tracked path draws → difference mode cancels to gray, remnant pops with A→B vector. 3s silent hold. Ally checkmarks stamp (SIMBAD, DSS). Lower-third: `tracked positions, not fixed stare`. Then: false-alarm spike chart → pixel grid with magenta-flagged cores → hollow-dot re-render → red stamp dragged to trash → `CAN'T TELL` stamp. Badge throughout: `cached replay — simulation where labeled, not live sky`.
+> **VISUAL (captured UI, animated cursor, 3 cursor moves total):** Hard cut to real UI on 3I/ATLAS chip. Horizons-tracked path draws A→B. Difference mode cancels to gray at 2:00, remnant pops 2:02.0 with A→B vector, 3s silent hold, cursor frozen. Ally double-stamp: `SIMBAD ✓` 2:08, `DSS ✓` 2:10 (paper thumps, 1.4s silence pocket). Cursor circles remnant with same hand-stroke as Act I PLUTO circle. Then: false-alarm spike chart (tiny bars grow, 28.9σ slam) → magenta-flagged cores pulse 2× → hollow-dot re-render → red stamp dragged to trash → `CAN'T TELL` stamps + thud. Freeze on 6-band chart, error bars grow center-out, 3s linger, hollow dots wobble once. Badges throughout: `cached replay — simulation where labeled, not live sky` + `tracked positions, not fixed stare`.
 
 **[FAST]**
 
@@ -61,53 +59,58 @@ We're Team AKASHTORI. We tried blinking SPHEREx ourselves — by hand, we got no
 
 **ORNI:** Gaia for the background stars, Horizons for where it should be. I sign off only when archives agree.
 
+*[1.4s silence — SIMBAD ✓ / DSS ✓ double-stamp]*
+
+**MAHDIN, quieter:** Faint. Same spot Horizons predicted.
+
 **[SLOW]**
 
 **MAHDIN:** We messed one up. I'll just say it.
 
-**ORNI, flat:** Our pre-fix pipeline flagged a control star — twenty-eight point nine sigma. Contamination, not sky. We pulled the pixel flags and withdrew the verdict — "can't tell", not a discovery.
+*[1.0s dead air]*
 
-*[beat]*
+**ORNI, flat, half-speed:** Our pre-fix pipeline flagged a control star — twenty-eight point nine sigma. Contamination, not sky. We pulled the pixel flags and withdrew the verdict — "can't tell", not a discovery.
 
-For 3I: all six bands, eleven of fourteen cutouts — three transport failures, shown hollow — Horizons-tracked. Faint, consistent-static. No brightness or colour evolution at these uncertainties. Numbers and error bars are on screen. We're not claiming an outburst.
+**ORNI:** Tombaugh rule — circle only the dot that survives.
+
+*[beat — hold CAN'T TELL 1.2s]*
+
+**ORNI:** For 3I: all six bands, eleven of fourteen cutouts — three transport failures, shown hollow — Horizons-tracked. Faint, consistent-static. No brightness or colour evolution at these uncertainties. Numbers and error bars are on screen. We're not claiming an outburst.
 
 > **ANCHOR:** A difference is only a discovery once the detector is ruled out.
 
 ---
 
 ## Act IV · SO WHAT & NEXT — The Sky (2:45–4:00)
-**Objective:** Beneficiary + metric, spoken repo + QR, concrete ask, split closer, 3 static cards inside 240s.
+**Objective:** Beneficiary first, QR command, countable ask, single closer ending on data, persistent QR footer.
 
-> **VISUAL (animated + captured):** Census map → dice roll into cached field → σ cards. Illustrated phone chrome (labeled `ANIMATED OS FRAME`), airplane toggle animates ON, wifi dies; inset: genuine capture, DevTools Offline checked, timeline blinks, URL identical, no cut. Repo scroll capture (real GitHub, jitter kept), QR slides in beside URL. Hold 5s static.
+> **VISUAL (animated + captured):** Census map (vector, `counts: repo inventory — ILLUSTRATION`) → σ cards (same σ-scale: control crossed out, 3I hugging zero, classroom field) → dice rolls into one cached field. Illustrated phone chrome (`ANIMATED OS FRAME`), airplane toggle ON, wifi dies; inset genuine capture: DevTools Offline checked, same URL, timeline blinks 143 epochs, no cut, 2s silent offline proof. Repo scroll: real GitHub root → slow scroll past `data/*.json` (143 visible) → hover `LICENSE` (MIT legible), QR slides beside URL, 5s static hold, cursor parks. DRIFT-WASH ghost 0.8s over census map, fades to shelf.
 
 **[FAST]**
 
-**ORNI:** Twenty fields, one hundred forty-three epochs, all in public JSON. Classroom with no wifi: 143 epochs blink offline. No login, no FITS download.
+**ORNI:** A classroom with no wifi can still blink 143 epochs offline. Twenty fields, public JSON. No login, no download, no excuses.
 
 **MAHDIN, wry — the one allowed joke:** We cached it so planes stay offline.
 
-**ORNI, half-speed spell:** The code is MIT at github dot com slash akashtori-13 slash drishti — on screen now, QR held. Schema's in the readme.
+**ORNI, half-speed spell:** The code is MIT at github dot com slash akashtori-13 slash drishti. Point your phone now. This QR is everything.
 
 **[SLOW]**
 
-**MAHDIN, open:** I left one part open on purpose — census-wide pair agreement is still open. If it's negative we'll post that too. Tonight: blink one cached field.
+**MAHDIN, open:** One question stays open on purpose — census-wide agreement. If it's negative, we'll post that too. Tonight: blink one field.
 
-**ORNI:** File field plus two epochs plus a screenshot, in repo issues via the QR. Pass or fail counts.
+**ORNI:** File two epochs plus a screenshot to Issues via that QR. Pass or fail, it counts.
 
 **ORNI:** Every measurement you just heard traces to IRSA through the repo — uncertainties on screen. What survives is what's checkable.
 
 *[2s silence. Cut to black.]*
 
-> **FINAL SPOKEN WORDS — MAHDIN, hold:**
-> Tombaugh blinked two plates. We blink one hundred forty-three epochs.
+> **FINAL SPOKEN WORDS — MAHDIN only, hold, then black:**
+> Tombaugh blinked two plates into history; we blink one hundred forty-three epochs into evidence anyone can recheck as data.
 
-> **ORNI, quiet, over black:**
-> Archive intact — verdicts only on visits that survive flags.
-
-**END CARDS (static, no narration, inside 240s):**
+**END CARDS (static, no narration, silent, inside 240s — QR footer persistent all 3):**
 - Card 1 (4s): DRISHTI / Himel Das, Zubayer Hasan Shaad, Md Hedayet Ullah, Md Mahdin Al Abrar, Aazmaine Alif Abrar, Suraiya Ratry Orni / Space Apps 2026 / [CHALLENGE] / 143 epochs · 240 cutouts · public JSON + repo URL + QR / MIT · offline-capable · no login.
-- Card 2 (6s): Data — SPHEREx/IRSA QR2 https://doi.org/10.26131/IRSA652 / QR3 https://doi.org/10.26131/IRSA662 / ESA Gaia DR3 · CDS SIMBAD/Sesame + 2MASS/DSS · NASA/JPL Horizons (geocentric) · IMCCE SkyBoT (unavailable, labeled) / MPC checker links only (no fetch) / CelesTrak via mirror (checksummed) / Yale BSC v5 / d3-celestial / Messier-NGC (artistic render).
-- Card 3 (5s): Negative results reported too · SkyBoT unavailable, labeled · nebula art marked · replay labeled simulation · no AI sky imagery · no stock footage · English subtitles burned-in + .srt.
+- Card 2 (6s): DATA — FROM IRSA / doi.org/10.26131/IRSA652 QR2 / doi.org/10.26131/IRSA662 QR3 / Gaia DR3 · SIMBAD/Sesame · Horizons (geocentric) · 2MASS/DSS / MPC links only · CelesTrak mirror · Yale BSC · d3-celestial / SkyBoT unavailable — labeled · Messier-NGC artistic.
+- Card 3 (5s): WHAT WE DIDN'T CLAIM / Negative results reported too / Can't-tell withdrawn, not hidden / Simulation labeled · nebula art marked / No AI sky · No stock footage / English captions burned-in + .srt. Footer: github.com/akashtori-13/drishti · MIT + QR.
 
 ---
 
@@ -131,4 +134,4 @@ For 3I: all six bands, eleven of fourteen cutouts — three transport failures, 
 
 ## Build spec (animation + captures, no live presenters)
 
-- A1 archival blink + cursor match-cut (40s) · A2 gradient illustration (55s) · A3 captured UI take, no cuts inside (45s) · A4 infographic rigor scroll (20s) · A5 census + animated-OS offline proof (40s) · A6 repo scroll + QR hold (10s). Spoken ≈210s + 15s cards = under 240s. Reduced-motion safe, subtitles burned + .srt, grayscale-checked palette (cividis default).
+- A1 cold UI blink + DOI watermark (40s) · A2 PRISM BREAK + shelf + DRIFT-WASH (45s, saves 10s to A3) · A3 captured UI take, pop 2:02, 3s hold, double-stamp, kill, error-bar linger (60s, no cuts inside) · A4 σ-compare bridge (10s) · A5 census + animated-OS offline proof + repo scroll + QR hold (40s) · Cards 4/6/5s silent. Spoken ~200s + 15s silence + 15s cards = ~230s < 240s. Silence map: S1 2s cold, S3 1s hinge, S4 1.5s shelf, S6 3s remnant, S7 1s confession, S8 1.2s stamp, S10 2s offline, S11 2s black. Reduced-motion safe, subtitles burned + .srt, grayscale-checked, QR ≥360px static ≥3s.
