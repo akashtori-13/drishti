@@ -1219,6 +1219,7 @@ body::after {
 .pal-list{display:flex; flex-direction:column; max-height:min(380px,50vh); overflow-y:auto;}
 .pal-list button{display:flex; min-height:44px; align-items:center; justify-content:space-between; gap:12px; border:0; background:transparent; color:var(--ink); text-align:left; padding:10px 12px; border-radius:10px; font-size:.875rem;}
 .pal-list button:hover{background:rgba(255,255,255,.08);}
+.pal-list button[data-active="true"]{background:rgba(255,255,255,.08);}
 
 /* ---------- artifact preview (default first layer) ---------- */
 .pv-veil{position:fixed; inset:0; z-index:85; background:rgba(2,3,6,.72);

@@ -165,6 +165,7 @@ export default function BlinkComparator({
   const [playing, setPlaying] = useState(false);  const [speed, setSpeed] = useState(550);
   const [palette, setPalette] = useState(false);
   const [palQ, setPalQ] = useState('');
+  const [palActive, setPalActive] = useState(0);
   const [stretch, setStretch] = useState<Stretch>('asinh');
   const [cmap, setCmap] = useState<Colormap>(() => (useAppStore.getState().colorblind ? 'cividis' : 'grayscale'));
   const [invert, setInvert] = useState(false);
@@ -1429,7 +1430,7 @@ export default function BlinkComparator({
       else if (kind === 'figure') exportFigure();
       else downloadPNG();
     };
-    const onPal = () => setPalette(true);
+    const onPal = () => { setPalActive(0); setPalette(true); };
     window.addEventListener('spectrahunt:export', onExport);
     window.addEventListener('spectrahunt:palette', onPal);
     return () => {
@@ -1775,15 +1776,33 @@ export default function BlinkComparator({
       {palette && (
         <div className="pal-veil" onMouseDown={() => setPalette(false)}>
           <div className="palette glass" role="dialog" aria-modal="true" aria-label="Command palette"
-            onMouseDown={(e) => e.stopPropagation()}>
-            <input autoFocus value={palQ} onChange={(e) => setPalQ(e.target.value)}
+            onMouseDown={(e) => e.stopPropagation()}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') { setPalette(false); return; }
+              if (e.key !== 'Tab') return;
+              const items = [...(e.currentTarget.querySelectorAll<HTMLElement>(
+                'button, input, [tabindex]:not([tabindex="-1"])'))]
+                .filter((el) => !el.hasAttribute('disabled') && el.getClientRects().length > 0);
+              if (!items.length) return;
+              const first = items[0];
+              const last = items[items.length - 1];
+              if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+              else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+            }}>
+            <input autoFocus value={palQ} onChange={(e) => { setPalQ(e.target.value); setPalActive(0); }}
               placeholder="Type a command or epoch…" aria-label="Command search"
+              aria-activedescendant={palHits[palActive] ? `pal-opt-${palActive}` : undefined}
+              aria-controls="pal-listbox" role="combobox" aria-expanded="true" aria-autocomplete="list"
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && palHits[0]) { palHits[0].run(); setPalette(false); }
+                if (e.key === 'Enter' && palHits[palActive]) { palHits[palActive].run(); setPalette(false); }
+                else if (e.key === 'ArrowDown') { e.preventDefault(); setPalActive((a) => Math.min(palHits.length - 1, a + 1)); }
+                else if (e.key === 'ArrowUp') { e.preventDefault(); setPalActive((a) => Math.max(0, a - 1)); }
               }} />
-            <div className="pal-list" role="listbox" aria-label="Commands">
+            <div className="pal-list" role="listbox" id="pal-listbox" aria-label="Commands">
               {palHits.map((c, i) => (
-                <button key={`${c.name}::${i}`} type="button" role="option" aria-selected={false}
+                <button key={`${c.name}::${i}`} id={`pal-opt-${i}`} type="button" role="option"
+                  aria-selected={i === palActive} data-active={i === palActive}
+                  onMouseMove={() => setPalActive(i)}
                   onClick={() => { c.run(); setPalette(false); }}>
                   <span>{c.name}</span>{c.hint && <kbd>{c.hint}</kbd>}
                 </button>
