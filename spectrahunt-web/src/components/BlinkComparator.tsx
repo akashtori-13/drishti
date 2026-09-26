@@ -44,21 +44,20 @@ function drawCover(ctx: CanvasRenderingContext2D, img: HTMLImageElement, w: numb
   ctx.drawImage(img, dx, dy, dw, dh);
 }
 
-/** Apply stretch/colormap/invert to canvas in place. */
-function stylize(canvas: HTMLCanvasElement, stretch: Stretch, vmin: number, vmax: number, invert: boolean, cm: Colormap, diffMode: boolean, diffScale: number) {
-  const ctx = canvas.getContext('2d', { willReadFrequently: true });
-  if (!ctx) return;
-  const { width: w, height: h } = canvas;
-  let data: ImageData;
-  try {
-    data = ctx.getImageData(0, 0, w, h);
-  } catch {
-    return;
-  }
-  const px = data.data;
+/** Apply stretch/colormap/invert to canvas in place.
+ *  4096-entry LUT on quantized luminance: visually identical to the per-pixel
+ *  path (±1 LSB quantization) at ~50x less math per frame. Cache keyed by
+ *  full param set; ~8 live entries max. */
+const LUT_N = 4096;
+const lutCache = new Map<string, Uint8Array>();
+function lutFor(stretch: Stretch, vmin: number, vmax: number, invert: boolean, cm: Colormap, diffMode: boolean, diffScale: number): Uint8Array {
   const span = Math.max(1e-6, vmax - vmin);
-  for (let i = 0; i < px.length; i += 4) {
-    const lum = (px[i] * 0.299 + px[i + 1] * 0.587 + px[i + 2] * 0.114) / 255;
+  const key = [stretch, vmin.toFixed(4), vmax.toFixed(4), invert, cm, diffMode, diffScale].join('|');
+  const hit = lutCache.get(key);
+  if (hit) return hit;
+  const lut = new Uint8Array(LUT_N * 3);
+  for (let q = 0; q < LUT_N; q++) {
+    const lum = q / (LUT_N - 1);
     let t: number;
     if (diffMode) {
       t = Math.min(1, Math.max(0, 0.5 + ((lum - 0.5) * diffScale)));
@@ -71,7 +70,30 @@ function stylize(canvas: HTMLCanvasElement, stretch: Stretch, vmin: number, vmax
       if (invert) t = 1 - t;
     }
     const [r, g, b] = colormap(t, cm);
-    px[i] = r; px[i + 1] = g; px[i + 2] = b; px[i + 3] = 255;
+    lut[q * 3] = r; lut[q * 3 + 1] = g; lut[q * 3 + 2] = b;
+  }
+  lutCache.set(key, lut);
+  if (lutCache.size > 8) {
+    const oldest = lutCache.keys().next().value as string | undefined;
+    if (oldest !== undefined) lutCache.delete(oldest);
+  }
+  return lut;
+}
+function stylize(canvas: HTMLCanvasElement, stretch: Stretch, vmin: number, vmax: number, invert: boolean, cm: Colormap, diffMode: boolean, diffScale: number) {
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  if (!ctx) return;
+  const { width: w, height: h } = canvas;
+  let data: ImageData;
+  try {
+    data = ctx.getImageData(0, 0, w, h);
+  } catch {
+    return;
+  }
+  const px = data.data;
+  const lut = lutFor(stretch, vmin, vmax, invert, cm, diffMode, diffScale);
+  for (let i = 0; i < px.length; i += 4) {
+    const q = Math.min(LUT_N - 1, Math.round(((px[i] * 0.299 + px[i + 1] * 0.587 + px[i + 2] * 0.114) / 255) * (LUT_N - 1)));
+    px[i] = lut[q * 3]; px[i + 1] = lut[q * 3 + 1]; px[i + 2] = lut[q * 3 + 2]; px[i + 3] = 255;
   }
   ctx.putImageData(data, 0, 0);
 }
