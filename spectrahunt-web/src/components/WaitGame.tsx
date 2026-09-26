@@ -535,7 +535,8 @@ export default function WaitGame({ headline = 'Fetching live sky data', onSkipHr
             </div>
             <p className="waitgame-fetch-step">
               <span>{progress.label}</span>
-              <span className="mono"> · {Math.min(progress.done, progress.total)}/{progress.total} · {elapsed}s</span>
+              <span className="mono" aria-hidden="true"> · {Math.min(progress.done, progress.total)}/{progress.total} · {elapsed}s</span>
+              <span className="sr-only">{Math.min(progress.done, progress.total)} of {progress.total}.</span>
             </p>
           </>
         )}

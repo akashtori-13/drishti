@@ -333,27 +333,32 @@ export default function BlinkComparator({
   // re-render constantly; a paused static page relies on the interval).
   // Local showcase PNGs all start at once (same-origin, instant); live
   // /api/frame.png renders stay throttled so IBE isn't thundered.
+  // Interval is created ONCE (audit: dep-less effect rebuilt it every render);
+  // mutable inputs ride refs so the schedule never churns.
+  const pumpRefs = useRef({ frames, idx, n, loaded, failed, loadFrame });
+  pumpRefs.current = { frames, idx, n, loaded, failed, loadFrame };
   useEffect(() => {
     const pump = () => {
       if (document.hidden) return; // visibility pause: heartbeat skips while hidden
-      const urls = [...new Set(frames.map((f) => f.png).filter((u): u is string => !!u))];
-      const ordered = [frames[idx]?.png, n ? frames[(idx - 1 + n) % n]?.png : undefined, ...urls];
+      const { frames: fr, idx: ii, n: nn, loaded: ld, failed: fl, loadFrame: lf } = pumpRefs.current;
+      const urls = [...new Set(fr.map((f) => f.png).filter((u): u is string => !!u))];
+      const ordered = [fr[ii]?.png, nn ? fr[(ii - 1 + nn) % nn]?.png : undefined, ...urls];
       const now = Date.now();
       let remoteStarted = false;
       for (const u of ordered) {
-        if (!u || loaded[u] || failed[u] || inflight.current.has(u)) continue;
+        if (!u || ld[u] || fl[u] || inflight.current.has(u)) continue;
         if (u.includes('/api/')) {
           if (remoteStarted || now - lastStart.current < 350) continue;
           remoteStarted = true;
           lastStart.current = now;
         }
-        loadFrame(u, 1);
+        lf(u, 1);
       }
     };
     pump();
     const t = setInterval(pump, 350);
     return () => clearInterval(t);
-  });
+  }, []);
 
   // preload band PNGs for true false-color (one retry; still silent-graceful:
   // false color simply stays disabled until they arrive)
@@ -551,6 +556,9 @@ export default function BlinkComparator({
         && (el.classList.contains('scrub') || el.getAttribute('aria-label') === 'Timeline scrub');
       if (!isScrub && (['INPUT', 'BUTTON', 'A', 'SELECT', 'TEXTAREA'].includes(tag)
         || el.getAttribute('role') === 'combobox' || el.isContentEditable)) return;
+      // canvas owns arrows/Enter for the crosshair (audit: one press must not
+      // both move the crosshair and step the epoch); Space still toggles play
+      if (el.tagName === 'CANVAS' && e.key !== ' ') return;
       if (e.key === ' ') { e.preventDefault(); setPlaying((p) => (n > 1 ? !p : p)); }
       else if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
       else if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
@@ -1517,7 +1525,7 @@ export default function BlinkComparator({
                 <div style={{ position: 'relative' }}>
                   <canvas ref={rightRef} style={{ width: '100%', height: '100%', display: 'block', cursor: 'crosshair' }} aria-label={`${title} — ${cur?.label}`}
                     onMouseMove={onSideMove} onMouseLeave={() => setSideHover(null)} onClick={onSideMove} />
-                  <span className="viewer-tag epoch mono">{cur?.label ?? '—'}</span>
+                  <span className="viewer-tag epoch mono" role="status">{cur?.label ?? '—'}</span>
                 </div>
               </div>
             ) : (
@@ -1525,8 +1533,8 @@ export default function BlinkComparator({
                 <canvas
                   ref={mainRef}
                   id="blinkCanvas"
-                  role="application"
-                  aria-label={`${title} — ${cur?.label ?? 'no frame'}. Arrow keys move the measuring crosshair, Enter measures.`}
+                  role="img"
+                  aria-label={`${title} — ${cur?.label ?? 'no frame'}. Focus and use arrow keys to move the measuring crosshair, Enter to measure.`}
                   tabIndex={0}
                   style={{ width: '100%', height: '100%', display: 'block', cursor: onSample ? 'crosshair' : 'grab' }}
                   onPointerDown={onPointerDown}
@@ -1537,7 +1545,7 @@ export default function BlinkComparator({
                   onKeyDown={onCanvasKey}
                 />
                 <span className="viewer-tag mono">{modeLabel}</span>
-                <span className="viewer-tag epoch mono">{cur?.label ?? '—'}</span>
+                <span className="viewer-tag epoch mono" role="status">{cur?.label ?? '—'}</span>
                 {cur?.png && !curImg && failed[cur.png] && (
                   <button type="button" className="frame-retry" onClick={() => retryUrl(cur.png as string)}>
                     ↻ Retry frame
