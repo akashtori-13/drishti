@@ -1,108 +1,113 @@
 # DRISHTI: 240 Seconds
 **NASA Space Apps Challenge — Pitch Script · Four-Act · 2026-09-27**
-**Official timing: WHO 45s / WHY 60s / WHAT 60s / SO WHAT 75s. Spoken ~210s + 15s cards = under 240s.**
+**Two voices only (Mahdin: story, Orni: science). Animated screen + captures, no live presenters. Spoken ~210s + 15s cards = under 240s.**
 
-> Draft 7 — round-5 verification fixes: Alif verification beat, thousands qualified, header corrected.
+> Draft 8 — two-voice animated retool. [CHALLENGE] slot for Sep-17 summaries.
 
 ---
 
 ## Act I · WHO — The Plates (0:00–0:45)
-**Objective:** Stakes in 10s, spoken roster with handoffs, challenge slot, dataset line.
+**Objective:** Stakes in 10s. No spoken roster (names on Card 1 only).
 
-> **VISUAL:** Black. Two hands hold printed SPHEREx frames, flip them click-click. Locked tripod: slide frames down, tap phone in same frame — no whip-pan. Lower-thirds: full names, one at a time. Card: [CHALLENGE].
+> **VISUAL (animated):** Black. Archival Tombaugh plates blink 3×, one dot circled `PLUTO`. Animated cursor drags plates into a browser frame: real DRISHTI capture, URL visible. Roster chips (Mahdin / Orni only) pulse with first lines. Card: [CHALLENGE].
 
 **[FAST]**
 
-**HIMEL:** Across every plate he checked, thousands of stars stayed put. One stood out — and it became Pluto.
+**MAHDIN, warm:** Across every plate he checked, thousands of stars stayed put. One stood out — and it became Pluto. In 1930 Tombaugh blinked two plates by hand, night after night.
 
-In 1930 Tombaugh blinked two plates by hand, night after night.
-
-We're Team AKASHTORI — *[gestures; each steps in, says own name]* I'm Himel Das — I wired the pipeline; systems. **[ZUBAYER]** Zubayer Hasan Shaad, tech. **[HEDAYET]** Md Hedayet Ullah, research. **[MAHDIN]** Md Mahdin Al Abrar — I cut this story; story. **[ALIF]** Aazmaine Alif Abrar, quality. **[ORNI]** Suraiya Ratry Orni, science — for [CHALLENGE].
+We're Team AKASHTORI. We tried blinking SPHEREx ourselves — gave up after ten fields. So DRISHTI does it.
 
 **[SLOW]**
 
-**HIMEL:** SPHEREx photographs the whole sky every six months in 102 infrared colors. No team can practically blink all that by hand at scale, visit by visit. So we built DRISHTI: cached SPHEREx Quick Release 2 cutouts (QR3 where covered) from the NASA/IPAC Infrared Science Archive, in a browser, on a phone.
+**MAHDIN:** SPHEREx photographs the whole sky every six months in infrared colors. No team can blink all that by hand, visit by visit.
+
+**ORNI, flat:** One hundred two bands. Cached Quick Release 2 cutouts — QR3 where covered — from the NASA/IPAC Infrared Science Archive, in a browser, on a phone.
 
 > **ANCHOR:** Across thousands of checked stars, one stood out.
 
 ---
 
 ## Act II · WHY — The Drift (0:45–1:45)
-**Objective:** Villain is geometry. One idea: drift breaks comparison.
+**Objective:** Villain is geometry. Animated prop, no hands.
 
-> **VISUAL:** Hand slides rainbow strip over pixel grid. Timeline dots dim to idle — none leave the archive. Lower-third: `ILLUSTRATION — not measurement`.
+> **VISUAL (animated):** Vector pixel grid; 6-stop gradient bar labeled `FILTER 1–6 — ILLUSTRATION` slides over it, pixels shifting blue→red. Timeline dots dim to idle, slide to an `ARCHIVE INTACT` shelf. Lower-third throughout: `ILLUSTRATION — not measurement`.
 
 **[SLOW]**
 
-**MAHDIN, holding prop:** SPHEREx carries no moving prism. Six rainbow filters, one per detector — each pixel sees one tint. Same star, left side looks bluer, right side looks redder.
+**MAHDIN:** SPHEREx carries no moving prism. Six rainbow filters, one per detector — each pixel sees one tint. Same star: bluer on the left, redder on the right.
 
-*[hands strip to Hedayet]*
-
-**HEDAYET:** I'm Hedayet, research. I set our same-colour rule: when the tint shifts, visits can't be fairly compared, so good data sits idle for that question. Nothing we use was deleted — IRSA still serves QR2 and QR3 as of September 2026 (QR1 already retired; we pin both DOIs).
+**ORNI:** Our same-colour rule: when the tint shifts, visits can't be fairly compared, so good data sits idle for that question. Nothing was deleted — IRSA still serves QR2 and QR3 as of September 2026. QR1 is retired. Both DOIs are on screen.
 
 **[FAST]**
 
-**HEDAYET:** That idle is the waste. Nobody messed up. That's just how they built it.
+**MAHDIN, wry:** That idle is the waste. Nobody messed up. That's just how they built it.
 
 > **ANCHOR:** The drift is nobody's fault. It's geometry.
 
 ---
 
 ## Act III · WHAT — The Tool (1:45–2:45)
-**Objective:** Continuous take: comet, 3 allies, control-star kill, qualified static. URL visible, finger in frame.
+**Objective:** Captured UI take: comet, 3 allies, control kill, qualified static. Cursor continuity, URL visible.
 
-> **VISUAL:** Continuous single take, UI-in-hand. Tap the 3I/ATLAS chip → difference mode: field cancels to gray, one remnant pops with A→B vector. Hold 3 seconds silent. URL visible throughout. Badge: `cached replay — simulation where labeled, not live sky`.
+> **VISUAL (captured UI, animated cursor):** Tap the 3I/ATLAS chip → difference mode cancels to gray, remnant pops with A→B vector. 3s silent hold. Ally checkmarks stamp (SIMBAD, SkyBoT unavailable-labeled, CelesTrak, DSS, Yale). Then: false-alarm spike chart → pixel grid with magenta-flagged cores → hollow-dot re-render → red stamp dragged to trash → `CAN'T TELL` stamp. Badge throughout: `cached replay — simulation where labeled, not live sky`.
 
 **[FAST]**
 
-**ZUBAYER, phone in hand:** This is 3I/ATLAS — third confirmed visitor from another star. If you stare at one spot you lose it. So I pulled its saved Horizons path and checked where it actually landed.
+**MAHDIN:** This is 3I/ATLAS — third confirmed visitor from another star. Stare at one spot and you lose it.
 
-*[tilts phone to Orni]*
+**ORNI:** So we pulled its saved Horizons path and checked where it actually landed.
 
-**ORNI:** I'm Orni, science — I sign off only when archives agree. SPHEREx for the image, Gaia for the background stars, Horizons for where it should be.
+**MAHDIN:** SPHEREx for the image —
 
-*[SILENT STAMPS — SIMBAD, SkyBoT (unavailable, labeled), CelesTrak, DSS, Yale — lower-thirds only]*
+**ORNI:** Gaia for the background stars, Horizons for where it should be. I sign off only when archives agree.
 
 **[SLOW]**
 
-**HEDAYET:** We messed one up. I'll just say it: our pre-fix pipeline flagged a CONTROL star — 28.9 sigma. Contamination, not sky.
+**MAHDIN:** We messed one up. I'll just say it.
 
-*[steps back; Alif steps in]*
+**ORNI, flat:** Our pre-fix pipeline flagged a control star — twenty-eight point nine sigma. Contamination, not sky. We pulled the pixel flags and withdrew the verdict — "can't tell", not a discovery.
 
-**ALIF:** I'm Alif, quality — I pulled the pixel flags and withdrew the verdict. I own that call — we left it as "can't tell" instead of making something up. For 3I we measured all six bands, 11 of 14 visits (3 transport failures, shown hollow), Horizons-tracked — faint, consistent-static, no brightness or colour evolution at these uncertainties. Numbers and error bars are on screen. We're not claiming an outburst.
+*[beat]*
+
+For 3I: all six bands, eleven of fourteen visits — three transport failures, shown hollow — Horizons-tracked. Faint, consistent-static. No brightness or colour evolution at these uncertainties. Numbers and error bars are on screen. We're not claiming an outburst.
 
 > **ANCHOR:** A difference is only a discovery once the detector is ruled out.
 
 ---
 
 ## Act IV · SO WHAT & NEXT — The Sky (2:45–4:00)
-**Objective:** Beneficiary + metric, spoken repo + QR, concrete ask, fixed closer, 3 static cards inside 240s.
+**Objective:** Beneficiary + metric, spoken repo + QR, concrete ask, split closer, 3 static cards inside 240s.
 
-> **VISUAL:** Census map (lower-third: `counts: repo inventory`), dice roll into a cached field, σ-ranked cards. Phone held up: airplane mode ON (toggle visible), timeline blinks from cache. Repo URL + QR held 5 seconds.
+> **VISUAL (animated + captured):** Census map → dice roll into cached field → σ cards. Illustrated phone chrome (labeled `ANIMATED OS FRAME`), airplane toggle animates ON, wifi dies; inset: genuine capture, DevTools Offline checked, timeline blinks, URL identical, no cut. Repo scroll capture (real GitHub, jitter kept), QR slides in beside URL. Hold 5s static.
 
 **[FAST]**
 
-**ORNI:** Twenty fields, 143 epochs, all in public JSON. If your classroom has no wifi: 143 epochs blink offline, no login, no FITS download.
+**ORNI:** Twenty fields, one hundred forty-three epochs, all in public JSON. Classroom with no wifi: 143 epochs blink offline. No login, no FITS download.
 
-*[holds phone up; Zubayer steps in]*
+**MAHDIN, wry — the one allowed joke:** We cached it so planes stay offline.
 
-**ZUBAYER:** I'm Zubayer — I cached it so planes stay offline. The code is MIT at github dot com slash akashtori-13 slash drishti — on screen now, QR held. Schema's in the readme.
+**ORNI, half-speed spell:** The code is MIT at github dot com slash akashtori-13 slash drishti — on screen now, QR held. Schema's in the readme.
 
 **[SLOW]**
 
-**MAHDIN:** I left one part open on purpose — census-wide pair agreement is still open. If it's negative we'll post that too. Tonight: open the repo issues page linked from the QR, blink one cached field, file field plus two epochs plus a screenshot. Pass or fail counts.
+**MAHDIN, open:** I left one part open on purpose — census-wide pair agreement is still open. If it's negative we'll post that too. Tonight: blink one cached field.
 
-**ALIF:** I'm Alif, quality — every number you just heard, I traced to the repo before we shot this. What survives is what's true.
+**ORNI:** File field plus two epochs plus a screenshot, in repo issues via the QR. Pass or fail counts.
 
-*[long pause. All six step into frame.]*
+**ORNI:** Every number you just heard, we traced to the repo before we shot this. What survives is what's true.
 
-> **FINAL SPOKEN WORDS — HIMEL, hold, then black:**
-> Tombaugh blinked two plates. We blink 143 epochs — archive intact, verdicts only on visits that survive flags.
+*[2s silence. Cut to black.]*
+
+> **FINAL SPOKEN WORDS — MAHDIN, hold:**
+> Tombaugh blinked two plates. We blink one hundred forty-three epochs.
+
+> **ORNI, quiet, over black:**
+> Archive intact — verdicts only on visits that survive flags.
 
 **END CARDS (static, no narration, inside 240s):**
 - Card 1 (4s): DRISHTI / Team AKASHTORI — all six names + roles / Space Apps 2026 / [CHALLENGE] / 143 epochs · 240 cutouts · public JSON + repo URL + QR / MIT · offline-capable · no login.
 - Card 2 (6s): Data — SPHEREx/IRSA QR2 https://doi.org/10.26131/IRSA652 / QR3 https://doi.org/10.26131/IRSA662 / ESA Gaia DR3 · CDS SIMBAD/Sesame + 2MASS/DSS · NASA/JPL Horizons (geocentric) · IMCCE SkyBoT (unavailable, labeled) / MPC checker links only (no fetch) / CelesTrak via mirror (checksummed) / Yale BSC v5 / d3-celestial / Messier-NGC (artistic render).
-- Card 3 (5s): Negative results reported too · SkyBoT degraded, labeled · nebula art marked · replay labeled simulation · no AI sky imagery · no stock footage · English subtitles burned-in + .srt.
+- Card 3 (5s): Negative results reported too · SkyBoT unavailable, labeled · nebula art marked · replay labeled simulation · no AI sky imagery · no stock footage · English subtitles burned-in + .srt.
 
 ---
 
@@ -115,7 +120,7 @@ We're Team AKASHTORI — *[gestures; each steps in, says own name]* I'm Himel Da
 | ESA Gaia DR3 | Star positions, magnitudes | Credit, Mission page |
 | CDS SIMBAD / Sesame | Object identity, coordinate resolve | Credit |
 | NASA/JPL Horizons | Small-body ephemerides (geocentric) | Credit |
-| IMCCE SkyBoT | Moving-object cone search (degraded — labeled) | Credit |
+| IMCCE SkyBoT | Moving-object cone search (unavailable — labeled) | Credit |
 | Minor Planet Center | Checker links (no fetch) | Mentioned |
 | CelesTrak (via mirror) | TLE sets, checksummed, freshness-gated | Credit |
 | CDS 2MASS / DSS HiPS | All-sky + context imagery | Credit |
@@ -124,6 +129,6 @@ We're Team AKASHTORI — *[gestures; each steps in, says own name]* I'm Himel Da
 | Constellation lines (d3-celestial) | Sky overlays, search | Credit |
 | Popular targets (ours) | 1,119 curated entries, SIMBAD-verified | Method in repo |
 
-## Demo shooting spec (continuous takes, no jump cuts)
+## Build spec (animation + captures, no live presenters)
 
-- T1 plates-to-browser (40s, locked tripod) · T2 rainbow prop (55s) · T3 visitor chase + difference (45s) · T4 rigor scroll (20s) · T5 census + airplane offline (40s) · T6 repo + QR hold (10s). Spoken ≈210s + 15s cards = under 240s. URL visible, finger in frame, airplane toggle on camera, "cached replay" badges on canned takes. Canned: all JSONs/cutouts/vectors cached. Fallback: USB backup + printed frames + QR cards.
+- A1 archival blink + cursor match-cut (40s) · A2 gradient illustration (55s) · A3 captured UI take, no cuts inside (45s) · A4 infographic rigor scroll (20s) · A5 census + animated-OS offline proof (40s) · A6 repo scroll + QR hold (10s). Spoken ≈210s + 15s cards = under 240s. Reduced-motion safe, subtitles burned + .srt, grayscale-checked palette (cividis default).
