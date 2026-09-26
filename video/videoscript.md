@@ -13,15 +13,15 @@
 
 **[FAST]**
 
-**HIMEL:** Thousands of stars stayed put. One moved — and it became Pluto.
+**HIMEL:** Thousands of stars stayed put. One stood out — and it became Pluto.
 
 In 1930 Tombaugh blinked two plates by hand, night after night.
 
-We're Team AKASHTORI — *[gestures; each steps in, says own name]* I'm Himel Das, systems. **[ZUBAYER]** Zubayer Hasan Shaad, tech. **[HEDAYET]** Md Hedayet Ullah, research. **[MAHDIN]** Md Mahdin Al Abrar, story. **[ALIF]** Aazmaine Alif Abrar, quality. **[ORNI]** Suraiya Ratry Orni, science — for [CHALLENGE].
+We're Team AKASHTORI — *[gestures; each steps in, says own name]* I'm Himel Das — I wired the pipeline; systems. **[ZUBAYER]** Zubayer Hasan Shaad, tech. **[HEDAYET]** Md Hedayet Ullah, research. **[MAHDIN]** Md Mahdin Al Abrar — I cut this story; story. **[ALIF]** Aazmaine Alif Abrar, quality. **[ORNI]** Suraiya Ratry Orni, science — for [CHALLENGE].
 
 **[SLOW]**
 
-**HIMEL:** SPHEREx photographs the whole sky every six months in 102 infrared colors. No team can practically blink all that by hand. So we built DRISHTI: cached SPHEREx Quick Release 2 cutouts (QR3 where covered) from the NASA/IPAC Infrared Science Archive, in a browser, on a phone.
+**HIMEL:** SPHEREx photographs the whole sky every six months in 102 infrared colors. No team can practically blink all that by hand at scale, visit by visit. So we built DRISHTI: cached SPHEREx Quick Release 2 cutouts (QR3 where covered) from the NASA/IPAC Infrared Science Archive, in a browser, on a phone.
 
 > **ANCHOR:** Thousands of stars stayed put. One didn't.
 
@@ -38,7 +38,7 @@ We're Team AKASHTORI — *[gestures; each steps in, says own name]* I'm Himel Da
 
 *[hands strip to Hedayet]*
 
-**HEDAYET:** I'm Hedayet, research. I set our same-colour rule: when the tint shifts, visits can't be fairly compared, so good data sits idle for that question. Nothing we use was deleted — IRSA still serves QR2 and QR3 as of September 2026.
+**HEDAYET:** I'm Hedayet, research. I set our same-colour rule: when the tint shifts, visits can't be fairly compared, so good data sits idle for that question. Nothing we use was deleted — IRSA still serves QR2 and QR3 as of September 2026 (QR1 already retired; we pin both DOIs).
 
 **[FAST]**
 
@@ -55,13 +55,13 @@ We're Team AKASHTORI — *[gestures; each steps in, says own name]* I'm Himel Da
 
 **[FAST]**
 
-**ZUBAYER, phone in hand:** This is 3I/ATLAS — third one we've ever seen from another star. If you stare at one spot you lose it. So I pulled its saved Horizons path and checked where it actually landed.
+**ZUBAYER, phone in hand:** This is 3I/ATLAS — third confirmed visitor from another star. If you stare at one spot you lose it. So I pulled its saved Horizons path and checked where it actually landed.
 
 *[tilts phone to Orni]*
 
 **ORNI:** I'm Orni, science — I sign off only when archives agree. SPHEREx for the image, Gaia for the background stars, Horizons for where it should be.
 
-*[SILENT STAMPS — SIMBAD, SkyBoT (labeled degraded), CelesTrak, DSS, Yale — lower-thirds only]*
+*[SILENT STAMPS — SIMBAD, SkyBoT (unavailable, labeled), CelesTrak, DSS, Yale — lower-thirds only]*
 
 **[SLOW]**
 
@@ -69,7 +69,7 @@ We're Team AKASHTORI — *[gestures; each steps in, says own name]* I'm Himel Da
 
 *[steps back; Alif steps in]*
 
-**ALIF:** I'm Alif, quality — I pulled the pixel flags and withdrew the verdict. We left it as "can't tell" instead of making something up. For 3I we measured all six bands, Horizons-tracked — faint, consistent-static, no brightness or colour evolution at these uncertainties. Numbers and error bars are on screen. We're not claiming an outburst.
+**ALIF:** I'm Alif, quality — I pulled the pixel flags and withdrew the verdict. I own that call — we left it as "can't tell" instead of making something up. For 3I we measured all six bands, 11 of 14 visits (3 transport failures, shown hollow), Horizons-tracked — faint, consistent-static, no brightness or colour evolution at these uncertainties. Numbers and error bars are on screen. We're not claiming an outburst.
 
 > **ANCHOR:** A difference is only a discovery once the detector is ruled out.
 
@@ -90,16 +90,16 @@ We're Team AKASHTORI — *[gestures; each steps in, says own name]* I'm Himel Da
 
 **[SLOW]**
 
-**MAHDIN:** One part we didn't finish — census-wide pair agreement is still open. If it's negative we'll post that too. Tonight: open the repo issues page linked from the QR, blink one cached field, file field plus two epochs plus a screenshot. Pass or fail counts.
+**MAHDIN:** I left one part open on purpose — census-wide pair agreement is still open. If it's negative we'll post that too. Tonight: open the repo issues page linked from the QR, blink one cached field, file field plus two epochs plus a screenshot. Pass or fail counts.
 
 *[long pause. All six step into frame.]*
 
 > **FINAL SPOKEN WORDS — HIMEL, hold, then black:**
-> Tombaugh blinked two plates. We blink 143 epochs — and keep every visit we can trust.
+> Tombaugh blinked two plates. We blink 143 epochs — archive intact, verdicts only on visits that survive flags.
 
 **END CARDS (static, no narration, inside 240s):**
 - Card 1 (4s): DRISHTI / Team AKASHTORI — all six names + roles / Space Apps 2026 / [CHALLENGE] / 143 epochs · 240 cutouts · public JSON + repo URL + QR / MIT · offline-capable · no login.
-- Card 2 (6s): Data — SPHEREx/IRSA QR2 https://doi.org/10.26131/IRSA652 / QR3 https://doi.org/10.26131/IRSA662 / ESA Gaia DR3 · CDS SIMBAD/Sesame + 2MASS/DSS · NASA/JPL Horizons (geocentric) · IMCCE SkyBoT / MPC checker links only / CelesTrak via mirror (checksummed) / Yale BSC v5 / d3-celestial / Messier-NGC (artistic render).
+- Card 2 (6s): Data — SPHEREx/IRSA QR2 https://doi.org/10.26131/IRSA652 / QR3 https://doi.org/10.26131/IRSA662 / ESA Gaia DR3 · CDS SIMBAD/Sesame + 2MASS/DSS · NASA/JPL Horizons (geocentric) · IMCCE SkyBoT (unavailable, labeled) / MPC checker links only (no fetch) / CelesTrak via mirror (checksummed) / Yale BSC v5 / d3-celestial / Messier-NGC (artistic render).
 - Card 3 (5s): Negative results reported too · SkyBoT degraded, labeled · nebula art marked · replay labeled simulation · no AI sky imagery · no stock footage · English subtitles burned-in + .srt.
 
 ---
