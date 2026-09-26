@@ -86,7 +86,7 @@ permalinks; skip-link, focus management, touch targets ≥44px,
 /api/lightcurve /api/spectrum /api/citation` — read-only, graceful 404s, never 500.
 `epochs.py`: TAP first (daemon-thread bound), SIA2 fallback, `newest` ordering,
 `limit` caps; returns `[]` when IRSA is unreachable.
-`cutouts.py`: lazy astropy — parse IMAGE/FLAGS/VARIANCE/WCS-WAVE, median-fill mask,
+`cutouts.py`: lazy astropy — parse IMAGE/FLAGS/VARIANCE/WCS-WAVE, aperture exclusion (never median-filled), area correction + `core_masked`,
 zscale+asinh PNG; `wavelengths_match()` enforces the LVF gate.
 `align.py`: WCS `reproject_interp` of B onto A's grid; FFT phase-correlation
 fallback; `sky_to_pixel` with array-center fallback.
@@ -132,4 +132,4 @@ M1 ✅ scaffold + transport + canvas map. M2 ✅ fallbacks deleted, TAP bounded.
 M3 ✅ full viewer (modes/diff/stretch/RGB/spectrum), search (sexagesimal/constellations/Sesame/surprise),
 permalinks, export, tutorial/tours/glossary, `/api/detect`, real ecliptic PNGs.
 M4: ecliptic census (~864 cells) → real surveyed belt on hero; per-band PNG rows.
-M5: weekly Action live; full-sky convergence meter (`x/2592 cells surveyed` — itself real).
+M5: weekly Action live; full-sky convergence meter (`x/2592 cells surveyed` — itself real; 72×36 slots, 2 polar cells empty).

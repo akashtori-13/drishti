@@ -41,7 +41,7 @@ to evidence.
 
 ## Future work
 
-True on-screen cardinal placement, linked side-by-side cursors (shipped),
+True on-screen cardinal placement, linked side-by-side cursors,
 deep-field stacks, ecliptic-belt densification, planet overlays, WISE side
 panel, 3D Sun–Earth–object geometry, weekly CI refresh, community flag
 aggregation, multi-language UI.

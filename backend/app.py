@@ -2,7 +2,7 @@
 DRISHTI dev API (local use only; production is fully static).
 
 Read-only proxy over IRSA: epoch discovery, cutout rendering, name resolution,
-SkyBoT cross-match. Every endpoint degrades gracefully (404/[] — never 500).
+SkyBoT cross-match. Every endpoint degrades gracefully on expected paths (404/[]; frame errors may 500, see docs/API.md).
 """
 
 import json
@@ -48,8 +48,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="DRISHTI API", version=PIPELINE_VERSION, lifespan=lifespan)
-app.add_middleware(CORSMiddleware, allow_origins=CORS_ORIGINS, allow_credentials=True,
-                   allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=CORS_ORIGINS, allow_credentials=False,
+                   allow_methods=["GET", "OPTIONS"], allow_headers=["Content-Type", "Range"])
 
 
 class EpochHit(BaseModel):
@@ -60,6 +60,9 @@ class EpochHit(BaseModel):
 
 
 def _load_showcase(sid: str) -> Dict[str, Any]:
+    import re
+    if not re.fullmatch(r"[a-z0-9][a-z0-9-]*", sid):
+        raise HTTPException(status_code=404, detail=f"Unknown showcase '{sid}'")
     path = SHOWCASE_DIR / f"{sid}.json"
     if not path.exists():
         raise HTTPException(status_code=404, detail=f"Unknown showcase '{sid}'")

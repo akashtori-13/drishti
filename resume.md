@@ -1,6 +1,6 @@
 # Resume — DRISHTI work session
 
-Saved: 2026-09-23 morning (main pushed; data jobs deliberately stopped for off-peak rerun).
+ARCHIVED — do not quote; see production-knowledge.md for current numbers. Saved: 2026-09-23 morning (main pushed; data jobs deliberately stopped for off-peak rerun).
 
 Repo: `akashtori-13/drishti` (renamed from spectrahunt). Local dir still
 `~/Documents/spectrahunt` (rename when quiet — venv/paths break otherwise).

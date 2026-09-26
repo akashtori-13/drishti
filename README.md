@@ -137,7 +137,12 @@ Key scripts (`scripts/`): `sky_census.py --shard I/N --progress f` + `--merge` (
 `build_bandstack.py`, `classify_fields.py --only/--force` (skips fresh reports),
 `nep_stack.py --n 12`, `process_field.py --ra --dec --band` (ad-hoc field),
 `warm_cache.py`, `nightly.sh` (merge → fill → build → verify → commit),
-`release.py` (one source builds web + APK + desktop, collects `dist/`).
+`release.py` (one source builds web + APK + desktop, collects `dist/`),
+`extract_track.py` (fixed + Horizons-tracked photometry), `pairfit.py` (pair
+colour verdicts + joint likelihood), `ranking.py` (variability leaderboard),
+`forensics_flip.py` (cutout forensics), `audit_discard.py` (blink-gate audit),
+`gen_precache.py` (offline precache manifest), `build_multiepoch.py`,
+`real_coverage.py`, `expand_swarm.py`.
 
 Backend (`backend/`, FastAPI): `/health /api/showcases /api/showcase/{id} /api/epochs
 /api/cutout.png /api/frame.png /api/frames /api/resolve /api/skybot /api/stars
@@ -169,7 +174,7 @@ app today, and every number on screen names which one it came from:
 | Movers | **IMCCE SkyBoT**, MPC, **JPL Horizons** | solar-system cross-checks at exposure MJD |
 | Orbits | **CelesTrak** TLEs | live SPHEREx orbit in the intro |
 | Bright stars | **Yale Bright Star Catalog v5** (vendored) | 1,627-star home sky-map layer |
-| Figures | Standard constellation lines (vendored GeoJSON) | 89 asterism figures |
+| Figures | Standard constellation lines (vendored GeoJSON) | 89 asterism figures (IAU lists 88; the file carries one duplicate/variant entry) |
 | Nebulae | Messier/NGC catalog positions | glow placement (rendering artistic, positions real) |
 
 ## The data (reuse it)
@@ -186,8 +191,13 @@ no key, no permission needed.
 - `spectrahunt-web/public/coverage.json` — 2,590 measured sky cells
 - `spectrahunt-web/public/cutouts/` + `compare/` — rendered PNGs (≤100 KB) and
   DSS2/2MASS context JPGs
+- `spectrahunt-web/public/tracks/` + `pairs/` + `ranking.json` — per-visit
+  (λ, t, σ, quality-flag) triplets, pair (A,R) verdicts + joint likelihoods,
+  colour-variability leaderboard
+- `spectrahunt-web/public/precache.json` — full offline pin list (352 URLs)
 
-Weekly-snapshot cadence (see `.github/workflows/refresh.yml`); pin a commit hash
+Refresh cadence is weekly-snapshot **aspiration** — `.github/workflows/refresh.yml`
+is currently unproven end-to-end (see `docs/OPS.md`); pin a commit hash
 for reproducibility; cite SPHEREx/IRSA (DOI above) plus this repo (MIT).
 
 ## Quick start
@@ -239,8 +249,8 @@ Windows NSIS via `cargo-xwin` + home-built `makensis` — see TROUBLESHOOTING.
 | Shell | Tech | Notes |
 |---|---|---|
 | PWA | manifest + `sw.js` + install chip | Offline after first visit; installable from the browser |
-| Android | Capacitor (`org.drishti.app.offline`) | Bundled `out/` = fully offline; `_blank` links → system browser; hardware back walks history. Build: `npx cap sync android` + gradle (JDK 21) |
-| Windows / Linux | Tauri v2 (`org.drishti.app`) | Targets: `nsis`, `appimage`, `deb`; external links via opener plugin. Linux builds locally; Windows via CI |
+| Android | Capacitor (`drishti.akashtori.space`) | Bundled `out/` = fully offline; `_blank` links → system browser; hardware back walks history. Build: `npx cap sync android` + gradle (JDK 21) |
+| Windows / Linux | Tauri v2 (`drishti.akashtori.space`) | Targets: `nsis`, `appimage`, `deb`; external links via opener plugin. Linux builds locally; Windows via CI |
 | Point-at-sky | `StellariumView` + `lib/skyposture.ts` | Device compass + tilt + GPS + clock → live RA/Dec camera with heading/elevation HUD, figure-8 calibration hint, ±45° compass trim, pause-on-drag. Round-trip-tested (100+ cases) |
 
 ## Repository map
@@ -273,7 +283,7 @@ cd spectrahunt-web && npx tsc --noEmit && npx eslint src  # 0 errors
 cd spectrahunt-web && npm run build            # static export to out/
 ```
 
-Bundle budget <10 MB (PNG+JSON). Weekly refresh via `.github/workflows/refresh.yml`.
+Bundle budget <15 MB (PNG+JSON). Weekly refresh via `.github/workflows/refresh.yml`.
 
 ## Citation
 

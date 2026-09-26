@@ -44,8 +44,7 @@ is the composition.
   (low-power/reduced-data devices). The scene degrades, never breaks.
 
 Budget check: Earth textures ~600KB (WebP, downscaled — it's a backdrop), SPHEREx loop
-~1.2MB, TLE bundle ~150KB → ~2MB total added, still under the 10MB cap with the current
-~3.3MB. If we ever *must* have free camera movement, the only justified exception is a
+~1.2MB, TLE bundle ~150KB → ~2MB total added, accounted in the 15 MB budget (bundle now ~11 MB). If we ever *must* have free camera movement, the only justified exception is a
 lazy-loaded WebGL intro module with the canvas-2D render as fallback — but the
 pre-rendered path is the default: 90% of the realism at 5% of the cost and zero
 runtime risk.

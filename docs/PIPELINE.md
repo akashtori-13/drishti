@@ -28,6 +28,12 @@ Design context: `SYSTEM_DESIGN.md` §§4–6, 9. API shapes: `docs/API.md`.
 | `classify_fields.py` | Detection + light curves → `public/reports/{id}.json` | `--only`, `--force`; skips fresh reports; conservative rules |
 | `process_field.py` | One position → `data/reports/field_*.json` | `--ra --dec --band`; ad-hoc analysis |
 | `serve.py` | Static server | no-store HTML (auto hard-refresh), immutable hashed assets |
+| `extract_track.py` | Fixed + Horizons-tracked aperture photometry → `data/track_*.json` | `--target/--ra/--dec --bands --per-band --tracked/--mjds`; atomic writes; masked-core quality flags |
+| `pairfit.py` | Same-time pair (A,R) + joint shared-R likelihood → `data/pairfit_*.json` | used-set pairing; core-masked excluded from verdicts |
+| `ranking.py` | Colour-variability leaderboard → `data/ranking.json` | UNRATED gate for fully-masked targets |
+| `forensics_flip.py` | Cutout forensics (aperture placement, flags, overlays) → `data/forensics/` | rerun-safe overlay naming |
+| `audit_discard.py` | Same-band blink-gate audit → `docs/discard-audit.json` | deterministic, no network |
+| `gen_precache.py` | Offline precache manifest → `public/precache.json` | wired as `prebuild`; 352 URLs |
 | `promote_orbital.py` | Orbital-intro webp assets → `public/orbital/` | idempotent; refuses totals over the 2 MB intro budget |
 | `warm_cache.py` | Cold-start warmer | `--bands`, `--detect N`; front-loads slow IRSA queries with retries |
 | `nightly.sh` / `watch_push.sh` / `audit_loop.sh` | Ops loops | merge → fill → build → verify → commit / commit-on-data / 50-pass verify |
@@ -53,7 +59,7 @@ we run `scripts/nightly.sh`: merge → fill → build → verify
   4 parallel census workers max; off-peak batching. Discovery cached 1 h.
 - IBE: 2 retries w/ backoff on 5xx/network; 422 fails fast → sibling frames.
 - Frame PNGs: `.cache/pngs`, pruned past 500 newest.
-- Bundle: PNG ≤ 100 KB each, total `out/` < 10 MB (now ~3.3 MB).
+- Bundle: PNG ≤ 100 KB each, total `out/` < 15 MB (now ~11 MB).
 
 ## Failure playbook
 

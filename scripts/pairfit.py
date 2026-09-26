@@ -106,6 +106,7 @@ def main(path: str) -> dict:
     for p in pts:
         by_band.setdefault(int(p["band"]), []).append(p)
     pairs = []
+    quality_masked = []
     for (ba, bb), name in FAMILIES.items():
         used_b: set[int] = set()  # one B epoch pairs at most once (independence)
         for a in by_band.get(ba, []):
@@ -115,6 +116,15 @@ def main(path: str) -> dict:
                 continue
             j, b = min(cands, key=lambda jb: abs(jb[1]["mjd"] - a["mjd"]))
             used_b.add(j)
+            sa, sb = a.get("flux_err"), b.get("flux_err")
+            if sa is None or sb is None or sa <= 0 or sb <= 0:
+                # missing/non-positive errors would feed zero denominators
+                # into dA/dR (audit critical): record, don't test
+                quality_masked.append(
+                    {"family": name,
+                     "mjd": round((a["mjd"] + b["mjd"]) / 2, 4),
+                     "reason": "missing error bars"})
+                continue
             A, sA, R, sR = pair_stats(a["flux"], a["flux_err"] or 0,
                                       b["flux"], b["flux_err"] or 0)
             # response-aware colour: flux per unit bandwidth in each arm,
@@ -141,7 +151,6 @@ def main(path: str) -> dict:
             })
     tests = []
     joints = []
-    quality_masked = []
     pre_fix = False
     for name in FAMILIES.values():
         fam = []
