@@ -27,10 +27,10 @@ facts behind it. `README.md` = the full project brief if you want depth.
 
 ## 2. Numbers board (all real, all safe to put on screen)
 
-20 fields · 108 blink epochs · 20/20 measured reports · 2,590 mapped sky cells ·
-102 spectral channels · 6 detectors · 8 data sources · <10 MB total app ·
+20 fields · 143 blink epochs · 20/20 measured reports · 2,590 mapped sky cells ·
+102 spectral channels · 6 detectors · 8 data sources · <15 MB budget (~11 MB) ·
 4 platforms, one codebase · top detection 143σ (3I/ATLAS) · ground truth 9/9
-known targets within 0.3 arcminutes · 59 automated tests.
+known targets within 0.3 arcminutes · 82 automated tests (24 + 58).
 
 ## 3. What to show (feature → how to demo → shot)
 

@@ -177,7 +177,7 @@ flowchart LR
     POS[ra, dec, band] --> DISC[TAP discover<br/>cached 1h]
     DISC --> FETCH[IBE FITS fetch]
     FETCH --> PARSE[parse IMAGE/FLAGS/VARIANCE/WCS]
-    PARSE --> MASK[mask bad px<br/>median fill]
+    PARSE --> MASK[mask bad px<br/>exclude + area-correct]
     MASK --> ALIGN[WCS reproject B→A<br/>corr-shift fallback]
     ALIGN --> DIFF[significance B−A<br/>variance or MAD noise]
     DIFF --> DIPOLE[+/- peak pairing<br/>movers vs variables]
@@ -275,7 +275,7 @@ same blink, in every projection.
 
 - M4: ecliptic census densification → real surveyed belt; per-band PNG rows;
   planet positions (Horizons batch) + day/night terminator in observer view.
-- M5: weekly Action live; convergence meter (`x/2592 cells surveyed`, itself real);
+- M5: weekly Action live; convergence meter (`x/2592 cells surveyed`, itself real — 72×36 slots, 2 polar cells empty);
   community flag aggregation (opt-in, anonymized); multi-language UI.
 - Later: WISE/2MASS/Pan-STARRS side panel via HiPS; 3D Sun–Earth–object geometry;
   on-device (WASM) source extraction for instant live diffs.

@@ -3,7 +3,7 @@
   "title": "3I/ATLAS \u2014 interstellar comet, Aug vs Dec 2025",
   "ra": 252.6633,
   "dec": -17.4904,
-  "story": "SPHEREx pointed at interstellar comet 3I/ATLAS twice: quiet in August 2025 (CO2 coma only) and erupting in December 2025 (H2O 40x up, organics, dust tail). Same sky, 4 months apart \u2014 drag the slider.",
+  "story": "SPHEREx caught interstellar comet 3I/ATLAS twice along its path: quiet in August 2025 and active in December 2025, 85 degrees apart across the sky. Horizons-tracked aperture photometry of both visits feeds the measured spectrum below \u2014 drag the slider.",
   "epochs": [
     {
       "label": "2025-08-01 \u00b7 pre-perihelion",

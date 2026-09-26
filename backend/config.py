@@ -49,10 +49,13 @@ USER_AGENT = "DRISHTI/2.0 (NASA Space Apps 2026)"
 # Local scratch (git-ignored). Never required at runtime.
 DATABASE_PATH = "data/spectrahunt.db"
 
-# Dev API server
-API_HOST = "0.0.0.0"
+# Dev API server. Binds loopback by default; CORS pinned to the local
+# frontends (audit: no wildcard, no credentialed-wildcard combo).
+API_HOST = "127.0.0.1"
 API_PORT = 8000
-CORS_ORIGINS = ["*"]
+CORS_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000",
+                "http://localhost:8000", "http://127.0.0.1:8000",
+                "capacitor://localhost", "tauri://localhost"]
 
 CITATION_TEXT = (
     "This publication makes use of data products from the Spectro-Photometer "

@@ -34,7 +34,7 @@ Symptom-first guide. Design context in `SYSTEM_DESIGN.md`; pipeline ops in
 | eslint `refs` on stable callbacks | False positive for props-in-events | Same treatment — one line, documented |
 | Canvas looks mirrored vs data | Projection orientation assumption | Stop and verify against a real frame before "fixing" (`SYSTEM_DESIGN.md` §7) |
 
-## Upstream status (last verified 2026-09-22)
+## Upstream status (last verified 2026-09-26)
 
 | Service | Status | Notes |
 |---|---|---|

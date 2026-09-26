@@ -11,7 +11,7 @@ zustand, canvas 2D (no WebGL, no Aladin). Styling: `src/app/globals.css`
 | `/` | `app/page.tsx` | Hero + tutorial + how-it-works |
 | `/intro` | `app/intro/page.tsx` | BORESIGHT orbital intro (Acts 1-2) → `/` |
 | `/sky` | `app/sky/page.tsx` | Observer (default) / all-sky map toggle |
-| `/blink/[id]` | `app/blink/[id]/page.tsx` | 15 IDs via `generateStaticParams`; unknown → branded 404 |
+| `/blink/[id]` | `app/blink/[id]/page.tsx` | 20 IDs via `generateStaticParams`; unknown → branded 404 |
 | `/blink/live?ra=&dec=&band=` | `app/blink/live/page.tsx` | Any visited field (Suspense + searchParams) |
 | `/candidates` | `app/candidates/page.tsx` | Full-bleed cards, objects modal, rotating colormap tones |
 | `/about` | `app/about/page.tsx` | Team AKASHTORI photocards |
@@ -68,7 +68,7 @@ epochIdx, onEpochChange, showMarkers, onToggleMarkers?, fovArcmin?, onSample?,
 center?, bandPngs?`. Internals:
 
 - Canvas engine: cover-fit draw → stretch/colormap/invert (`lib/astro.ts`
-  mirrors the backend render); modes blink/side/swipe/true-diff/motion-color/false-color,
+  mirrors the backend render); modes blink/side/swipe/diff/replay/color,
 all exclusive via `CompareMode` (color joined the union; the old RGB toggle is gone).
 - Preload is **progressive** (each arrival re-renders; placeholders meanwhile).
 - `lib/motion.ts` — real in-browser differencing (MAD-noise ±5σ dipoles +
@@ -101,8 +101,13 @@ picking alike. Free look: drag pans, wheel/pinch zooms about the cursor
   permalinks, CSV, `mjdToDate`.
 - `catalogs.ts` — SIMBAD-first resolve, SkyBoT/MPC/Horizons/SIMBAD/IRSA link
   builders, surprise fields, tours, glossary.
-- `skycache.ts` — IndexedDB imagery + neighbor prefetch, localStorage JSON
-  (lines, per-view stars, LRU-capped), `loadCachedImage`.
+- `skycache.ts` — IndexedDB imagery (300-entry bounded) + neighbor prefetch, localStorage JSON
+  (lines, per-view stars, LRU-capped with timestamp cleanup), `loadCachedImage`.
+- `cachefirst.ts` — `swr()` stale-while-revalidate over localStorage (Infinity TTL
+  serves without refetch for immutable build artifacts).
+- `reports.ts` — shared `ReportDoc` type + cache-first `getReport()` (reports/tracks/pairs/ranking).
+- `TrackSpectrum.tsx` / `PairVerdicts.tsx` / `RankingBoard.tsx` — measured (A,R) spectra,
+  pair evolution verdicts, colour-variability leaderboard, all device-cache-first.
 - `motion.ts` — see above.
 - `orbit.ts` — hand-ported near-earth SGP4 (zero deps) + WGS-84 sub-point,
   Sun/subsolar math, `(approx)` boresight proxy, cache-first
@@ -112,7 +117,7 @@ picking alike. Free look: drag pans, wheel/pinch zooms about the cursor
 ## Conventions for contributors
 
 - Client components start with `'use client'`. No new runtime deps without
-  discussion (bundle budget < 10 MB; currently ~3.3 MB).
+  discussion (bundle budget < 15 MB; currently ~11 MB).
 - Canvas overlays: always derive from the same math as clicks (hover =
   inverse of draw). When touching any projection, re-verify against a real
   frame (see `SYSTEM_DESIGN.md` §7) — never assume orientation.

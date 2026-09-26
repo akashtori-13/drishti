@@ -31,7 +31,7 @@ using only a browser (or the offline DRISHTI app where bandwidth is scarce).
 
 - Export your candidate as CSV. Its URL encodes the exact view — send it to a friend
   and they land on your discovery.
-- All measurements are public JSON in the repo (`public/reports/`): plot a light
+- All measurements are public JSON in the repo (`spectrahunt-web/public/reports/`): plot a light
   curve in a spreadsheet and bring it next class.
 
 Built by Team AKASHTORI for NASA Space Apps Challenge 2026. Data: SPHEREx QR2 via

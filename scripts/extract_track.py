@@ -116,6 +116,9 @@ async def measure(url: str, ra: float, dec: float, tmp: Path, band=None) -> dict
                     "wavelength_um": lam, "bandwidth_um": bw,
                     "aper_masked_frac": round(hit["masked_frac"], 4),
                     "core_masked": bool(hit["core_masked"])})
+        if hit["npix"] == 0:
+            # fully-masked aperture: 0.0 is not a measurement (audit critical)
+            rec.update({"flux": None, "flux_err": None, "reason": "aperture fully masked"})
     except Exception as ex:  # noqa: BLE001 - per-point failure is data, not crash
         rec["reason"] = f"{type(ex).__name__}: {ex}"[:160]
     return rec

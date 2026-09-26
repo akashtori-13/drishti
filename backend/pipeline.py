@@ -277,6 +277,8 @@ async def spectrum_for(ra: float, dec: float,
         m = aperture_flux(f["image"], xy[0], xy[1], variance=f.get("variance"))
         points.append({"band": det, "wavelength_um": f.get("wavelength_um") or b["wave_um"],
                        "flux": m["flux"], "flux_err": m["flux_err"], "mjd": hits[-1].get("mjd")})
+    out = {"points": sorted(points, key=lambda p: p["wavelength_um"]),
+           "detail": "ok" if points else "fetch-failed"}
     if points and len(points) < attempted:
         out["detail"] = "partial"
         out["missing"] = attempted - len(points)

@@ -106,17 +106,17 @@ IRSA playbook (slow/flaky upstream): raise timeouts before parallelism; serial (
 ## 11. Brand & identity
 
 - **DRISHTI** — *SPHEREx Transient Explorer & Light-spectrum Large-scale Archival Repository*, by **Team AKASHTORI**, NASA Space Apps Challenge 2026.
-- npm `stellar-web` · Tauri `org.drishti.app` · Android `org.drishti.app.offline` · IRSA user-agent `DRISHTI/1.0` · CI bot `stellar-bot` · copyright Team AKASHTORI (MIT + SPHEREx/IRSA attribution).
+- npm `stellar-web` (frozen legacy name) · Tauri `drishti.akashtori.space` · Android `drishti.akashtori.space` · IRSA user-agent `DRISHTI/1.0` · CI bot `stellar-bot` · copyright Team AKASHTORI (MIT + SPHEREx/IRSA attribution).
 - Deliberately unchanged (invisible) identifiers: `spectrahunt-web/` dir, `spectrahunt:` DOM events, `sh-*` storage keys, `spectrahunt-sky` tile cache, `spectrahunt-ui` skill id, `data/spectrahunt.db`. GitHub repo itself renamed to `akashtori-13/drishti` (old URLs redirect).
 
 ## 12. Feature inventory (everything shipped)
 
 - **Home `/`**: real-sky hero mini-map with field markers, object/coordinate search, Try chips + dice, featured-detection carousel, field rail, live numbers band, how-it-works, install-app chip, first-visit tutorial (4 steps), session toast (mutually exclusive with tutorial).
 - **Sky `/sky`**: Stellarium observer view (HiPS DSS color / 2MASS IR tiles, GPS locate, live clock ±hour stepping, constellation figures, equatorial grid, Gaia DR3 stars, Sun/Moon computed markers, cardinal ring, hover readout with Alt/Az + RA/Dec), all-sky coverage-map toggle (2,590 measured cells), inspector with blink entry, **point-at-sky AR mode** (compass + tilt + GPS + clock → live RA/Dec camera, heading/elevation HUD, ±45° compass trim, pause-on-drag, iOS permission flow).
-- **Blink `/blink/[id]`** (+ live `/blink/live?ra=&dec=&band=`): autoplay transport, timeline scrub + filmstrip, **blink / side-by-side / swipe / diff / motion-color / true-RGB** modes, linear/log/sqrt/asinh stretch, 4 colormaps + invert, faint/balanced/bright presets, black/white levels, 102 channels across 6 detectors, RGB channel mapping, in-browser ±5σ mover/variable detection with markers, click-to-measure spectrum, light curve, band spectrum, catalog cross-links, share URLs encoding band+epoch+mode, exports (PNG figure, WebM animation, CSV, JSON), ⌘K command palette, keyboard transport.
-- **Candidates `/candidates`**: measured cards (Known/Mover/Variable/Unidentified — never invented), top-σ + baseline stats, known-object names, all/known/unidentified filters with counts, CSV/JSON export.
-- **About `/about`**: mission, LVF same-band rule, band table, method precision (units, 6.2″/px, σ), **ground-truth panel (9/9 fixed targets ≤0.3′)**, impact, team, tours, glossary, shortcuts, citation, 7-source list.
-- **Orbital intro `/intro`**: BORESIGHT acts — live SPHEREx orbit from real TLE, 613-object CelesTrak swarm, procedural spacecraft model, free-look camera, glitch transition to console home. Skipped by default on mobile/slow networks, opt-in via About.
+- **Blink `/blink/[id]`** (+ live `/blink/live?ra=&dec=&band=`): autoplay transport, timeline scrub + filmstrip, **blink / side / swipe / diff / replay / color** modes, linear/log/sqrt/asinh stretch, 4 colormaps + invert, faint/balanced/bright presets, black/white levels, 102 channels across 6 detectors, RGB channel mapping, in-browser ±5σ mover/variable detection with markers, click-to-measure spectrum, light curve, band spectrum, catalog cross-links, share URLs encoding band+epoch+mode, exports (PNG figure, WebM animation, CSV, JSON), ⌘K command palette, keyboard transport.
+- **Candidates `/candidates`**: measured cards (Known/Mover/Variable/Unidentified — never invented), top-σ + baseline stats, known-object names, all/unknown/known filters with counts, CSV/JSON export.
+- **About `/about`** + **`/mission`** + **`/crew`**: mission, LVF same-band rule, band table, method precision (units, 6.2″/px, σ), **ground-truth panel (9/9 fixed targets ≤0.3′)**, impact, team, tours, glossary, shortcuts, citation, 7-source list.
+- **Orbital intro `/intro`**: BORESIGHT acts — live SPHEREx orbit from real TLE, 716-object CelesTrak swarm, procedural spacecraft model, free-look camera, glitch transition to console home. Skipped by default on mobile/slow networks, opt-in via About.
 - **Dice**: rolls a random *blinkable* showcase (skips pending fields, never re-rolls current), opens its blink directly. Pool: all 20 showcases.
 - **PWA**: manifest + PNG/maskable icons, offline service worker (navigations network-first, JSON stale-while-revalidate, images cache-first ≤250), install chip, `NEXT_PUBLIC_DISABLE_SW=1` keeps dev HMR clean.
 - **Shells**: Capacitor Android (bundled `out/`, system-browser links, hardware-back), Tauri desktop (nsis/appimage/deb, opener plugin). NativeShell adapter no-ops on web.
@@ -130,7 +130,7 @@ IRSA playbook (slow/flaky upstream): raise timeouts before parallelism; serial (
 Per-field bands: 19 fields 6/6 detectors; galactic-center 3/3 (coverage limit).
 Notables: 3I/ATLAS (13 movers, top 143σ, literature-cited), galactic-center (20 movers),
 omega-cen (27 movers), orion (40 variables), NEP 7-frame median deep stack,
-lmc 2→5 and virgo 2→6 epochs added in latest fill.
+lmc 7 and virgo 8 epochs added in latest fill.
 
 Report schema per field: movers, variables, top σ, baseline days, known-object
 block with citation, **lightcurve[]** (MJD/flux), **spectrum[]** (6 bands, flux ± err).
@@ -177,7 +177,8 @@ hand-rolled SW. (Video must credit all of these on screen.)
 
 - **v1.0.0** — shells+PWA+AR+README baseline. CI partially failed (since fixed); artifacts backfilled manually.
 - **v1.0.1** — onboarding order, mobile overflow fixes, NEP stack, lmc/virgo epochs, bandstack wave, rename follow-ups. CI fully green; signed APK attached manually.
-- Next: v1.0.2 with 20/20 wave + About upgrades (pending tag).
+- **v2.9 → v3.0.0** — measured SED panels, per-epoch wavelengths, single-spectrum dedupe, offline-first data layer, full offline precache bundle, Horizons-tracked comet spectrum + control star, pair-colour verdicts, field ranking, blink skip control, live-decode escape hatch. Artifacts built locally (CI billing blocked).
+- **v3.1.0** — joint-likelihood pair engine (shared-R χ² + response-aware colour), masked-core photometry fix + forensics, FITS retention cache, pair-verdict + ranking panels, 5-target ranking set, all-sky offline base map, release tooling (signed APK scripted). Published with 5 local artifacts.
 
 ## 18. Known limitations (say these before judges find them)
 
@@ -237,7 +238,7 @@ No server, key, or permission needed. Pin a commit hash for reproducibility.
   (movers, variables, top σ, baselines, lightcurve[], 6-band spectrum[] ± err, known-object citations)
 - Sky index: `.../public/coverage.json` (2,590 cells: epochs, images, bands, spans)
 - Imagery: `.../public/cutouts/{id}_{epoch}.png`, `.../public/compare/{id}_{dss,2mass}.jpg`
-- Embed: `<iframe src="https://<deploy>/blink/{id}">` (any field, share URLs restore exact view incl. band/epoch/mode)
+- Embed: framing is blocked by `X-Frame-Options: DENY`; link out instead of `<iframe>` until an allowlist exists
 - Snapshots: GitHub Releases carry versioned binaries; data snapshots ride git tags
 
 Reuse policy: MIT + SPHEREx/IRSA attribution (DOI 10.26131/IRSA652). Weekly refresh
