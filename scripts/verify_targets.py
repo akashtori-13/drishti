@@ -118,7 +118,8 @@ def qr3_coverage(targets: list[dict]) -> dict:
 def timed_search(svc, query, maxrec=10):
     """svc.search with a hard timeout (hung TAP calls sleep forever otherwise)."""
     with concurrent.futures.ThreadPoolExecutor(max_workers=1) as ex:
-        fut = ex.submit(svc.search, query, maxrec)
+        import functools
+        fut = ex.submit(functools.partial(svc.search, query, maxrec=maxrec))
         try:
             return fut.result(timeout=QUERY_TIMEOUT)
         except concurrent.futures.TimeoutError:
