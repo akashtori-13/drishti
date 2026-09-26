@@ -179,7 +179,7 @@ export default function BlinkComparator({
   knownNames?: string[];
   /** Newest-epoch PNG per detector (1-6) for true false-color composites. */
   bandPngs?: Record<number, string | null>;
-  onStats?: (s: { movers: number; variables: number; ready: boolean } | null) => void;
+  onStats?: (s: { movers: number; variables: number; ready: boolean; cands?: Array<{ kind: string; sigma: number }>; bins?: number[] | null } | null) => void;
 }) {
   const n = frames.length;
   const idx = Math.min(epochIdx, n - 1);
@@ -259,7 +259,7 @@ export default function BlinkComparator({
   const [sizeTick, setSizeTick] = useState(0);
   const leftRef = useRef<HTMLCanvasElement>(null);
   const rightRef = useRef<HTMLCanvasElement>(null);
-  const histRef = useRef<HTMLCanvasElement>(null);
+  const histBins = useRef<number[] | null>(null);
   const diffStatRef = useRef<HTMLSpanElement>(null);
   const drag = useRef<{ x: number; y: number; pan: { x: number; y: number }; moved: boolean } | null>(null);
   // multi-touch pinch zoom: live pointer positions + touchdown baseline
@@ -642,7 +642,9 @@ export default function BlinkComparator({
     return () => { alive = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, center?.ra, center?.dec, fovArcmin]);
-  // detection summary for the data rail (parent-owned state, effect boundary)
+  // detection summary for the data rail (parent-owned state, effect boundary).
+  // Top candidates + histogram bins travel too, so the rail owns the Status
+  // list (audit: left panel is stage/tweak output only; results live in Overview).
   useEffect(() => {
     if (!onStats) return;
     if (!curImg || !prevImg) {
@@ -650,7 +652,9 @@ export default function BlinkComparator({
       return;
     }
     const movers = candidates.filter((c) => c.kind === 'mover').length;
-    onStats({ movers, variables: candidates.length - movers, ready: true });
+    onStats({ movers, variables: candidates.length - movers, ready: true,
+      cands: candidates.slice(0, 5).map((c) => ({ kind: c.kind, sigma: c.sigma })),
+      bins: histBins.current });
   }, [candidates, curImg, prevImg, onStats]);
   const bandMeta = BANDS[band - 1];
   const detChannels = useMemo(() => CHANNELS.filter((c) => c.detector === band), [band]);
@@ -1131,21 +1135,10 @@ export default function BlinkComparator({
         bins[Math.min(47, Math.floor(lum * 48))]++;
         if (diffMode && Math.abs(lum - 0.5) > 0.2) hot++;
       }
-      const hc = histRef.current;
-      if (hc) {
-        const hw = (hc.width = 220);
-        const hh = (hc.height = 44);
-        const hctx = hc.getContext('2d');
-        if (hctx) {
-          hctx.clearRect(0, 0, hw, hh);
-          const mx = Math.max(1, ...bins);
-          hctx.fillStyle = diffMode ? '#e8c34a' : '#7c83fd';
-          bins.forEach((v, bi) => {
-            const bh = Math.max(1, (v / mx) * (hh - 4));
-            hctx.fillRect((bi / bins.length) * hw, hh - bh, hw / bins.length - 0.5, bh);
-          });
-        }
-      }
+      histBins.current = bins;
+      // rail owns the only histogram now (bins travel via onStats); the
+      // tweak-left canvas is gone, so no display draw happens here.
+      histBins.current = bins;
       if (diffStatRef.current) {
         const total = d.length / 16;
         diffStatRef.current.textContent = diffMode
@@ -1778,29 +1771,6 @@ export default function BlinkComparator({
               <span ref={diffStatRef} className="mono" style={{ color: '#e8c34a' }} />
               {mode !== 'diff' && <span className="mono">Switch to Diff to quantify change</span>}
             </p>
-            <div className="ws-sub">Status</div>
-            <p className="ws-status">
-              {candidates.length
-                ? `${candidates.length} candidate${candidates.length === 1 ? '' : 's'} — real pixel differencing, ≥5σ`
-                : 'Scanning pixels for movers…'}
-            </p>
-            {candidates.length > 0 ? (
-              <ul className="cand-detect-list">
-                {candidates.slice(0, 5).map((c, i) => (
-                  <li key={i} className="mono">
-                    <span className={c.kind === 'mover' ? 'tag-mover' : 'tag-var'}>
-                      {c.kind === 'mover' ? 'MOVER' : 'VARIABLE'}
-                    </span>{' '}
-                    #{i + 1} · {c.sigma.toFixed(1)}σ
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              curImg && prevImg && (
-                <p className="ws-status">No movers above 5σ between these epochs — quiet field.</p>
-              )
-            )}
-            <canvas ref={histRef} className="hist" aria-label="Brightness histogram of the displayed frame" />
           </section>
         </aside>
 

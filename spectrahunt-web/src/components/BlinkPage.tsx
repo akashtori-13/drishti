@@ -65,7 +65,7 @@ export default function BlinkPage({ id }: { id: string }) {
   const [liveSpec, setLiveSpec] = useState<Array<{ wavelength_um: number; flux: number }> | null>(null);
   const [liveLc, setLiveLc] = useState<Array<{ mjd?: number; flux: number }> | null>(null);
   const [report, setReport] = useState<ReportDoc | null>(null);
-  const [detStats, setDetStats] = useState<{ movers: number; variables: number; ready: boolean } | null>(null);
+  const [detStats, setDetStats] = useState<{ movers: number; variables: number; ready: boolean; cands?: Array<{ kind: string; sigma: number }>; bins?: number[] | null } | null>(null);
   // Fetch progress for the WaitGame panel: monotonic step counter so the
   // player sees what is loading and how far along it is.
   const [prog, setProg] = useState({ done: 0, total: 3, label: 'Contacting IRSA…' });
@@ -438,6 +438,37 @@ export default function BlinkPage({ id }: { id: string }) {
                     )}
                   </div>
                   <p className="story">{viewing.story}</p>
+                  <h3>Detections — what moved?</h3>
+                  <p className="fine">
+                    {detStats
+                      ? detStats.movers + detStats.variables > 0
+                        ? `${detStats.movers} mover${detStats.movers === 1 ? '' : 's'}, ${detStats.variables} variable${detStats.variables === 1 ? '' : 's'} ≥5σ in this pair.`
+                        : 'No movers above 5σ between these epochs — quiet field.'
+                      : 'Scanning pixels for movers…'}
+                  </p>
+                  {detStats && (detStats.cands ?? []).length > 0 && (
+                    <ul className="cand-detect-list">
+                      {detStats.cands!.slice(0, 5).map((c, i) => (
+                        <li key={`${c.kind}:${i}`} className="mono">
+                          <span className={c.kind === 'mover' ? 'tag-mover' : 'tag-var'}>
+                            {c.kind === 'mover' ? 'MOVER' : 'VARIABLE'}
+                          </span>{' '}
+                          #{i + 1} · {c.sigma.toFixed(1)}σ
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {detStats?.bins?.length ? (
+                    <svg viewBox="0 0 220 44" role="img" aria-label="Brightness histogram of the displayed frame"
+                      style={{ width: '100%', maxWidth: 280, background: '#04050a', borderRadius: 8 }}>
+                      {detStats.bins.map((v, bi) => {
+                        const mx = Math.max(1, ...detStats.bins!);
+                        const bh = Math.max(1, (v / mx) * 40);
+                        return <rect key={bi} x={(bi / detStats.bins!.length) * 220} y={44 - bh}
+                          width={220 / detStats.bins!.length - 0.5} height={bh} fill="#7c83fd" />;
+                      })}
+                    </svg>
+                  ) : null}
                   <h3>Did it brighten? — brightness over time</h3>
                   {liveLc?.length || sample?.values.length ? (
                     <>
