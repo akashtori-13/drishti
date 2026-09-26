@@ -189,7 +189,11 @@ export default function BlinkComparator({
   const [palQ, setPalQ] = useState('');
   const [palActive, setPalActive] = useState(0);
   const [stretch, setStretch] = useState<Stretch>('asinh');
-  const [cmap, setCmap] = useState<Colormap>(() => (useAppStore.getState().colorblind ? 'cividis' : 'grayscale'));
+  const [cmap, setCmap] = useState<Colormap>(() => {
+    const once = useAppStore.getState().entryCmap;
+    if (once) { useAppStore.getState().setEntryCmap(null); return once; }
+    return useAppStore.getState().colorblind ? 'cividis' : 'grayscale';
+  });
   const [invert, setInvert] = useState(false);
   const [vmin, setVmin] = useState(0.05);
   const [vmax, setVmax] = useState(0.98);
@@ -496,10 +500,12 @@ export default function BlinkComparator({
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) setPlaying(false);
   }, []);
 
-  // autoplay on arrival (loops forever until the user steps in)
+  // autoplay on arrival (loops forever until the user steps in), gated on
+  // the stored autoplay setting — a paused preview stays paused (audit)
   useEffect(() => {
     if (n < 2) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!useAppStore.getState().autoplay) return;
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setPlaying(true);
   }, [n]);

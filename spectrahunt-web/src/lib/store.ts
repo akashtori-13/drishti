@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import type { Colormap } from '@/lib/astro';
 
 export type CompareMode = 'blink' | 'side' | 'swipe' | 'diff' | 'replay' | 'color';
 
@@ -21,6 +22,9 @@ interface AppState {
   setBand: (b: number) => void;
   setShowMarkers: (v: boolean) => void;
   setColorblind: (v: boolean) => void;
+  /** One-shot entry colormap for preview→blink handoff (transient, not persisted). */
+  entryCmap: Colormap | null;
+  setEntryCmap: (v: Colormap | null) => void;
   setAutoplay: (v: boolean) => void;
   setTutorialDone: (v: boolean) => void;
 }
@@ -56,17 +60,20 @@ export const useAppStore = create<AppState>((set) => ({
     set({ tutorialDone: v });
     try { localStorage.setItem('sh-tutorial', v ? '1' : '0'); } catch { /* noop */ }
   },
+  entryCmap: null,
+  setEntryCmap: (v) => set({ entryCmap: v }),
   previewId: null,
   openPreview: (id: string) => set({ previewId: id }),
   closePreview: () => set({ previewId: null }),
 }));
 
-/** Shareable blink URL: /blink/<id>?band=&epoch=&mode= */
-export function blinkURL(id: string, opts?: { band?: number; epoch?: number; mode?: CompareMode }): string {
+/** Shareable blink URL: /blink/<id>?band=&epoch=&mode=&cmap= */
+export function blinkURL(id: string, opts?: { band?: number; epoch?: number; mode?: CompareMode; cmap?: string }): string {
   const p = new URLSearchParams();
   if (opts?.band !== undefined) p.set('band', String(opts.band));
   if (opts?.epoch !== undefined) p.set('epoch', String(opts.epoch));
   if (opts?.mode) p.set('mode', opts.mode);
+  if (opts?.cmap) p.set('cmap', opts.cmap);
   const qs = p.toString();
   return `/blink/${encodeURIComponent(id)}${qs ? `?${qs}` : ''}`;
 }
