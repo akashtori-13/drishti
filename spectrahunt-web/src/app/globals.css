@@ -1328,9 +1328,6 @@ body::after {
 .measure-chip{position:absolute; z-index:6; transform:translate(-50%,-130%); display:flex; align-items:center; gap:8px; font-size:.6875rem; padding:5px 6px 5px 10px; border-radius:10px; background:rgba(5,6,12,.88); border:1px solid var(--line-strong); color:var(--ink); white-space:nowrap; pointer-events:auto;}
 .measure-chip button{border:0; background:transparent; color:var(--ink-3); font-size:.875rem; line-height:1; padding:2px 4px; cursor:pointer;}
 .measure-chip button:hover{color:#fff;}
-@media(min-width:961px){
-  .blink-grid{grid-template-columns:minmax(0,1fr);}
-}
 
 /* ---------- stellarium view ---------- */
 .stel{position:absolute; inset:0; overflow:hidden; background:#04050a; touch-action:none;}
