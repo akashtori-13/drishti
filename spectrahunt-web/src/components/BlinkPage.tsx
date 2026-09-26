@@ -22,43 +22,6 @@ import { horizonsURL, irsaViewerURL, mpcCheckerURL, simbadURL, skybotURL } from 
 type RailTab = 'overview' | 'epochs' | 'catalogs' | 'share';
 
 /** Live frame histogram for the Overview tab: reads the displayed canvas. */
-function RailHistogram({ watch }: { watch: unknown }) {
-  const ref = useRef<HTMLCanvasElement>(null);
-  useEffect(() => {
-    const hc = ref.current;
-    if (!hc) return;
-    const draw = () => {
-      const src = document.getElementById('blinkCanvas') as HTMLCanvasElement | null;
-      const hctx = hc.getContext('2d');
-      if (!src || !hctx || !src.width) return;
-      hc.width = 260;
-      hc.height = 52;
-      let data: Uint8ClampedArray;
-      try {
-        data = hctx && src.getContext('2d', { willReadFrequently: true })?.getImageData(
-          0, 0, src.width, src.height)?.data as Uint8ClampedArray;
-      } catch { return; }
-      if (!data) return;
-      const bins = new Array<number>(48).fill(0);
-      for (let i = 0; i < data.length; i += 32) {
-        const lum = (data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114) / 255;
-        bins[Math.min(47, Math.floor(lum * 48))]++;
-      }
-      hctx.clearRect(0, 0, hc.width, hc.height);
-      const mx = Math.max(1, ...bins);
-      hctx.fillStyle = '#7c83fd';
-      bins.forEach((v, bi) => {
-        const bh = Math.max(1, (v / mx) * (hc.height - 4));
-        hctx.fillRect((bi / bins.length) * hc.width, hc.height - bh, hc.width / bins.length - 0.5, bh);
-      });
-    };
-    const t = requestAnimationFrame(() => setTimeout(draw, 60));
-    return () => cancelAnimationFrame(t);
-  }, [watch]);
-  return <canvas ref={ref} className="hist" style={{ width: '100%' }} aria-label="Live frame brightness histogram" />;
-}
-
-/** DSS2 + 2MASS context cutouts (land async via fetch_compare.py). */
 function OtherEyes({ id }: { id: string }) {
   const [ok, setOk] = useState<Record<string, boolean>>({ dss: true, '2mass': true });
   return (
@@ -74,8 +37,10 @@ function OtherEyes({ id }: { id: string }) {
               style={{ width: '100%', aspectRatio: '1/1', objectFit: 'cover', borderRadius: 10, display: 'block', background: '#04050a' }}
               onError={() => setOk((o) => ({ ...o, [k]: false }))} />
           ) : (
-            <span style={{ display: 'grid', placeItems: 'center', width: '100%', aspectRatio: '1/1', borderRadius: 10, background: '#04050a', color: '#8a90ab', fontSize: 11 }}>
-              indexing…
+            <span role="alert" style={{ display: 'grid', placeItems: 'center', gap: 6, width: '100%', aspectRatio: '1/1', borderRadius: 10, background: '#0a0d1a', color: '#8a90ab', fontSize: 11, textAlign: 'center', padding: 8 }}>
+              {label} unavailable — needs connection.
+              <button type="button" className="epoch-chip" style={{ minWidth: 44, minHeight: 44 }}
+                onClick={() => setOk((o) => ({ ...o, [k]: true }))}>↻ Retry</button>
             </span>
           )}
           <figcaption className="mono" style={{ fontSize: 11, color: '#8a90ab', marginTop: 4 }}>{label} · 0.5°</figcaption>
@@ -115,9 +80,9 @@ export default function BlinkPage({ id }: { id: string }) {
   // whenever the viewer steps onto a pending frame, but the game must not
   // reappear mid-browse.
   const [pairSeen, setPairSeen] = useState(false);
-  if (detStats?.ready && !pairSeen) {
-    setPairSeen(true);
-  }
+  useEffect(() => {
+    if (detStats?.ready) setPairSeen(true);
+  }, [detStats]);
   const viewing = data && data.id === id ? data : null;
   // band PNG map identity must be stable across parent re-renders (audit:
   // a fresh object literal retriggered the band-preload effect endlessly).
@@ -473,25 +438,7 @@ export default function BlinkPage({ id }: { id: string }) {
                     )}
                   </div>
                   <p className="story">{viewing.story}</p>
-                  <h3>Frame</h3>
-                  <RailHistogram watch={[epochIdx, compareMode, band, viewing.id]} />
-                  <p className="fine">
-                    {detStats
-                      ? detStats.movers + detStats.variables > 0
-                        ? `${detStats.movers} mover${detStats.movers === 1 ? '' : 's'}, ${detStats.variables} variable${detStats.variables === 1 ? '' : 's'} ≥5σ in this pair.`
-                        : 'No movers above 5σ between these epochs — quiet field.'
-                      : 'Scanning pixels for movers…'}
-                  </p>
-                  <dl className="meta-grid">
-                    <dt>RA / Dec</dt><dd className="mono">{fmtRa(viewing.ra)} / {fmtDec(viewing.dec)}</dd>
-                    <dt>Epochs</dt><dd className="mono">{epochs.length}</dd>
-                    <dt>Band</dt><dd className="mono">D{band}</dd>
-                    <dt>Obs ID</dt><dd className="mono">{cur?.obs_id ?? '—'}</dd>
-                    <dt>Date</dt><dd className="mono">{cur?.mjd ? `${mjdToDate(cur.mjd)} (MJD ${cur.mjd.toFixed(2)})` : '—'}</dd>
-                    <dt>Scale</dt><dd className="mono">6.2″/px</dd>
-                    <dt>Motion</dt><dd className="mono">{motion === null ? 'needs 2 dated epochs' : `${motion.toFixed(1)} ″/day`}</dd>
-                  </dl>
-                  <h3>Brightness vs time</h3>
+                  <h3>Did it brighten? — brightness over time</h3>
                   {liveLc?.length || sample?.values.length ? (
                     <>
                       <LightCurve
