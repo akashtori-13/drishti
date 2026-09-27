@@ -4,6 +4,9 @@ Pip is DRISHTI's roaming-alien-turned-parked buddy: a rule-based, offline,
 deterministic helper. No network, no LLM on the default path. An optional
 BYO-key cloud brain exists behind explicit per-message consent.
 
+Pip ships **off by default** under Settings → Experimental. Nothing about
+Pip affects science data or verdicts.
+
 ## What Pip is
 
 - `src/lib/guide.ts` — pure intent engine: `answerGuide(q, ctx)` returns
