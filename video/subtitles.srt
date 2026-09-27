@@ -1,31 +1,198 @@
 1
-00:00:00,000 --> 00:00:45,000
-DRISHTI blinks seasons apart — watch a dot move.
-Six of eight cached epochs, in a browser.
-Ninety-six years ago: Tombaugh, Pluto, at Lowell.
+00:00:00,000 --> 00:00:10,281
+DRISHTI blinks seasons apart —
+watch the middle, a dot moves.
 
 2
-00:00:45,000 --> 00:01:45,000
-SPHEREx tints by spot. Six wedges, 102 channels.
-Tile 2 bluer, Tile 5 redder. The tint trap.
-Same tint only; the rest waits on the shelf.
+00:00:10,281 --> 00:00:23,933
+Hand-blinks don't scale — six of eight,
+this field's cached epochs, in a browser.
 
 3
-00:01:45,000 --> 00:02:45,000
-A visitor from another star. Follow Horizons path.
-Blinked, not subtracted. Pre-fix flagged a control:
-flagged pixels, not sky. Verdict: can't tell.
-Six bands, 20/20 cutouts. No outburst at these uncertainties.
+00:00:23,933 --> 00:00:32,360
+Ninety-six years ago —
+Tombaugh, Pluto, at Lowell.
 
 4
-00:02:45,000 --> 00:03:45,000
-A classroom with no wifi can blink cached epochs offline.
-143 epochs, 20 fields, public JSON. No login to blink.
-Code is MIT. Scan that QR when online.
-Tonight: blink a field. File two epochs to Issues.
-Tombaugh blinked plates into history.
-We blink 143 epochs, recheckable as data.
+00:00:32,360 --> 00:00:39,438
+Same trick, built to scale, on your phone.
 
 5
-00:03:45,000 --> 00:04:00,000
-[silent end cards — no narration]
+00:00:39,438 --> 00:00:45,000
+DRISHTI blinks it in the browser.
+
+6
+00:00:45,000 --> 00:00:47,925
+SPHEREx tints by spot.
+
+7
+00:00:47,925 --> 00:00:52,844
+Six LVF wedges, hundred-two channels.
+
+8
+00:00:52,844 --> 00:00:56,567
+Tile 2 bluer, Tile 5 redder.
+
+9
+00:00:58,067 --> 00:00:59,928
+The tint trap.
+
+10
+00:00:59,928 --> 00:01:01,258
+Same star.
+
+11
+00:01:01,258 --> 00:01:04,050
+Can't fairly compare.
+
+12
+00:01:04,050 --> 00:01:12,426
+Tombaugh blinked matched plates;
+ours switch filters mid-blink.
+
+13
+00:01:12,426 --> 00:01:18,409
+Same tint only — the
+rest waits on the shelf.
+
+14
+00:01:18,409 --> 00:01:27,982
+Nothing deleted for this question;
+older versions stay listed on screen.
+
+15
+00:01:27,982 --> 00:01:32,901
+Archive intact, waiting, ready still.
+
+16
+00:01:32,901 --> 00:01:42,208
+Good data, idle, intact — while real
+change could slip past unnoticed.
+
+17
+00:01:42,208 --> 00:01:45,000
+That's the tint rule.
+
+18
+00:01:45,000 --> 00:01:48,078
+A visitor from another star.
+
+19
+00:01:48,078 --> 00:01:49,397
+Stare loses.
+
+20
+00:01:49,397 --> 00:01:53,464
+Follow Horizons path, visit by visit.
+
+21
+00:01:53,464 --> 00:01:55,663
+3I/ATLAS, C/2025 N1.
+
+22
+00:01:55,663 --> 00:01:57,311
+SPHEREx image —
+
+23
+00:01:57,311 --> 00:02:00,169
+Gaia stars, Horizons path.
+
+24
+00:02:01,569 --> 00:02:05,856
+Faint — tracked frame to tracked frame.
+
+25
+00:02:05,856 --> 00:02:12,012
+Blinked, not subtracted — the
+gray Diff is display-only.
+
+26
+00:02:12,012 --> 00:02:13,441
+We messed up.
+
+27
+00:02:14,441 --> 00:02:17,299
+Pre-fix flagged a control.
+
+28
+00:02:17,299 --> 00:02:19,937
+Flagged pixels, not sky.
+
+29
+00:02:19,937 --> 00:02:23,565
+Verdict withdrawn — "can't tell."
+
+30
+00:02:23,565 --> 00:02:29,281
+For 3I: six bands, twenty
+of twenty cutouts tracked.
+
+31
+00:02:29,281 --> 00:02:33,898
+Transient IBE 503s retried, all recovered.
+
+32
+00:02:33,898 --> 00:02:36,756
+None hollow, never joined.
+
+33
+00:02:36,756 --> 00:02:45,000
+Faint — no outburst detected at these
+uncertainties; slower change allowed.
+
+34
+00:02:45,000 --> 00:02:52,823
+A classroom with no wifi can blink
+this field's cached epochs offline.
+
+35
+00:02:52,823 --> 00:03:00,087
+One hundred forty-three epochs
+across twenty fields, public JSON.
+
+36
+00:03:00,087 --> 00:03:02,098
+No login to blink.
+
+37
+00:03:02,098 --> 00:03:06,121
+We cached it so planes stay offline.
+
+38
+00:03:06,121 --> 00:03:07,462
+Code is MIT.
+
+39
+00:03:07,462 --> 00:03:10,256
+Scan that QR when online.
+
+40
+00:03:10,256 --> 00:03:15,397
+A question stays open —
+census-wide agreement.
+
+41
+00:03:15,397 --> 00:03:18,414
+Prove us wrong, we'll post.
+
+42
+00:03:18,414 --> 00:03:20,985
+Tonight: blink a field.
+
+43
+00:03:20,985 --> 00:03:26,125
+File two epochs to Issues,
+login only to file.
+
+44
+00:03:26,125 --> 00:03:29,701
+Pass or fail, we read every one.
+
+45
+00:03:29,701 --> 00:03:33,836
+Tombaugh blinked plates into history.
+
+46
+00:03:33,836 --> 00:03:43,000
+We blink one hundred forty-three epochs
+across twenty fields, recheckable as data.
