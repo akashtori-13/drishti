@@ -2,7 +2,7 @@
 **NASA Space Apps Challenge — Pitch Script · Four-Act · 2026-09-27**
 **Two voices only (Mahdin: story, Orni: science — Orni owns quantities; proper names exempt). Animated screen + captures, no live presenters. Spoken 322w (VO bodies, labels excluded; hyphenates = 1) (~155s @125wpm) + 5.9s marked silence + 15s cards ≈176s < 240s**
 
-> Draft 20 — V-cycle: QR3 linked-not-measured · hollow-0 to 3I sentence · DISTA 12/12 refresh · `video/subtitles.srt` shipped · hard-out note.
+> Draft 21 — X1 sweep: verified 322w headers · 46-cue verbatim .srt · repo-scroll CACHED REPLAY header.
 
 ---
 
