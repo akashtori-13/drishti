@@ -1,15 +1,15 @@
 # DRISHTI: 240 Seconds
 **NASA Space Apps Challenge — Pitch Script · Four-Act · 2026-09-27**
-**Two voices only (Mahdin: story, Orni: science — Orni owns quantities; proper names exempt). Animated screen + captures, no live presenters. Spoken 373w (~179s @125wpm) + 5.9s marked silence + 15s cards ≈200s < 240s**
+**Two voices only (Mahdin: story, Orni: science — Orni owns quantities; proper names exempt). Animated screen + captures, no live presenters. Spoken 291w (~140s @125wpm) + 5.9s marked silence + 15s cards ≈161s < 240s**
 
-> Draft 14 — Tile-VO deixis · anchors on-screen · QR-date precision · OPS stack credit · pledge softened · ruling bounded · true counts · consent fallback per K18 (initials if withheld).
+> Draft 15 — Mahdin zero-digit (Tile + 3I naming to Orni) · L84 two breaths · true counts below · consent FORMS DONE (Himel + Zubayer full names cleared for Card 1; VO is Mahdin + Orni only).
 
 ---
 
 ## Act I · WHO — The Blink (0:00–0:45)
 **Objective:** DRISHTI + stakes in <10s. No spoken roster (names on Card 1 only).
 
-> **VISUAL (captured, no fade-in):** Hard cut to real UI, header `CACHED REPLAY — not live sky · DOI 10.26131/IRSA652`. Hard-start mid-blink on real DRISHTI capture locked to virgo-field (8 epochs), URL bar visible, counter ticking to match spoken "six of eight". Lower-third from 0:02: `SPHEREx QR2 served · IRSA DOI 10.26131/IRSA652 · QR3 from Sep 2026 where covered DOI 10.26131/IRSA662 · QR1 retired Feb 2026`. Single archival Tombaugh plate blinks once behind translucent UI (labeled `ARCHIVAL — Lowell Obs.`, credited Card 2 + USEOFDATA). Cursor drags plate into browser frame, URL identical. DOI watermark bottom-right held 6s.
+> **VISUAL (captured, no fade-in):** Hard cut to real UI, header `CACHED REPLAY — not live sky · DOI 10.26131/IRSA652`. Hard-start mid-blink on real DRISHTI capture locked to virgo-field (8 epochs), URL bar visible, counter ticking to match spoken "six of eight" (counter mid-blink at six of eight). Lower-third from 0:02: `SPHEREx QR2 served · IRSA DOI 10.26131/IRSA652 · QR3 from Sep 2026 where covered DOI 10.26131/IRSA662 · QR1 retired Feb 2026`. Single archival Tombaugh plate blinks once behind translucent UI (labeled `ARCHIVAL — Lowell Obs.`, credited Card 2 + USEOFDATA). Cursor drags plate into browser frame, URL identical. DOI watermark bottom-right held 6s.
 
 **[FAST]**
 
@@ -32,13 +32,13 @@
 
 **[FAST]**
 
-**ORNI, flat, pre-crack — over rainbow, off the break:** SPHEREx tints by spot. Six LVF wedges, hundred-two channels.
+**ORNI, flat, pre-crack — over rainbow, off the break:** SPHEREx tints by spot. Six LVF wedges, hundred-two channels. Tile 2 bluer, Tile 5 redder.
 
 *[1.5s dead air — post-crack, no speech, cracked prism holds]*
 
 **MAHDIN, quiet:** The tint trap.
 
-**MAHDIN:** Same star. Tile 2 bluer, Tile 5 redder. Can't fairly compare.
+**MAHDIN:** Same star. Can't fairly compare.
 
 **MAHDIN, wry:** Tombaugh blinked matched plates; ours switch filters mid-blink.
 
@@ -59,9 +59,9 @@
 
 **[FAST]**
 
-**MAHDIN:** 3I/ATLAS — a visitor. Stare, you lose it.
+**MAHDIN:** A visitor from another star. Stare loses.
 
-**ORNI:** So we follow its Horizons path, visit by visit.
+**ORNI:** Follow Horizons path, visit by visit. 3I/ATLAS. Third confirmed.
 
 **MAHDIN:** SPHEREx image —
 
@@ -81,7 +81,9 @@
 
 **ORNI, flat, half-speed:** Pre-fix flagged a control. Flagged pixels, not sky. Verdict withdrawn — "can't tell."
 
-**ORNI:** For 3I: six bands, twenty of twenty cutouts tracked. Transient IBE 503s retried, all recovered. Zero core-masked hollow excluded — hollow defined on screen, none present here, never joined. Faint — no detected brightness or colour change at these uncertainties. Outburst ruled out at these uncertainties; slower change allowed.
+**ORNI:** For 3I: six bands, twenty of twenty cutouts tracked. Transient IBE 503s retried, all recovered.
+
+**ORNI:** None hollow, never joined. Faint — no detected change at these uncertainties. Outburst ruled out here; slower change allowed.
 
 > **ANCHOR — on-screen text (not spoken), editorial guide:** Our working rule: a blink counts as evidence only after the detector is ruled out.
 
@@ -150,4 +152,4 @@
 
 ## Build spec (animation + captures, no live presenters)
 
-- Act I (0:00–0:45) · Act II (0:45–1:45) · Act III (1:45–2:45, S6 3s max, later holds under VO, no cuts inside) · Act IV (2:45–3:45, 60s) · Cards 3:45–4:00 (4/6/5s silent). Spoken ~250w (~120s @125wpm) + ~15s silence (S6 3s, S11 2s floors kept) + 15s cards ≈ 150s < 240s, ~90s delivery slack. Per-field epoch counts: 3i-atlas 2; galactic-center 4; nep-deep 5; ecliptic-mover 6; lmc 7; orion 7; 14 fields × 8 = 143 total (19 band-3 + nep-deep band-4). Reduced-motion safe, subtitles burned + .srt, grayscale-checked, QR ≥400px static 5s.
+- Act I (0:00–0:45) · Act II (0:45–1:45) · Act III (1:45–2:45, S6 3s max, later holds under VO, no cuts inside) · Act IV (2:45–3:45, 60s) · Cards 3:45–4:00 (4/6/5s silent). Spoken 291w (~140s @125wpm) + 5.9s marked silence (1.5+1.4+1.0+2.0) + 15s cards (4+6+5) ≈161s < 240s, ~79s slack. Per-field epoch counts: 3i-atlas 2; galactic-center 4; nep-deep 5; ecliptic-mover 6; lmc 7; orion 7; 14 fields × 8 = 143 total (19 band-3 + nep-deep band-4). Reduced-motion safe, subtitles burned + .srt, grayscale-checked, QR ≥400px static 5s.
