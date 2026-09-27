@@ -1,0 +1,29 @@
+{
+ "00a737b8e9846c9507d79dd7449fa700d86b408ea8426354e0bbb9b254f69920.fits": {
+  "band_id": null,
+  "grid": [
+   2.398,
+   3.8629
+  ],
+  "A": null,
+  "verdict": "UNDECIDED \u2014 in-range hits are unjustifie"
+ },
+ "138cbd8fccd7651500edc4af9c00af9d214f830a7d05d56bb659d3cd36c8c7c2.fits": {
+  "band_id": null,
+  "grid": [
+   1.6163,
+   2.4391
+  ],
+  "A": null,
+  "verdict": "UNDECIDED \u2014 in-range hits are unjustifie"
+ },
+ "21c2fee1d2c6e1e55217d9ea602b81bf9521ef422908d9a62441e51a7b13f845.fits": {
+  "band_id": null,
+  "grid": [
+   1.6163,
+   2.4391
+  ],
+  "A": null,
+  "verdict": "UNDECIDED \u2014 in-range hits are unjustifie"
+ }
+}
