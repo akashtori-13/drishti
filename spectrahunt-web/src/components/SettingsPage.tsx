@@ -87,17 +87,18 @@ export default function SettingsPage() {
       <p className="hero-kicker">Tune the app</p>
       <h1>Settings</h1>
 
-      <section aria-label="Guide">
-        <h2 className="set-h">Guide</h2>
+      <section aria-label="Experimental features">
+        <h2 className="set-h">Experimental</h2>
+        <p className="set-desc">Unstable helpers under test. Off by default; nothing here affects your data.</p>
         <SettingRow
           label="Pip the sky buddy"
-          desc="A roaming alien guide. Explains pages, navigates on request, flips viewer settings."
+          desc="A parked alien guide. Explains pages, navigates on request, flips viewer settings."
           on={guideEnabled} onToggle={() => setGuideEnabled(!guideEnabled)}
-          controlLabel="Pip the sky buddy"
+          controlLabel="Pip the sky buddy (experimental)"
         />
       </section>
 
-      <CloudSettings />
+      {guideEnabled && <CloudSettings />}
 
       <section aria-label="Accessibility">
         <h2 className="set-h">Accessibility</h2>

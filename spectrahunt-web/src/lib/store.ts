@@ -81,7 +81,7 @@ export const useAppStore = create<AppState>((set) => ({
     set({ tutorialDone: v });
     try { localStorage.setItem('sh-tutorial', v ? '1' : '0'); } catch { /* noop */ }
   },
-  guideEnabled: typeof window !== 'undefined' ? load('sh-guide', true) : true,
+  guideEnabled: typeof window !== 'undefined' ? load('sh-guide', false) : false,
   setGuideEnabled: (v) => {
     set({ guideEnabled: v });
     if (!v) set({ guideOpen: false });
