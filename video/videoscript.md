@@ -2,7 +2,7 @@
 **NASA Space Apps Challenge — Pitch Script · Four-Act · 2026-09-27**
 **Two voices only (Mahdin: story, Orni: science — Orni owns quantities; proper names exempt). Animated screen + captures, no live presenters. Spoken 291w (~140s @125wpm) + 5.9s marked silence + 15s cards ≈161s < 240s**
 
-> Draft 17 — Q-cycle: punchy closer (12w) · Act IV anchor · designation for rank · check-stamps · detection wording · DISTA retry update · QR1 cited-not-served · showcases cites.
+> Draft 18 — R10 fix: repo-scroll path corrected to `spectrahunt-web/public/showcases/*.json` (field bundles; `data/*.json` holds tracks/pairfits).
 
 ---
 
@@ -92,7 +92,7 @@
 ## Act IV · SO WHAT & NEXT — The Sky (2:45–3:45, 60s)
 **Objective:** Beneficiary first, QR scan-when-online, countable dare ask, single landing. Ends 3:45 into cards.
 
-> **VISUAL (animated + captured):** Census map (header `ILLUSTRATION — counts: repo inventory · not sky image`) → σ cards (header `ILLUSTRATION — schematic, same σ-scale, not measurement`; footers `CONTROL — withdrawn, crossed out` / `3I/ATLAS — hugging zero, cached` / `CLASSROOM FIELD — illustration`; DOI strip `IRSA QR2 DOI 10.26131/IRSA652 · QR3 DOI 10.26131/IRSA662 where covered · QR1 retired Feb 2026 — cited, not served · QR3 from Sep 2026` adjacent) → dice roll (header `ILLUSTRATION — random-pick visual, not sampling`) dice lands on draco-field (`CACHED REPLAY`). header `ILLUSTRATION — staged classroom, not a field study`, Classroom: vector desks + chalkboard `BLINK DRACO-FIELD'S 8 EPOCHS`, giant illustrated phone (`ANIMATED ILLUSTRATION — phone detail`), airplane ON, wifi dies; header `CACHED REPLAY — offline, not live sky`, inset genuine capture: DevTools Offline checked, same URL, draco-field's 8 cached epochs blink (per `spectrahunt-web/public/showcases/draco-field.json` `epochs`: 8× band 3), no cut, 3s silent proof. Repo scroll: real GitHub root → `data/*.json` → click one field JSON (keys legible, 2s hold, `public JSON — keys on screen`) → hover `LICENSE` (MIT legible), QR beside URL 5s static. DRIFT-WASH ghost 0.8s, lower-third `ILLUSTRATION — not measurement`, fades to shelf. QR footnote: `QR — scan when online`.
+> **VISUAL (animated + captured):** Census map (header `ILLUSTRATION — counts: repo inventory · not sky image`) → σ cards (header `ILLUSTRATION — schematic, same σ-scale, not measurement`; footers `CONTROL — withdrawn, crossed out` / `3I/ATLAS — hugging zero, cached` / `CLASSROOM FIELD — illustration`; DOI strip `IRSA QR2 DOI 10.26131/IRSA652 · QR3 DOI 10.26131/IRSA662 where covered · QR1 retired Feb 2026 — cited, not served · QR3 from Sep 2026` adjacent) → dice roll (header `ILLUSTRATION — random-pick visual, not sampling`) dice lands on draco-field (`CACHED REPLAY`). header `ILLUSTRATION — staged classroom, not a field study`, Classroom: vector desks + chalkboard `BLINK DRACO-FIELD'S 8 EPOCHS`, giant illustrated phone (`ANIMATED ILLUSTRATION — phone detail`), airplane ON, wifi dies; header `CACHED REPLAY — offline, not live sky`, inset genuine capture: DevTools Offline checked, same URL, draco-field's 8 cached epochs blink (per `spectrahunt-web/public/showcases/draco-field.json` `epochs`: 8× band 3), no cut, 3s silent proof. Repo scroll: real GitHub root → `spectrahunt-web/public/showcases/*.json` → click one field JSON (keys legible, 2s hold, `public JSON — keys on screen`) → hover `LICENSE` (MIT legible), QR beside URL 5s static. DRIFT-WASH ghost 0.8s, lower-third `ILLUSTRATION — not measurement`, fades to shelf. QR footnote: `QR — scan when online`.
 
 **[FAST]**
 
