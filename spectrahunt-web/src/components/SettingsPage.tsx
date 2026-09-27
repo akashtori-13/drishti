@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Icon from '@/components/Icon';
 import { useAppStore } from '@/lib/store';
@@ -74,14 +74,75 @@ function CloudSettings() {
   );
 }
 
+/** Experimental features modal: Pip buddy + cloud answers. Focus-trapped. */
+function ExperimentalModal({ onClose }: { onClose: () => void }) {
+  const guideEnabled = useAppStore((s) => s.guideEnabled);
+  const setGuideEnabled = useAppStore((s) => s.setGuideEnabled);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const prevFocus = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    prevFocus.current = document.activeElement as HTMLElement | null;
+    panelRef.current?.focus({ preventScroll: true });
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { e.preventDefault(); onClose(); return; }
+      if (e.key !== 'Tab') return;
+      const panel = panelRef.current;
+      if (!panel) return;
+      const els = panel.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+      if (els.length === 0) return;
+      const first = els[0];
+      const last = els[els.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      try {
+        if (prevFocus.current && document.contains(prevFocus.current)) {
+          prevFocus.current.focus({ preventScroll: true });
+        }
+      } catch { /* noop */ }
+    };
+  }, [onClose]);
+  return (
+    <div role="dialog" aria-modal="true" aria-label="Experimental features" className="tut-veil"
+      style={{ position: 'fixed', inset: 0, zIndex: 80, display: 'grid', placeItems: 'center', background: 'rgba(4,5,10,.72)', padding: 20 }}>
+      <div ref={panelRef} tabIndex={-1} className="glass tut-panel"
+        style={{ position: 'relative', maxWidth: 520, width: '100%', borderRadius: 20, padding: 28, outline: 'none' }}>
+        <button type="button" onClick={onClose} aria-label="Close experimental features"
+          style={{ position: 'absolute', top: 10, right: 12, background: 'none', border: 0, padding: '6px 8px', fontSize: 12, color: '#8a90ab', cursor: 'pointer' }}>
+          Close
+        </button>
+        <p className="hero-kicker">Unstable helpers under test</p>
+        <h2 style={{ fontSize: 22, margin: '8px 0 4px' }}>Experimental features</h2>
+        <p className="set-desc">Off by default; nothing here affects your data.</p>
+        <SettingRow
+          label="Pip the sky buddy"
+          desc="A parked alien guide. Explains pages, navigates on request, flips viewer settings."
+          on={guideEnabled} onToggle={() => setGuideEnabled(!guideEnabled)}
+          controlLabel="Pip the sky buddy (experimental)"
+        />
+        {guideEnabled && <CloudSettings />}
+      </div>
+    </div>
+  );
+}
+
 /** Settings: accessibility, playback, contact, and about — crew lives at /crew. */
 export default function SettingsPage() {
   const colorblind = useAppStore((s) => s.colorblind);
   const setColorblind = useAppStore((s) => s.setColorblind);
   const autoplay = useAppStore((s) => s.autoplay);
   const setAutoplay = useAppStore((s) => s.setAutoplay);
-  const guideEnabled = useAppStore((s) => s.guideEnabled);
-  const setGuideEnabled = useAppStore((s) => s.setGuideEnabled);
+  const [expOpen, setExpOpen] = useState(false);
   return (
     <div className="prose" style={{ position: 'relative', zIndex: 1 }}>
       <p className="hero-kicker">Tune the app</p>
@@ -89,16 +150,16 @@ export default function SettingsPage() {
 
       <section aria-label="Experimental features">
         <h2 className="set-h">Experimental</h2>
-        <p className="set-desc">Unstable helpers under test. Off by default; nothing here affects your data.</p>
-        <SettingRow
-          label="Pip the sky buddy"
-          desc="A parked alien guide. Explains pages, navigates on request, flips viewer settings."
-          on={guideEnabled} onToggle={() => setGuideEnabled(!guideEnabled)}
-          controlLabel="Pip the sky buddy (experimental)"
-        />
+        <button type="button" className="menu-link" onClick={() => setExpOpen(true)}>
+          <Icon name="sliders" className="icon" />
+          <span className="menu-text">
+            <span className="menu-label">Experimental features</span>
+            <span className="menu-desc">Pip buddy, cloud answers — off by default</span>
+          </span>
+        </button>
       </section>
 
-      {guideEnabled && <CloudSettings />}
+      {expOpen && <ExperimentalModal onClose={() => setExpOpen(false)} />}
 
       <section aria-label="Accessibility">
         <h2 className="set-h">Accessibility</h2>
