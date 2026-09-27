@@ -7,7 +7,7 @@
 ---
 
 ## Act I · WHO — The Blink (0:00–0:45)
-**Objective:** DRISHTI + stakes in <10s. No spoken roster (names on Card 1 only).
+**Objective:** DRISHTI + stakes in <10s at FAST pace (≥150wpm; 25 tokens ≈10s). No spoken roster (names on Card 1 only).
 
 > **VISUAL (captured, no fade-in):** Hard cut to real UI, header `CACHED REPLAY — not live sky · DOI 10.26131/IRSA652`. Hard-start mid-blink on real DRISHTI capture locked to virgo-field (8 epochs), URL bar visible, counter ticking to match spoken "six of eight" (counter mid-blink at six of eight; story blurbs out of frame — 'blink two visits' = compare-any-two instruction). Lower-third from 0:02: `SPHEREx QR2 served · IRSA DOI 10.26131/IRSA652 · QR3 from Sep 2026 where covered DOI 10.26131/IRSA662 · QR1 retired Feb 2026 — cited, not served`. Single archival Tombaugh plate blinks once behind translucent UI (labeled `ARCHIVAL — Lowell Obs.`, credited Card 2 + USEOFDATA). Cursor drags plate into browser frame, URL identical. DOI watermark bottom-right held 6s.
 
@@ -154,4 +154,4 @@
 
 ## Build spec (animation + captures, no live presenters)
 
-- Act I (0:00–0:45) · Act II (0:45–1:45) · Act III (1:45–2:45, S6 3s max, later holds under VO, no cuts inside) · Act IV (2:45–3:45, 60s) · Cards 3:45–4:00 (4/6/5s silent). Spoken 294w (28 VO bodies, markdown + labels excluded) (~141s @125wpm) + 5.9s marked silence (1.5+1.4+1.0+2.0) + 14.5s cards (4+6+4.5) ≈162s < 240s, ~78s slack. Per-field epoch counts per `spectrahunt-web/public/showcases/*.json` `epochs` arrays: 3i-atlas 2; galactic-center 4; nep-deep 5; ecliptic-mover 6; lmc-field 7; orion-field 7; 14 fields × 8 = 143 total (19 fields band-3 + nep-deep band-4). Reduced-motion safe, subtitles burned + `video/subtitles.srt` (46 verbatim cues, cue-free silences + cards), grayscale-checked, QR ≥400px static 5s. Container hard-out 3:59.5 (≤239.5s, 0.5s guardband); content ~162s, ~78s slack — freeze 3:58 inside Card 3 — no slate overrun, hard cut at 0:00, hard black by ≤239.5s.
+- Act I (0:00–0:45) · Act II (0:45–1:45) · Act III (1:45–2:45, S6 3s max, later holds under VO, no cuts inside) · Act IV (2:45–3:45, 60s) · Cards 3:45–3:59.5 (4/6/4.5s silent). Spoken 294w (28 VO bodies, markdown + labels excluded) (~141s @125wpm) + 5.9s marked silence (1.5+1.4+1.0+2.0) + 14.5s cards (4+6+4.5) ≈162s < 240s, ~78s slack. Per-field epoch counts per `spectrahunt-web/public/showcases/*.json` `epochs` arrays: 3i-atlas 2; galactic-center 4; nep-deep 5; ecliptic-mover 6; lmc-field 7; orion-field 7; 14 fields × 8 = 143 total (19 fields band-3 + nep-deep band-4). Reduced-motion safe, subtitles burned + `video/subtitles.srt` (46 verbatim cues, cue-free silences + cards), grayscale-checked, QR ≥400px static 5s. Container hard-out 3:59.5 (≤239.5s, 0.5s guardband); content ~162s, ~78s slack — freeze 3:58 inside Card 3 — no slate overrun, hard cut at 0:00, hard black by ≤239.5s.
