@@ -148,19 +148,6 @@ export default function SettingsPage() {
       <p className="hero-kicker">Tune the app</p>
       <h1>Settings</h1>
 
-      <section aria-label="Experimental features">
-        <h2 className="set-h">Experimental</h2>
-        <button type="button" className="menu-link" onClick={() => setExpOpen(true)}>
-          <Icon name="sliders" className="icon" />
-          <span className="menu-text">
-            <span className="menu-label">Experimental features</span>
-            <span className="menu-desc">Pip buddy, cloud answers — off by default</span>
-          </span>
-        </button>
-      </section>
-
-      {expOpen && <ExperimentalModal onClose={() => setExpOpen(false)} />}
-
       <section aria-label="Accessibility">
         <h2 className="set-h">Accessibility</h2>
         <SettingRow
@@ -180,6 +167,19 @@ export default function SettingsPage() {
           controlLabel="Autoplay previews"
         />
       </section>
+
+      <section aria-label="Experimental features">
+        <h2 className="set-h">Experimental</h2>
+        <button type="button" className="menu-link" onClick={() => setExpOpen(true)}>
+          <Icon name="sliders" className="icon" />
+          <span className="menu-text">
+            <span className="menu-label">Experimental features</span>
+            <span className="menu-desc">Pip buddy, cloud answers — off by default</span>
+          </span>
+        </button>
+      </section>
+
+      {expOpen && <ExperimentalModal onClose={() => setExpOpen(false)} />}
 
       <section aria-label="Contact">
         <h2 className="set-h">Contact</h2>
