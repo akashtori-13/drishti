@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { Colormap } from '@/lib/astro';
+import type { GuideShowcaseCtx } from '@/lib/guide';
 
 export type CompareMode = 'blink' | 'side' | 'swipe' | 'diff' | 'replay' | 'color';
 
@@ -27,6 +28,26 @@ interface AppState {
   setEntryCmap: (v: Colormap | null) => void;
   setAutoplay: (v: boolean) => void;
   setTutorialDone: (v: boolean) => void;
+  /** Guide buddy (Pip): global enable switch. */
+  guideEnabled: boolean;
+  setGuideEnabled: (v: boolean) => void;
+  /** Guide panel open state. */
+  guideOpen: boolean;
+  setGuideOpen: (v: boolean) => void;
+  /** Blink ids whose first-visit greeting was read. */
+  guideBlinkSeen: string[];
+  markGuideBlinkSeen: (id: string) => void;
+  /** Current blink showcase for guide summaries (set by BlinkPage). */
+  guideShowcase: GuideShowcaseCtx | null;
+  setGuideShowcase: (v: GuideShowcaseCtx | null) => void;
+}
+
+function loadList(key: string): string[] {
+  try {
+    const raw = localStorage.getItem(key);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr.filter((x) => typeof x === 'string') : [];
+  } catch { return []; }
 }
 
 function load(key: string, fallback: boolean): boolean {
@@ -60,6 +81,23 @@ export const useAppStore = create<AppState>((set) => ({
     set({ tutorialDone: v });
     try { localStorage.setItem('sh-tutorial', v ? '1' : '0'); } catch { /* noop */ }
   },
+  guideEnabled: typeof window !== 'undefined' ? load('sh-guide', true) : true,
+  setGuideEnabled: (v) => {
+    set({ guideEnabled: v });
+    if (!v) set({ guideOpen: false });
+    try { localStorage.setItem('sh-guide', v ? '1' : '0'); } catch { /* noop */ }
+  },
+  guideOpen: false,
+  setGuideOpen: (v) => set({ guideOpen: v }),
+  guideBlinkSeen: typeof window !== 'undefined' ? loadList('sh-guide-blink') : [],
+  markGuideBlinkSeen: (id) => set((st) => {
+    if (st.guideBlinkSeen.includes(id)) return st;
+    const next = [...st.guideBlinkSeen, id];
+    try { localStorage.setItem('sh-guide-blink', JSON.stringify(next)); } catch { /* noop */ }
+    return { guideBlinkSeen: next };
+  }),
+  guideShowcase: null as GuideShowcaseCtx | null,
+  setGuideShowcase: (v: GuideShowcaseCtx | null) => set({ guideShowcase: v }),
   entryCmap: null,
   setEntryCmap: (v) => set({ entryCmap: v }),
   previewId: null,
