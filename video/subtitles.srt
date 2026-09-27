@@ -1,0 +1,31 @@
+1
+00:00:00,000 --> 00:00:45,000
+DRISHTI blinks seasons apart — watch a dot move.
+Six of eight cached epochs, in a browser.
+Ninety-six years ago: Tombaugh, Pluto, at Lowell.
+
+2
+00:00:45,000 --> 00:01:45,000
+SPHEREx tints by spot. Six wedges, 102 channels.
+Tile 2 bluer, Tile 5 redder. The tint trap.
+Same tint only; the rest waits on the shelf.
+
+3
+00:01:45,000 --> 00:02:45,000
+A visitor from another star. Follow Horizons path.
+Blinked, not subtracted. Pre-fix flagged a control:
+flagged pixels, not sky. Verdict: can't tell.
+Six bands, 20/20 cutouts. No outburst at these uncertainties.
+
+4
+00:02:45,000 --> 00:03:45,000
+A classroom with no wifi can blink cached epochs offline.
+143 epochs, 20 fields, public JSON. No login to blink.
+Code is MIT. Scan that QR when online.
+Tonight: blink a field. File two epochs to Issues.
+Tombaugh blinked plates into history.
+We blink 143 epochs, recheckable as data.
+
+5
+00:03:45,000 --> 00:04:00,000
+[silent end cards — no narration]
