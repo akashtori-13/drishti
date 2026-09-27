@@ -1550,3 +1550,64 @@ main:has(.orbit-finale) + .site-foot {
   .orbit-finale{min-height:0;}
   .finale-earth-container{opacity:.85;}
 }
+
+/* ---- Pip the guide buddy ---- */
+.guide-fab{position:fixed; right:16px; bottom:16px; z-index:60; width:64px; height:64px; padding:4px; border-radius:50%; border:1px solid var(--line-strong); background:rgba(6,10,24,.85); cursor:pointer; backdrop-filter:blur(6px);}
+.guide-fab:hover{border-color:#3ddc97;}
+.guide-fab:focus-visible{outline:2px solid #7df0c8; outline-offset:2px;}
+.guide-fab svg{display:block;}
+.guide-panel{position:fixed; right:16px; bottom:92px; z-index:61; width:min(360px, calc(100vw - 32px)); max-height:min(520px, calc(100dvh - 180px)); display:flex; flex-direction:column; background:rgba(6,10,24,.96); border:1px solid var(--line-strong); border-radius:14px; overflow:hidden; backdrop-filter:blur(8px);}
+.guide-head{display:flex; align-items:center; gap:10px; padding:10px 12px; border-bottom:1px solid var(--line);}
+.guide-title{display:flex; flex-direction:column; gap:2px; flex:1;}
+.guide-title strong{font-size:.9375rem;}
+.guide-title .mono{font-size:.6875rem; color:var(--ink-2);}
+.guide-log{flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:10px; min-height:120px;}
+.guide-msg{display:flex; gap:8px; align-items:flex-start;}
+.guide-msg.you{justify-content:flex-end;}
+.guide-bubble{max-width:85%; background:rgba(255,255,255,.06); border:1px solid var(--line); border-radius:12px; padding:8px 10px;}
+.guide-msg.you .guide-bubble{background:rgba(61,220,151,.14); border-color:rgba(61,220,151,.35);}
+.guide-bubble p{margin:0; font-size:.875rem; line-height:1.5;}
+.guide-chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;}
+.guide-chips .epoch-chip{min-height:44px;}
+.guide-form{display:flex; gap:8px; padding:10px 12px; border-top:1px solid var(--line);}
+.guide-form input{flex:1; min-height:44px; border-radius:10px; border:1px solid var(--line-strong); background:rgba(255,255,255,.05); color:inherit; padding:0 12px; font:inherit; font-size:.875rem;}
+.guide-form input:focus-visible{outline:2px solid #7df0c8; outline-offset:1px;}
+@media (prefers-reduced-motion: reduce){ .guide-fab{transition:none;} }
+
+/* ---- Pip parked presence (no roam) ---- */
+.guide-fab{transform:none;}
+.guide-fab svg{animation:pip-bob 3.2s ease-in-out infinite;}
+.guide-fab:hover svg{animation-play-state:paused;}
+.guide-fab.is-asleep svg{animation-play-state:paused;}
+.guide-fab.is-asleep{filter:brightness(.75);}
+.guide-fab.is-waving svg{animation:pip-wave .6s ease-in-out 1;}
+@keyframes pip-bob{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
+@keyframes pip-wave{0%,100%{transform:rotate(0);}30%{transform:rotate(-8deg);}65%{transform:rotate(6deg);}}
+.guide-fab svg{transform-origin:50% 90%;}
+.guide-dot{position:absolute; top:6px; right:6px; width:12px; height:12px; border-radius:50%; background:#ff5d73; border:2px solid #060a18;}
+.guide-src{display:block; font-size:.6875rem; color:var(--ink-2); margin-top:6px;}
+.guide-confirm{padding:10px 12px; border-top:1px solid var(--line);}
+.guide-confirm p{margin:0 0 8px; font-size:.75rem;}
+.guide-textin{min-height:44px; border-radius:10px; border:1px solid var(--line-strong); background:rgba(255,255,255,.05); color:inherit; padding:8px 12px; font:inherit; font-size:.875rem; width:100%;}
+.guide-textin::placeholder{color:#c3c9e0; opacity:1;}
+.guide-form input::placeholder{color:#c3c9e0; opacity:1;}
+.guide-form input{font-size:1rem;}
+.guide-cloud.on{border-color:#3ddc97; color:#7df0c8;}
+@media (max-width:640px){
+  .guide-fab{right:12px; bottom:calc(88px + env(safe-area-inset-bottom)); width:56px; height:56px;}
+  .guide-panel{right:0; left:0; bottom:0; width:100%; max-width:100%; border-radius:20px 20px 0 0; border-bottom:0; max-height:calc(88dvh - 76px); padding-bottom:calc(12px + env(safe-area-inset-bottom)); z-index:70;}
+  .guide-panel::before{content:''; display:block; width:48px; height:4px; border-radius:2px; background:var(--line-strong); margin:8px auto 0;}
+  .guide-log{padding:10px; gap:8px;}
+  .guide-bubble{max-width:88%;}
+  .guide-bubble p{font-size:.8125rem;}
+  .guide-chips{flex-wrap:nowrap; overflow-x:auto;}
+  .guide-chips .epoch-chip{white-space:nowrap;}
+  .guide-form{position:sticky; bottom:0;}
+  .guide-form input{font-size:1rem; min-height:48px;}
+  .guide-form .epoch-chip{min-width:48px; min-height:48px;}
+}
+@media (prefers-reduced-motion: reduce){
+  .guide-fab svg{animation:none;}
+  .guide-fab.is-waving svg{animation:none;}
+  .pip-blink{animation:none;}
+}

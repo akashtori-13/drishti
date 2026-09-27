@@ -196,6 +196,24 @@ export default function BlinkPage({ id }: { id: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
+  // Guide buddy: publish showcase facts for Pip's summaries (panel greets
+  // on open; never auto-open — transient opens die on SW-takeover reload).
+  const guideEnabled = useAppStore((s) => s.guideEnabled);
+  useEffect(() => {
+    const g = useAppStore.getState();
+    if (!viewing) { g.setGuideShowcase(null); return; }
+    const bands = Object.keys(viewing.bands ?? {})
+      .map(Number).filter((b) => Number.isInteger(b) && b >= 1 && b <= 6).sort((a, b) => a - b);
+    g.setGuideShowcase({
+      id: viewing.id,
+      title: viewing.title,
+      epochs: viewing.epochs.length,
+      bands: bands.length > 0 ? bands : [viewing.epochs[0]?.band ?? 3],
+      story: viewing.story,
+    });
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+  }, [viewing, guideEnabled]);
+
   // Background revalidation: getShowcase() serves the device copy instantly and
   // refreshes behind. When fresh JSON arrives (e.g. newly indexed PNGs), swap
   // it in without a manual reload — preserving the viewer's band/epoch choice.

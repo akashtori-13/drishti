@@ -7,6 +7,8 @@ import Icon from '@/components/Icon';
 import Tutorial from '@/components/Tutorial';
 import SpaceBackdrop from '@/components/SpaceBackdrop';
 import ArtifactPreview from '@/components/ArtifactPreview';
+import GuideMascot from '@/components/GuideMascot';
+import GuidePanel from '@/components/GuidePanel';
 import { useAppStore } from '@/lib/store';
 
 /** Site chrome: nav + footer on every real page (footer hidden on fullscreen sky). */
@@ -21,6 +23,8 @@ export default function SiteChrome({ children, showTutorial = false }: { childre
       <Header />
       {showTutorial && <Tutorial />}
       <ArtifactPreview />
+      <GuideMascot />
+      <GuidePanel />
       <main id="main" tabIndex={-1} className="flex-1">
         <div key={pathname} className="xfade xfade-route">
           {children}
