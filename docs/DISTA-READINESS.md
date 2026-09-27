@@ -62,6 +62,7 @@ What this means for the brief's questions:
   across all six bands (`data/track_3i-atlas-tracked.json`; B5 needed a retry
   after transient IBE 503s). Faint but on-target: B4 0.7±0.1, B6 1.0±0.3,
   B1 1.0±0.3, B5 0.9±0.2. All failures are IRSA transport, none pipeline.
+  **Retry update:** B5 transient IBE 503s retried to success + D1+D4 counterpart fill → `data/track_3i-atlas-tracked.json` now 20/20 (`n_points=20`, `n_attempted=20`), superseding interim 11/14; all failures IRSA transport, none pipeline.
 - **Experiment 3, control star (2026-09-26)**: same pipeline, fixed aperture
   on UCAC4 363-079561 (2MASS J16503662-1730286, SIMBAD-confirmed field star):
   11/12 cutouts, SNR 30–160 per point
