@@ -1,15 +1,15 @@
 # DRISHTI: 240 Seconds
 **NASA Space Apps Challenge — Pitch Script · Four-Act · 2026-09-27**
-**Two voices only (Mahdin: story, Orni: science — Orni owns every number). Animated screen + captures, no live presenters. Spoken ~250w + ~15s silence + 15s cards = under 240s.**
+**Two voices only (Mahdin: story, Orni: science — Orni owns quantities; proper names exempt). Animated screen + captures, no live presenters. Spoken 384w (~184s @125wpm) + ~15s silence + 15s cards = under 240s.**
 
-> Draft 12 — honesty rebuild: 143 across 20 fields (per-field counts), 20/20 split (transport vs hollow), LVF wedges, Diff display-only, caveat footer, traceability IDs, login scope. [CHALLENGE] + ages user-blocked.
+> Draft 13 — PLANET X and SPHEREx · transport-retry truth · per-field locks (virgo Act I, draco classroom) · number-rule exemption · consent flag: Himel + Zubayer under-18 (names on Card 1 — guardian consent required before publish; VO is Mahdin + Orni only).
 
 ---
 
 ## Act I · WHO — The Blink (0:00–0:45)
 **Objective:** DRISHTI + stakes in <10s. No spoken roster (names on Card 1 only).
 
-> **VISUAL (captured, no fade-in):** Hard cut to real UI, header `CACHED REPLAY — not live sky · DOI 10.26131/IRSA652`. Hard-start mid-blink on real DRISHTI capture locked to one 8-epoch field (e.g. virgo-field), URL bar visible, counter ticking to match spoken "six of eight". Lower-third from 0:02: `SPHEREx QR2 · IRSA · DOI 10.26131/IRSA652 · QR3 where covered`. Single archival Tombaugh plate blinks once behind translucent UI (labeled `ARCHIVAL — Lowell Obs.`, credited Card 2 + USEOFDATA). Cursor drags plate into browser frame, URL identical. DOI watermark bottom-right held 6s.
+> **VISUAL (captured, no fade-in):** Hard cut to real UI, header `CACHED REPLAY — not live sky · DOI 10.26131/IRSA652`. Hard-start mid-blink on real DRISHTI capture locked to virgo-field (8 epochs), URL bar visible, counter ticking to match spoken "six of eight". Lower-third from 0:02: `SPHEREx QR2 · IRSA · DOI 10.26131/IRSA652 · QR3 where covered`. Single archival Tombaugh plate blinks once behind translucent UI (labeled `ARCHIVAL — Lowell Obs.`, credited Card 2 + USEOFDATA). Cursor drags plate into browser frame, URL identical. DOI watermark bottom-right held 6s.
 
 **[FAST]**
 
@@ -28,7 +28,7 @@
 ## Act II · WHY — The Drift (0:45–1:45)
 **Objective:** Villain is geometry. PRISM BREAK gasp, VO off the break, no blame.
 
-> **VISUAL (animated):** Black, one star-dot. Glass prism drops, rainbow fan blooms (`WHAT YOU EXPECT`) — prism cracks, fan shatters into 6 wedge tiles `LVF 1–6 — ILLUSTRATION` slamming left→right with thunks. Cracked prism holds. Same star under Tile 2 vs Tile 5: different tint one side vs the other, blink flickers color not motion. Grid `SCHEMATIC GRID`. Timeline dots dim, slide to `ARCHIVE KEPT — versions on screen` shelf (QR1 dimmed, QR2/QR3 lit + `QR1 retired · QR2 + QR3 served Sep 2026 · DOIs on screen`, not spoken) with 5-word VO bed + soft thunk. Ghost inset: reused plate crop 20% (`ARCHIVAL INSET — not data`). DRIFT-WASH + DRIFT-TONE (subtitled). Lower-third throughout: `ILLUSTRATION — not measurement`.
+> **VISUAL (animated):** Black, one star-dot. Glass prism drops, rainbow fan blooms (`WHAT YOU EXPECT`) — prism cracks, fan shatters into 6 wedge tiles `LVF 1–6 — ILLUSTRATION` slamming left→right with thunks. Cracked prism holds. Same star under Tile 2 vs Tile 5: different tint this side vs that side, blink flickers color not motion. Grid `SCHEMATIC GRID`. Timeline dots dim, slide to `ARCHIVE KEPT — versions on screen` shelf (QR1 dimmed, QR2/QR3 lit + `QR1 retired · QR2 + QR3 served Sep 2026 · DOIs on screen`, not spoken) with 5-word VO bed + soft thunk. Ghost inset: reused plate crop 20% (`ARCHIVAL INSET — not data`). DRIFT-WASH + DRIFT-TONE (subtitled). Lower-third throughout: `ILLUSTRATION — not measurement`.
 
 **[FAST]**
 
@@ -38,7 +38,7 @@
 
 **MAHDIN, quiet:** The tint trap.
 
-**MAHDIN:** Same star. Bluer one side, redder the other. Can't fairly compare.
+**MAHDIN:** Same star. Bluer this side, redder that side. Can't fairly compare.
 
 **MAHDIN, wry:** Tombaugh blinked matched plates; ours switch filters mid-blink.
 
@@ -55,7 +55,7 @@
 ## Act III · WHAT — The Tool (1:45–2:45)
 **Objective:** One captured take, no cuts inside. Blinked-not-subtracted, follow-not-stare, Gaia+Horizons only, 20/20 split, qualified static. URL visible.
 
-> **VISUAL (captured UI, animated cursor):** Hard cut to real UI, header `CACHED REPLAY — not live sky · DOI 10.26131/IRSA652`. Compare toggle cycles blink → swipe → Diff B−A 2:00 (badge `Diff B−A — display aid, not measurement`); tracked frames jump A→B following Horizons path — never fixed stare. Persistent badges: `cached replay · following comet, not staring` + bar `3I/ATLAS (Horizons: ATLAS C/2025 N1, geocentric) · SPHEREx image + Horizons track + Gaia background check`. Remnant holds 2:02.0 + A→B vector, S6 3.0s silent max, cursor parks off-target lower-left, vector pulses 1×, stamps stagger to break freeze: `Gaia background check — no known star here` 2:03.5, `Horizons ATLAS C/2025 N1 (geocentric) — at predicted spot` 2:04.3 (no checkmarks, no SIMBAD/DSS — app-wide cards only). Cursor circles remnant with Act I PLUTO hand-stroke. False-alarm chart header `CACHED REPLAY — withdrawn pre-fix output, not a detection`, footer `control UCAC4 363-079561 / 2MASS J16503662-1730286 — flagged pixels, withdrawn` → magenta cores pulse 2× → hollow-dot re-render (`hollow = excluded, never joined`) → red stamp to trash → `CAN'T TELL` + thud (under VO, not silent). Freeze 6-band chart header `CACHED REPLAY — IRSA QR2`, footer `20/20 cutouts · 0 transport (retry, not shown) · 0 hollow excluded · 7 tests · dA/dR ~0.5σ, joint p 0.34–0.49 · faint near floor — no outburst claimed`; bars grow center-out under VO, hollow legend holds. Gaia cue: field stars flash 1× onto faint DR3 grid crosses (silent schematic cue, under VO). Horizons freeze 1.2s on readout (under VO).
+> **VISUAL (captured UI, animated cursor):** Hard cut to real UI, header `CACHED REPLAY — not live sky · DOI 10.26131/IRSA652`. Compare toggle cycles blink → swipe → Diff B−A 2:00 (badge `Diff B−A — display aid, not measurement`); tracked frames jump A→B following Horizons path — never fixed stare. Persistent badges: `cached replay · following comet, not staring` + bar `3I/ATLAS (Horizons: ATLAS C/2025 N1, geocentric) · SPHEREx image + Horizons track + Gaia background check`. Remnant holds 2:02.0 + A→B vector, S6 3.0s silent max, cursor parks off-target lower-left, vector pulses 1×, stamps stagger to break freeze: `Gaia background check — no known star here` 2:03.5, `Horizons ATLAS C/2025 N1 (geocentric) — at predicted spot` 2:04.3 (no checkmarks, no SIMBAD/DSS — app-wide cards only). Cursor circles remnant with Act I PLUTO hand-stroke. False-alarm chart header `CACHED REPLAY — withdrawn pre-fix output, not a detection`, footer `control UCAC4 363-079561 / 2MASS J16503662-1730286 — flagged pixels, withdrawn · repeats scatter ~2× undiagnosed` → magenta cores pulse 2× → hollow-dot re-render (`hollow = excluded, never joined`; legend held as definition — 0 present this field) → red stamp to trash → `CAN'T TELL` + thud (under VO, not silent). Freeze 6-band chart header `CACHED REPLAY — IRSA QR2`, footer `20/20 cutouts · 1 transient IBE 503 retried, 20/20 recovered · 0 hollow excluded · 7 tests · dA/dR ~0.5σ, joint p 0.34–0.49 · faint near floor — no outburst claimed`; bars grow center-out under VO, hollow legend holds. Gaia cue: field stars flash 1× onto faint DR3 grid crosses (silent schematic cue, under VO). Horizons freeze 1.2s on readout (under VO).
 
 **[FAST]**
 
@@ -81,7 +81,7 @@
 
 **ORNI, flat, half-speed:** Pre-fix flagged a control. Flagged pixels, not sky. Verdict withdrawn — "can't tell."
 
-**ORNI:** For 3I: six bands, twenty of twenty cutouts tracked. Zero transport failures — retry, not shown. Zero core-masked hollow excluded — shown-hollow, never joined. Faint — no detected brightness or colour change at these uncertainties. Numbers and error bars on screen. No outburst claimed.
+**ORNI:** For 3I: six bands, twenty of twenty cutouts tracked. One transient IBE 503 retried, twenty of twenty recovered. Zero core-masked hollow excluded — hollow defined on screen, none present here, never joined. Faint — no detected brightness or colour change at these uncertainties. Numbers and error bars on screen. No outburst claimed.
 
 > **ANCHOR:** Our working rule: a blink counts as evidence only after the detector is ruled out.
 
@@ -90,11 +90,11 @@
 ## Act IV · SO WHAT & NEXT — The Sky (2:45–3:45, 60s)
 **Objective:** Beneficiary first, QR scan-when-online, countable dare ask, single landing. Ends 3:45 into cards.
 
-> **VISUAL (animated + captured):** Census map (header `ILLUSTRATION — counts: repo inventory · not sky image`) → σ cards (header `ILLUSTRATION — schematic, same σ-scale, not measurement`; footers `CONTROL — withdrawn, crossed out` / `3I/ATLAS — hugging zero, cached` / `CLASSROOM FIELD — illustration`; DOI strip `IRSA QR2 DOI 10.26131/IRSA652` adjacent) → dice roll (header `ILLUSTRATION — random-pick visual, not sampling`) into one cached field (`CACHED REPLAY`). Classroom: vector desks + chalkboard `BLINK THIS FIELD'S EPOCHS`, giant illustrated phone (`ANIMATED ILLUSTRATION` + `STAGED CLASSROOM — NOT A FIELD STUDY`), airplane ON, wifi dies; inset genuine capture: DevTools Offline checked, same URL, this field's cached epochs blink (that field's repo count, 2–8), no cut, 3s silent proof. Repo scroll: real GitHub root → `data/*.json` → click one field JSON (keys legible, 2s hold, `public JSON — keys on screen`) → hover `LICENSE` (MIT legible), QR beside URL 5s static. DRIFT-WASH ghost 0.8s, fades to shelf. QR footnote: `QR — scan when online`.
+> **VISUAL (animated + captured):** Census map (header `ILLUSTRATION — counts: repo inventory · not sky image`) → σ cards (header `ILLUSTRATION — schematic, same σ-scale, not measurement`; footers `CONTROL — withdrawn, crossed out` / `3I/ATLAS — hugging zero, cached` / `CLASSROOM FIELD — illustration`; DOI strip `IRSA QR2 DOI 10.26131/IRSA652` adjacent) → dice roll (header `ILLUSTRATION — random-pick visual, not sampling`) dice lands on draco-field (`CACHED REPLAY`). Classroom: vector desks + chalkboard `BLINK DRACO-FIELD'S 8 EPOCHS`, giant illustrated phone (`ANIMATED ILLUSTRATION` + `STAGED CLASSROOM — NOT A FIELD STUDY`), airplane ON, wifi dies; inset genuine capture: DevTools Offline checked, same URL, draco-field's 8 cached epochs blink, no cut, 3s silent proof. Repo scroll: real GitHub root → `data/*.json` → click one field JSON (keys legible, 2s hold, `public JSON — keys on screen`) → hover `LICENSE` (MIT legible), QR beside URL 5s static. DRIFT-WASH ghost 0.8s, fades to shelf. QR footnote: `QR — scan when online`.
 
 **[FAST]**
 
-**ORNI:** A classroom with no wifi can blink this field's cached epochs offline. One hundred forty-three across twenty fields, public JSON. No login to blink.
+**ORNI:** A classroom with no wifi can blink this field's cached epochs offline. One hundred forty-three epochs across twenty fields, public JSON. No login to blink.
 
 **MAHDIN, wry — the one joke:** We cached it so planes stay offline.
 
@@ -113,7 +113,7 @@
 > **ORNI, flat:** We blink one hundred forty-three epochs across twenty fields into evidence open for recheck as data.
 
 **END CARDS (static, no narration, silent, 3:45–4:00, QR footer persistent):**
-- Card 1 (3:45–3:49, 4s): DRISHTI / Himel Das, Zubayer Hasan Shaad, Md Hedayet Ullah, Md Mahdin Al Abrar, Aazmaine Alif Abrar, Suraiya Ratry Orni / Space Apps 2026 / [CHALLENGE] / 143 epochs across 20 fields · 240 cutouts — repo inventory (README + OPS §13) · public JSON + repo URL + QR / MIT · offline-capable · no login to blink.
+- Card 1 (3:45–3:49, 4s): DRISHTI / Himel Das, Zubayer Hasan Shaad, Md Hedayet Ullah, Md Mahdin Al Abrar, Aazmaine Alif Abrar, Suraiya Ratry Orni / Space Apps 2026 / PLANET X and SPHEREx / 143 epochs across 20 fields · 240 cutouts — repo inventory (README + OPS §§13, 19) · public JSON + repo URL + QR / MIT · offline-capable · no login to blink.
 - Card 2 (3:49–3:55, 6s): DATA — FROM IRSA / doi.org/10.26131/IRSA652 QR2 / doi.org/10.26131/IRSA662 QR3 — where covered, not claimed in bundle / Gaia DR3 · SIMBAD/Sesame · Horizons (geocentric) · 2MASS/DSS HiPS / MPC links only · CelesTrak mirror · Yale BSC v5 · d3-celestial / ARCHIVAL: Pluto plates — Lowell Observatory Archives (Tombaugh 1930), inset only, not data / SkyBoT unavailable — labeled · Messier-NGC artistic.
 - Card 3 (3:55–4:00, 5s): WHAT WE DIDN'T CLAIM / HOW MADE / Negative results reported too / Can't-tell withdrawn, not hidden / Simulation labeled · nebula art marked / Generative AI: none (visuals/VO/script/sky) · Stock footage/audio: none / Animation + captures + VO + edit: original team work / English captions burned-in + .srt. Footer: github.com/akashtori-13/drishti · MIT + QR.
 
@@ -143,4 +143,4 @@
 
 ## Build spec (animation + captures, no live presenters)
 
-- Act I (0:00–0:45) · Act II (0:45–1:45) · Act III (1:45–2:45, S6 3s max, later holds under VO, no cuts inside) · Act IV (2:45–3:45, 60s) · Cards 3:45–4:00 (4/6/5s silent). Spoken ~250w (~120s @125wpm) + ~15s silence (S6 3s, S11 2s floors kept) + 15s cards ≈ 150s < 240s, ~90s delivery slack. Per-field epoch counts: 3i-atlas 2; galactic-center 4; nep-deep 5; ecliptic-mover 6; lmc/orion 7; 14 fields × 8 = 143 total (19 band-3 + nep-deep band-4). Reduced-motion safe, subtitles burned + .srt, grayscale-checked, QR ≥400px static 5s.
+- Act I (0:00–0:45) · Act II (0:45–1:45) · Act III (1:45–2:45, S6 3s max, later holds under VO, no cuts inside) · Act IV (2:45–3:45, 60s) · Cards 3:45–4:00 (4/6/5s silent). Spoken ~250w (~120s @125wpm) + ~15s silence (S6 3s, S11 2s floors kept) + 15s cards ≈ 150s < 240s, ~90s delivery slack. Per-field epoch counts: 3i-atlas 2; galactic-center 4; nep-deep 5; ecliptic-mover 6; lmc 7; orion 7; 14 fields × 8 = 143 total (19 band-3 + nep-deep band-4). Reduced-motion safe, subtitles burned + .srt, grayscale-checked, QR ≥400px static 5s.
