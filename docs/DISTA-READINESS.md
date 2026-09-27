@@ -65,7 +65,8 @@ What this means for the brief's questions:
   **Retry update:** B5 transient IBE 503s retried to success + D1+D4 counterpart fill → `data/track_3i-atlas-tracked.json` now 20/20 (`n_points=20`, `n_attempted=20`), superseding interim 11/14; all failures IRSA transport, none pipeline.
 - **Experiment 3, control star (2026-09-26)**: same pipeline, fixed aperture
   on UCAC4 363-079561 (2MASS J16503662-1730286, SIMBAD-confirmed field star):
-  11/12 cutouts, SNR 30–160 per point
+  12/12 cutouts, SNR 30–160 per point
+  **Retry update:** transient IRSA failure retried to success → `data/track_252.65242_-17.50776.json` now 12/12 (`n_points=12`, `n_attempted=12`), superseding interim 11/12.
   (`data/track_252.65242_-17.50776.json`, shipped in-app as
   `spectrahunt-web/public/tracks/track_control-star.json`). The pipeline
   measures clean stellar slopes. Caveat, not hidden: repeat visits disagree
