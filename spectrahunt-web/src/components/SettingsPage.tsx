@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import Icon from '@/components/Icon';
 import { useAppStore } from '@/lib/store';
@@ -80,6 +81,11 @@ function ExperimentalModal({ onClose }: { onClose: () => void }) {
   const setGuideEnabled = useAppStore((s) => s.setGuideEnabled);
   const panelRef = useRef<HTMLDivElement>(null);
   const prevFocus = useRef<HTMLElement | null>(null);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
   useEffect(() => {
     prevFocus.current = document.activeElement as HTMLElement | null;
     panelRef.current?.focus({ preventScroll: true });
@@ -112,7 +118,8 @@ function ExperimentalModal({ onClose }: { onClose: () => void }) {
       } catch { /* noop */ }
     };
   }, [onClose]);
-  return (
+  if (!mounted) return null;
+  return createPortal(
     <div role="dialog" aria-modal="true" aria-label="Experimental features" className="tut-veil"
       style={{ position: 'fixed', inset: 0, zIndex: 80, display: 'grid', placeItems: 'center', background: 'rgba(4,5,10,.72)', padding: 20 }}>
       <div ref={panelRef} tabIndex={-1} className="glass tut-panel"
@@ -132,7 +139,8 @@ function ExperimentalModal({ onClose }: { onClose: () => void }) {
         />
         {guideEnabled && <CloudSettings />}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
