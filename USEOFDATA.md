@@ -19,6 +19,7 @@ as interpretation. This file is the map.
 | Messier/NGC positions | 16 nebula anchor coordinates (constants) | Sky glow renderer (**artistic rendering**, positions real) | Honesty contract in code |
 | Constellation lines (d3-celestial/Ofrohn) | Vendored GeoJSON figures | Sky overlays, search | Credit |
 | `data/popular_targets.txt` | 1,119 curated targets (our compilation) | Search/precache queue | Ours; SIMBAD-verified, method in `scripts/verify_targets.py` |
+| Lowell Observatory Archives | Tombaugh 1930 Pluto plate crop — video inset only, not measurement | Pitch video Act I blink + Act II ghost inset (labeled `ARCHIVAL`), Card 2 credit | Archival courtesy; not data, no DOI in repo |
 
 Only SPHEREx/IRSA carries a machine-enforced citation + DOI. Everything else
 is credited by Sources-list links. No source is redistributed beyond fair-use
