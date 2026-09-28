@@ -144,8 +144,19 @@ async def main_async(targets):
                 save_partial(done)
                 print(f"  {counter['n']} urls, {counter['err']} errors", flush=True)
 
-    # Build URL queue first (TAP per target x band), then download.
+    # Rebuild download queue from a previous listing pass (resume path).
+    # Old-format entries (mjd lists, no urls) are dropped for re-query.
+    listed = done.setdefault("_listed", {})
+    for key in [k for k, v in listed.items() if not (isinstance(v, dict) and "urls" in v)]:
+        del listed[key]
     queue = []
+    for key, entry in listed.items():
+        for u in entry["urls"]:
+            if u not in done:
+                queue.append(u)
+    if queue:
+        print(f"  rebuilt {len(queue)} queued urls from previous listing", flush=True)
+    # Build URL queue first (TAP per target x band), then download.
     for i, t in enumerate(targets):
         for bp in t["bps"]:
             key = f"{t['name']}|{bp}"
@@ -157,7 +168,8 @@ async def main_async(targets):
                     if r["cutout_url"] not in done:
                         queue.append(r["cutout_url"])
                 listed = done.setdefault("_listed", {})
-                listed[key] = [r["mjd"] for r in rows]
+                listed[key] = {"urls": [r["cutout_url"] for r in rows],
+                               "mjds": [r["mjd"] for r in rows]}
             except Exception as e:  # noqa: BLE001
                 print(f"  TAP miss {t['name']} {bp}: {type(e).__name__}", flush=True)
         if (i + 1) % 25 == 0:
