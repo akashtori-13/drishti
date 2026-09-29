@@ -1,157 +1,172 @@
-# DRISHTI: 240 Seconds
-**NASA Space Apps Challenge — Pitch Script · Four-Act · 2026-09-27**
-**Two voices only (Mahdin: story, Orni: science — Orni owns quantities; proper names exempt). Animated screen + captures, no live presenters. Spoken 294 whitespace tokens (wc -w, incl 11 standalone em-dash pause marks) = 283 spoken words (28 VO bodies, markdown + labels excluded) (~141s @125wpm on 294, conservative) + 5.9s marked silence + 14.5s cards ≈162s < 240s**
+# DRISHTI: 240 Seconds of Glory
+**NASA Space Apps Challenge — Pitch Script v3.9 · Four-Act · Data-Glazed Cut**
 
-> Draft 22 — Z1 lock: 294w headers (28 VO bodies, markdown stripped) · Card 3 4.5s, hard-out 3:59.5, freeze 3:58 · QR2-DOI typo fix (652).
+> [!CAUTION]
+> **Producer honesty flags — resolve before shoot, not spoken.**
+> This draft contradicts measured repo data in 7 places. Each must be fixed
+> or cut before filming, or the Best-Use-of-Data case collapses on fact-check:
+> 1. **"Definitive 143-sigma signal" (3I/ATLAS)** — measured result is faint,
+>    consistent-static (pairfit 7/7, dA/dR ~0.5σ, joints p 0.34–0.49, one D1+D4
+>    link dR=2.11σ disclosed). No outburst claimed. See `data/pairfit_3i-atlas-tracked.json`, `docs/DISTA-READINESS.md`.
+> 2. **"Cross-checked live, in real time … Eight archives, one page"** — app is
+>    offline-first on precomputed JSONs; SkyBoT endpoint 404s (labeled
+>    unavailable); nothing is live. See `USEOFDATA.md`.
+> 3. **"Captured across five frames … pipeline keeps two, DRISHTI keeps all five"**
+>    — tracked file is 20/20 (`data/track_3i-atlas-tracked.json`); "five" and
+>    "keeps two" are unverified.
+> 4. **"Over a billion objects" / "five centuries of naked-eye stars"** — unsourced.
+>    Yale BSC v5 = 1,627 stars (V≤5.0). Drop or source.
+> 5. **"Real generated footage of the universe"** — contradicts the project's
+>    no-AI-sky-imagery rule. Use archival/DSS or labeled illustration only.
+> 6. **"Hans Zimmer type background music"** — Zimmer's music is copyrighted;
+>    a soundalike still risks Content ID. Commission original or licensed music.
+> 7. **QR3 "traces 3I/ATLAS across every array"** — measured pixels are QR2;
+>    QR3 = linked cutouts where covered. See `data/qr3_coverage.json`.
+> 8. Blanks to fill: Flagstaff city slot, months counts, `[CHALLENGE]` title,
+>    Himel & Zubayer faces excluded per note (guardian consent covers names only).
 
----
+Same tone and pacing throughout. The data is named out loud, extensively — a rapid “who's talking to who” montage in Act III naming every live archive DRISHTI cross-checks against, plus a broader-sky moment in Act IV. A full on-screen credits manifest sits at the end of this document, meant to run under the final black frame.
+Target runtime: 4:00 (240 seconds)
+ACT I · WHO — THE INHERITANCE 0:00 – 0:45
+Open with a paradox, told in short, cinematic beats. Land the historical scene before the audience knows it's a history lesson. Introduce the team as the continuation of an instinct. Name NASA's archive once, early, so the data provenance is established before anything else.
+VISUAL
+Black. Three seconds of nothing. Then the SPHEREx all-sky map fades in, rotating slowly. No music, voice only. A faint, small credit line low in frame throughout the film — NASA/JPL-Caltech · IRSA — never called out, always present. At 0:22, hard cut to a 1930 photograph: Clyde Tombaugh at his blink comparator in Flagstaff. Grain. Cold light. A slow push in on his hands.
+SLOW
+In 1930, in , Arizona, a twenty-four-year-old astronomer was alone with just two photographic plates and proly with a cup of coffee — blinking them back and forth. And he repeated this, Night after night for months. 			
+Yeah, he was Clyde Tombaugh. What he found after  months of staring into the dark was Pluto.  
+[visual style: veritasium like historical animation]
 
-## Act I · WHO — The Blink (0:00–0:45)
-**Objective:** DRISHTI + stakes in <10s at FAST pace (≥150wpm; 25 tokens ≈10s). No spoken roster (names on Card 1 only).
+Ninety-six years later, NASA's SPHEREx maps the entire infrared sky every six months — over a billion objects, in a hundred and two spectrum the human eye has never seen. and every image lands in a public NASA archive called IRSA. 
+[visual style: if available, real satellite launching footage and archive overview. Otherwise, use motion graphics]
 
-> **VISUAL (captured, no fade-in):** Hard cut to real UI, header `CACHED REPLAY — not live sky · DOI 10.26131/IRSA652`. Hard-start mid-blink on real DRISHTI capture locked to virgo-field (8 epochs), URL bar visible, counter ticking to match spoken "six of eight" (counter mid-blink at six of eight; story blurbs out of frame — 'blink two visits' = compare-any-two instruction). Lower-third from 0:02: `SPHEREx QR2 served · IRSA DOI 10.26131/IRSA652 · QR3 from Sep 2026 where covered DOI 10.26131/IRSA662 · QR1 retired Feb 2026 — cited, not served`. Single archival Tombaugh plate blinks once behind translucent UI (labeled `ARCHIVAL — Lowell Obs.`, credited Card 2 + USEOFDATA). Cursor drags plate into browser frame, URL identical. DOI watermark bottom-right held 6s.
+And the way the instrument is built means most of what it sees can never be compared to itself. So, a significant portion of it gets thrown away.
+AND( emp)  This is what led us to our project!  
+[visual style: 1. Product animation imitating Kurzgesagt style, 2. Motion graphics with emphasis effect]
 
-**[FAST]**
+[pause — let the loss land]
+Six of us sat in our room, staring at the same problem. In a lil screen, this time.
+I'm Mahdin. With my mates (consequentially comes Aazmaine, Saikat and Orni followed by Himel and Zubayer’s text intro)……………… We're Team AKASHTORI. This is DRISHTI. 
+[visual style: 1. Artemis mission crew intro, 2. Motion design with sophistication]
+Don’t have Himel & Zubayer’s face here.
+ACT II · WHY — THE RULE THAT FORGOT HOW TO SEE0:45 – 1:45
+Name the antagonist. Explain the LVF as a physical system, not a feature list. Land the 466/0 number clean and alone — it's the proof, so let it breathe. End on the reframe that opens Act III.
+VISUAL
+Cut to the LVF diagram — a flat prism laid across the detector, the wavelength shifting continuously as a colour gradient. A star lands at two different points on the array across two epochs; a wavelength readout counts up from 2.02 μm to 2.47 μm. Then the same-band rule appears as a single equation: |Δλ| > bandwidth/2 → DISCARD. The equation cracks. The number appears, clean and alone, nothing else on screen: 466 kept. 0 rejected.
+FAST
 
-**MAHDIN, close-mic:** DRISHTI blinks seasons apart — watch the middle, a dot moves.
+SPHEREx doesn't use filters — every detector is coated with a Linear Variable Filter, and the wavelength shifts continuously across its surface, so a star lands on a different spectrum depending on exactly where it falls.
+Revisit that same patch of sky six months later, and the band has moved.
+But here ( emp ) comes the problem that hurts us and the reason for drishti. 
+[visual style: 1. If possible, using 3D animation or even visually attractive 2D animation is perfect.]
+If the wave-length does not match, it throws the visit away. Collapses months of observation into two js points — oldest and newest — and literally ( emp) drop everything in between.
+[pause] 
+SLOW
+We measured what that actually costs, on our own data: four hundred and sixty-six visits were kept.
 
-**ORNI, flat:** Hand-blinks don't scale — six of eight, this field's cached epochs, in a browser.
+Yet this time, not a single one was rejected. Although the system worked with perfection—but still the answer was not found. 
+Because a mismatched visit isn't noise. It's the second point on the object's own (emp) spectrum, which was sampled at a wavelength, nobody even noticed at all. 
+[visual style: Kurzgesagt style animation with an animal/bird character]
+BUT WE DID! OUR DRISHTI IS HERE FOR THIS JOB. [visual style: Climax style, proper sound effect, product announcing type of motion graphics]
 
-**ORNI:** Ninety-six years ago — Tombaugh, Pluto, at Lowell.
 
-**MAHDIN:** Same trick, built to scale, on your phone. DRISHTI blinks it in the browser.
+ACT III · WHAT — DRISHTI AND DISTA1:45 – 3:00
+Show the tool. Right after introducing it, one fast, rhythmic montage beat names every live archive DRISHTI talks to — delivered like a roll call of allies, not a spec sheet. Then two short true stories carry the rigor. DISTA closes the act as a prototype, calibration named once, framed as rigor.
+VISUAL
+Cut to the live DRISHTI URL. Cursor types 3I/ATLAS. Enter. The blink begins — August, December, August, December. As the montage line plays, quick-cut a label stamping onto the frame for each archive named — Gaia, SIMBAD, Horizons, SkyBoT, MPC, 2MASS/DSS, Yale BSC — like stamps hitting a passport, one per beat, fast. Then switch to Diff. Motion vectors appear. Open the spectrum panel. Then a wide shot of the candidate list: 20 fields, 143 epochs. Then a simple SED plot with five mismatched points and a fitted curve, labelled DISTA · prototype.
+FAST
+This open-access and interactive app allows users to blink every SPHEREx visit for a specific region. Without even the internet and having the burden of processing IRSA data. anyone can access it offline and dive into the set of Spectra.  
+[visual style: product launch motion graphic animation style with SFX]
+ MONTAGE — QUICK, RHYTHMIC, ONE ARCHIVE PER BEAT
+And SPHEREx isn't working alone. Every position you search gets cross-checked live, in real time, against Gaia for the star that's really there, SIMBAD to resolve its name, JPL Horizons for anything moving through the frame, SkyBoT to flag anything that shouldn't be, the Minor Planet Center to check our own homework, 2MASS and the Digitized Sky Survey for the field around it, and the Yale Bright Star Catalogue — five centuries of naked-eye stars — for context. NASA. ESA. JPL. Caltech. Yale. Eight archives, one page, all open, all credited, none of it invented.
+And the SPHEREx image itself traces to one named release — QR2 which is  cited by its DOI, in the footer, in every export, every time. ( Emp) 
+SLOW
+Lets watch the result: the interstellar comet 3I/ATLAS, captured across five frames. A definitive 143-sigma signal, drifting through the dark at a mere 0.3 arcseconds a day.
+Comets don't sit still in the sky.  This is why a fixed aperture found nothing at first but just an empty sky. So, We tracked it along its real Horizons ephemeris instead, and caught it on target, in every visit ( emp): 
+This is where our drishti wins. The standard pipeline keeps two of these five. But our DRISHTI keeps all ( emp)  five. 
+[visual style: Kurzgesagt type animation]
+[pause]
+A quiet one nearly got past us too. A control star which is directly straight out of Gaia spiked on one visit like something had changed. But  it did not. (With non Chalant vibe) A masked (emp)  pixel was hiding inside our own aperture. And We (emp)  caught this, then fixed it, and got our vision. And vision means Dristhi in Bengali. That's how DRISHTI came. 
+[visual style: Veritasium style 2D animation]
 
-> **ANCHOR — on-screen text (not spoken), editorial guide:** Plate after plate, checked stars stayed put. One stood out.
 
----
+Every number on this screen has already survived us trying to break it.
+But keeping every visit is only half of the job. 
 
-## Act II · WHY — The Drift (0:45–1:45)
-**Objective:** Villain is geometry. PRISM BREAK gasp, VO off the break, no blame.
+Here comes DISTA, our second layer which is still a prototype. every visit is a point on the object's own spectrum, even ( emp ) the mismatched ones. So it fits a curve through all of them. Then asks,  what does not belong?
+DISTA pairs the detectors that see the same sky in the same instant, so we can tell whether a change lives in the object, or just in the instrument. And we say plainly what we haven't proven yet: those pairs have to agree with each other first. And that ( emp) is the next experiment. 
+[visual style: SaaS product launch type motion graphics with SFX]
+ACT IV · SO WHAT & NEXT — THE POTENTIAL3:00 – 4:00
+Show what DRISHTI unlocks in one clean breath of numbers, then pull back to the rest of the sky DRISHTI renders — one more short, rhythmic naming beat. Name DISTA's frontier in one sentence. State the next experiment, naming the next SPHEREx release by name. Return to Tombaugh and land on a short, declarative line about the archive — not a question.
+VISUAL
+Cut to the live DRISHTI URL. Scroll slowly through the 20 fields, 143 epochs, 240 cutouts. Then the home sky view — bright stars, nebula glows, constellation lines, a satellite track — each layer briefly highlighted as it's named. Then a single slide: Next — QR3, trace 3I/ATLAS across every array. Final shot: the all-sky map, slow fade to the 1930 photograph. Hold. Black — and under the black, the credits manifest can run as a real end-crawl.
+SLOW
+now the qn might arise: what does this even ( emp) change to be precise? 
+Let's break it down 
+A student in Bandarban, Bangladesh. A teacher in Nairobi, Kenya. An amateur astronomer in Chandpur. Someone with just a phone in his hand. 
 
-> **VISUAL (animated):** Black, one star-dot. Glass prism drops, rainbow fan blooms (`WHAT YOU EXPECT — illustrated expectation`) — prism cracks, fan shatters into 6 wedge tiles `LVF 1–6 — ILLUSTRATION` slamming left→right with thunks. Cracked prism holds. Same star under Tile 2 vs Tile 5: different tint this side vs that side, blink flickers color not motion. Grid `SCHEMATIC GRID`. Timeline dots dim, slide to `ARCHIVE KEPT — versions on screen (illustrated shelf)` (QR1 dimmed, QR2/QR3 lit + `QR1 retired Feb 2026 — cited, not served · QR2 served · QR3 from Sep 2026 · DOIs on screen`, not spoken) with 5-word VO bed + soft thunk. Ghost inset: reused plate crop 20% (`ARCHIVAL INSET — not data`). DRIFT-WASH + DRIFT-TONE (subtitled). Lower-third throughout: `ILLUSTRATION — not measurement`.
+ Anyone , anywhere in the planet, can now watch the infrared sky-change over time without 
+ Any pipeline, 
+Any permission, 
+Any waiting.
+And the crazy part? 
+>1000 fields. 
+>A hundred ( emp)  and forty-three epochs.
+> Two hundred and forty cutouts. 
+These all Run on a phone, even on a plane, even when the data sources themselves ( emp)  are down. 
+[visual style: 1. Veritasium type 2D animation with images, 2. SaaS motion graphics]
+MONTAGE — SHORT, LIGHT
+And zoom out, and the rest of the sky is real too — a five-hundred-year-old catalogue of naked-eye stars, sixteen Messier nebulae anchored to their true coordinates, constellation lines drawn from charts astronomers have used for a century, live satellites tracked through CelesTrak. All credited. Nothing invented.
+[pause]
+And DISTA is where it gets exciting. SPHEREx was built to catch ice — water, carbon dioxide — hiding in that spectrum, but it is very difficult to track how any of it changes over time. We're building an effortless solution for everyone.
+FAST
+Our next experiment is already running, on QR3 — SPHEREx's newest release which traces 3I/ATLAS across every array, and see if the systematics are small enough to trust. If they are, DISTA works successfully! 
+[visual style: Vox style animation with some of Kurgesagt effect]
+( Eita bolar por we can do a voice over je “ ahhh, peace” ( realizing our dista works! ) but eta vdo te oivbe present korte partesi hbe. Eta spectator ke informal vibe diye attract korbe) 
 
-**[FAST]**
+Even If ( emp)  they're not, let's just say so — that's a crazy/ interesting finding too for the field of astronomy!  
+[long pause — let the room go quiet]
+FINAL SPOKEN WORDS — HOLD, THEN BLACK
+Somewhere in this data, there may be something we don't even have a name for yet.”
+[2 sec silence]
+“The question is… will we recognize it when we see it?
+[visual style: real generated footage of the universe (Nebula, galaxies, stars, blackholes, quasers, super nova), sliding one by one so fast, NatGeo type documentary effect, recreating Oppenheimer ending scene with Hans Zimmer type of background music]
 
-**ORNI, flat, pre-crack — over rainbow, off the break:** SPHEREx tints by spot. Six LVF wedges, hundred-two channels. Tile 2 bluer, Tile 5 redder.
 
-*[1.5s dead air — post-crack, no speech, cracked prism holds]*
-
-**MAHDIN, quiet:** The tint trap.
-
-**MAHDIN:** Same star. Can't fairly compare.
-
-**MAHDIN, wry:** Tombaugh blinked matched plates; ours switch filters mid-blink.
-
-**ORNI:** Same tint only — the rest waits on the shelf. Nothing deleted for this question; older versions stay listed on screen.
-
-**MAHDIN, quiet, under shelf slide:** Archive intact, waiting, ready still.
-
-**MAHDIN, quiet:** Good data, idle, intact — while real change could slip past unnoticed. That's the tint rule.
-
-> **ANCHOR — on-screen text (not spoken), editorial guide:** The drift is nobody's fault. It's the tint rule.
-
----
-
-## Act III · WHAT — The Tool (1:45–2:45)
-**Objective:** One captured take, no cuts inside. Blinked-not-subtracted, follow-not-stare, Gaia+Horizons only, 20/20 split, qualified static. URL visible.
-
-> **VISUAL (captured UI, animated cursor):** Hard cut to real UI, header `CACHED REPLAY — not live sky · DOI 10.26131/IRSA652`. Compare toggle cycles blink → swipe → Diff B−A 2:00 (badge `Diff B−A — display aid, not measurement`); tracked frames jump A→B following Horizons path — never fixed stare. Persistent badges: `cached replay · following comet, not staring` + bar `3I/ATLAS (Horizons: ATLAS C/2025 N1, geocentric) · SPHEREx image + Horizons track + Gaia background check`. Remnant holds 2:02.0 + A→B vector, S6 3.0s silent max, cursor parks off-target lower-left, vector pulses 1×, stamps stagger to break freeze: `Gaia background check — grid overlaid here` 2:03.5, `Horizons ATLAS C/2025 N1 (geocentric) — path queried here` 2:04.3 (no checkmarks, no SIMBAD/DSS — app-wide cards only). Cursor circles remnant with Act I PLUTO hand-stroke. False-alarm chart header `CACHED REPLAY — withdrawn pre-fix output, not a detection`, footer `control UCAC4 363-079561 / 2MASS J16503662-1730286 (data/track_252.65242_-17.50776.json) — flagged pixels, withdrawn · repeats scatter ~2× undiagnosed` → magenta cores pulse 2× → hollow-dot re-render (`hollow = excluded, never joined`; legend held as definition) → red stamp to trash → `CAN'T TELL` + thud (under VO, not silent). Freeze 6-band chart header `CACHED REPLAY — IRSA QR2 DOI 10.26131/IRSA652`, footer `20/20 cutouts · transient IBE 503s retried, 20/20 recovered · 0 hollow excluded · 7 tests · dA/dR typically ~0.5σ, one D1+D4 link dR=2.11σ · joints p 0.34–0.49 · all consistent-static · faint near floor — No outburst detected at these uncertainties; slower change allowed`; bars grow center-out under VO, hollow legend holds — 0 present this field. Gaia cue: field stars flash 1× onto faint DR3 grid crosses, badge `SCHEMATIC — Gaia grid overlay, not measurement` (silent schematic cue, under VO). Horizons freeze 1.2s on readout (under VO).
-
-**[FAST]**
-
-**MAHDIN:** A visitor from another star. Stare loses.
-
-**ORNI:** Follow Horizons path, visit by visit. 3I/ATLAS, C/2025 N1.
-
-**MAHDIN:** SPHEREx image —
-
-**ORNI:** Gaia stars, Horizons path.
-
-*[1.4s silence — Gaia / Horizons stamps]*
-
-**MAHDIN, quieter:** Faint — tracked frame to tracked frame.
-
-**ORNI, flat:** Blinked, not subtracted — the gray Diff is display-only.
-
-**[SLOW]**
-
-**MAHDIN:** We messed up.
-
-*[1.0s dead air]*
-
-**ORNI, flat, half-speed:** Pre-fix flagged a control. Flagged pixels, not sky. Verdict withdrawn — "can't tell."
-
-**ORNI:** For 3I: six bands, twenty of twenty cutouts tracked. Transient IBE 503s retried, all recovered.
-
-**ORNI:** None hollow, never joined. Faint — no outburst detected at these uncertainties; slower change allowed.
-
-> **ANCHOR — on-screen text (not spoken), editorial guide:** Our working rule: a blink counts as evidence only after the detector is ruled out.
-
----
-
-## Act IV · SO WHAT & NEXT — The Sky (2:45–3:45, 60s)
-**Objective:** Beneficiary first, QR scan-when-online, countable dare ask, single landing. Ends 3:45 into cards.
-
-> **VISUAL (animated + captured):** Census map (header `ILLUSTRATION — counts: repo inventory · not sky image`) → σ cards (header `ILLUSTRATION — schematic, same σ-scale, not measurement`; footers `CONTROL — withdrawn, crossed out` / `3I/ATLAS — hugging zero, cached` / `CLASSROOM FIELD — illustration`; DOI strip `IRSA QR2 DOI 10.26131/IRSA652 · QR3 where covered — linked cutouts; measured pixels QR2 DOI 10.26131/IRSA652 · QR1 retired Feb 2026 — cited, not served` adjacent) → dice roll (header `ILLUSTRATION — random-pick visual, not sampling`) dice lands on draco-field (`CACHED REPLAY`). header `ILLUSTRATION — staged classroom, not a field study`, Classroom: vector desks + chalkboard `BLINK DRACO-FIELD'S 8 EPOCHS`, giant illustrated phone (`ANIMATED ILLUSTRATION — phone detail`), airplane ON, wifi dies; header `CACHED REPLAY — offline, not live sky`, inset genuine capture: DevTools Offline checked, same URL, draco-field's 8 cached epochs blink (per `spectrahunt-web/public/showcases/draco-field.json` `epochs`: 8× band 3), no cut, 3s silent proof. Repo scroll (header `CACHED REPLAY — repo files, not sky` held throughout, real capture — URL visible, root + LICENSE hover): real GitHub root → `spectrahunt-web/public/showcases/*.json` → click one field JSON (keys legible, 2s hold, `public JSON — keys on screen`) → hover `LICENSE` (MIT legible), QR beside URL 5s static. DRIFT-WASH ghost 0.8s, lower-third `ILLUSTRATION — not measurement`, fades to shelf. QR footnote: `QR — scan when online`.
-
-**[FAST]**
-
-**ORNI:** A classroom with no wifi can blink this field's cached epochs offline. One hundred forty-three epochs across twenty fields, public JSON. No login to blink.
-
-**MAHDIN, wry — the one joke:** We cached it so planes stay offline.
-
-**ORNI, half-speed:** Code is MIT. Scan that QR when online.
-
-**[SLOW]**
-
-**MAHDIN, open:** A question stays open — census-wide agreement. Prove us wrong, we'll post. Tonight: blink a field.
-
-**ORNI:** File two epochs to Issues, login only to file. Pass or fail, we read every one.
-
-*[2s silence. Cut to black.]*
-
-> **ANCHOR — on-screen text (not spoken), editorial guide:** Tonight blink a field — 143 epochs, 20 fields stay open.
-
-> **FINAL SPOKEN WORDS — MAHDIN then ORNI, hold, then black:**
-> **MAHDIN:** Tombaugh blinked plates into history.
-> **ORNI, flat:** We blink one hundred forty-three epochs across twenty fields, recheckable as data.
-
-**END CARDS (static, no narration, silent, 3:45–3:59.5, QR footer persistent):**
-- Card 1 (3:45–3:49, 4s): DRISHTI / Himel Das, Zubayer Hasan Shaad, Md Hedayet Ullah, Md Mahdin Al Abrar, Aazmaine Alif Abrar, Suraiya Ratry Orni / Space Apps 2026 / PLANET X and SPHEREx / 143 epochs across 20 fields · 240 cutouts — repo inventory (README + OPS §§13, 19) · public JSON + repo URL + QR / MIT · offline-capable · no login to blink.
-- Card 2 (3:49–3:55, 6s): DATA — SPHEREx/IRSA (IPAC) / doi.org/10.26131/IRSA652 QR2 / doi.org/10.26131/IRSA662 QR3 where covered — linked cutouts; measured pixels QR2 / QR1 retired Feb 2026 — cited, not served / ESA Gaia DR3 · CDS Strasbourg SIMBAD/Sesame · NASA/JPL Horizons (geocentric) · CDS Strasbourg 2MASS/DSS HiPS / MPC links only · CelesTrak mirror · Yale BSC v5 · d3-celestial / ARCHIVAL: Pluto plates — Lowell Observatory Archives (Tombaugh 1930), inset only, not data / IMCCE SkyBoT unavailable — labeled · Messier-NGC artistic / TOOLS (silent): AWS Open Data (SPHEREx QR) · Bricolage + Geist via Google Fonts · Next.js/React · FastAPI · astropy/reproject/photutils · Tauri/Capacitor · hand-rolled SW.
-- Card 3 (3:55–3:59.5, 4.5s, freeze 3:58): WHAT WE DIDN'T CLAIM / HOW MADE / Negative results reported too / Can't-tell withdrawn, not hidden / Simulation labeled · nebula art marked / Generative AI: none (visuals/VO/script/sky) · Stock footage/audio: none / Animation + captures + VO + edit: original team work / English captions burned-in + .srt. Footer: github.com/akashtori-13/drishti · MIT + QR.
-
----
-
-## Data & Sources Manifest — *not spoken, end-credits crawl*
-
-| Source | What we use | Credit / DOI |
-|---|---|---|
-| SPHEREx/IRSA QR2 | Spectral images, TAP, IBE cutouts | DOI 10.26131/IRSA652 |
-| SPHEREx/IRSA QR3 | QR3 where covered — linked cutouts; measured pixels QR2 | DOI 10.26131/IRSA662 |
-| ESA Gaia DR3 | Star positions, magnitudes | Credit, Mission page |
-| CDS SIMBAD / Sesame | Object identity, coordinate resolve | Credit |
-| NASA/JPL Horizons | Small-body ephemerides, ATLAS C/2025 N1, geocentric | Credit |
-| IMCCE SkyBoT | Moving-object cone search (unavailable — labeled) | Credit |
-| Minor Planet Center | Checker links (no fetch) | Mentioned |
-| CelesTrak (via mirror) | TLE sets, checksummed, freshness-gated | Credit |
-| CDS 2MASS / DSS HiPS | All-sky + context imagery | Credit |
-| Yale Bright Star Catalog v5 | 1,627 stars (V≤5.0) home layer | Credit |
-| Messier/NGC positions | 16 nebula anchors (rendering artistic) | Code honesty contract |
-| Constellation lines (d3-celestial) | Sky overlays, search | Credit |
-| Popular targets (ours) | 1,119 curated entries, SIMBAD-verified | Method in repo |
-| Control star | UCAC4 363-079561 / 2MASS J16503662-1730286, field star | Pre-fix withdrawal demo, flagged |
-| Lowell Observatory Archives | Tombaugh 1930 plate crop — inset only, not measurement | Archival courtesy, labeled |
-| Production | Vector/schematic animation + UI capture + team VO + team edit | Original team work, no template/stock |
-| AI / stock disclosure | Generative-AI tools: none; Stock footage/audio: none | All pixels/VO original except credited data/archival |
-| AWS Open Data | SPHEREx QR delivery | Credit |
-| Google Fonts | Bricolage + Geist lettering | Credit / OFL |
-| Next.js / React | Web UI framework | Credit |
-| FastAPI | Backend API framework | Credit |
-| astropy / reproject / photutils | FITS/WCS/reproject/photometry | Credit |
-| Tauri / Capacitor | Desktop + Android shells | Credit |
-| Service worker | Hand-rolled offline cache | Original team work |
-
-## Build spec (animation + captures, no live presenters)
-
-- Act I (0:00–0:45) · Act II (0:45–1:45) · Act III (1:45–2:45, S6 3s max, later holds under VO, no cuts inside) · Act IV (2:45–3:45, 60s) · Cards 3:45–3:59.5 (4/6/4.5s silent). Spoken 294 whitespace tokens (wc -w, incl 11 standalone em-dash pause marks) = 283 spoken words (28 VO bodies, markdown + labels excluded) (~141s @125wpm on 294, conservative) + 5.9s marked silence (1.5+1.4+1.0+2.0) + 14.5s cards (4+6+4.5) ≈162s < 240s, ~78s slack. Per-field epoch counts per `spectrahunt-web/public/showcases/*.json` `epochs` arrays: 3i-atlas 2; galactic-center 4; nep-deep 5; ecliptic-mover 6; lmc-field 7; orion-field 7; 14 fields × 8 = 143 total (19 fields band-3 + nep-deep band-4). Reduced-motion safe, subtitles burned + `video/subtitles.srt` (46 verbatim cues, cue-free silences + cards), grayscale-checked, QR ≥400px static 5s. Container hard-out 3:59.5 (≤239.5s, 0.5s guardband); content ~162s, ~78s slack — freeze 3:58 inside Card 3 — no slate overrun, hard cut at 0:00, hard black by ≤239.5s.
+FULL DATA & SOURCES MANIFEST
+Not spoken. Meant to run as an end-credits crawl under the final black frame (Act IV), or to sit in the video description / repo README. Every source DRISHTI touches, named — nothing owed goes unnamed, even what never makes it into the voiceover.
+Source
+What we use
+Credit / DOI
+NASA/JPL-Caltech SPHEREx via IRSA
+QR2 spectral images (L2), QR3 where covered — blink frames, spectra, tracks, verdicts
+DOI 10.26131/IRSA652 (QR2), 10.26131/IRSA662 (QR3) — machine-enforced in-app
+ESA Gaia DR3
+Star positions + magnitudes
+Credited, mission page
+CDS SIMBAD / Sesame
+Object identity + coordinate resolution
+Credited
+NASA/JPL Horizons
+Small-body ephemerides — 3I/ATLAS tracking
+Credited
+IMCCE SkyBoT
+Moving-object cone search
+Credited
+Minor Planet Center
+Cross-check links
+Mentioned
+CelesTrak
+Satellite TLEs
+Credited
+CDS 2MASS / DSS HiPS
+All-sky context imagery
+Credited
+Yale Bright Star Catalogue v5
+1,627 naked-eye stars
+Credited
+Messier / NGC positions
+16 nebula anchor coordinates
+Real positions, artistic render — labeled
+Constellation lines (d3-celestial / Ofrohn)
+Sky figures
+Credited
