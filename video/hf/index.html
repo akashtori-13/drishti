@@ -33,13 +33,11 @@
   .stars { position: absolute; inset: 0; }
   .stars i { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #fff;
              animation: tw 3s ease-in-out infinite; }
-  @keyframes tw { 0%,100% { opacity: .15; } 50% { opacity: .9; } }
+  @keyframes tw { 0%,100% { opacity: .25; } 50% { opacity: .55; } }
   .scan { position: absolute; left: 0; right: 0; height: 120px; top: -140px;
           background: linear-gradient(to bottom, transparent, rgba(125,240,200,.14), transparent); }
   .sweep { position: absolute; top: 0; bottom: 0; width: 220px;
            background: linear-gradient(to right, transparent, rgba(255,255,255,.35), transparent); }
-  .flick { animation: flk .5s steps(2) infinite; }
-  @keyframes flk { 0%,100% { opacity: 1; } 50% { opacity: .82; } }
 </style>
 </head>
 <body>
@@ -58,7 +56,7 @@
   </section>
   <section id="c1c" class="clip" data-start="24" data-duration="12">
     <div id="c1-compwrap" style="position:absolute;inset:0;">
-      <img class="cover flick" id="c1-comp" src="assets/blink-comparator.jpg" alt="" />
+      <img class="cover" id="c1-comp" src="assets/blink-comparator.jpg" alt="" />
       <div class="scan" id="c1-scan"></div>
     </div>
     <div class="credit">Zeiss blink comparator, Lowell Observatory 1930 · CC BY 2.0 brewbooks · inset, not data</div>
@@ -96,7 +94,7 @@
   <section id="c2c" class="clip" data-start="80" data-duration="25">
     <div class="stars" id="stars-c2c"></div>
     <div class="center">
-      <div class="big"><span id="c2-kept">0</span> kept · <span id="c2-rej">0</span> rejected</div>
+      <div class="big" id="c2-466">466 kept · 0 rejected</div>
       <div class="small">measured on our own data · nothing deleted</div>
     </div>
   </section>
@@ -106,7 +104,7 @@
     <img class="cover" id="c3-app" src="assets/app-blink-3i.png" alt="" />
     <div class="credit">cached replay — DRISHTI blink, 3I/ATLAS</div>
   </section>
-  <section id="c3b" class="clip" data-start="135" data-duration="30">
+  <section id="c3b" class="clip" data-start="130" data-duration="25">
     <div class="center">
       <div class="kicker">cross-checked · every search</div>
       <div id="c3-stamps">
@@ -117,7 +115,7 @@
   </section>
 
   <!-- C4 ACT IIIb 165-195 : control kill + DISTA -->
-  <section id="c4a" class="clip" data-start="165" data-duration="15">
+  <section id="c4a" class="clip" data-start="155" data-duration="13">
     <div class="center">
       <div style="position:relative;">
         <div><img id="c4-plot" src="assets/plot-control-track.png" alt="" width="1350" /></div>
@@ -127,7 +125,7 @@
       <div class="small">simulation — flagged pixels, not sky</div>
     </div>
   </section>
-  <section id="c4b" class="clip" data-start="180" data-duration="15">
+  <section id="c4b" class="clip" data-start="168" data-duration="12">
     <div class="center">
       <div class="kicker">DISTA · prototype</div>
       <div class="med">every visit is a point on the spectrum — even the mismatched ones</div>
@@ -136,7 +134,7 @@
   </section>
 
   <!-- C5 ACT IV 195-235 : numbers + sky + QR3 -->
-  <section id="c5a" class="clip" data-start="195" data-duration="15">
+  <section id="c5a" class="clip" data-start="180" data-duration="15">
     <div class="stars" id="stars-c5a"></div>
     <div class="center">
       <div class="cards" id="c5-cards">
@@ -147,25 +145,30 @@
       <div class="small">offline · no login · public JSON</div>
     </div>
   </section>
-  <section id="c5b" class="clip" data-layout-allow-overflow data-start="210" data-duration="15">
+  <section id="c5b" class="clip" data-layout-allow-overflow data-start="195" data-duration="17">
     <img class="cover" id="c5-home" src="assets/app-home.png" alt="" />
     <div class="credit">cached replay — DRISHTI sky</div>
   </section>
-  <section id="c5c" class="clip" data-start="225" data-duration="10">
+  <section id="c5c" class="clip" data-start="212" data-duration="10">
     <div class="center">
       <div class="kicker">next</div>
       <div class="big" id="c5-qr3">QR3 — trace 3I/ATLAS across every array</div>
     </div>
   </section>
 
-  <!-- C6 CLOSER 235-240 : callback + manifest -->
-  <section id="c6" class="clip" data-start="235" data-duration="5">
+  <!-- C6 CLOSER 222-240 : all-sky callback + static manifest -->
+  <section id="c6a" class="clip" data-start="222" data-duration="10">
+    <img class="cover" id="c6-sky" src="assets/allsky.jpg" alt="" />
+    <img class="cover" id="c6-comp" src="assets/blink-comparator.jpg" alt="" />
+    <div class="credit">archival — Lowell Obs. 1930, inset only, not data</div>
+  </section>
+  <section id="c6b" class="clip" data-start="232" data-duration="8">
     <div class="stars" id="stars-c6"></div>
-    <div class="crawl" id="c6-crawl">
+    <div class="center"><div class="small" id="c6-manifest">
       DRISHTI · Team AKASHTORI · Space Apps 2026<br />
       SPHEREx/IRSA QR2 DOI 10.26131/IRSA652 · QR3 DOI 10.26131/IRSA662 · Gaia DR3 · SIMBAD · Horizons · SkyBoT (unavailable, labeled) · MPC · CelesTrak · 2MASS/DSS · Yale BSC v5 · Messier/NGC (artistic) · d3-celestial<br />
       no AI sky imagery · replay labeled simulation · MIT · offline-capable
-    </div>
+    </div></div>
   </section>
 
 </div>
@@ -200,41 +203,42 @@
   const tl = gsap.timeline({ paused: true });
   // C1
   tl.fromTo("#c1-black", { opacity: 0 }, { opacity: 1, duration: 1.5 }, 0.5);
-  tl.fromTo("#c1-sky", { x: -60, scale: 1.15, opacity: 0 }, { x: 60, scale: 1, opacity: 1, duration: 14, ease: "none" }, 8);
-  tl.fromTo("#c1-maplabel", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1.2 }, 9);
-  tl.fromTo("#c1-compwrap", { scale: 1, opacity: 0 }, { scale: 1.12, opacity: 1, duration: 7, ease: "none" }, 24);
-  tl.fromTo("#c1-scan", { y: -140 }, { y: 1200, duration: 6, ease: "none", repeat: 1 }, 24.5);
-  tl.fromTo("#c1-1930", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1.2 }, 25);
-  tl.fromTo("#c1-team", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1 }, 36.5);
-  tl.fromTo("#c1-title", { opacity: 0, scale: 0.92 }, { opacity: 1, scale: 1, duration: 1.4 }, 37.5);
+  tl.fromTo("#c1-sky", { x: -25, scale: 1.06, opacity: 0 }, { x: 25, scale: 1, opacity: 1, duration: 13, ease: "sine.inOut" }, 8);
+  tl.fromTo("#c1-maplabel", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.8, ease: "power1.out" }, 9);
+  tl.fromTo("#c1-compwrap", { scale: 1, opacity: 0 }, { scale: 1.04, opacity: 1, duration: 9, ease: "sine.inOut" }, 24);
+  tl.fromTo("#c1-scan", { y: -140 }, { y: 1200, duration: 5, ease: "sine.inOut" }, 26);
+  tl.fromTo("#c1-1930", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.8, ease: "power1.out" }, 25);
+  tl.fromTo("#c1-team", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.8, ease: "power1.out" }, 36.5);
+  tl.fromTo("#c1-title", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.9, ease: "power1.out" }, 37.5);
   // C2 + lambda counter object
   const lam = { v: 2.02 };
   const lamEl = document.getElementById("c2-lambda");
-  tl.fromTo("#c2-bar", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1 }, 45.5);
-  tl.fromTo("#c2-sweep", { x: -260 }, { x: 1300, duration: 5, ease: "power1.inOut", repeat: 3 }, 46);
+  tl.fromTo("#c2-bar", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.8, ease: "power1.out" }, 45.5);
+  tl.fromTo("#c2-sweep", { x: -260 }, { x: 1300, duration: 4, ease: "sine.inOut" }, 47);
   tl.to(lam, { v: 2.47, duration: 12, ease: "none",
     onUpdate: () => { lamEl.textContent = lam.v.toFixed(2) + " μm"; } }, 47);
-  tl.fromTo("#c2-eq", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1 }, 65.5);
-  tl.fromTo("#c2-eq", { x: 0 }, { x: 14, duration: 0.07, repeat: 5, yoyo: true, ease: "none" }, 68.5);
+  tl.fromTo("#c2-eq", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.8, ease: "power1.out" }, 65.5);
+  tl.to("#c2-eq", { opacity: 0.35, duration: 1.2, ease: "sine.out" }, 70);
   tl.fromTo("#c2-crack", { opacity: 0 }, { opacity: 1, duration: 1 }, 68);
-  countUp("#c2-kept", 466, 81, 3);
+
   // C3
-  tl.fromTo("#c3-app", { x: -40, scale: 1.08, opacity: 0 }, { x: 40, scale: 1, opacity: 1, duration: 12, ease: "none" }, 105);
+  tl.fromTo("#c3-app", { x: -20, scale: 1.04, opacity: 0 }, { x: 20, scale: 1, opacity: 1, duration: 14, ease: "sine.inOut" }, 105);
   tl.fromTo("#c3-stamps .stamp",
-    { opacity: 0, scale: 1.7, rotation: -4 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.35, stagger: 0.5 }, 136);
+    { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power1.out", stagger: 0.4 }, 131);
   // C4
-  tl.fromTo("#c4-plot", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1 }, 165.5);
-  tl.fromTo("#c4-scan", { y: -140 }, { y: 700, duration: 4, ease: "none", repeat: 2 }, 166);
-  tl.fromTo("#c4-stamp", { opacity: 0, scale: 1.6 }, { opacity: 1, scale: 1, duration: 0.5 }, 168);
-  tl.to("#c4-stamp", { scale: 1.06, duration: 0.4, yoyo: true, repeat: 5 }, 169);
+  tl.fromTo("#c4-plot", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.8, ease: "power1.out" }, 155.5);
+  tl.fromTo("#c4-scan", { y: -140 }, { y: 700, duration: 4, ease: "sine.inOut" }, 156);
+  tl.fromTo("#c4-stamp", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: "power1.out" }, 157);
+  
   // C5
-  tl.fromTo("#c5-cards .ncard", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, stagger: 0.4 }, 195.5);
-  countUp("#c5-n20", 20, 196, 2); countUp("#c5-n143", 143, 196.5, 2.5); countUp("#c5-n240", 240, 197, 3);
-  tl.fromTo("#c5-home", { x: 40, scale: 1.06, opacity: 0 }, { x: -40, scale: 1, opacity: 1, duration: 8, ease: "none" }, 210);
-  tl.fromTo("#c5-qr3", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1 }, 225.5);
-  tl.to("#c5-qr3", { scale: 1.04, duration: 0.6, yoyo: true, repeat: 3 }, 227);
-  // C6 crawl
-  tl.fromTo("#c6-crawl", { y: 500 }, { y: -260, duration: 5, ease: "none" }, 235);
+  tl.fromTo("#c5-cards .ncard", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.8, ease: "power1.out", stagger: 0.15 }, 180.5);
+  countUp("#c5-n20", 20, 181, 6); countUp("#c5-n143", 143, 181.5, 6); countUp("#c5-n240", 240, 182, 6);
+  tl.fromTo("#c5-home", { x: 20, scale: 1.03, opacity: 0 }, { x: -20, scale: 1, opacity: 1, duration: 12, ease: "sine.inOut" }, 195);
+  tl.fromTo("#c5-qr3", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.9, ease: "power1.out" }, 212.5);
+  // C6 callback crossfade + static manifest
+  tl.fromTo("#c6-sky", { opacity: 1 }, { opacity: 0.25, duration: 8, ease: "sine.inOut" }, 222);
+  tl.fromTo("#c6-comp", { opacity: 0 }, { opacity: 0.85, duration: 8, ease: "sine.inOut" }, 222);
+  tl.fromTo("#c6-manifest", { opacity: 0 }, { opacity: 1, duration: 1.2, ease: "power1.out" }, 232.5);
   window.__timelines["drishti240"] = tl;
 </script>
 </body>
