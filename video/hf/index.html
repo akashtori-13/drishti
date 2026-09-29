@@ -16,7 +16,7 @@
   .med { font-size: 54px; font-weight: 700; }
   #c1-maplabel { background: rgba(0,0,0,.62); padding: 12px 34px; border-radius: 14px; }
   .small { font-size: 30px; color: #aab0c8; }
-  .credit { position: absolute; bottom: 28px; left: 40px; font-size: 22px; color: rgba(238,240,248,.55); }
+  .credit { position: absolute; bottom: 28px; left: 40px; font-size: 22px; color: rgba(238,240,248,.78); background: rgba(0,0,0,.45); padding: 4px 12px; border-radius: 8px; }
   .cover { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .stamp { display: inline-block; border: 3px solid #7df0c8; color: #7df0c8; border-radius: 12px;
            padding: 10px 26px; font-size: 40px; font-weight: 800; margin: 8px; }
@@ -30,6 +30,16 @@
            border-radius: 14px; padding: 18px 34px; font-size: 38px; }
   .ncard b { font-size: 64px; display: block; }
   .crawl { position: absolute; left: 0; right: 0; font-size: 30px; line-height: 2; color: #c9cfe6; text-align: center; }
+  .stars { position: absolute; inset: 0; }
+  .stars i { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #fff;
+             animation: tw 3s ease-in-out infinite; }
+  @keyframes tw { 0%,100% { opacity: .15; } 50% { opacity: .9; } }
+  .scan { position: absolute; left: 0; right: 0; height: 120px; top: -140px;
+          background: linear-gradient(to bottom, transparent, rgba(125,240,200,.14), transparent); }
+  .sweep { position: absolute; top: 0; bottom: 0; width: 220px;
+           background: linear-gradient(to right, transparent, rgba(255,255,255,.35), transparent); }
+  .flick { animation: flk .5s steps(2) infinite; }
+  @keyframes flk { 0%,100% { opacity: 1; } 50% { opacity: .82; } }
 </style>
 </head>
 <body>
@@ -37,19 +47,25 @@
 
   <!-- C1 ACT I 0-45 : black, allsky, comparator, team, title -->
   <section id="c1a" class="clip" data-start="0" data-duration="8">
+    <div class="stars" id="stars-c1a"></div>
     <div class="center"><div class="kicker" id="c1-black">black · voice only</div></div>
   </section>
-  <section id="c1b" class="clip" data-start="8" data-duration="16">
+  <section id="c1b" class="clip" data-layout-allow-overflow data-start="8" data-duration="16">
     <img class="cover" id="c1-sky" src="assets/allsky.jpg" alt="" />
+    <div class="stars" id="stars-c1b"></div>
     <div class="credit">NASA/JPL-Caltech · IRSA</div>
     <div class="center"><div class="med" id="c1-maplabel">SPHEREx all-sky · infrared</div></div>
   </section>
   <section id="c1c" class="clip" data-start="24" data-duration="12">
-    <img class="cover" id="c1-comp" src="assets/blink-comparator.jpg" alt="" />
+    <div id="c1-compwrap" style="position:absolute;inset:0;">
+      <img class="cover flick" id="c1-comp" src="assets/blink-comparator.jpg" alt="" />
+      <div class="scan" id="c1-scan"></div>
+    </div>
     <div class="credit">Zeiss blink comparator, Lowell Observatory 1930 · CC BY 2.0 brewbooks · inset, not data</div>
     <div class="center"><div class="big" id="c1-1930">1930 · Flagstaff</div></div>
   </section>
   <section id="c1d" class="clip" data-start="36" data-duration="9">
+    <div class="stars" id="stars-c1d"></div>
     <div class="center">
       <div class="kicker">Team AKASHTORI</div>
       <div class="med" id="c1-team">Mahdin · Aazmaine · Saikat · Orni · Himel · Zubayer</div>
@@ -61,8 +77,11 @@
   <section id="c2a" class="clip" data-start="45" data-duration="20">
     <div class="center">
       <div class="kicker">linear variable filter · one detector</div>
-      <div class="bar6" id="c2-bar">
-        <div style="background:#3B82F6"></div><div style="background:#22D3EE"></div><div style="background:#A3E635"></div><div style="background:#FACC15"></div><div style="background:#FB923C"></div><div style="background:#DC2626"></div>
+      <div style="position:relative;overflow:hidden;border-radius:12px;">
+        <div class="bar6" id="c2-bar">
+          <div style="background:#3B82F6"></div><div style="background:#22D3EE"></div><div style="background:#A3E635"></div><div style="background:#FACC15"></div><div style="background:#FB923C"></div><div style="background:#DC2626"></div>
+        </div>
+        <div class="sweep" id="c2-sweep"></div>
       </div>
       <div class="big" id="c2-lambda">2.02 μm</div>
       <div class="small">wavelength shifts across the array</div>
@@ -75,14 +94,15 @@
     </div>
   </section>
   <section id="c2c" class="clip" data-start="80" data-duration="25">
+    <div class="stars" id="stars-c2c"></div>
     <div class="center">
-      <div class="big" id="c2-466">466 kept · 0 rejected</div>
+      <div class="big"><span id="c2-kept">0</span> kept · <span id="c2-rej">0</span> rejected</div>
       <div class="small">measured on our own data · nothing deleted</div>
     </div>
   </section>
 
   <!-- C3 ACT IIIa 105-165 : app demo + archive stamps -->
-  <section id="c3a" class="clip" data-start="105" data-duration="30">
+  <section id="c3a" class="clip" data-layout-allow-overflow data-start="105" data-duration="30">
     <img class="cover" id="c3-app" src="assets/app-blink-3i.png" alt="" />
     <div class="credit">cached replay — DRISHTI blink, 3I/ATLAS</div>
   </section>
@@ -99,7 +119,10 @@
   <!-- C4 ACT IIIb 165-195 : control kill + DISTA -->
   <section id="c4a" class="clip" data-start="165" data-duration="15">
     <div class="center">
-      <div><img id="c4-plot" src="assets/plot-control-track.png" alt="" width="1350" /></div>
+      <div style="position:relative;">
+        <div><img id="c4-plot" src="assets/plot-control-track.png" alt="" width="1350" /></div>
+        <div class="scan" id="c4-scan"></div>
+      </div>
       <div><span class="stamp red" id="c4-stamp">28.9σ WITHDRAWN → CAN'T TELL</span></div>
       <div class="small">simulation — flagged pixels, not sky</div>
     </div>
@@ -114,16 +137,17 @@
 
   <!-- C5 ACT IV 195-235 : numbers + sky + QR3 -->
   <section id="c5a" class="clip" data-start="195" data-duration="15">
+    <div class="stars" id="stars-c5a"></div>
     <div class="center">
       <div class="cards" id="c5-cards">
-        <div class="ncard"><b>20</b>fields</div>
-        <div class="ncard"><b>143</b>epochs</div>
-        <div class="ncard"><b>240</b>cutouts</div>
+        <div class="ncard"><b id="c5-n20">0</b>fields</div>
+        <div class="ncard"><b id="c5-n143">0</b>epochs</div>
+        <div class="ncard"><b id="c5-n240">0</b>cutouts</div>
       </div>
       <div class="small">offline · no login · public JSON</div>
     </div>
   </section>
-  <section id="c5b" class="clip" data-start="210" data-duration="15">
+  <section id="c5b" class="clip" data-layout-allow-overflow data-start="210" data-duration="15">
     <img class="cover" id="c5-home" src="assets/app-home.png" alt="" />
     <div class="credit">cached replay — DRISHTI sky</div>
   </section>
@@ -136,6 +160,7 @@
 
   <!-- C6 CLOSER 235-240 : callback + manifest -->
   <section id="c6" class="clip" data-start="235" data-duration="5">
+    <div class="stars" id="stars-c6"></div>
     <div class="crawl" id="c6-crawl">
       DRISHTI · Team AKASHTORI · Space Apps 2026<br />
       SPHEREx/IRSA QR2 DOI 10.26131/IRSA652 · QR3 DOI 10.26131/IRSA662 · Gaia DR3 · SIMBAD · Horizons · SkyBoT (unavailable, labeled) · MPC · CelesTrak · 2MASS/DSS · Yale BSC v5 · Messier/NGC (artistic) · d3-celestial<br />
@@ -145,12 +170,40 @@
 
 </div>
 <script>
+  // Deterministic starfields (seeded LCG — no Math.random, render-safe).
+  function seedDots(id, n, seed) {
+    const host = document.getElementById(id);
+    if (!host) return;
+    let s = seed;
+    const rnd = () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+    for (let i = 0; i < n; i++) {
+      const d = document.createElement("i");
+      d.style.left = (rnd() * 100).toFixed(2) + "%";
+      d.style.top = (rnd() * 100).toFixed(2) + "%";
+      d.style.animationDelay = (rnd() * 3).toFixed(2) + "s";
+      const sz = 2 + Math.floor(rnd() * 3);
+      d.style.width = sz + "px"; d.style.height = sz + "px";
+      host.appendChild(d);
+    }
+  }
+  seedDots("stars-c1a", 70, 11); seedDots("stars-c1b", 40, 22);
+  seedDots("stars-c1d", 60, 33); seedDots("stars-c2c", 50, 44);
+  seedDots("stars-c5a", 60, 55); seedDots("stars-c6", 80, 66);
+
+  function countUp(sel, target, at, dur) {
+    const el = document.querySelector(sel);
+    const o = { v: 0 };
+    tl.to(o, { v: target, duration: dur, ease: "power2.out",
+      onUpdate: () => { el.textContent = Math.round(o.v); } }, at);
+  }
+
   const tl = gsap.timeline({ paused: true });
   // C1
   tl.fromTo("#c1-black", { opacity: 0 }, { opacity: 1, duration: 1.5 }, 0.5);
-  tl.fromTo("#c1-sky", { scale: 1.15, opacity: 0 }, { scale: 1, opacity: 1, duration: 6, ease: "none" }, 8);
+  tl.fromTo("#c1-sky", { x: -60, scale: 1.15, opacity: 0 }, { x: 60, scale: 1, opacity: 1, duration: 14, ease: "none" }, 8);
   tl.fromTo("#c1-maplabel", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1.2 }, 9);
-  tl.fromTo("#c1-comp", { scale: 1, opacity: 0 }, { scale: 1.12, opacity: 1, duration: 7, ease: "none" }, 24);
+  tl.fromTo("#c1-compwrap", { scale: 1, opacity: 0 }, { scale: 1.12, opacity: 1, duration: 7, ease: "none" }, 24);
+  tl.fromTo("#c1-scan", { y: -140 }, { y: 1200, duration: 6, ease: "none", repeat: 1 }, 24.5);
   tl.fromTo("#c1-1930", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1.2 }, 25);
   tl.fromTo("#c1-team", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1 }, 36.5);
   tl.fromTo("#c1-title", { opacity: 0, scale: 0.92 }, { opacity: 1, scale: 1, duration: 1.4 }, 37.5);
@@ -158,22 +211,28 @@
   const lam = { v: 2.02 };
   const lamEl = document.getElementById("c2-lambda");
   tl.fromTo("#c2-bar", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1 }, 45.5);
+  tl.fromTo("#c2-sweep", { x: -260 }, { x: 1300, duration: 5, ease: "power1.inOut", repeat: 3 }, 46);
   tl.to(lam, { v: 2.47, duration: 12, ease: "none",
     onUpdate: () => { lamEl.textContent = lam.v.toFixed(2) + " μm"; } }, 47);
   tl.fromTo("#c2-eq", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1 }, 65.5);
+  tl.fromTo("#c2-eq", { x: 0 }, { x: 14, duration: 0.07, repeat: 5, yoyo: true, ease: "none" }, 68.5);
   tl.fromTo("#c2-crack", { opacity: 0 }, { opacity: 1, duration: 1 }, 68);
-  tl.fromTo("#c2-466", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 1.5 }, 80.5);
+  countUp("#c2-kept", 466, 81, 3);
   // C3
-  tl.fromTo("#c3-app", { scale: 1.08, opacity: 0 }, { scale: 1, opacity: 1, duration: 5, ease: "none" }, 105);
+  tl.fromTo("#c3-app", { x: -40, scale: 1.08, opacity: 0 }, { x: 40, scale: 1, opacity: 1, duration: 12, ease: "none" }, 105);
   tl.fromTo("#c3-stamps .stamp",
-    { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.35, stagger: 0.5 }, 136);
+    { opacity: 0, scale: 1.7, rotation: -4 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.35, stagger: 0.5 }, 136);
   // C4
   tl.fromTo("#c4-plot", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1 }, 165.5);
+  tl.fromTo("#c4-scan", { y: -140 }, { y: 700, duration: 4, ease: "none", repeat: 2 }, 166);
   tl.fromTo("#c4-stamp", { opacity: 0, scale: 1.6 }, { opacity: 1, scale: 1, duration: 0.5 }, 168);
+  tl.to("#c4-stamp", { scale: 1.06, duration: 0.4, yoyo: true, repeat: 5 }, 169);
   // C5
   tl.fromTo("#c5-cards .ncard", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, stagger: 0.4 }, 195.5);
-  tl.fromTo("#c5-home", { scale: 1.06, opacity: 0 }, { scale: 1, opacity: 1, duration: 5, ease: "none" }, 210);
+  countUp("#c5-n20", 20, 196, 2); countUp("#c5-n143", 143, 196.5, 2.5); countUp("#c5-n240", 240, 197, 3);
+  tl.fromTo("#c5-home", { x: 40, scale: 1.06, opacity: 0 }, { x: -40, scale: 1, opacity: 1, duration: 8, ease: "none" }, 210);
   tl.fromTo("#c5-qr3", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1 }, 225.5);
+  tl.to("#c5-qr3", { scale: 1.04, duration: 0.6, yoyo: true, repeat: 3 }, 227);
   // C6 crawl
   tl.fromTo("#c6-crawl", { y: 500 }, { y: -260, duration: 5, ease: "none" }, 235);
   window.__timelines["drishti240"] = tl;
