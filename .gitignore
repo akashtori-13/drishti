@@ -50,3 +50,6 @@ spectrahunt-web/android/app/keystore.properties
 *.jks
 desktop/src-tauri/gen/schemas/
 data/census_progress.json
+
+# local agent tooling (hyperframes skills, 27MB)
+.agents/
