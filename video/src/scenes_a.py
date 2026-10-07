@@ -355,7 +355,7 @@ def sc_waste(img,t,d,C):
 def sc_team(img,t,d,C):
     bg(img,t)
     c0=C[0]; c1=C[1]; c2=C[2]; c3=C[3]
-    if t<5:
+    if t<4.5:
         # title block (cap-top ~43px): MEET THE TEAM + subtitle
         from PIL import Image as PImage, ImageDraw as PDraw, ImageFont as PFont
         H, W = img.shape[:2]
@@ -370,27 +370,31 @@ def sc_team(img,t,d,C):
             arr = np.asarray(ov).astype(np.float32)
             am = (arr[..., 3:4] / 255.0) * ta
             img[:] = np.clip(img.astype(np.float32) * (1 - am) + arr[..., :3][..., ::-1] * am, 0, 255).astype(img.dtype)
-    if t<5:
-        # photo cards: quick stagger in, short hold (time goes to the logo)
+    if t<4.5:
+        # photo cards: fast stagger (all in by ~1.2s), 2.5s+ hold, 0.35s exit
         for i,(nm,col) in enumerate(TEAM):
             cx=640+((i%3)-1)*357; cy=250+(i//3)*268
-            tt=0.2+i*0.3
+            tt=0.2+i*0.10
             a=1.0 if t>=tt+0.4 else eb(seg(t,tt-0.05,tt+0.4))
             if a<=0: continue
-            team_card(img,i,cx,cy,col,op=min(a,1.0))
-    elif t<8:
-        # hold the photo grid; dim into the AKASHTORI title overlay
+            a=min(a,1.0)*(1-seg(t,4.15,4.5))
+            if a<=0: continue
+            team_card(img,i,cx,cy,col,op=a)
+    elif t<7.4:
+        # hold the photo grid; AKASHTORI text overlay animation
         for i,(nm,col) in enumerate(TEAM):
             cx=640+((i%3)-1)*357; cy=250+(i//3)*268
             team_card(img,i,cx,cy,col,op=1.0)
-        if t>4.4:
-            kk=eo(seg(t,4.4,5.0)); img[:]=cv2.addWeighted(img,1-0.82*kk,np.full_like(img,NAVY),0.82*kk,0)
+        if t>4.35:
+            kin=eo(seg(t,4.35,5.15)); kout=1-seg(t,7.0,7.4)
+            kk=kin*kout
+            img[:]=cv2.addWeighted(img,1-0.82*kk,np.full_like(img,NAVY),0.82*kk,0)
             text(img,'TEAM',640,250,'m',36,GY,op=kk); text(img,'AKASHTORI',640,340,'b',100,WH,op=kk)
             line(img,(380,410),(380+520*kk,410),AM,5)
     else:
         img[:]=NAVY; starfield(img,t,0.8)
-        k=eb(seg(t,8,8.7))
-        logo(img,(640,275),290,seg(t,8,9.3),1.0,t)
+        k=eb(seg(t,7.4,8.2))
+        logo(img,(640,275),290,seg(t,7.25,9.25),1.0,t)
         text(img,'DRISHTI',640,520,'b',int(max(10,110*k)),WH)
 def sc_throw(img,t,d,C):
     bg(img,t)
