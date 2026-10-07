@@ -35,7 +35,8 @@ TEAM_MEMBERS=[
  ('Zubayer Hasan Shaad','Scientific Systems Architect','Grp pic/ZubayerHasanShaad_ScientificSystemsArchitect.jpg'),
 ]
 def _load_team_photos(size=150, radius=30):
-    from PIL import Image as PImage
+    from PIL import Image as PImage, ImageEnhance
+    import cv2
     outs = []
     for _, _, rel in TEAM_MEMBERS:
         try:
@@ -45,8 +46,15 @@ def _load_team_photos(size=150, radius=30):
             # faces sit in the upper part: bias the square crop upward
             y0 = max(0, min(h - s, int(h * 0.12)))
             x0 = (w - s) // 2
-            im = im.crop((x0, y0, x0 + s, y0 + s)).resize((size, size))
+            im = im.crop((x0, y0, x0 + s, y0 + s))
+            # normalize brightness toward mid-gray, then shared grade
             import numpy as np
+            g = np.asarray(im.convert('L'), np.float32)
+            gain = min(max(110.0 / max(1.0, g.mean()), 0.85), 1.18)
+            im = PImage.fromarray(np.clip(np.asarray(im, np.float32) * gain, 0, 255).astype(np.uint8))
+            im = ImageEnhance.Contrast(im).enhance(1.05)
+            im = ImageEnhance.Color(im).enhance(0.95)
+            im = im.resize((size, size))
             arr = np.asarray(im)[:, :, ::-1].copy()
             yy, xx = np.ogrid[:size, :size]
             cx = np.clip(xx, radius, size - 1 - radius)
@@ -60,6 +68,125 @@ def _load_team_photos(size=150, radius=30):
             outs.append(None)
     return outs
 TEAM_PHOTOS=_load_team_photos()
+# 720p card geometry (spec scaled ×0.667): card 325×231, photo 150 r27,
+# accent border 3px + 3px dark gap, glow 19px @35%, stack 15/5, name 23px
+# fixed 2-line area, role 14px tracked. All cards pixel-identical.
+CARD_W, CARD_H = 325, 231
+CARD_PHOTO, CARD_R = 150, 27
+def _tracked(draw, xy, s, font, fill, tracking, anchor='ma'):
+    widths = [draw.textlength(ch, font=font) for ch in s]
+    adv = [w + tracking * font.size for w in widths]
+    total = sum(adv) - (tracking * font.size if adv else 0)
+    x, y = xy
+    if anchor == 'ma':
+        x -= total / 2
+    for ch, w in zip(s, widths):
+        draw.text((x, y), ch, font=font, fill=fill)
+        x += w + tracking * font.size
+    return total
+def team_card(img, slot, cx, cy, ring_col, op=1.0):
+    """Full member card: shadow + glass + glow + photo + name + role."""
+    import numpy as np
+    import cv2
+    from PIL import Image as PImage, ImageDraw as PDraw, ImageFont as PFont, ImageFilter
+    op = float(min(max(op, 0.0), 1.0))
+    if op <= 0.01:
+        return
+    x0, y0 = int(cx - CARD_W / 2), int(cy - CARD_H / 2)
+    H, W = img.shape[:2]
+    fb = PFont.truetype('fonts/Poppins-Bold.ttf', 23)
+    fm = PFont.truetype('fonts/Poppins-Medium.ttf', 14)
+    fm2 = PFont.truetype('fonts/Poppins-Medium.ttf', 17)
+    # shadow
+    sh = PImage.new('L', (CARD_W + 40, CARD_H + 40), 0)
+    PDraw.Draw(sh).rounded_rectangle([20, 24, CARD_W + 20, CARD_H + 24], radius=24, fill=90)
+    sh = sh.filter(ImageFilter.GaussianBlur(12))
+    sha = (np.asarray(sh).astype(np.float32) / 255 * op)
+    xa, xb = max(0, x0 - 20), min(W, x0 + CARD_W + 20)
+    ya, yb = max(0, y0 - 20), min(H, y0 + CARD_H + 20)
+    if xa < xb and ya < yb:
+        s = sha[ya - (y0 - 20):yb - (y0 - 20), xa - (x0 - 20):xb - (x0 - 20)][..., None]
+        img[ya:yb, xa:xb] = np.clip(img[ya:yb, xa:xb] * (1 - s), 0, 255).astype(img.dtype)
+    # glass fill + 1px border
+    ov = np.zeros((H, W), np.float32)
+    cv2.rectangle(ov, (x0, y0 + 24), (x0 + CARD_W, y0 + CARD_H - 24), 1.0, -1)
+    cv2.rectangle(ov, (x0 + 24, y0), (x0 + CARD_W - 24, y0 + CARD_H), 1.0, -1)
+    for qx, qy in ((x0 + 24, y0 + 24), (x0 + CARD_W - 24, y0 + 24),
+                   (x0 + 24, y0 + CARD_H - 24), (x0 + CARD_W - 24, y0 + CARD_H - 24)):
+        cv2.circle(ov, (qx, qy), 24, 1.0, -1)
+    glass = np.asarray([36, 20, 17], np.float32)
+    m = np.clip(ov * op, 0, 1)[..., None]
+    img[:] = np.clip(img.astype(np.float32) * (1 - m) + glass * m, 0, 255).astype(img.dtype)
+    edge = np.zeros((H, W), np.float32)
+    cv2.rectangle(edge, (x0, y0 + 24), (x0 + CARD_W, y0 + CARD_H - 24), 1.0, 1)
+    cv2.rectangle(edge, (x0 + 24, y0), (x0 + CARD_W - 24, y0 + CARD_H), 1.0, 1)
+    for qx, qy in ((x0 + 24, y0 + 24), (x0 + CARD_W - 24, y0 + 24),
+                   (x0 + 24, y0 + CARD_H - 24), (x0 + CARD_W - 24, y0 + CARD_H - 24)):
+        cv2.circle(edge, (qx, qy), 24, 1.0, 1)
+    me = np.clip(edge * op, 0, 1)[..., None]
+    img[:] = np.clip(img.astype(np.float32) * (1 - me) + np.asarray([90, 90, 110], np.float32) * me, 0, 255).astype(img.dtype)
+    # photo: accent border 3px + 3px dark gap, glow 19px @35% clipped above text
+    acc = np.asarray(ring_col[::-1], np.float32)
+    px, py, ps, pr = x0 + (CARD_W - CARD_PHOTO) // 2, y0 + 19, CARD_PHOTO, CARD_R
+    glow = np.zeros((H, W), np.float32)
+    cv2.rectangle(glow, (px - 6, py - 6 + pr), (px + ps + 6, py + ps - 6 - pr), 1.0, -1)
+    cv2.rectangle(glow, (px - 6 + pr, py - 6), (px + ps + 6 - pr, py + ps + 6), 1.0, -1)
+    for qx, qy in ((px - 6 + pr, py - 6 + pr), (px + ps + 6 - pr, py - 6 + pr),
+                   (px - 6 + pr, py + ps - 6 - pr), (px + ps + 6 - pr, py + ps - 6 - pr)):
+        cv2.circle(glow, (qx, qy), pr, 1.0, -1)
+    glow = cv2.GaussianBlur(glow, (0, 0), 10)
+    mg = np.clip(glow * 0.28 * op, 0, 1)[..., None]
+    img[:] = np.clip(img.astype(np.float32) * (1 - mg) + acc * mg, 0, 255).astype(img.dtype)
+    cv2.rectangle(img, (px - 6, py - 6 + pr), (px + ps + 6, py + ps - 6 - pr), (16, 14, 11), -1)
+    cv2.rectangle(img, (px - 6 + pr, py - 6), (px + ps + 6 - pr, py + ps + 6), (16, 14, 11), -1)
+    for qx, qy in ((px - 6 + pr, py - 6 + pr), (px + ps + 6 - pr, py - 6 + pr),
+                   (px - 6 + pr, py + ps - 6 - pr), (px + ps + 6 - pr, py + ps - 6 - pr)):
+        cv2.circle(img, (qx, qy), pr, (16, 14, 11), -1)
+    cv2.rectangle(img, (px - 3, py - 3 + pr), (px + ps + 3, py + ps - 3 - pr), tuple(int(v) for v in acc), 3)
+    cv2.rectangle(img, (px - 3 + pr, py - 3), (px + ps + 3 - pr, py + ps + 3), tuple(int(v) for v in acc), 3)
+    for qx, qy in ((px - 3 + pr, py - 3 + pr), (px + ps + 3 - pr, py - 3 + pr),
+                   (px - 3 + pr, py + ps - 3 - pr), (px + ps + 3 - pr, py + ps - 3 - pr)):
+        cv2.circle(img, (qx, qy), pr, tuple(int(v) for v in acc), 3)
+    arr, alpha = TEAM_PHOTOS[slot]
+    if arr.shape[0] != ps:
+        arr = cv2.resize(arr, (ps, ps))
+        alpha = cv2.resize(alpha, (ps, ps))
+    a = np.clip(alpha * op, 0, 1)[..., None]
+    img[py:py + ps, px:px + ps] = np.clip(
+        img[py:py + ps, px:px + ps].astype(np.float32) * (1 - a) + arr.astype(np.float32) * a, 0, 255).astype(img.dtype)
+    # name (auto-shrink, Saikat wraps) + role (accent-lightened, one line)
+    name, role = TEAM_MEMBERS[slot][0], TEAM_MEMBERS[slot][1].upper()
+    pil = PImage.new('RGBA', (W, H), (0, 0, 0, 0))
+    dr = PDraw.Draw(pil)
+    fbn, fsn = fb, 23
+    lines = [name]
+    while dr.textlength(name, font=fbn) > CARD_W - 32 and fsn > 20:
+        fsn -= 1
+        fbn = PFont.truetype('fonts/Poppins-Bold.ttf', fsn)
+    if dr.textlength(name, font=fbn) > CARD_W - 32:
+        head, tail = name.rsplit(' (', 1) if ' (' in name else (name, '')
+        lines = [head, '(' + tail] if tail else [head]
+    light = tuple(int(0.7 * v + 0.3 * 255) for v in ring_col[::-1])
+    fr = PFont.truetype('fonts/Poppins-Medium.ttf', 14)
+    rtxt = role
+    while dr.textlength(''.join(rtxt), font=fr) > CARD_W - 32 and fr.size > 11:
+        fr = PFont.truetype('fonts/Poppins-Medium.ttf', fr.size - 1)
+    ny = y0 + 19 + ps + 15
+    if len(lines) == 1:
+        ny += 14
+    for li, ln in enumerate(lines):
+        fn = fbn if li == 0 else PFont.truetype('fonts/Poppins-Medium.ttf', 17)
+        fc = (245, 243, 236) if li == 0 else (174, 182, 208)
+        if li == 0 and len(lines) == 1:
+            _tracked(dr, (cx, ny), ln, fn, fc, 0.0)
+        else:
+            dr.text((cx, ny), ln, font=fn, fill=fc, anchor='ma')
+        ny += 28
+    ry = y0 + 19 + ps + 15 + 56 + 5
+    _tracked(dr, (cx, ry), rtxt, fr, light, 0.10)
+    ov = np.asarray(pil).astype(np.float32)
+    am = (ov[..., 3:4] / 255.0) * op
+    img[:] = np.clip(img.astype(np.float32) * (1 - am) + ov[..., :3][..., ::-1] * am, 0, 255).astype(img.dtype)
 def _rring(img, x0, y0, size, radius, col, th, op):
     import cv2
     # filled shapes: this builds a mask/slab, not an outline
@@ -228,31 +355,34 @@ def sc_waste(img,t,d,C):
 def sc_team(img,t,d,C):
     bg(img,t)
     c0=C[0]; c1=C[1]; c2=C[2]; c3=C[3]
+    if t<10.5:
+        # title block (cap-top ~43px): MEET THE TEAM + subtitle
+        from PIL import Image as PImage, ImageDraw as PDraw, ImageFont as PFont
+        H, W = img.shape[:2]
+        ta=eo(seg(t,0.2,0.8))
+        if ta>0.01:
+            ov = PImage.new('RGBA', (W, H), (0, 0, 0, 0))
+            dr = PDraw.Draw(ov)
+            fb = PFont.truetype('fonts/Poppins-Bold.ttf', 35)
+            fm = PFont.truetype('fonts/Poppins-Medium.ttf', 16)
+            _tracked(dr, (W // 2, 46), 'MEET THE TEAM', fb, (242, 240, 232), 0.14)
+            _tracked(dr, (W // 2, 46 + 12 + 26), 'TEAM AKASHTORI · Planet X and SPHEREx', fm, (174, 182, 208), 0.12)
+            arr = np.asarray(ov).astype(np.float32)
+            am = (arr[..., 3:4] / 255.0) * ta
+            img[:] = np.clip(img.astype(np.float32) * (1 - am) + arr[..., :3][..., ::-1] * am, 0, 255).astype(img.dtype)
     if t<7.5:
-        # photo grid from the start (screen+dots removed): badges stagger in
-        # over the first seconds, then hold for the whole slide
-        names=["I'm Mahdin","Aazmaine","Saikat","Orni","Himel","Zubayer"]
+        # photo cards stagger in fast, then hold still
         for i,(nm,col) in enumerate(TEAM):
-            cx=640+((i%3)-1)*400; cy=215+(i//3)*250
+            cx=640+((i%3)-1)*357; cy=250+(i//3)*268
             tt=0.3+i*0.35
             a=1.0 if t>=tt+0.4 else eb(seg(t,tt-0.05,tt+0.4))
             if a<=0: continue
-            a=min(a,1.0)
-            team_photo(img,i,(cx,cy-40),168,col,op=a)
-            text(img,TEAM_MEMBERS[i][0],cx,cy+60,'b',26,WH,op=a)
-            text(img,TEAM_MEMBERS[i][1],cx,cy+92,'r',19,GY,op=a)
+            team_card(img,i,cx,cy,col,op=min(a,1.0))
     elif t<10.5:
-        txt=ACTSTEXT=c1[2] if len(c1)>2 else ''
-        k=eo(seg(t,c1[0]-0.1,c1[0]+0.5))
-        times=[c1[0]+0.7,c1[0]+1.55,c1[0]+2.0,c1[0]+2.45,c1[0]+2.9,c1[0]+3.4]
-        # hold the photo grid; dim early into the AKASHTORI title
-        names=["I'm Mahdin","Aazmaine","Saikat","Orni","Himel","Zubayer"]
+        # hold the photo cards; dim early into the AKASHTORI title
         for i,(nm,col) in enumerate(TEAM):
-            cx=640+((i%3)-1)*400; cy=215+(i//3)*250
-            a=1.0
-            team_photo(img,i,(cx,cy-40),168,col,op=a)
-            text(img,TEAM_MEMBERS[i][0],cx,cy+60,'b',26,WH,op=a)
-            text(img,TEAM_MEMBERS[i][1],cx,cy+92,'r',19,GY,op=a)
+            cx=640+((i%3)-1)*357; cy=250+(i//3)*268
+            team_card(img,i,cx,cy,col,op=1.0)
         if t>6.9:
             kk=eo(seg(t,6.9,7.5)); img[:]=cv2.addWeighted(img,1-0.82*kk,np.full_like(img,NAVY),0.82*kk,0)
             text(img,'TEAM',640,250,'m',36,GY,op=kk); text(img,'AKASHTORI',640,340,'b',100,WH,op=kk)
