@@ -6,6 +6,25 @@ PL_A=(0.62,0.38); PL_B=(0.69,0.44)
 ALLSKY=[(R.uniform(-1,1),R.uniform(-1,1)) for _ in range(5000)]
 ALLSKY=[(x,y) for x,y in ALLSKY if x*x+y*y<=1]
 TEAM=[('Mahdin',CY),('Aazmaine',AM),('Saikat',MG),('Orni',GR),('Himel',VI),('Zubayer',BL)]
+CAP_AMBER=AM; CAP_CREAM=RGB(232,228,216); CAP_PERI=RGB(111,127,191); CAP_BG=RGB(20,24,48)
+def plate_caption(img,cx,y,plate,date,op=1.0,dy=0.0):
+    """Specimen-label pill for the plate caption. Single line, tracked plate
+    name (semi-bold→Bold) + amber dot + cream date. Centered on plate axis."""
+    if op<=0.01: return
+    ls=0.15; size=28
+    w_plate=sum(textw(ch,'b',size)+(ls*size if ch!=' ' else ls*size*0.5) for ch in plate)-ls*size
+    w_date=textw(date,'r',28)
+    dot_r=3; gap=16
+    pill_w=w_plate+gap*2+dot_r*2+w_date+44; pill_h=size+20
+    cy=y+dy
+    rrect(img,cx-pill_w/2,cy-pill_h/2,pill_w,pill_h,999,CAP_BG,-1,0.85*op)
+    rrect(img,cx-pill_w/2,cy-pill_h/2,pill_w,pill_h,999,CAP_PERI,2,op)
+    x=cx-(w_plate+gap*2+dot_r*2+w_date)/2
+    for ch in plate:
+        text(img,ch,x,cy,'b',size,CAP_AMBER,anchor='l',op=op)
+        x+=textw(ch,'b',size)+(ls*size if ch!=' ' else ls*size*0.5)
+    circ(img,(x+gap+dot_r,cy),dot_r,CAP_AMBER,-1,op)
+    text(img,date,x+gap*2+dot_r*2,cy,'r',28,CAP_CREAM,anchor='l',op=op*0.85)
 # Real member photos + full names + roles (video/"Grp pic"). Loaded once.
 TEAM_MEMBERS=[
  ('Md Mahdin Al Abrar','Content Producer','Grp pic/MdMahdinAlAbrar_ContentProducer.jpeg'),
@@ -85,9 +104,9 @@ def sc_plates(img,t,d,C):
     bg(img,t)
     # year title
     a=eo(seg(t,0,0.9)); text(img,'1930',150-60*(1-a),90,'b',72,AM,'l',op=a)
-    text(img,'ARIZONA',154-60*(1-a),145,'m',26,GY,'l',op=a)
-    # plate viewer
-    cx,cy,sz=700,372,400
+    text(img,'ARIZONA',154-60*(1-a),145,'m',26,RGB(174,182,208),'l',op=a)
+    # plate viewer (group shifted up 25px so the caption pill clears the frame)
+    cx,cy,sz=700,347,400
     rrect(img,cx-sz/2-24,cy-sz/2-24,sz+48,sz+48,26,RGB(30,36,64),-1); rrect(img,cx-sz/2-24,cy-sz/2-24,sz+48,sz+48,26,RGB(110,125,175),3)
     slide=eo(seg(t,0.2,1.3))
     ph=int((t-1.4)*2.2)%2 if t>1.4 else 0
@@ -98,8 +117,18 @@ def sc_plates(img,t,d,C):
     pa=(x0+PL_A[0]*sz,y0+PL_A[1]*sz); pb=(x0+PL_B[0]*sz,y0+PL_B[1]*sz)
     mv=pb if ph else pa
     circ(img,mv,4.5,RGB(40,22,16))
-    # plate label
-    text(img,'PLATE '+('B' if ph else 'A')+'  ·  '+('Jan 29' if ph else 'Jan 23'),cx,cy+sz/2+30,'m',22,GY)
+    # plate label: pill tag below the frame (frame bottom 571, pill center 603:
+    # 32px gap, baseline ~85px above the 720p bottom edge)
+    la=eo(seg(t,0.35,0.75)); dy=10*(1-la)
+    cyc=(t-1.4)*2.2 if t>1.4 else 0.0
+    f=(cyc%1)*0.4545
+    cur=('PLATE B' if ph else 'PLATE A','Jan 29' if ph else 'Jan 23')
+    if t>1.4 and f<0.3:
+        w=f/0.3; prev=('PLATE A' if ph else 'PLATE B','Jan 23' if ph else 'Jan 29')
+        plate_caption(img,cx,603,prev[0],prev[1],op=(1-w)*la,dy=dy)
+        plate_caption(img,cx,603,cur[0],cur[1],op=w*la,dy=dy)
+    else:
+        plate_caption(img,cx,603,cur[0],cur[1],op=la,dy=dy)
     # night tally
     n=int(1+max(0,t-1.0)*3.4)
     text(img,'NIGHT %d'%n,1010+0,210,'b',34,WH,'l',op=a)
