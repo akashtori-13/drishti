@@ -234,8 +234,8 @@ def sc_team(img,t,d,C):
         names=["I'm Mahdin","Aazmaine","Saikat","Orni","Himel","Zubayer"]
         for i,(nm,col) in enumerate(TEAM):
             cx=640+((i%3)-1)*400; cy=215+(i//3)*250
-            tt=0.5+i*0.6
-            a=eb(seg(t,tt-0.05,tt+0.45))
+            tt=0.3+i*0.35
+            a=1.0 if t>=tt+0.4 else eb(seg(t,tt-0.05,tt+0.4))
             if a<=0: continue
             a=min(a,1.0)
             team_photo(img,i,(cx,cy-40),168,col,op=a)
