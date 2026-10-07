@@ -198,20 +198,18 @@ def sc_team(img,t,d,C):
     bg(img,t)
     c0=C[0]; c1=C[1]; c2=C[2]; c3=C[3]
     if t<c2[0]:
-        # screen at the center
-        k=eo(seg(t,0,0.8))
-        rrect(img,500,250,280,170,14,RGB(14,18,40),-1,k); rrect(img,500,250,280,170,14,CY,3,k)
-        pts=[(520+i*5,380-30*math.sin(i*0.25)-14*math.sin(i*0.9+t)-i*0.4) for i in range(50)]
-        poly(img,pts,CY,k,th=2,closed=False); dglow(img,(640,335),150,CY,0.2*k)
-        text(img,'?',640,335,'b',60,mix(NAVY,AM,0.9),op=k*0.5)
-        rrect(img,600,420,80,10,4,GY,-1,k); rrect(img,560,430,160,8,4,GY,-1,k)
+        # photo grid from the start (screen+dots removed): badges stagger in
+        # over the first seconds, then hold for the whole slide
+        names=["I'm Mahdin","Aazmaine","Saikat","Orni","Himel","Zubayer"]
         for i,(nm,col) in enumerate(TEAM):
-            a=-math.pi/2+i*(6.2832/6)+0.5; px=640+380*math.cos(a); py=360+250*math.sin(a)
-            kk=eb(seg(t,0.3+i*0.12,0.9+i*0.12))
-            circ(img,(px,py),38*kk,col); circ(img,(px,py),38*kk,WH,3)
-            lx=math.cos(a+3.14)*3; ly=math.sin(a+3.14)*3
-            if kk>0.5: circ(img,(px+lx-10,py+ly-4),4,NAVY); circ(img,(px+lx+10,py+ly-4),4,NAVY)
-            line(img,(px,py),(px+(640-px)*0.08,py+(360-py)*0.08),col,1,0.0)
+            cx=640+((i%3)-1)*400; cy=215+(i//3)*250
+            tt=0.5+i*0.6
+            a=eb(seg(t,tt-0.05,tt+0.45))
+            if a<=0: continue
+            a=min(a,1.0)
+            team_photo(img,i,(cx,cy-40),128,col,op=a)
+            text(img,TEAM_MEMBERS[i][0],cx,cy+55,'b',20,WH,op=a)
+            text(img,TEAM_MEMBERS[i][1],cx,cy+82,'r',15,GY,op=a)
     elif t<c3[0]:
         txt=ACTSTEXT=c1[2] if len(c1)>2 else ''
         k=eo(seg(t,c1[0]-0.1,c1[0]+0.5))
@@ -227,6 +225,7 @@ def sc_team(img,t,d,C):
                 tt=c1[0]+(c1[1]-c1[0])*(pos/len(full))*0.97
             a=eb(seg(t,tt-0.05,tt+0.45))
             if a<=0: continue
+            a=min(a,1.0)
             team_photo(img,i,(cx,cy-40),128,col,op=a)
             text(img,TEAM_MEMBERS[i][0],cx,cy+55,'b',20,WH,op=a)
             text(img,TEAM_MEMBERS[i][1],cx,cy+82,'r',15,GY,op=a)
