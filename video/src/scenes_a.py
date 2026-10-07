@@ -15,7 +15,7 @@ TEAM_MEMBERS=[
  ('Himel Das','Team Leader','Grp pic/HimelDas_TeamLeader.jpeg'),
  ('Zubayer Hasan Shaad','Scientific Systems Architect','Grp pic/ZubayerHasanShaad_ScientificSystemsArchitect.jpg'),
 ]
-def _load_team_photos(size=150, radius=26):
+def _load_team_photos(size=150, radius=30):
     from PIL import Image as PImage
     outs = []
     for _, _, rel in TEAM_MEMBERS:
@@ -23,37 +23,62 @@ def _load_team_photos(size=150, radius=26):
             im = PImage.open(rel).convert('RGB')
             w, h = im.size
             s = min(w, h)
-            im = im.crop(((w-s)//2, (h-s)//2, (w+s)//2, (h+s)//2)).resize((size, size))
+            # faces sit in the upper part: bias the square crop upward
+            y0 = max(0, min(h - s, int(h * 0.12)))
+            x0 = (w - s) // 2
+            im = im.crop((x0, y0, x0 + s, y0 + s)).resize((size, size))
             import numpy as np
             arr = np.asarray(im)[:, :, ::-1].copy()
             yy, xx = np.ogrid[:size, :size]
-            edge = np.minimum(np.minimum(xx, yy), np.minimum(size - 1 - xx, size - 1 - yy))
-            alpha = np.clip((edge - (radius - 12)) / 12.0, 0, 1)
+            cx = np.clip(xx, radius, size - 1 - radius)
+            cy = np.clip(yy, radius, size - 1 - radius)
+            dist = np.sqrt((xx - cx) ** 2 + (yy - cy) ** 2)
+            alpha = np.ones((size, size))
+            corner = dist > radius
+            alpha[corner] = np.clip((radius - dist[corner]) / 3.0 + 1.0, 0, 1)
             outs.append((arr, alpha))
         except Exception:
             outs.append(None)
     return outs
 TEAM_PHOTOS=_load_team_photos()
+def _rring(img, x0, y0, size, radius, col, th, op):
+    import cv2
+    cv2.rectangle(img, (x0, y0 + radius), (x0 + size, y0 + size - radius), col, th)
+    cv2.rectangle(img, (x0 + radius, y0), (x0 + size - radius, y0 + size), col, th)
+    for cx_, cy_ in ((x0 + radius, y0 + radius), (x0 + size - radius, y0 + radius),
+                     (x0 + radius, y0 + size - radius), (x0 + size - radius, y0 + size - radius)):
+        cv2.circle(img, (cx_, cy_), radius, col, th)
+    _ = op
 def team_photo(img, slot, centre, size, ring_col, op=1.0):
-    """Paste member photo with coloured ring; slot=None draws initial ring only."""
+    """Paste member photo (rounded square, face-biased crop) with rounded-square ring."""
     import numpy as np
     import cv2
     x, y = int(centre[0]), int(centre[1])
-    r = size // 2
-    circ(img, (x, y), r + 5, ring_col, 4, op)
+    x0, y0 = x - size // 2, y - size // 2
+    H, W = img.shape[:2]
+    # ring drawn on a scratch layer so `op` fades it cleanly
+    layer = np.zeros_like(img)
+    _rring(layer, x0 - 4, y0 - 4, size + 8, 30, tuple(int(v) for v in ring_col), 5, op)
+    m = (layer.sum(axis=2, keepdims=True) > 0).astype(np.float32) * op
+    img[:] = (img.astype(np.float32) * (1 - m) + layer.astype(np.float32) * m).astype(img.dtype)
     if slot is None or slot >= len(TEAM_PHOTOS) or TEAM_PHOTOS[slot] is None:
         return
     arr, alpha = TEAM_PHOTOS[slot]
     if arr.shape[0] != size:
         arr = cv2.resize(arr, (size, size))
         alpha = cv2.resize(alpha, (size, size))
-    x0, y0 = x - size // 2, y - size // 2
-    H, W = img.shape[:2]
+    ov = np.zeros((H, W), np.uint8)
+    cv2.rectangle(ov, (x0, y0 + 30), (x0 + size, y0 + size - 30), 255, -1)
+    cv2.rectangle(ov, (x0 + 30, y0), (x0 + size - 30, y0 + size), 255, -1)
+    for cx_, cy_ in ((x0 + 30, y0 + 30), (x0 + size - 30, y0 + 30),
+                     (x0 + 30, y0 + size - 30), (x0 + size - 30, y0 + size - 30)):
+        cv2.circle(ov, (cx_, cy_), 30, 255, -1)
     xa, xb = max(0, x0), min(W, x0 + size)
     ya, yb = max(0, y0), min(H, y0 + size)
     if xa >= xb or ya >= yb:
         return
-    a = (alpha[ya-y0:yb-y0, xa-x0:xb-x0] * op)[..., None]
+    keep = (ov[ya:yb, xa:xb] > 0)[..., None].astype(np.float32)
+    a = (alpha[ya-y0:yb-y0, xa-x0:xb-x0] * keep[..., 0] * op)[..., None]
     img[ya:yb, xa:xb] = (img[ya:yb, xa:xb] * (1 - a) + arr[ya-y0:yb-y0, xa-x0:xb-x0] * a).astype(img.dtype)
 def bg(img,t,k=0): img[:]=BG0; starfield(img,t,0.6)
 def sc_plates(img,t,d,C):
