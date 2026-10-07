@@ -84,87 +84,97 @@ def _tracked(draw, xy, s, font, fill, tracking, anchor='ma'):
         draw.text((x, y), ch, font=font, fill=fill)
         x += w + tracking * font.size
     return total
+# cardless member geometry (720p): photo 132 r24, uniform dark gap 3px,
+# single uniform ring 3px (outer r30, inner r27 = outer - width).
+# Stack under the 144px photo block: 20px / name (~17) / 8px / role (~12).
+# Stack height 199, cy = stack centre -> block top = cy-100. No panel/shadow.
+MEM_PHOTO, MEM_GAP, MEM_RINGW = 132, 3, 3
+MEM_R_OUT, MEM_R_PHOTO = 30, 24
+MEM_HALF = 100
+MEM_TEXT_W = 300  # name/role line budget (column pitch 357 -> 28px side clearance)
 def team_card(img, slot, cx, cy, ring_col, op=1.0):
-    """Full member card: shadow + glass + glow + photo + name + role."""
+    """Cardless member: centered glow + one uniform ring + name + role on bg."""
     import numpy as np
     import cv2
-    from PIL import Image as PImage, ImageDraw as PDraw, ImageFont as PFont, ImageFilter
+    from PIL import Image as PImage, ImageDraw as PDraw, ImageFont as PFont
     op = float(min(max(op, 0.0), 1.0))
     if op <= 0.01:
         return
-    x0, y0 = int(cx - CARD_W / 2), int(cy - CARD_H / 2)
     H, W = img.shape[:2]
-    fb = PFont.truetype('fonts/Poppins-Bold.ttf', 23)
-    fm = PFont.truetype('fonts/Poppins-Medium.ttf', 14)
-    fm2 = PFont.truetype('fonts/Poppins-Medium.ttf', 17)
-    # shadow
-    sh = PImage.new('L', (CARD_W + 40, CARD_H + 40), 0)
-    PDraw.Draw(sh).rounded_rectangle([20, 24, CARD_W + 20, CARD_H + 24], radius=24, fill=90)
-    sh = sh.filter(ImageFilter.GaussianBlur(12))
-    sha = (np.asarray(sh).astype(np.float32) / 255 * op)
-    xa, xb = max(0, x0 - 20), min(W, x0 + CARD_W + 20)
-    ya, yb = max(0, y0 - 20), min(H, y0 + CARD_H + 20)
-    if xa < xb and ya < yb:
-        s = sha[ya - (y0 - 20):yb - (y0 - 20), xa - (x0 - 20):xb - (x0 - 20)][..., None]
-        img[ya:yb, xa:xb] = np.clip(img[ya:yb, xa:xb] * (1 - s), 0, 255).astype(img.dtype)
-    # glass fill + 1px border
-    ov = np.zeros((H, W), np.float32)
-    cv2.rectangle(ov, (x0, y0 + 24), (x0 + CARD_W, y0 + CARD_H - 24), 1.0, -1)
-    cv2.rectangle(ov, (x0 + 24, y0), (x0 + CARD_W - 24, y0 + CARD_H), 1.0, -1)
-    for qx, qy in ((x0 + 24, y0 + 24), (x0 + CARD_W - 24, y0 + 24),
-                   (x0 + 24, y0 + CARD_H - 24), (x0 + CARD_W - 24, y0 + CARD_H - 24)):
-        cv2.circle(ov, (qx, qy), 24, 1.0, -1)
-    glass = np.asarray([36, 20, 17], np.float32)
-    m = np.clip(ov * op, 0, 1)[..., None]
-    img[:] = np.clip(img.astype(np.float32) * (1 - m) + glass * m, 0, 255).astype(img.dtype)
-    # (no edge outline: glass edge stays clean)
-    # photo: accent border 3px + 3px dark gap, glow clipped above text
-    acc = np.asarray(ring_col[::-1], np.float32)
-    px, py, ps, pr = x0 + (CARD_W - CARD_PHOTO) // 2, y0 + 16, CARD_PHOTO, CARD_R
-    glow = np.zeros((H, W), np.float32)
-    cv2.rectangle(glow, (px - 6, py - 6 + pr), (px + ps + 6, py + ps - 6 - pr), 1.0, -1)
-    cv2.rectangle(glow, (px - 6 + pr, py - 6), (px + ps + 6 - pr, py + ps + 6), 1.0, -1)
-    for qx, qy in ((px - 6 + pr, py - 6 + pr), (px + ps + 6 - pr, py - 6 + pr),
-                   (px - 6 + pr, py + ps - 6 - pr), (px + ps + 6 - pr, py + ps - 6 - pr)):
-        cv2.circle(glow, (qx, qy), pr, 1.0, -1)
-    glow = cv2.GaussianBlur(glow, (0, 0), 10)
-    mg = np.clip(glow * 0.28 * op, 0, 1)[..., None]
-    img[:] = np.clip(img.astype(np.float32) * (1 - mg) + acc * mg, 0, 255).astype(img.dtype)
-    cv2.rectangle(img, (px - 6, py - 6 + pr), (px + ps + 6, py + ps - 6 - pr), (16, 14, 11), -1)
-    cv2.rectangle(img, (px - 6 + pr, py - 6), (px + ps + 6 - pr, py + ps + 6), (16, 14, 11), -1)
-    for qx, qy in ((px - 6 + pr, py - 6 + pr), (px + ps + 6 - pr, py - 6 + pr),
-                   (px - 6 + pr, py + ps - 6 - pr), (px + ps + 6 - pr, py + ps - 6 - pr)):
-        cv2.circle(img, (qx, qy), pr, (16, 14, 11), -1)
-    cv2.rectangle(img, (px - 3, py - 3 + pr), (px + ps + 3, py + ps - 3 - pr), tuple(int(v) for v in acc), 3)
-    cv2.rectangle(img, (px - 3 + pr, py - 3), (px + ps + 3 - pr, py + ps + 3), tuple(int(v) for v in acc), 3)
-    for qx, qy in ((px - 3 + pr, py - 3 + pr), (px + ps + 3 - pr, py - 3 + pr),
-                   (px - 3 + pr, py + ps - 3 - pr), (px + ps + 3 - pr, py + ps - 3 - pr)):
-        cv2.circle(img, (qx, qy), pr, tuple(int(v) for v in acc), 3)
+    bgr = np.asarray(ring_col, np.float32)       # TEAM colours are BGR (cv2)
+    blk = MEM_PHOTO + 2 * (MEM_GAP + MEM_RINGW)  # 144: photo+gap+ring block
+    bx0, by0 = int(cx - blk / 2), int(cy - MEM_HALF)
+    # 1. one soft centered glow (accent, 35%, symmetric, sigma 9, no offset)
+    gl = np.zeros((H, W), np.float32)
+    gr = MEM_R_OUT
+    cv2.rectangle(gl, (bx0, by0 + gr), (bx0 + blk, by0 + blk - gr), 1.0, -1)
+    cv2.rectangle(gl, (bx0 + gr, by0), (bx0 + blk - gr, by0 + blk), 1.0, -1)
+    for qx, qy in ((bx0 + gr, by0 + gr), (bx0 + blk - gr, by0 + gr),
+                   (bx0 + gr, by0 + blk - gr), (bx0 + blk - gr, by0 + blk - gr)):
+        cv2.circle(gl, (qx, qy), gr, 1.0, -1)
+    gl = cv2.GaussianBlur(gl, (0, 0), 9)
+    mg = np.clip(gl * 0.35 * op, 0, 1)[..., None]
+    img[:] = np.clip(img.astype(np.float32) * (1 - mg) + bgr * mg, 0, 255).astype(img.dtype)
+    # 2. uniform dark gap (3px all sides) + 3. ONE uniform ring (outer r30,
+    # inner r27 concentric -> constant 3px around straights and curves)
+    ring = np.zeros((H, W), np.float32)
+    cv2.rectangle(ring, (bx0, by0 + gr), (bx0 + blk, by0 + blk - gr), 1.0, -1)
+    cv2.rectangle(ring, (bx0 + gr, by0), (bx0 + blk - gr, by0 + blk), 1.0, -1)
+    for qx, qy in ((bx0 + gr, by0 + gr), (bx0 + blk - gr, by0 + gr),
+                   (bx0 + gr, by0 + blk - gr), (bx0 + blk - gr, by0 + blk - gr)):
+        cv2.circle(ring, (qx, qy), gr, 1.0, -1)
+    iw, ir = MEM_RINGW, MEM_R_OUT - MEM_RINGW  # inset 3, inner radius 27
+    cv2.rectangle(ring, (bx0 + iw, by0 + iw + ir), (bx0 + blk - iw, by0 + blk - iw - ir), 0.0, -1)
+    cv2.rectangle(ring, (bx0 + iw + ir, by0 + iw), (bx0 + blk - iw - ir, by0 + blk - iw), 0.0, -1)
+    for qx, qy in ((bx0 + iw + ir, by0 + iw + ir), (bx0 + blk - iw - ir, by0 + iw + ir),
+                   (bx0 + iw + ir, by0 + blk - iw - ir), (bx0 + blk - iw - ir, by0 + blk - iw - ir)):
+        cv2.circle(ring, (qx, qy), ir, 0.0, -1)
+    mr = np.clip(ring * op, 0, 1)[..., None]
+    img[:] = np.clip(img.astype(np.float32) * (1 - mr) + bgr * mr, 0, 255).astype(img.dtype)
+    gap = np.zeros((H, W), np.float32)
+    gx0, gy0, gs = bx0 + iw, by0 + iw, blk - 2 * iw  # 138px box inside the ring
+    cv2.rectangle(gap, (gx0, gy0 + ir), (gx0 + gs, gy0 + gs - ir), 1.0, -1)
+    cv2.rectangle(gap, (gx0 + ir, gy0), (gx0 + gs - ir, gy0 + gs), 1.0, -1)
+    for qx, qy in ((gx0 + ir, gy0 + ir), (gx0 + gs - ir, gy0 + ir),
+                   (gx0 + ir, gy0 + gs - ir), (gx0 + gs - ir, gy0 + gs - ir)):
+        cv2.circle(gap, (qx, qy), ir, 1.0, -1)
+    md = np.clip(gap * op, 0, 1)[..., None]
+    img[:] = np.clip(img.astype(np.float32) * (1 - md) + np.asarray([16, 14, 11], np.float32) * md, 0, 255).astype(img.dtype)
+    # 4. photo, clipped to the same centre with r24 (never pokes past the ring)
     arr, alpha = TEAM_PHOTOS[slot]
+    ps = MEM_PHOTO
     if arr.shape[0] != ps:
         arr = cv2.resize(arr, (ps, ps))
         alpha = cv2.resize(alpha, (ps, ps))
-    a = np.clip(alpha * op, 0, 1)[..., None]
+    px, py = bx0 + iw + MEM_GAP, by0 + iw + MEM_GAP
+    clip = np.zeros((ps, ps), np.float32)
+    pr = MEM_R_PHOTO
+    cv2.rectangle(clip, (0, pr), (ps, ps - pr), 1.0, -1)
+    cv2.rectangle(clip, (pr, 0), (ps - pr, ps), 1.0, -1)
+    for qx, qy in ((pr, pr), (ps - pr, pr), (pr, ps - pr), (ps - pr, ps - pr)):
+        cv2.circle(clip, (qx, qy), pr, 1.0, -1)
+    a = np.clip(alpha * clip * op, 0, 1)[..., None]
     img[py:py + ps, px:px + ps] = np.clip(
         img[py:py + ps, px:px + ps].astype(np.float32) * (1 - a) + arr.astype(np.float32) * a, 0, 255).astype(img.dtype)
     # name (auto-shrink, Saikat wraps) + role (accent-lightened, one line)
     name, role = TEAM_MEMBERS[slot][0], TEAM_MEMBERS[slot][1].upper()
     pil = PImage.new('RGBA', (W, H), (0, 0, 0, 0))
     dr = PDraw.Draw(pil)
+    fb = PFont.truetype('fonts/Poppins-Bold.ttf', 23)
     fbn, fsn = fb, 23
     lines = [name]
-    while dr.textlength(name, font=fbn) > CARD_W - 32 and fsn > 20:
+    while dr.textlength(name, font=fbn) > MEM_TEXT_W and fsn > 20:
         fsn -= 1
         fbn = PFont.truetype('fonts/Poppins-Bold.ttf', fsn)
-    if dr.textlength(name, font=fbn) > CARD_W - 32:
+    if dr.textlength(name, font=fbn) > MEM_TEXT_W:
         head, tail = name.rsplit(' (', 1) if ' (' in name else (name, '')
         lines = [head, '(' + tail] if tail else [head]
     light = tuple(int(0.7 * v + 0.3 * 255) for v in ring_col[::-1])
     fr = PFont.truetype('fonts/Poppins-Medium.ttf', 14)
     rtxt = role
-    while dr.textlength(''.join(rtxt), font=fr) > CARD_W - 32 and fr.size > 11:
+    while dr.textlength(''.join(rtxt), font=fr) > MEM_TEXT_W and fr.size > 11:
         fr = PFont.truetype('fonts/Poppins-Medium.ttf', fr.size - 1)
-    ny = y0 + 16 + 132 + 12
+    ny = by0 + blk + 12
     if len(lines) == 1:
         ny += 13
     for li, ln in enumerate(lines):
@@ -175,7 +185,7 @@ def team_card(img, slot, cx, cy, ring_col, op=1.0):
         else:
             dr.text((cx, ny), ln, font=fn, fill=fc, anchor='ma')
         ny += 26
-    ry = y0 + 16 + 132 + 12 + 52 + 4
+    ry = by0 + blk + 12 + 41
     _tracked(dr, (cx, ry), rtxt, fr, light, 0.10)
     ov = np.asarray(pil).astype(np.float32)
     am = (ov[..., 3:4] / 255.0) * op
@@ -365,7 +375,7 @@ def sc_team(img,t,d,C):
     if t<4.5:
         # photo cards: fast stagger (all in by ~1.2s), 2.5s+ hold, 0.35s exit
         for i,(nm,col) in enumerate(TEAM):
-            cx=640+((i%3)-1)*357; cy=222+(i//3)*288
+            cx=640+((i%3)-1)*357; cy=249+(i//3)*280
             tt=0.2+i*0.10
             a=1.0 if t>=tt+0.4 else eb(seg(t,tt-0.05,tt+0.4))
             if a<=0: continue
@@ -375,7 +385,7 @@ def sc_team(img,t,d,C):
     elif t<7.4:
         # hold the photo grid; AKASHTORI text overlay animation
         for i,(nm,col) in enumerate(TEAM):
-            cx=640+((i%3)-1)*357; cy=222+(i//3)*288
+            cx=640+((i%3)-1)*357; cy=249+(i//3)*280
             team_card(img,i,cx,cy,col,op=1.0)
         if t>4.35:
             kin=eo(seg(t,4.35,5.15)); kout=1-seg(t,7.0,7.4)
