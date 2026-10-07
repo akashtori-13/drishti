@@ -62,11 +62,13 @@ def _load_team_photos(size=150, radius=30):
 TEAM_PHOTOS=_load_team_photos()
 def _rring(img, x0, y0, size, radius, col, th, op):
     import cv2
-    cv2.rectangle(img, (x0, y0 + radius), (x0 + size, y0 + size - radius), col, th)
-    cv2.rectangle(img, (x0 + radius, y0), (x0 + size - radius, y0 + size), col, th)
+    # filled shapes: this builds a mask/slab, not an outline
+    cv2.rectangle(img, (x0, y0 + radius), (x0 + size, y0 + size - radius), col, -1)
+    cv2.rectangle(img, (x0 + radius, y0), (x0 + size - radius, y0 + size), col, -1)
     for cx_, cy_ in ((x0 + radius, y0 + radius), (x0 + size - radius, y0 + radius),
                      (x0 + radius, y0 + size - radius), (x0 + size - radius, y0 + size - radius)):
-        cv2.circle(img, (cx_, cy_), radius, col, th)
+        cv2.circle(img, (cx_, cy_), radius, col, -1)
+    _ = th
     _ = op
 def team_photo(img, slot, centre, size, ring_col, op=1.0):
     """Paste member photo (rounded square, face-biased crop) with rounded-square ring."""
@@ -226,7 +228,7 @@ def sc_waste(img,t,d,C):
 def sc_team(img,t,d,C):
     bg(img,t)
     c0=C[0]; c1=C[1]; c2=C[2]; c3=C[3]
-    if t<c2[0]:
+    if t<7.5:
         # photo grid from the start (screen+dots removed): badges stagger in
         # over the first seconds, then hold for the whole slide
         names=["I'm Mahdin","Aazmaine","Saikat","Orni","Himel","Zubayer"]
@@ -236,30 +238,23 @@ def sc_team(img,t,d,C):
             a=eb(seg(t,tt-0.05,tt+0.45))
             if a<=0: continue
             a=min(a,1.0)
-            team_photo(img,i,(cx,cy-40),128,col,op=a)
-            text(img,TEAM_MEMBERS[i][0],cx,cy+55,'b',20,WH,op=a)
-            text(img,TEAM_MEMBERS[i][1],cx,cy+82,'r',15,GY,op=a)
-    elif t<c3[0]:
+            team_photo(img,i,(cx,cy-40),168,col,op=a)
+            text(img,TEAM_MEMBERS[i][0],cx,cy+60,'b',26,WH,op=a)
+            text(img,TEAM_MEMBERS[i][1],cx,cy+92,'r',19,GY,op=a)
+    elif t<10.5:
         txt=ACTSTEXT=c1[2] if len(c1)>2 else ''
         k=eo(seg(t,c1[0]-0.1,c1[0]+0.5))
         times=[c1[0]+0.7,c1[0]+1.55,c1[0]+2.0,c1[0]+2.45,c1[0]+2.9,c1[0]+3.4]
-        # sync badges to words: given cue text proportion
+        # hold the photo grid; dim early into the AKASHTORI title
         names=["I'm Mahdin","Aazmaine","Saikat","Orni","Himel","Zubayer"]
         for i,(nm,col) in enumerate(TEAM):
             cx=640+((i%3)-1)*400; cy=215+(i//3)*250
-            if i==0: tt=c1[0]
-            else:
-                full="I'm Mahdin — with Aazmaine, Saikat, Orni, Himel and Zubayer."
-                pos=full.index(nm) if nm in full else 0
-                tt=c1[0]+(c1[1]-c1[0])*(pos/len(full))*0.97
-            a=eb(seg(t,tt-0.05,tt+0.45))
-            if a<=0: continue
-            a=min(a,1.0)
-            team_photo(img,i,(cx,cy-40),128,col,op=a)
-            text(img,TEAM_MEMBERS[i][0],cx,cy+55,'b',20,WH,op=a)
-            text(img,TEAM_MEMBERS[i][1],cx,cy+82,'r',15,GY,op=a)
-        if t>c3[0]-0.6:
-            kk=eo(seg(t,c3[0]-0.6,c3[0]+0.2)); img[:]=cv2.addWeighted(img,1-0.82*kk,np.full_like(img,NAVY),0.82*kk,0)
+            a=1.0
+            team_photo(img,i,(cx,cy-40),168,col,op=a)
+            text(img,TEAM_MEMBERS[i][0],cx,cy+60,'b',26,WH,op=a)
+            text(img,TEAM_MEMBERS[i][1],cx,cy+92,'r',19,GY,op=a)
+        if t>6.9:
+            kk=eo(seg(t,6.9,7.5)); img[:]=cv2.addWeighted(img,1-0.82*kk,np.full_like(img,NAVY),0.82*kk,0)
             text(img,'TEAM',640,250,'m',36,GY,op=kk); text(img,'AKASHTORI',640,340,'b',100,WH,op=kk)
             line(img,(380,410),(380+520*kk,410),AM,5)
     else:
