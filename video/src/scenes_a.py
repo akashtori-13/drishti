@@ -71,8 +71,8 @@ TEAM_PHOTOS=_load_team_photos()
 # 720p card geometry (spec scaled ×0.667): card 325×231, photo 150 r27,
 # accent border 3px + 3px dark gap, glow 19px @35%, stack 15/5, name 23px
 # fixed 2-line area, role 14px tracked. All cards pixel-identical.
-CARD_W, CARD_H = 325, 231
-CARD_PHOTO, CARD_R = 150, 27
+CARD_W, CARD_H = 325, 248
+CARD_PHOTO, CARD_R = 132, 27
 def _tracked(draw, xy, s, font, fill, tracking, anchor='ma'):
     widths = [draw.textlength(ch, font=font) for ch in s]
     adv = [w + tracking * font.size for w in widths]
@@ -117,17 +117,10 @@ def team_card(img, slot, cx, cy, ring_col, op=1.0):
     glass = np.asarray([36, 20, 17], np.float32)
     m = np.clip(ov * op, 0, 1)[..., None]
     img[:] = np.clip(img.astype(np.float32) * (1 - m) + glass * m, 0, 255).astype(img.dtype)
-    edge = np.zeros((H, W), np.float32)
-    cv2.rectangle(edge, (x0, y0 + 24), (x0 + CARD_W, y0 + CARD_H - 24), 1.0, 1)
-    cv2.rectangle(edge, (x0 + 24, y0), (x0 + CARD_W - 24, y0 + CARD_H), 1.0, 1)
-    for qx, qy in ((x0 + 24, y0 + 24), (x0 + CARD_W - 24, y0 + 24),
-                   (x0 + 24, y0 + CARD_H - 24), (x0 + CARD_W - 24, y0 + CARD_H - 24)):
-        cv2.circle(edge, (qx, qy), 24, 1.0, 1)
-    me = np.clip(edge * op, 0, 1)[..., None]
-    img[:] = np.clip(img.astype(np.float32) * (1 - me) + np.asarray([90, 90, 110], np.float32) * me, 0, 255).astype(img.dtype)
-    # photo: accent border 3px + 3px dark gap, glow 19px @35% clipped above text
+    # (no edge outline: glass edge stays clean)
+    # photo: accent border 3px + 3px dark gap, glow clipped above text
     acc = np.asarray(ring_col[::-1], np.float32)
-    px, py, ps, pr = x0 + (CARD_W - CARD_PHOTO) // 2, y0 + 19, CARD_PHOTO, CARD_R
+    px, py, ps, pr = x0 + (CARD_W - CARD_PHOTO) // 2, y0 + 16, CARD_PHOTO, CARD_R
     glow = np.zeros((H, W), np.float32)
     cv2.rectangle(glow, (px - 6, py - 6 + pr), (px + ps + 6, py + ps - 6 - pr), 1.0, -1)
     cv2.rectangle(glow, (px - 6 + pr, py - 6), (px + ps + 6 - pr, py + ps + 6), 1.0, -1)
@@ -171,9 +164,9 @@ def team_card(img, slot, cx, cy, ring_col, op=1.0):
     rtxt = role
     while dr.textlength(''.join(rtxt), font=fr) > CARD_W - 32 and fr.size > 11:
         fr = PFont.truetype('fonts/Poppins-Medium.ttf', fr.size - 1)
-    ny = y0 + 19 + ps + 15
+    ny = y0 + 16 + 132 + 12
     if len(lines) == 1:
-        ny += 14
+        ny += 13
     for li, ln in enumerate(lines):
         fn = fbn if li == 0 else PFont.truetype('fonts/Poppins-Medium.ttf', 17)
         fc = (245, 243, 236) if li == 0 else (174, 182, 208)
@@ -181,8 +174,8 @@ def team_card(img, slot, cx, cy, ring_col, op=1.0):
             _tracked(dr, (cx, ny), ln, fn, fc, 0.0)
         else:
             dr.text((cx, ny), ln, font=fn, fill=fc, anchor='ma')
-        ny += 28
-    ry = y0 + 19 + ps + 15 + 56 + 5
+        ny += 26
+    ry = y0 + 16 + 132 + 12 + 52 + 4
     _tracked(dr, (cx, ry), rtxt, fr, light, 0.10)
     ov = np.asarray(pil).astype(np.float32)
     am = (ov[..., 3:4] / 255.0) * op
@@ -365,15 +358,14 @@ def sc_team(img,t,d,C):
             dr = PDraw.Draw(ov)
             fb = PFont.truetype('fonts/Poppins-Bold.ttf', 35)
             fm = PFont.truetype('fonts/Poppins-Medium.ttf', 16)
-            _tracked(dr, (W // 2, 46), 'MEET THE TEAM', fb, (242, 240, 232), 0.14)
-            _tracked(dr, (W // 2, 46 + 12 + 26), 'TEAM AKASHTORI · Planet X and SPHEREx', fm, (174, 182, 208), 0.12)
+            dr.text((W // 2, 34), 'MEET THE TEAM', font=fb, fill=(242, 240, 232), anchor='ma')
             arr = np.asarray(ov).astype(np.float32)
             am = (arr[..., 3:4] / 255.0) * ta
             img[:] = np.clip(img.astype(np.float32) * (1 - am) + arr[..., :3][..., ::-1] * am, 0, 255).astype(img.dtype)
     if t<4.5:
         # photo cards: fast stagger (all in by ~1.2s), 2.5s+ hold, 0.35s exit
         for i,(nm,col) in enumerate(TEAM):
-            cx=640+((i%3)-1)*357; cy=250+(i//3)*268
+            cx=640+((i%3)-1)*357; cy=222+(i//3)*288
             tt=0.2+i*0.10
             a=1.0 if t>=tt+0.4 else eb(seg(t,tt-0.05,tt+0.4))
             if a<=0: continue
@@ -383,7 +375,7 @@ def sc_team(img,t,d,C):
     elif t<7.4:
         # hold the photo grid; AKASHTORI text overlay animation
         for i,(nm,col) in enumerate(TEAM):
-            cx=640+((i%3)-1)*357; cy=250+(i//3)*268
+            cx=640+((i%3)-1)*357; cy=222+(i//3)*288
             team_card(img,i,cx,cy,col,op=1.0)
         if t>4.35:
             kin=eo(seg(t,4.35,5.15)); kout=1-seg(t,7.0,7.4)
