@@ -154,8 +154,10 @@ def team_card(img, slot, cx, cy, ring_col, op=1.0):
     for qx, qy in ((pr, pr), (ps - pr, pr), (pr, ps - pr), (ps - pr, ps - pr)):
         cv2.circle(clip, (qx, qy), pr, 1.0, -1)
     a = np.clip(alpha * clip * op, 0, 1)[..., None]
-    img[py:py + ps, px:px + ps] = np.clip(
-        img[py:py + ps, px:px + ps].astype(np.float32) * (1 - a) + arr.astype(np.float32) * a, 0, 255).astype(img.dtype)
+    if slot not in (4, 5):
+        # face photo; slots 4-5 (Himel, Zubayer) keep the dark disc + initials
+        img[py:py + ps, px:px + ps] = np.clip(
+            img[py:py + ps, px:px + ps].astype(np.float32) * (1 - a) + arr.astype(np.float32) * a, 0, 255).astype(img.dtype)
     # name (auto-shrink, Saikat wraps) + role (accent-lightened, one line)
     name, role = TEAM_MEMBERS[slot][0], TEAM_MEMBERS[slot][1].upper()
     pil = PImage.new('RGBA', (W, H), (0, 0, 0, 0))
@@ -170,6 +172,12 @@ def team_card(img, slot, cx, cy, ring_col, op=1.0):
         head, tail = name.rsplit(' (', 1) if ' (' in name else (name, '')
         lines = [head, '(' + tail] if tail else [head]
     light = tuple(int(0.7 * v + 0.3 * 255) for v in ring_col[::-1])
+    if slot in (4, 5):
+        # avatar: accent initials centred on the dark disc
+        parts = TEAM_MEMBERS[slot][0].split()
+        init = (parts[0][0] + parts[-1][0]).upper()
+        fa = PFont.truetype('fonts/Poppins-Bold.ttf', 44)
+        dr.text((cx, py + ps // 2), init, font=fa, fill=light, anchor='mm')
     fr = PFont.truetype('fonts/Poppins-Medium.ttf', 14)
     rtxt = role
     while dr.textlength(''.join(rtxt), font=fr) > MEM_TEXT_W and fr.size > 11:
@@ -358,45 +366,37 @@ def sc_waste(img,t,d,C):
 def sc_team(img,t,d,C):
     bg(img,t)
     c0=C[0]; c1=C[1]; c2=C[2]; c3=C[3]
-    if t<4.5:
-        # title block (cap-top ~43px): MEET THE TEAM + subtitle
-        from PIL import Image as PImage, ImageDraw as PDraw, ImageFont as PFont
-        H, W = img.shape[:2]
-        ta=eo(seg(t,0.2,0.8))
-        if ta>0.01:
-            ov = PImage.new('RGBA', (W, H), (0, 0, 0, 0))
-            dr = PDraw.Draw(ov)
-            fb = PFont.truetype('fonts/Poppins-Bold.ttf', 35)
-            fm = PFont.truetype('fonts/Poppins-Medium.ttf', 16)
-            dr.text((W // 2, 34), 'MEET THE TEAM', font=fb, fill=(242, 240, 232), anchor='ma')
-            arr = np.asarray(ov).astype(np.float32)
-            am = (arr[..., 3:4] / 255.0) * ta
-            img[:] = np.clip(img.astype(np.float32) * (1 - am) + arr[..., :3][..., ::-1] * am, 0, 255).astype(img.dtype)
-    if t<4.5:
-        # photo cards: fast stagger (all in by ~1.2s), 2.5s+ hold, 0.35s exit
+    if t<c2[0]:
+        # room: six of us around a small screen (first team cut, cue 0 0-5.7s)
+        k=eo(seg(t,0,0.8))
+        rrect(img,500,250,280,170,14,RGB(14,18,40),-1,k); rrect(img,500,250,280,170,14,CY,3,k)
+        pts=[(520+i*5,380-30*math.sin(i*0.25)-14*math.sin(i*0.9+t)-i*0.4) for i in range(50)]
+        poly(img,pts,CY,k,th=2,closed=False); dglow(img,(640,335),150,CY,0.2*k)
+        text(img,'?',640,335,'b',60,mix(NAVY,AM,0.9),op=k*0.5)
+        rrect(img,600,420,80,10,4,GY,-1,k); rrect(img,560,430,160,8,4,GY,-1,k)
         for i,(nm,col) in enumerate(TEAM):
-            cx=640+((i%3)-1)*357; cy=249+(i//3)*280
-            tt=0.2+i*0.10
-            a=1.0 if t>=tt+0.4 else eb(seg(t,tt-0.05,tt+0.4))
-            if a<=0: continue
-            a=min(a,1.0)*(1-seg(t,4.15,4.5))
-            if a<=0: continue
-            team_card(img,i,cx,cy,col,op=a)
-    elif t<7.4:
-        # hold the photo grid; AKASHTORI text overlay animation
+            a=-math.pi/2+i*(6.2832/6)+0.5; px=640+380*math.cos(a); py=360+250*math.sin(a)
+            kk=eb(seg(t,0.3+i*0.12,0.9+i*0.12))
+            circ(img,(px,py),38*kk,col); circ(img,(px,py),38*kk,WH,3)
+            lx=math.cos(a+3.14)*3; ly=math.sin(a+3.14)*3
+            if kk>0.5: circ(img,(px+lx-10,py+ly-4),4,NAVY); circ(img,(px+lx+10,py+ly-4),4,NAVY)
+            line(img,(px,py),(px+(640-px)*0.08,py+(360-py)*0.08),col,1,0.0)
+    elif t<c3[0]:
+        # intro badges pop in fast and hold (slots 4-5: Himel/Zubayer as avatars)
         for i,(nm,col) in enumerate(TEAM):
-            cx=640+((i%3)-1)*357; cy=249+(i//3)*280
-            team_card(img,i,cx,cy,col,op=1.0)
-        if t>4.35:
-            kin=eo(seg(t,4.35,5.15)); kout=1-seg(t,7.0,7.4)
-            kk=kin*kout
-            img[:]=cv2.addWeighted(img,1-0.82*kk,np.full_like(img,NAVY),0.82*kk,0)
+            cx=640+((i%3)-1)*400; cy=219+(i//3)*270
+            tt=c2[0]+0.05+i*0.08
+            a=1.0 if t>=tt+0.35 else eb(seg(t,tt-0.05,tt+0.35))
+            if a<=0: continue
+            team_card(img,i,cx,cy,col,op=min(a,1.0))
+        if t>c3[0]-0.6:
+            kk=eo(seg(t,c3[0]-0.6,c3[0]+0.2)); img[:]=cv2.addWeighted(img,1-0.82*kk,np.full_like(img,NAVY),0.82*kk,0)
             text(img,'TEAM',640,250,'m',36,GY,op=kk); text(img,'AKASHTORI',640,340,'b',100,WH,op=kk)
             line(img,(380,410),(380+520*kk,410),AM,5)
     else:
         img[:]=NAVY; starfield(img,t,0.8)
-        k=eb(seg(t,7.4,8.2))
-        logo(img,(640,275),290,seg(t,7.25,9.25),1.0,t)
+        k=eb(seg(t,c3[0],c3[0]+0.7))
+        logo(img,(640,275),290,seg(t,c3[0],c3[0]+1.3),1.0,t)
         text(img,'DRISHTI',640,520,'b',int(max(10,110*k)),WH)
 def sc_throw(img,t,d,C):
     bg(img,t)
