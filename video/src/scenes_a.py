@@ -366,7 +366,7 @@ def sc_waste(img,t,d,C):
 def sc_team(img,t,d,C):
     bg(img,t)
     c0=C[0]; c1=C[1]; c2=C[2]; c3=C[3]
-    if t<c2[0]:
+    if t<5.0:
         # room: six of us around a small screen (first team cut, cue 0 0-5.7s)
         k=eo(seg(t,0,0.8))
         rrect(img,500,250,280,170,14,RGB(14,18,40),-1,k); rrect(img,500,250,280,170,14,CY,3,k)
@@ -385,7 +385,7 @@ def sc_team(img,t,d,C):
         # intro badges pop in fast and hold (slots 4-5: Himel/Zubayer as avatars)
         for i,(nm,col) in enumerate(TEAM):
             cx=640+((i%3)-1)*400; cy=219+(i//3)*270
-            tt=c2[0]+0.05+i*0.08
+            tt=5.05+i*0.10
             a=1.0 if t>=tt+0.35 else eb(seg(t,tt-0.05,tt+0.35))
             if a<=0: continue
             team_card(img,i,cx,cy,col,op=min(a,1.0))
