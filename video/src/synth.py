@@ -97,7 +97,7 @@ put(at(3,0.1),pop(330),0.4)
 for i in range(6): put(at(3,0.3+i*0.12),pop(400+i*60),0.25,-0.7+i*0.28)
 for i in range(6): put(at(3,0.3+i*0.12+0.02),bell(784*2**(i/6),0.8),0.12)
 put(at(3,0.5),shimmer(2.0,1800),0.4)
-for i in range(6): put(at(3,10.45+i*0.08),pop(420+i*55),0.3,-0.7+i*0.28)
+for i in range(6): put(at(3,5.05+i*0.10),pop(420+i*55),0.3,-0.7+i*0.28)
 put(at(3,11.3),impact(0.6,2),0.65); put(at(3,11.3),whoosh(0.7),0.4)
 put(at(3,11.7),riser(1.2),0.55); put(at(3,12.05),pop(260),0.4); put(at(3,12.35),whoosh(0.5),0.4); put(at(3,12.6),impact(1.0,3.0),0.9); put(at(3,12.6),shimmer(2.5,1500),0.6)
 # 4 throw
