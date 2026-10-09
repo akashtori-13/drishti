@@ -26,6 +26,36 @@ interface Card {
   stat: string; date: string; png: string | null;
   motion: number | null; mjds: Array<number | undefined>;
   objects: ReportObject[];
+  popular: boolean; tag: string;
+}
+
+interface PopularTarget { id: string; name: string; ra: number; dec: number; type: string; }
+
+// First 1000 of the curated famous-first popular-targets list (position =
+// popularity proxy). Measured showcases always pin above these.
+const POPULAR_URL = '/data/popular-targets.json';
+const POPULAR_MAX = 1000;
+const PAGE = 60;
+
+async function getPopular(): Promise<PopularTarget[]> {
+  try {
+    const r = await fetch(POPULAR_URL);
+    if (!r.ok) return [];
+    const docs = (await r.json()) as PopularTarget[];
+    return Array.isArray(docs) ? docs.slice(0, POPULAR_MAX) : [];
+  } catch {
+    return [];
+  }
+}
+
+function popularCards(docs: PopularTarget[]): Card[] {
+  return docs.map((d) => ({
+    id: d.id, name: d.name, ra: d.ra, dec: d.dec, band: 3,
+    kind: 'pending' as Kind, knownName: '',
+    stat: 'not yet measured', date: 'queued', png: null,
+    motion: null, mjds: [], objects: [],
+    popular: true, tag: d.type,
+  }));
 }
 
 type Filter = 'all' | 'unknown' | 'known';
@@ -81,6 +111,7 @@ function cardsFrom(showcases: Showcase[], reports: Map<string, Report>): Card[] 
       date: (s.epochs[0]?.mjd ? `MJD ${s.epochs[0].mjd}` : 'QR2'),
       png: s.epochs[0]?.png ?? null, motion, mjds,
       objects: rep?.objects ?? [],
+      popular: false, tag: BANDS[(s.epochs[0]?.band ?? 3) - 1].label,
     };
   });
   const rank: Record<Kind, number> = { known: 0, mover: 1, variable: 2, unidentified: 3, pending: 4 };
@@ -149,21 +180,39 @@ export default function CandidatesPage() {
   }, [colorblind]);
   const docsRef = useRef(new Map<string, Showcase>());
   const repsRef = useRef(new Map<string, Report>());
+  const popRef = useRef<Card[]>([]);
   const gridRef = useRef<HTMLDivElement>(null);
   useTiltGroup(gridRef);
+  // lazy grid: first PAGE cards render, the sentinel appends more on scroll
+  const [visible, setVisible] = useState(PAGE);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const ob = new IntersectionObserver((es) => {
+      if (es.some((e) => e.isIntersecting)) setVisible((v) => v + PAGE);
+    }, { rootMargin: '800px' });
+    ob.observe(el);
+    return () => ob.disconnect();
+    // re-attach once the sentinel mounts (list loads async) and after each page
+  }, [visible, cards.length]);
+  // switching filters restarts the lazy list from the top page (see onClick below)
 
   useEffect(() => {
     let alive = true;
     void Promise.all([
       Promise.all(SHOWCASE_IDS.map((id) => getShowcase(id).catch(() => null))),
       Promise.all(SHOWCASE_IDS.map((id) => getReport(id))),
-    ]).then(([docs, reps]) => {
+      getPopular(),
+    ]).then(([docs, reps, pop]) => {
       if (!alive) return;
       const map = new Map<string, Report>();
       for (const r of reps) if (r) map.set(r.id, r);
       docsRef.current = new Map(docs.filter((d): d is Showcase => d !== null).map((d) => [d.id, d]));
       repsRef.current = map;
-      setCards(cardsFrom([...docsRef.current.values()], map));
+      popRef.current = popularCards(pop);
+      setVisible(PAGE);
+      setCards([...cardsFrom([...docsRef.current.values()], map), ...popRef.current]);
     });
     // Background revalidation: getShowcase() serves stale instantly and refreshes
     // behind. Fresh arrivals (e.g. newly indexed PNGs) update the card in place.
@@ -178,17 +227,21 @@ export default function CandidatesPage() {
       } catch { /* fall through and swap */ }
       docsRef.current.set(fresh.id, fresh);
       if (!alive) return;
-      setCards(cardsFrom([...docsRef.current.values()], repsRef.current));
+      setCards([...cardsFrom([...docsRef.current.values()], repsRef.current), ...popRef.current]);
     };
     window.addEventListener('sh-revalidate', onRevalidate);
     return () => { alive = false; window.removeEventListener('sh-revalidate', onRevalidate); };
   }, []);
 
-  const list = cards.filter((c) =>
-    filter === 'all' ? true : filter === 'known' ? c.kind === 'known' : c.kind !== 'known');
+  const matchFilter = (c: Card) =>
+    filter === 'all' ? true : filter === 'known' ? c.kind === 'known'
+      : c.kind !== 'known' && c.kind !== 'pending';
+  const list = cards.filter(matchFilter);
+  const shown = list.slice(0, visible);
 
   const count = (f: Filter) => cards.filter((c) =>
-    f === 'all' ? true : f === 'known' ? c.kind === 'known' : c.kind !== 'known').length;
+    f === 'all' ? true : f === 'known' ? c.kind === 'known'
+      : c.kind !== 'known' && c.kind !== 'pending').length;
 
   const exportAll = (fmt: 'csv' | 'json') => {
     const rows = list.map((c) => ({
@@ -210,16 +263,16 @@ export default function CandidatesPage() {
     <div className="page">
       <div className="page-head">
         <div>
-          <p className="hero-kicker">Measured fields · sorted by significance</p>
+          <p className="hero-kicker">Measured fields first · queued targets below</p>
           <h1>Featured fields</h1>
-          <p>Curated SPHEREx fields, each measured by the detection pipeline (aligned difference, dipole significance, light curves). Kinds come from real numbers — or honest “unidentified”.</p>
+          <p>Measured SPHEREx fields, sorted by significance — then the 1,000 most popular sky targets in popularity order. Queued cards are honest placeholders: not yet measured, cutout pending.</p>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
           <div className="segment" role="group" aria-label="Filter candidates">
             {(['all', 'unknown', 'known'] as const).map((f) => (
               <button
                 key={f} type="button" aria-pressed={f === filter}
-                onClick={() => setFilter(f)}
+                onClick={() => { setFilter(f); setVisible(PAGE); }}
               >
                 {f === 'all' ? 'All' : f === 'known' ? 'Known objects' : 'Unidentified'}{' '}
                 <span className="count-pill" aria-hidden="true">{count(f)}</span>
@@ -232,11 +285,43 @@ export default function CandidatesPage() {
       </div>
 
       {!list.length && <p className="empty">No candidates match this filter.</p>}
+      {!!list.length && (
+        <p className="mono" aria-live="polite" style={{ color: '#8a90ab', fontSize: 12 }}>
+          Showing {shown.length} of {list.length}
+        </p>
+      )}
       <div className="cand-grid" ref={gridRef}>
-        {list.map((c, i) => {
+        {shown.map((c, i) => {
           const band = BANDS[c.band - 1];
           // thumbnail tone cycles per position so neighbours never match
           const tone = colorblind ? 'cb' : ((['gray', 'color', 'cb'] as const)[(i + toneShift) % 3]);
+          if (c.popular) {
+            // queued target: static card, no preview — nothing measured yet
+            return (
+              <Reveal key={c.id} index={i}>
+              <div className="cand-wrap">
+              <article className="cand" aria-label={`${c.name}, queued, not yet measured`}>
+                <div className="cand-thumb" data-tone={tone}>
+                  <Thumb card={c} tone={tone} />
+                </div>
+                <span className="cand-badges">
+                  <span className="badge">
+                    <span className="dot" />Queued
+                  </span>
+                  <span className="cand-score mono">{c.stat}</span>
+                </span>
+                <div className="cand-body">
+                  <div className="cand-name">{c.name}</div>
+                  <div className="cand-meta mono"><span>{c.tag}</span><span>{c.date}</span></div>
+                  <div className="cand-meta mono">
+                    <span>RA {c.ra.toFixed(2)} Dec {c.dec.toFixed(2)}</span>
+                  </div>
+                </div>
+              </article>
+              </div>
+              </Reveal>
+            );
+          }
           return (
             <Reveal key={c.id} index={i}>
             <div className="cand-wrap">
@@ -276,6 +361,11 @@ export default function CandidatesPage() {
           );
         })}
       </div>
+      {shown.length < list.length && (
+        <div ref={sentinelRef} aria-hidden="true" style={{ minHeight: 24 }}>
+          <p className="mono" style={{ color: '#8a90ab', fontSize: 12 }}>Loading more…</p>
+        </div>
+      )}
       {objModal && (
         <ObjModal
           name={objModal.name}
