@@ -91,8 +91,8 @@ Pick one and say why.
 **Write benefit first.** Features are what it does. Benefits are what that means for them.
 
 **Be specific.**
-- ❌ "Save time and streamline"
-- ✅ "Cut your weekly reporting from 4 hours to 15 minutes"
+- <img src="../../assets/icons/cross.svg" alt="Avoid" width="18"> "Save time and streamline"
+- <img src="../../assets/icons/check.svg" alt="Prefer" width="18"> "Cut your weekly reporting from 4 hours to 15 minutes"
 
 **Reduce risk.** Pick at least one: free trial, free plan, no credit card, cancel anytime, money back guarantee.
 
