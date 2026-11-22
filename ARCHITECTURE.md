@@ -128,8 +128,8 @@ bundle <10MB · each showcase <2s offline · keyboard-only pass · 360px pass.
 
 ## 7. Roadmap
 
-M1 ✅ scaffold + transport + canvas map. M2 ✅ fallbacks deleted, TAP bounded.
-M3 ✅ full viewer (modes/diff/stretch/RGB/spectrum), search (sexagesimal/constellations/Sesame/surprise),
+M1 <img src="assets/icons/check.svg" alt="done" width="14"> scaffold + transport + canvas map. M2 <img src="assets/icons/check.svg" alt="done" width="14"> fallbacks deleted, TAP bounded.
+M3 <img src="assets/icons/check.svg" alt="done" width="14"> full viewer (modes/diff/stretch/RGB/spectrum), search (sexagesimal/constellations/Sesame/surprise),
 permalinks, export, tutorial/tours/glossary, `/api/detect`, real ecliptic PNGs.
 M4: ecliptic census (~864 cells) → real surveyed belt on hero; per-band PNG rows.
 M5: weekly Action live; full-sky convergence meter (`x/2592 cells surveyed` — itself real; 72×36 slots, 2 polar cells empty).

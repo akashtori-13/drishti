@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1010 36" width="1010" height="36" role="img" aria-label="Project badges: NASA Space Apps 2026, MIT license, SPHEREx QR2 IRSA, Next.js 16, FastAPI, PWA offline">
+  <g font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="12" font-weight="600">
+    <g>
+      <rect x="1" y="1" width="168" height="34" rx="6" fill="#0f2942" stroke="#1e3a5f"/>
+      <rect x="1" y="1" width="84" height="34" rx="6" fill="#0b4f6c"/>
+      <path d="M1 7a6 6 0 0 1 6-6h72v34H7a6 6 0 0 1-6-6z" fill="#0b4f6c"/>
+      <text x="12" y="24" fill="#a5f3fc">NASA</text>
+      <text x="92" y="24" fill="#e0f2fe">SPACE APPS 26</text>
+    </g>
+    <g>
+      <rect x="177" y="1" width="104" height="34" rx="6" fill="#132a1f" stroke="#1e4636"/>
+      <text x="190" y="24" fill="#86efac">MIT LICENSE</text>
+    </g>
+    <g>
+      <rect x="289" y="1" width="216" height="34" rx="6" fill="#2b1d0b" stroke="#6b4a12"/>
+      <rect x="289" y="1" width="90" height="34" rx="6" fill="#8a5a0c"/>
+      <path d="M289 7a6 6 0 0 1 6-6h78v34h-78a6 6 0 0 1-6-6z" fill="#8a5a0c"/>
+      <text x="300" y="24" fill="#fde68a">SPHEREx</text>
+      <text x="388" y="24" fill="#fef3c7">QR2 · IRSA</text>
+    </g>
+    <g>
+      <rect x="513" y="1" width="132" height="34" rx="6" fill="#0f172a" stroke="#334155"/>
+      <text x="526" y="24" fill="#e2e8f0">NEXT.JS 16</text>
+    </g>
+    <g>
+      <rect x="653" y="1" width="118" height="34" rx="6" fill="#0c1b2a" stroke="#1d3b57"/>
+      <text x="666" y="24" fill="#93c5fd">FASTAPI</text>
+    </g>
+    <g>
+      <rect x="779" y="1" width="230" height="34" rx="6" fill="#0b1f22" stroke="#134e4a"/>
+      <text x="792" y="24" fill="#5eead4">PWA · OFFLINE · DESKTOP</text>
+    </g>
+  </g>
+</svg>
