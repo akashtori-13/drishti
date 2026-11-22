@@ -99,73 +99,22 @@ Real captures of the shipped app. No mock-ups, no generated science imagery.
 
 One source builds every client. `spectrahunt-web/out` (Next.js static export) is the only web artifact — the website, the PWA, the Android shell and the desktop shells all serve that exact directory. No per-platform code forks.
 
-```mermaid
-flowchart TD
-    IRSA["IRSA (SPHEREx QR2)<br/>TAP · SIA2 · IBE · SkyBoT · SIMBAD · Gaia"]
-    PIPE["Python pipeline<br/>backend/ + scripts/"]
-    BUNDLE["Static bundle<br/>spectrahunt-web/public<br/>showcases · reports · coverage · cutouts"]
-    OUT["spectrahunt-web/out<br/>Next.js static export"]
-    WEB["Web + PWA<br/>Netlify / any static host"]
-    APK["Android APK<br/>Capacitor shell"]
-    DESK["Windows + Linux<br/>Tauri shells"]
-    LIVE["Live API (optional)<br/>FastAPI :8000, dev + on-demand"]
+<div align="center">
+<img src="assets/diagrams/architecture.svg" alt="Architecture: IRSA data flows through the Python pipeline into the static bundle, which builds the web, PWA, Android and desktop clients plus an optional live API." width="560">
+<br><sub>Diagram source: <code>assets/diagrams/architecture.mmd</code>.</sub>
+</div>
 
-    IRSA --> PIPE --> BUNDLE --> OUT
-    OUT --> WEB
-    OUT --> APK
-    OUT --> DESK
-    WEB -->|install prompt + SW| PWA["Installed PWA<br/>(offline-capable)"]
-    PIPE -.->|dev / on-demand proxy| LIVE
-    LIVE -.->|DATA_MODE=live| WEB
-```
-
-```mermaid
-flowchart LR
-    subgraph clients ["Clients (all read the same bundle)"]
-        B1["/ (home)"]
-        B2["/sky (map + AR)"]
-        B3["/blink/[id]"]
-        B4["/candidates"]
-        B5["/about"]
-    end
-    subgraph data ["Static data API"]
-        S["showcases/*.json<br/>epochs + PNGs + bands"]
-        R["reports/*.json<br/>movers · σ · light curves · spectra"]
-        C["coverage.json<br/>2,590 measured cells"]
-        P["cutouts/ + compare/<br/>rendered imagery"]
-    end
-    clients --> data
-    EXT["Third-party apps<br/>raw.githubusercontent.com"] --> data
-```
+<div align="center">
+<img src="assets/diagrams/data-flow.svg" alt="All clients read the same static data API: showcases, reports, coverage and cutouts." width="500">
+<br><sub>Diagram source: <code>assets/diagrams/data-flow.mmd</code>.</sub>
+</div>
 
 ### Data pipeline
 
-```mermaid
-flowchart TD
-    TAP["IRSA TAP<br/>spherex.artifact ⋈ plane"]
-    SIA["SIA2 fallback<br/>(~1d lag)"]
-    IBE["IRSA IBE<br/>FITS cutouts"]
-    DISC["epochs.py<br/>discover_epochs"]
-    REN["cutouts.py<br/>parse / mask / zscale+asinh"]
-    ALI["align.py<br/>WCS reproject + correlation"]
-    PHO["photometry.py<br/>aperture flux · σ maps · dipoles"]
-    CLS["classify_fields.py<br/>reports/*.json"]
-    CEN["sky_census.py<br/>coverage.json (sharded, resumable)"]
-    IDX["build_showcases.py<br/>showcase indexer"]
-    BND["build_bandstack.py<br/>all-6-detector PNGs"]
-    NEP["nep_stack.py<br/>median deep-stack"]
-    CMP["fetch_compare.py<br/>DSS2 + 2MASS context"]
-
-    TAP --> DISC
-    SIA --> DISC
-    DISC --> IBE
-    IBE --> REN --> ALI --> PHO --> CLS
-    DISC --> CEN
-    REN --> IDX
-    REN --> BND
-    REN --> NEP
-    DISC --> CMP
-```
+<div align="center">
+<img src="assets/diagrams/pipeline.svg" alt="Data pipeline: IRSA TAP and SIA2 discover epochs; IBE cutouts are rendered, aligned, measured and classified into reports and coverage." width="700">
+<br><sub>Diagram source: <code>assets/diagrams/pipeline.mmd</code>.</sub>
+</div>
 
 **Key scripts** (`scripts/`): `sky_census.py --shard I/N --progress f` + `--merge` (all-sky census), `build_showcases.py --only <id>` (oldest+newest pairing, ≤5 sibling frames for IBE 422s), `build_bandstack.py`, `classify_fields.py --only/--force`, `nep_stack.py --n 12`, `process_field.py --ra --dec --band`, `warm_cache.py`, `nightly.sh`, `release.py`, `extract_track.py`, `pairfit.py`, `ranking.py`, `forensics_flip.py`, `audit_discard.py`, `gen_precache.py`, `build_multiepoch.py`, `real_coverage.py`, `expand_swarm.py`.
 
@@ -298,6 +247,25 @@ cd spectrahunt-web && npm run build            # static export to out/
 ```
 
 Bundle budget <15 MB (PNG+JSON). Weekly refresh via `.github/workflows/refresh.yml`.
+
+## About DRISHTI
+
+DRISHTI is built by **team AKASHTORI** for the **NASA Space Apps Challenge 2026**
+(Advanced · Astrophysics / Planets & Moons / Software). Six people, one infrared
+sky: we design the system, measure the fields, check the science and tell the
+story — so anyone can hunt what moves.
+
+| | In-app section | What you'll find |
+| --- | --- | --- |
+| <img src="assets/icons/book.svg" alt="" width="26"> | [About](/about) | The mission, the real data layers, the honesty rule and how to cite us. |
+| <img src="assets/icons/candidates.svg" alt="" width="26"> | [Crew](/crew) | The six people behind the project, with roles and contact links. |
+| <img src="assets/icons/orbit.svg" alt="" width="26"> | [Mission](/mission) | The LVF same-band rule, band table, tours, glossary and method. |
+| <img src="assets/icons/measure.svg" alt="" width="26"> | [Featured](/candidates) | Measured movers, variables and unidentified candidates. |
+
+The same content lives in the repository: [SYSTEM_DESIGN.md](SYSTEM_DESIGN.md),
+[docs/GUIDE.md](docs/GUIDE.md) and the [documentation index](docs/README.md).
+
+---
 
 ## Citation
 

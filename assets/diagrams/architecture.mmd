@@ -1,0 +1,17 @@
+flowchart TD
+    IRSA["IRSA (SPHEREx QR2)<br/>TAP · SIA2 · IBE · SkyBoT · SIMBAD · Gaia"]
+    PIPE["Python pipeline<br/>backend/ + scripts/"]
+    BUNDLE["Static bundle<br/>spectrahunt-web/public<br/>showcases · reports · coverage · cutouts"]
+    OUT["spectrahunt-web/out<br/>Next.js static export"]
+    WEB["Web + PWA<br/>Netlify / any static host"]
+    APK["Android APK<br/>Capacitor shell"]
+    DESK["Windows + Linux<br/>Tauri shells"]
+    LIVE["Live API (optional)<br/>FastAPI :8000, dev + on-demand"]
+
+    IRSA --> PIPE --> BUNDLE --> OUT
+    OUT --> WEB
+    OUT --> APK
+    OUT --> DESK
+    WEB -->|install prompt + SW| PWA["Installed PWA<br/>(offline-capable)"]
+    PIPE -.->|dev / on-demand proxy| LIVE
+    LIVE -.->|DATA_MODE=live| WEB

@@ -1,0 +1,16 @@
+flowchart LR
+    subgraph clients ["Clients (all read the same bundle)"]
+        B1["/ (home)"]
+        B2["/sky (map + AR)"]
+        B3["/blink/[id]"]
+        B4["/candidates"]
+        B5["/about"]
+    end
+    subgraph data ["Static data API"]
+        S["showcases/*.json<br/>epochs + PNGs + bands"]
+        R["reports/*.json<br/>movers · σ · light curves · spectra"]
+        C["coverage.json<br/>2,590 measured cells"]
+        P["cutouts/ + compare/<br/>rendered imagery"]
+    end
+    clients --> data
+    EXT["Third-party apps<br/>raw.githubusercontent.com"] --> data
