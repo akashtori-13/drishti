@@ -11,6 +11,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/sky`, lastModified: now },
     { url: `${base}/candidates`, lastModified: now },
     { url: `${base}/about`, lastModified: now },
+    { url: `${base}/settings`, lastModified: now },
+    { url: `${base}/mission`, lastModified: now },
+    { url: `${base}/crew`, lastModified: now },
     ...SHOWCASE_IDS.map((id) => ({ url: `${base}/blink/${id}`, lastModified: now })),
   ];
 }

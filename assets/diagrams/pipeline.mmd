@@ -1,0 +1,24 @@
+flowchart TD
+    TAP["IRSA TAP<br/>spherex.artifact ⋈ plane"]
+    SIA["SIA2 fallback<br/>(~1d lag)"]
+    IBE["IRSA IBE<br/>FITS cutouts"]
+    DISC["epochs.py<br/>discover_epochs"]
+    REN["cutouts.py<br/>parse / mask / zscale+asinh"]
+    ALI["align.py<br/>WCS reproject + correlation"]
+    PHO["photometry.py<br/>aperture flux · σ maps · dipoles"]
+    CLS["classify_fields.py<br/>reports/*.json"]
+    CEN["sky_census.py<br/>coverage.json (sharded, resumable)"]
+    IDX["build_showcases.py<br/>showcase indexer"]
+    BND["build_bandstack.py<br/>all-6-detector PNGs"]
+    NEP["nep_stack.py<br/>median deep-stack"]
+    CMP["fetch_compare.py<br/>DSS2 + 2MASS context"]
+
+    TAP --> DISC
+    SIA --> DISC
+    DISC --> IBE
+    IBE --> REN --> ALI --> PHO --> CLS
+    DISC --> CEN
+    REN --> IDX
+    REN --> BND
+    REN --> NEP
+    DISC --> CMP
